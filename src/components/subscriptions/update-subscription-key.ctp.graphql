@@ -1,0 +1,5 @@
+mutation UpdateSubscription($id: String, $version: Long!, $actions: [SubscriptionUpdateAction!]!) {
+  updateSubscription(version: $version, id: $id, actions: $actions) {
+    id
+  }
+}

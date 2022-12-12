@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
 import { Switch, Route, useRouteMatch } from 'react-router-dom';
-import Spacings from '@commercetools-uikit/spacings';
-import Channels from './components/channels';
 import Welcome from './components/welcome';
+import States from './components/states';
+import Subscriptions from './components/subscriptions';
+import SubscriptionDetail from './components/subscriptions/SubscriptionDetail';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -22,16 +23,20 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
    */
 
   return (
-    <Spacings.Inset scale="l">
-      <Switch>
-        <Route path={`${match.path}/channels`}>
-          <Channels linkToWelcome={match.url} />
-        </Route>
-        <Route>
-          <Welcome />
-        </Route>
-      </Switch>
-    </Spacings.Inset>
+    <Switch>
+      <Route path={`${match.path}/states`}>
+        <States linkToWelcome={match.url} />
+      </Route>
+      <Route path={`${match.path}/subscription/:id`}>
+        <SubscriptionDetail linkToWelcome={`${match.url}/subscriptions`} />
+      </Route>
+      <Route path={`${match.path}/subscriptions`}>
+        <Subscriptions linkToWelcome={match.url} />
+      </Route>
+      <Route>
+        <Welcome />
+      </Route>
+    </Switch>
   );
 };
 ApplicationRoutes.displayName = 'ApplicationRoutes';

@@ -1,0 +1,5 @@
+mutation DeleteSubscription($id: String, $version: Long!) {
+  deleteSubscription(version: $version, id: $id) {
+    id
+  }
+}

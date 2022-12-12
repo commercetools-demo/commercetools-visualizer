@@ -65,52 +65,26 @@ const InfoCard = (props: TInfoCardProps) => (
 InfoCard.displayName = 'InfoCard';
 
 const Welcome = () => {
-  const match = useRouteMatch();
-  const intl = useIntl();
 
   return (
-    <Constraints.Horizontal max={16}>
-      <Spacings.Stack scale="xl">
-        <Text.Headline as="h1" intlMessage={messages.title} />
-        <div>
-          <div className={styles.imageContainer}>
-            <img
-              alt="web developer"
-              src={WebDeveloperSvg}
-              width="100%"
-              height="100%"
-            />
+    <Spacings.Inset scale="l">
+      <Constraints.Horizontal max={16}>
+        <Spacings.Stack scale="xl">
+          <Text.Headline as="h1" intlMessage={messages.title} />
+          <div>
+            <div className={styles.imageContainer}>
+              <img
+                alt="web developer"
+                src={WebDeveloperSvg}
+                width="100%"
+                height="100%"
+              />
+            </div>
           </div>
-        </div>
-
-        <Spacings.Stack scale="l">
           <Text.Subheadline as="h4" intlMessage={messages.subtitle} />
-          <Grid
-            gridGap="16px"
-            gridAutoColumns="1fr"
-            gridTemplateColumns="repeat(3, 1fr)"
-          >
-            <InfoCard
-              title={intl.formatMessage(messages.cardDocumentationTitle)}
-              content={intl.formatMessage(messages.cardDocumentationContent)}
-              linkTo="https://docs.commercetools.com/custom-applications/what-is-a-custom-application"
-              isExternal
-            />
-            <InfoCard
-              title={intl.formatMessage(messages.cardDesignSystemTitle)}
-              content={intl.formatMessage(messages.cardDesignSystemContent)}
-              linkTo="https://uikit.commercetools.com"
-              isExternal
-            />
-            <InfoCard
-              title={intl.formatMessage(messages.cardChannelsTitle)}
-              content={intl.formatMessage(messages.cardChannelsContent)}
-              linkTo={`${match.url}/channels`}
-            />
-          </Grid>
         </Spacings.Stack>
-      </Spacings.Stack>
-    </Constraints.Horizontal>
+      </Constraints.Horizontal>
+    </Spacings.Inset>
   );
 };
 Welcome.displayName = 'Welcome';

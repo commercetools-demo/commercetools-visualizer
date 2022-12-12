@@ -17,19 +17,25 @@ const config = {
     },
   },
   oAuthScopes: {
-    view: ['view_products'],
-    manage: ['manage_products'],
+    view: ['view_states'],
+    manage: ['manage_states', 'manage_subscriptions'],
   },
-  icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
+  icon: '${path:@commercetools-frontend/assets/application-icons/wrench.svg}',
   mainMenuLink: {
-    defaultLabel: 'Template starter',
+    defaultLabel: 'Visualizer',
     labelAllLocales: [],
     permissions: [PERMISSIONS.View],
   },
   submenuLinks: [
     {
-      uriPath: 'channels',
-      defaultLabel: 'Channels',
+      uriPath: 'subscriptions',
+      defaultLabel: 'Subscriptions',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'states',
+      defaultLabel: 'States',
       labelAllLocales: [],
       permissions: [PERMISSIONS.View],
     },

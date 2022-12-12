@@ -1,0 +1,48 @@
+query FetchSubscription($id: String) {
+  subscription(id: $id) {
+    id
+    key
+    version
+    createdAt
+    destination {
+      type
+      ... on AzureServiceBusDestination {
+        connectionString
+      }
+      ... on EventBridgeDestination {
+        source
+        region
+        accountId
+      }
+      ... on EventGridDestination {
+        uri
+        eventGridAccessKey: accessKey
+      }
+      ... on GoogleCloudPubSubDestination {
+        projectId
+        topic
+      }
+      ... on SNSDestination {
+        topicArn
+        accessKey
+        accessSecret
+        authenticationMode
+        topicArn
+      }
+      ... on SQSDestination {
+        queueUrl
+        accessKey
+        accessSecret
+        region
+        authenticationMode
+      }
+    }
+    changes {
+      resourceTypeId
+    }
+    messages {
+      resourceTypeId
+      types
+    }
+  }
+}

@@ -1,8 +1,5 @@
 import { ApolloError, type ServerError } from '@apollo/client';
-import {
-  TCommercetoolsSubscription,
-  TSubscriptionDraft,
-} from './types/generated/ctp';
+import { TCommercetoolsSubscription } from './types/generated/ctp';
 
 export const getErrorMessage = (error: ApolloError) =>
   error.graphQLErrors?.map((e) => e.message).join('\n') || error.message;

@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
-import { useRouteMatch, Link as RouterLink } from 'react-router-dom';
-import { useIntl } from 'react-intl';
+import { Link as RouterLink } from 'react-router-dom';
 import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import { AngleRightIcon } from '@commercetools-uikit/icons';
@@ -65,7 +64,6 @@ const InfoCard = (props: TInfoCardProps) => (
 InfoCard.displayName = 'InfoCard';
 
 const Welcome = () => {
-
   return (
     <Spacings.Inset scale="l">
       <Constraints.Horizontal max={16}>

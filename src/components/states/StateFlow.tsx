@@ -22,7 +22,6 @@ dagreGraph.setDefaultEdgeLabel(() => ({}));
 const nodeWidth = 172;
 const nodeHeight = 36;
 
-
 const getLayoutedElements = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nodes: Array<any>,
@@ -68,14 +67,16 @@ interface Props {
 const StateFlow: FC<Props> = ({ items }) => {
   const [isHorizontal, setHorizontal] = useState<boolean>(false);
   const initialNodes: Array<Node> = items.map((item) => {
+    let type = '';
+    if (item.initial) {
+      type = 'input';
+    } else if (item.transitions === undefined) {
+      type = 'output';
+    }
     const result: Node = {
       id: item.id,
       data: { label: item.key },
-      type: item.initial
-        ? 'input'
-        : item.transitions === undefined
-          ? 'output'
-          : '',
+      type: type,
       position: { x: 0, y: 0 },
     };
     return result;
@@ -122,7 +123,6 @@ const StateFlow: FC<Props> = ({ items }) => {
     setHorizontal(!isHorizontal);
     setNodes([...layoutedNodes]);
     setEdges([...layoutedEdges]);
-
   }, [nodes, edges, setNodes, setEdges, isHorizontal]);
 
   return (

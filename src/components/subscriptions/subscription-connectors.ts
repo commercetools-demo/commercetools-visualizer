@@ -3,6 +3,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
+import { ApolloError } from '@apollo/client';
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import {
   TMutation,
@@ -17,7 +18,6 @@ import {
 import UpdateSubscriptionKeyMutation from './update-subscription-key.ctp.graphql';
 import DeleteSubscriptionIdMutation from './delete-subscription-id.ctp.graphql';
 import FetchQuery from './fetch-subscription.cpt.graphql';
-import { ApolloError } from '@apollo/client';
 
 export const useSubscriptionKeyUpdater = () => {
   const [updateSubscriptionKey, { loading }] = useMcMutation<

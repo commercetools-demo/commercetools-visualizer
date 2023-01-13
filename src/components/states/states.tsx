@@ -10,13 +10,13 @@ import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import { useQuery } from '@apollo/client';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import { ReactNode } from 'react';
+import Spacings from '@commercetools-uikit/spacings';
+import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { TQuery, TQuery_StatesArgs, TState } from '../../types/generated/ctp';
 import { getErrorMessage } from '../../helpers';
 import FetchStatesQuery from './fetch-states.cpt.graphql';
 import messages from './messages';
 import StateFlow from './StateFlow';
-import Spacings from '@commercetools-uikit/spacings';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 
 type Props = {
   linkToWelcome: string;
@@ -112,11 +112,15 @@ const States = (props: Props) => {
           <TabHeader
             exactPathMatch={true}
             key={index}
-            to={`${match.url}${index === 0 ? '' : `/${item.title.toLocaleLowerCase()}`
-              }`}
-            label={intl.formatMessage({
-              ...messages[item.title]
-            }, { amount: item.amount })}
+            to={`${match.url}${
+              index === 0 ? '' : `/${item.title.toLocaleLowerCase()}`
+            }`}
+            label={intl.formatMessage(
+              {
+                ...messages[item.title],
+              },
+              { amount: item.amount }
+            )}
           />
         );
       })}
@@ -135,10 +139,11 @@ const States = (props: Props) => {
           return (
             <Route
               key={index}
-              path={`${match.url}${index === itemsToRender.length - 1
-                ? ''
-                : `/${item.title.toLocaleLowerCase()}`
-                }`}
+              path={`${match.url}${
+                index === itemsToRender.length - 1
+                  ? ''
+                  : `/${item.title.toLocaleLowerCase()}`
+              }`}
             >
               <div>{item.content}</div>
             </Route>

@@ -21,9 +21,6 @@ const getChunkImport = (locale: string): Promise<TI18NImportData> => {
 const loadMessages = async (locale: string): Promise<TMergedMessages> => {
   try {
     const chunkImport = await getChunkImport(locale);
-    // Prefer loading `default` (for ESM bundles) and
-    // fall back to normal import (for CJS bundles).
-    // @ts-ignore
     return chunkImport.default || chunkImport;
   } catch (error) {
     console.warn(

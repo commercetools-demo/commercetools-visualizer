@@ -1,4 +1,4 @@
-import { Maybe } from "./types/generated/ctp";
+import { Maybe } from './types/generated/ctp';
 
 export type TFormValues = {
   id: string;

@@ -60,6 +60,7 @@
     "@testing-library/react": "12.1.5",
     "@testing-library/react-hooks": "8.0.1",
     "@types/dagre": "^0.7.48",
+    "@types/react-router": "<6",
     "dagre": "^0.8.5",
     "eslint": "8.25.0",
     "eslint-formatter-pretty": "4.1.0",

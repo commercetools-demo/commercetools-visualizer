@@ -5,7 +5,7 @@ import {
 } from '@commercetools-frontend/application-components';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Spacings from '@commercetools-uikit/spacings';
@@ -16,6 +16,8 @@ import {
   usePaginationState,
 } from '@commercetools-uikit/hooks';
 import { Pagination } from '@commercetools-uikit/pagination';
+import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { getErrorMessage } from '../../helpers';
 import {
   TCommercetoolsSubscription,
@@ -26,6 +28,7 @@ import PubSub from './icons/google-cloud-pub-sub-logo.svg';
 import Destinations from './destinations/Destinations';
 import FetchQuery from './fetch-subscriptions.cpt.graphql';
 import messages from './messages';
+import styles from './subscriptions.module.css';
 
 type Props = {
   linkToWelcome: string;
@@ -132,7 +135,23 @@ const Subscriptions = (props: Props) => {
     }
   };
   return (
-    <InfoMainPage title={intl.formatMessage(messages.title)}>
+    <InfoMainPage
+      customTitleRow={
+        <div className={styles.subscriptionHeader}>
+          <Spacings.Inline scale="m" alignItems="center">
+            <Text.Headline as="h2">
+              {intl.formatMessage(messages.title)}
+            </Text.Headline>
+          </Spacings.Inline>
+          <SecondaryButton
+            iconLeft={<PlusBoldIcon />}
+            as={Link}
+            to={props.linkToWelcome + '/subscription/new'}
+            label={intl.formatMessage(messages.subscriptionAdd)}
+          />
+        </div>
+      }
+    >
       {data.subscriptions.total === 0 && (
         <div>{intl.formatMessage(messages.noResults)}</div>
       )}

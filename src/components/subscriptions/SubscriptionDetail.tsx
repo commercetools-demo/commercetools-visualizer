@@ -34,7 +34,7 @@ import {
   useSubscriptionKeyUpdater,
 } from './subscription-connectors';
 
-type TErrors = {
+export type TErrors = {
   key: { missing?: boolean };
 };
 

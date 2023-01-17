@@ -1,0 +1,102 @@
+:root {
+  --bullet-height: var(--spacing-xl);
+}
+
+.header-list-item-button {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.header-list-item-button:focus {
+  outline: 0;
+}
+
+.header-list-item-button[disabled] {
+  cursor: default;
+}
+
+.header-list-item-button[disabled] .bullet {
+  box-shadow: none;
+}
+
+.header-list-item-button:hover:not([disabled]) .bullet {
+  box-shadow: var(--shadow-8);
+  background-color: var(--color-primary);
+}
+
+.header-list-item-button:first-of-type {
+  justify-content: flex-start;
+}
+
+.header-list-item-button:last-child {
+  justify-content: flex-end;
+}
+
+.bullet-container {
+  flex-shrink: 0;
+  padding-left: var(--spacing-s);
+  position: relative;
+  width: calc(var(--spacing-s) + var(--bullet-height));
+  z-index: 2;
+}
+
+.bullet {
+  align-items: center;
+  background-color: var(--color-neutral-60);
+  border-radius: var(--spacing-m);
+  box-shadow: var(--shadow-7);
+  color: var(--color-surface);
+  display: flex;
+  font-size: 16px;
+  height: var(--bullet-height);
+  justify-content: center;
+  transition: background-color var(--transition-linear-80ms),
+    box-shadow 150ms ease-in-out;
+}
+
+.header-list-item--active .bullet {
+  background-color: var(--color-accent-40);
+  box-shadow: var(--shadow-9);
+}
+
+.header-list-item--done .bullet {
+  background-color: var(--color-accent);
+}
+
+.tab-text {
+  color: var(--color-neutral-60);
+  display: block;
+  font-weight: 200;
+  padding: var(--spacing-s) var(--spacing-m);
+  position: relative;
+  text-align: left;
+  z-index: 1;
+}
+
+/* Skins */
+
+/* Skin grey (default) */
+
+.tab-text-grey {
+  composes: tab-text;
+  background-color: var(--color-neutral-90);
+}
+
+.bullet-container-grey {
+  composes: bullet-container;
+  background-color: var(--color-neutral-90);
+}
+
+/* Skin white */
+
+.tab-text-white {
+  composes: tab-text;
+  background-color: var(--color-surface);
+}
+
+.bullet-container-white {
+  composes: bullet-container;
+  background-color: var(--color-surface);
+}

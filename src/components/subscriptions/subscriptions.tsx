@@ -28,7 +28,6 @@ import PubSub from './icons/google-cloud-pub-sub-logo.svg';
 import Destinations from './destinations/Destinations';
 import FetchQuery from './fetch-subscriptions.cpt.graphql';
 import messages from './messages';
-import styles from './subscriptions.module.css';
 
 type Props = {
   linkToWelcome: string;
@@ -44,8 +43,9 @@ const Subscriptions = (props: Props) => {
     FetchQuery,
     {
       variables: {
-        limit: 100,
-        offset: 0,
+        limit: perPage.value,
+        offset: (page.value - 1) * perPage.value,
+        sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
       },
       context: {
         target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
@@ -137,19 +137,18 @@ const Subscriptions = (props: Props) => {
   return (
     <InfoMainPage
       customTitleRow={
-        <div className={styles.subscriptionHeader}>
-          <Spacings.Inline scale="m" alignItems="center">
-            <Text.Headline as="h2">
-              {intl.formatMessage(messages.title)}
-            </Text.Headline>
-          </Spacings.Inline>
+        <Spacings.Inline justifyContent="space-between">
+          <Text.Headline as="h2">
+            {intl.formatMessage(messages.title)}
+          </Text.Headline>
+
           <SecondaryButton
             iconLeft={<PlusBoldIcon />}
             as={Link}
             to={props.linkToWelcome + '/subscription/new'}
             label={intl.formatMessage(messages.subscriptionAdd)}
           />
-        </div>
+        </Spacings.Inline>
       }
     >
       {data.subscriptions.total === 0 && (

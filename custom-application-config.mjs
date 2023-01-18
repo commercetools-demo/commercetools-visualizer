@@ -17,8 +17,8 @@ const config = {
     },
   },
   oAuthScopes: {
-    view: ['view_states'],
-    manage: ['manage_states', 'manage_subscriptions'],
+    view: ['view_states', 'view_types'],
+    manage: ['manage_states', 'manage_subscriptions', 'manage_types'],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/wrench.svg}',
   mainMenuLink: {
@@ -36,6 +36,12 @@ const config = {
     {
       uriPath: 'states',
       defaultLabel: 'States',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'types',
+      defaultLabel: 'Types',
       labelAllLocales: [],
       permissions: [PERMISSIONS.View],
     },

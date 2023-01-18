@@ -5,6 +5,7 @@ import States from './components/states';
 import Subscriptions from './components/subscriptions';
 import SubscriptionDetail from './components/subscriptions/SubscriptionDetail';
 import NewSubscription from './components/subscriptions/new/NewSubscription';
+import Types from './components/types/list/types';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -39,6 +40,9 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/subscriptions`}>
         <Subscriptions linkToWelcome={match.url} />
+      </Route>
+      <Route path={`${match.path}/types`}>
+        <Types linkToWelcome={match.url} />
       </Route>
       <Route>
         <Welcome />

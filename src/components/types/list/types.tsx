@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { useHistory } from 'react-router-dom';
 import { useMcQuery } from '@commercetools-frontend/application-shell';
@@ -12,6 +12,9 @@ import {
 } from '@commercetools-uikit/hooks';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
+import DataTableManager, {
+  UPDATE_ACTIONS,
+} from '@commercetools-uikit/data-table-manager';
 import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { ContentNotification } from '@commercetools-uikit/notifications';
@@ -61,6 +64,17 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
   });
+
+  const [tableData, setTableData] = useState({
+    columns: createColumnDefinitions(intl.formatMessage),
+    visibleColumns: createColumnDefinitions(intl.formatMessage),
+    visibleColumnKeys: createColumnDefinitions(intl.formatMessage).map(
+      (column) => column.key
+    ),
+  });
+
+  const [isCondensed, setIsCondensed] = useState<boolean>(false);
+  const [isWrappingText, setIsWrappingText] = useState<boolean>(false);
 
   if (error) {
     return (
@@ -137,6 +151,44 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
     }
   };
 
+  const columnManager = {
+    disableColumnManager: false,
+    hideableColumns: tableData.columns,
+    visibleColumnKeys: tableData.visibleColumnKeys,
+  };
+
+  const onSettingChange = (action: string, nextValue: boolean | string[]) => {
+    const {
+      COLUMNS_UPDATE,
+      IS_TABLE_CONDENSED_UPDATE,
+      IS_TABLE_WRAPPING_TEXT_UPDATE,
+    } = UPDATE_ACTIONS;
+
+    switch (action) {
+      case IS_TABLE_CONDENSED_UPDATE: {
+        setIsCondensed(nextValue as boolean);
+        break;
+      }
+      case IS_TABLE_WRAPPING_TEXT_UPDATE: {
+        setIsWrappingText(nextValue as boolean);
+        break;
+      }
+      case COLUMNS_UPDATE: {
+        if (Array.isArray(nextValue)) {
+          Array.isArray(nextValue) &&
+            setTableData({
+              ...tableData,
+              visibleColumns: tableData.columns.filter((column) =>
+                nextValue.includes(column.key)
+              ),
+              visibleColumnKeys: nextValue,
+            });
+        }
+        break;
+      }
+    }
+  };
+
   return (
     <InfoMainPage
       customTitleRow={
@@ -156,16 +208,27 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
 
       {total > 0 ? (
         <Spacings.Stack scale="l">
-          <DataTable<NonNullable<TQuery['typeDefinitions']['results']>[0]>
-            isCondensed
-            columns={createColumnDefinitions(intl.formatMessage)}
-            rows={results}
-            itemRenderer={itemRenderer}
-            sortedBy={tableSorting.value.key}
-            sortDirection={tableSorting.value.order}
-            onSortChange={tableSorting.onChange}
-            //onRowClick={(row) => push(`${linkToWelcome}/types/${row.id}`)}
-          />
+          <DataTableManager
+            columns={tableData.visibleColumns}
+            columnManager={columnManager}
+            onSettingsChange={onSettingChange}
+            displaySettings={{
+              isWrappingText,
+              isCondensed,
+              disableDisplaySettings: false,
+            }}
+          >
+            <DataTable<NonNullable<TQuery['typeDefinitions']['results']>[0]>
+              isCondensed
+              columns={tableData.visibleColumns}
+              rows={results}
+              itemRenderer={itemRenderer}
+              sortedBy={tableSorting.value.key}
+              sortDirection={tableSorting.value.order}
+              onSortChange={tableSorting.onChange}
+              //onRowClick={(row) => push(`${linkToWelcome}/types/${row.id}`)}
+            />
+          </DataTableManager>
           <Pagination
             page={page.value}
             onPageChange={page.onChange}

@@ -3,11 +3,23 @@ import { useCheckboxContext } from './CheckboxContext';
 type Props = {
   value: string;
   label: string;
+  isChecked: (values: Array<string> | undefined, value: string) => boolean;
+  removeItem: (
+    values: Array<string> | undefined,
+    value: string
+  ) => Array<string>;
+  addItem: (values: Array<string> | undefined, value: string) => Array<string>;
 };
 
-export default function CheckboxGroupItem({ value, label }: Props) {
+export default function CheckboxGroupItem({
+  value,
+  label,
+  isChecked,
+  removeItem,
+  addItem,
+}: Props) {
   const { field, helpers } = useCheckboxContext();
-  const checked = Boolean(field.value && field.value.find((_) => _ === value));
+  const checked = isChecked(field.value, value);
   return (
     <li>
       <label style={{ display: 'block' }}>
@@ -17,13 +29,9 @@ export default function CheckboxGroupItem({ value, label }: Props) {
           checked={checked}
           onChange={() => {
             if (checked) {
-              helpers.setValue(field.value.filter((_) => _ !== value));
+              helpers.setValue(removeItem(field.value, value));
             } else {
-              if (field.value) {
-                helpers.setValue([...field.value, value]);
-              } else {
-                helpers.setValue([value]);
-              }
+              helpers.setValue(addItem(field.value, value));
             }
           }}
         />

@@ -1,3 +1,4 @@
+import { TChangeSubscriptionInput } from '../../../types/generated/ctp';
 import CheckboxGroup from '../../checkbox/CheckboxGroup';
 
 const Changes = () => {
@@ -45,7 +46,45 @@ const Changes = () => {
       columns={3}
     >
       {possibilities.map((entry, index) => {
-        return <CheckboxGroup.Item key={index} label={entry} value={entry} />;
+        return (
+          <CheckboxGroup.Item
+            key={index}
+            label={entry}
+            value={entry}
+            isChecked={(values: Array<string> | undefined, value: string) => {
+              return Boolean(
+                values &&
+                  values.find(
+                    (item) =>
+                      (item as any as TChangeSubscriptionInput)
+                        .resourceTypeId === value
+                  )
+              );
+            }}
+            addItem={(
+              values: Array<TChangeSubscriptionInput> | undefined,
+              value: string
+            ) => {
+              const toAdd: TChangeSubscriptionInput = { resourceTypeId: value };
+              if (values) {
+                return [...values, toAdd];
+              } else {
+                return [toAdd];
+              }
+            }}
+            removeItem={(
+              values: Array<TChangeSubscriptionInput> | undefined,
+              value: string
+            ) => {
+              return values
+                ? values.filter((item) => {
+                  const toRemove: TChangeSubscriptionInput = item as any;
+                    return toRemove.resourceTypeId !== value;
+                })
+                : [];
+            }}
+          />
+        );
       })}
     </CheckboxGroup>
   );

@@ -67,7 +67,13 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
       },
       destinationType: 'GoogleCloudPubSub',
       changes: [{ resourceTypeId: 'product' }],
-      messages: [{ resourceTypeId: 'product', types: [] }],
+      messages: [
+        { resourceTypeId: 'product', types: ['ProductRevertedStagedChanges'] },
+        {
+          resourceTypeId: 'business-unit',
+          types: ['BusinessUnitAddressAdded'],
+        },
+      ],
     },
     onSubmit: handleSubmit,
     validate: validate,
@@ -104,6 +110,8 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
   const current = createStepsDefinition.findIndex((item) => {
     return item.key === step;
   });
+
+  console.log(formik.values);
 
   return (
     <div className={styles.subscriptionNewPage}>

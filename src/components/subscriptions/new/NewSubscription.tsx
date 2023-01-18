@@ -110,18 +110,8 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
 
   const formik = useFormik<SubscriptionDraft>({
     initialValues: {
-      key: 'pho-test',
-      destination: {
-        GoogleCloudPubSub: {
-          topic: 'learn-pho-subscription-topic',
-          projectId: 'ct-sales-207211',
-        },
-      },
+      destination: {},
       destinationType: 'GoogleCloudPubSub',
-      // changes: [{ resourceTypeId: 'product' }],
-      messages: [
-        { resourceTypeId: 'product', types: ['ProductRevertedStagedChanges'] },
-      ],
     },
     onSubmit: handleSubmit,
     validate: validate,

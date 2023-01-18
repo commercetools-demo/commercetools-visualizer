@@ -1,0 +1,5 @@
+mutation CreateSubscription($draft: SubscriptionDraft!) {
+  createSubscription(draft: $draft) {
+    id
+  }
+}

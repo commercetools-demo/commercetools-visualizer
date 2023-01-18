@@ -17,6 +17,10 @@ export default defineMessages<string>({
     id: 'Subscriptions.subscriptionUpdated',
     defaultMessage: 'Subscription {subscriptionKey} updated',
   },
+  subscriptionCreated: {
+    id: 'Subscriptions.subscriptionCreated',
+    defaultMessage: 'Subscription {subscriptionKey} created',
+  },
   subscriptionAdd: {
     id: 'Subscriptions.subscriptionAdd',
     defaultMessage: 'Add new Subscription',

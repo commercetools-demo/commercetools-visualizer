@@ -234,20 +234,19 @@ const Messages = () => {
                   label={entry}
                   value={item.resourceTypeId + '#' + entry}
                   isChecked={(
-                    values: Array<string> | undefined,
+                    values: Array<TMessageSubscriptionInput> | undefined,
                     value: string
                   ) => {
                     return Boolean(
                       values &&
                         values.find((item) => {
-                          const i = item as any as TMessageSubscriptionInput;
-                          if (!i || !i.types) {
+                          if (!item || !item.types) {
                             return false;
                           }
                           const [resourceTypeId, name] = value.split('#');
                           return (
-                            i.resourceTypeId === resourceTypeId &&
-                            i.types.indexOf(name) >= 0
+                            item.resourceTypeId === resourceTypeId &&
+                            item.types.indexOf(name) >= 0
                           );
                         })
                     );

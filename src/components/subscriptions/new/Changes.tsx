@@ -51,14 +51,12 @@ const Changes = () => {
             key={index}
             label={entry}
             value={entry}
-            isChecked={(values: Array<string> | undefined, value: string) => {
+            isChecked={(
+              values: Array<TChangeSubscriptionInput> | undefined,
+              value: string
+            ) => {
               return Boolean(
-                values &&
-                  values.find(
-                    (item) =>
-                      (item as any as TChangeSubscriptionInput)
-                        .resourceTypeId === value
-                  )
+                values && values.find((item) => item.resourceTypeId === value)
               );
             }}
             addItem={(
@@ -78,9 +76,9 @@ const Changes = () => {
             ) => {
               return values
                 ? values.filter((item) => {
-                  const toRemove: TChangeSubscriptionInput = item as any;
-                    return toRemove.resourceTypeId !== value;
-                })
+                    const toRemove: TChangeSubscriptionInput = item as any;
+                  return toRemove.resourceTypeId !== value;
+                  })
                 : [];
             }}
           />

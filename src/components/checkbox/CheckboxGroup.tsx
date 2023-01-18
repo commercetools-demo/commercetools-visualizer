@@ -10,10 +10,10 @@ type Props = PropsWithChildren<{
   label: string;
 }>;
 
-function CheckboxGroup({ name, label, columns = 1, children }: Props) {
-  const [field, meta, helpers] = useField<Array<string>>(name);
+function CheckboxGroup<T>({ name, label, columns = 1, children }: Props) {
+  const [field, meta, helpers] = useField<Array<T>>(name);
   return (
-    <CheckboxProvider value={{ field, helpers, meta }}>
+    <CheckboxProvider<T> value={{ field, helpers, meta }}>
       <fieldset>
         <legend>{label}</legend>
 

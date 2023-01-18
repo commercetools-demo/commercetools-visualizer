@@ -9,6 +9,12 @@ import SelectField from '@commercetools-uikit/select-field';
 import type { FormikErrors } from 'formik';
 import omitEmpty from 'omit-empty-es';
 import TextInput from '@commercetools-uikit/text-input';
+import {
+  TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
+  useShowNotification,
+} from '@commercetools-frontend/actions-global';
+import { DOMAINS } from '@commercetools-frontend/constants';
 import Steps from '../../steps';
 import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { TFormValues } from '../../../types';
@@ -17,6 +23,8 @@ import messages from '../messages';
 import styles from '../subscriptions.module.css';
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
 import { TErrors } from '../SubscriptionDetail';
+import { useSubscriptionCreator } from '../subscription-connectors';
+import { transformErrors } from '../transform-errors';
 import Destinations from './Destinations';
 import Changes from './Changes';
 import Messages from './Messages';
@@ -38,10 +46,54 @@ type SubscriptionDraft = { destinationType: string } & TSubscriptionDraft;
 const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
   const intl = useIntl();
   const history = useHistory();
+  const subscriptionCreator = useSubscriptionCreator();
 
-  const handleSubmit = useCallback(async (formikValues, formikHelpers) => {
-    console.log(formikValues);
-  }, []);
+  const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
+
+  const handleSubmit = useCallback(
+    async (formikValues, formikHelpers) => {
+      try {
+        const subscriptionDraft: TSubscriptionDraft = {
+          key:
+            formikValues.key && formikValues.key !== ''
+              ? formikValues.key
+              : undefined,
+          destination: formikValues.destination,
+          changes:
+            formikValues.changes && formikValues.changes.length > 0
+              ? formikValues.messages
+              : undefined,
+          messages:
+            formikValues.messages && formikValues.messages.length > 0
+              ? formikValues.messages
+              : undefined,
+        };
+        const createdSubscription = await subscriptionCreator.execute({
+          draft: subscriptionDraft,
+        });
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.subscriptionCreated, {
+            subscriptionKey:
+              createdSubscription.data?.createSubscription?.id || '',
+          }),
+        });
+      } catch (graphQLErrors) {
+        const transformedErrors = transformErrors(graphQLErrors);
+        if (transformedErrors.unmappedErrors.length > 0) {
+          showApiErrorNotification({
+            errors:
+              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+          });
+        }
+
+        formikHelpers.setErrors(transformedErrors.formErrors);
+      }
+    },
+    [intl, subscriptionCreator]
+  );
 
   const validate = (
     formikValues: SubscriptionDraft
@@ -61,18 +113,14 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
       key: 'pho-test',
       destination: {
         GoogleCloudPubSub: {
-          topic: 'ct-sales-207211',
-          projectId: 'learn-pho-subscription-topic',
+          topic: 'learn-pho-subscription-topic',
+          projectId: 'ct-sales-207211',
         },
       },
       destinationType: 'GoogleCloudPubSub',
-      changes: [{ resourceTypeId: 'product' }],
+      // changes: [{ resourceTypeId: 'product' }],
       messages: [
         { resourceTypeId: 'product', types: ['ProductRevertedStagedChanges'] },
-        {
-          resourceTypeId: 'business-unit',
-          types: ['BusinessUnitAddressAdded'],
-        },
       ],
     },
     onSubmit: handleSubmit,
@@ -110,8 +158,6 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
   const current = createStepsDefinition.findIndex((item) => {
     return item.key === step;
   });
-
-  console.log(formik.values);
 
   return (
     <div className={styles.subscriptionNewPage}>
@@ -251,6 +297,10 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
         totalSteps={createStepsDefinition.length}
         onSave={() => {
           formik.submitForm();
+          history.replace({
+            pathname: linkToWelcome + '/subscriptions',
+          });
+          return;
         }}
         onNext={() => {
           history.replace({

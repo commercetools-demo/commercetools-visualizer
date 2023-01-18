@@ -144,6 +144,9 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
         subscriptionKey: subscription?.key,
       }),
     });
+    history.replace({
+      pathname: linkToWelcome + '/subscriptions',
+    });
   };
 
   return (

@@ -11,6 +11,14 @@ query FetchStates($limit: Int!, $offset: Int!, $sort: [String!]) {
       initial
       type
       key
+      nameAllLocales {
+        locale
+        value
+      }
+      descriptionAllLocales {
+        locale
+        value
+      }
     }
   }
 }

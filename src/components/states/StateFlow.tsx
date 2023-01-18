@@ -1,5 +1,10 @@
 import PrimaryButton from '@commercetools-uikit/primary-button';
 import dagre from 'dagre';
+import {
+  formatLocalizedString,
+  transformLocalizedFieldToLocalizedString,
+} from '@commercetools-frontend/l10n';
+import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 
 import { FC, useCallback, useState } from 'react';
 // eslint-disable-next-line import/no-named-as-default
@@ -13,6 +18,7 @@ import ReactFlow, {
   Background,
   Controls,
 } from 'reactflow';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { TState } from '../../types/generated/ctp';
 import 'reactflow/dist/style.css';
 
@@ -65,6 +71,10 @@ interface Props {
 }
 
 const StateFlow: FC<Props> = ({ items }) => {
+  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
+    dataLocale: context.dataLocale,
+    projectLanguages: context.project?.languages,
+  }));
   const [isHorizontal, setHorizontal] = useState<boolean>(false);
   const initialNodes: Array<Node> = items.map((item) => {
     let type = '';
@@ -75,7 +85,35 @@ const StateFlow: FC<Props> = ({ items }) => {
     }
     const result: Node = {
       id: item.id,
-      data: { label: item.key },
+      data: {
+        label:
+          formatLocalizedString(
+            {
+              name: transformLocalizedFieldToLocalizedString(
+                item.nameAllLocales ?? []
+              ),
+            },
+            {
+              key: 'name',
+              locale: dataLocale,
+              fallbackOrder: projectLanguages,
+              fallback: NO_VALUE_FALLBACK,
+            }
+          ) || item.key,
+        // description: formatLocalizedString(
+        //   {
+        //     name: transformLocalizedFieldToLocalizedString(
+        //       item.descriptionAllLocales ?? []
+        //     ),
+        //   },
+        //   {
+        //     key: 'name',
+        //     locale: dataLocale,
+        //     fallbackOrder: projectLanguages,
+        //     fallback: NO_VALUE_FALLBACK,
+        //   }
+        // ),
+      },
       type: type,
       position: { x: 0, y: 0 },
     };

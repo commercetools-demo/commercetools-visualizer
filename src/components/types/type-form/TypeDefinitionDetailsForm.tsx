@@ -9,11 +9,9 @@ import Spacings from '@commercetools-uikit/spacings';
 import { FormattedMessage, useIntl } from 'react-intl';
 import TextInput from '@commercetools-uikit/text-input';
 import omitEmpty from 'omit-empty-es';
-import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import SelectField from '@commercetools-uikit/select-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import PrimaryButton from '@commercetools-uikit/primary-button';
 import { Maybe, TFieldDefinition } from '../../../types/generated/ctp';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
@@ -195,13 +193,6 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
           />
         </CollapsiblePanel>
       )}
-      <Constraints.Horizontal max={'scale'}>
-        <PrimaryButton
-          label={intl.formatMessage(messages.submitButton)}
-          isDisabled={!formik.dirty || !formik.isValid || formik.isSubmitting}
-          //onClick={onSubmit}
-        />
-      </Constraints.Horizontal>
     </Spacings.Stack>
   );
 

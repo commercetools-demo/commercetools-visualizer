@@ -62,4 +62,9 @@ export default defineMessages({
     description: 'Title for fieldDefinitions reference field',
     defaultMessage: 'Reference Type',
   },
+  fieldDefinitionUpdated: {
+    id: 'FieldForm.updated.title',
+    description: 'Message for fieldDefinitions update action',
+    defaultMessage: 'Field Definition updated',
+  },
 });

@@ -35,6 +35,14 @@ export const convertToActionData = (draft: Partial<TTypeDefinition>) => ({
     draft.descriptionAllLocales || []
   ),
   key: draft.key,
+  fieldDefinitions: draft.fieldDefinitions?.map((item) => {
+    return {
+      name: item.name,
+      label: transformLocalizedFieldToLocalizedString(
+        item.labelAllLocales || []
+      ),
+    };
+  }),
 });
 
 export const formValuesToDoc = (formValues: TFormValues) => ({
@@ -80,14 +88,13 @@ export const useTypeDefinitionUpdater = () => {
     originalDraft,
     nextDraft,
   }: {
-    originalDraft: NonNullable<TTypeDefinition>;
+    originalDraft: Partial<TTypeDefinition>;
     nextDraft: any;
   }) => {
     const actions = syncTypes.buildActions(
       nextDraft,
       convertToActionData(originalDraft)
     );
-
     try {
       return await updateTypeDefinitionId({
         context: {
@@ -95,7 +102,7 @@ export const useTypeDefinitionUpdater = () => {
         },
         variables: {
           id: originalDraft.id,
-          version: originalDraft.version,
+          version: originalDraft.version || 1,
           actions: createGraphQlUpdateActions(actions),
         },
       });
@@ -162,6 +169,7 @@ export const useTypeWithDefinitionByNameFetcher = (
   });
   return {
     fieldDefinitions: data?.typeDefinition?.fieldDefinitions,
+    version: data?.typeDefinition?.version,
     error,
     loading,
     refetch,

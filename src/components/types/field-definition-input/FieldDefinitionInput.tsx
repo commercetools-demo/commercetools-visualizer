@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
   CustomFormModalPage,
@@ -14,28 +14,21 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
-import { useTypeWithDefinitionByNameFetcher } from '../type-definition-connectors';
+import {
+  showNotification,
+  showApiErrorNotification,
+  TApiErrorNotificationOptions,
+} from '@commercetools-frontend/actions-global';
+import { DOMAINS } from '@commercetools-frontend/constants';
+import {
+  useTypeDefinitionUpdater,
+  useTypeWithDefinitionByNameFetcher,
+} from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
+import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from './messages';
 import FieldDefinitionInputForm from './FieldDefinitionInputForm';
-
-const initializeEmptyValues = () => ({
-  type: {
-    name: 'String',
-    referenceTypeId: '',
-  },
-  isSet: false,
-  name: '',
-  label: {
-    en: '',
-  },
-  required: false,
-  inputHint: 'SingleLine',
-});
-
-// TODO: edit existing
-const initializeFieldValues = (field: any) => ({});
 
 type Props = {
   isOpen?: boolean;
@@ -60,8 +53,54 @@ const FieldDefinitionInput: FC<Props> = (props) => {
   }));
   const intl = useIntl();
 
-  const { fieldDefinitions, error, loading, refetch } =
+  const typeDefinitionUpdater = useTypeDefinitionUpdater();
+
+  const { fieldDefinitions, error, loading, version, refetch } =
     useTypeWithDefinitionByNameFetcher(id, [fieldDefinitionName]);
+
+  const handleSubmit = useCallback(
+    async (formikValues, formikHelpers) => {
+      try {
+        const data = {
+          fieldDefinitions: [
+            {
+              name: formikValues.name,
+              label: LocalizedTextInput.omitEmptyTranslations(
+                formikValues.label
+              ),
+            },
+          ],
+        };
+        if (fieldDefinitions) {
+          await typeDefinitionUpdater.execute({
+            originalDraft: {
+              id: id,
+              fieldDefinitions: [fieldDefinitions[0]],
+              version: version,
+            },
+            nextDraft: data,
+          });
+        }
+        refetch();
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
+        });
+      } catch (graphQLErrors) {
+        const transformedErrors = transformErrors(graphQLErrors);
+        if (transformedErrors.unmappedErrors.length > 0) {
+          showApiErrorNotification({
+            errors:
+              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+          });
+        }
+
+        formikHelpers.setErrors(transformedErrors.formErrors);
+      }
+    },
+    [fieldDefinitions, intl, refetch, typeDefinitionUpdater, version]
+  );
 
   if (error) {
     return (
@@ -81,51 +120,20 @@ const FieldDefinitionInput: FC<Props> = (props) => {
     return <PageNotFound />;
   }
 
-  const initialValues = fieldDefinitions
-    ? initializeFieldValues(fieldDefinitions)
-    : initializeEmptyValues();
-  // const stringSchema = yup
-  //   .string()
-  //   .required(<FormattedMessage {...messages.requiredFieldError} />);
-
-  // const validationSchema = yup.object({
-  //   name: yup
-  //     .string()
-  //     .min(2)
-  //     .max(36)
-  //     .matches(
-  //       /^[A-Za-z0-9_-]+$/,
-  //       'Field Name must contain only letters, digits, "_" or "-" and no spaces!'
-  //     ),
-  //   label: stringSchema,
-  //   required: yup.boolean(),
-  //   type: yup.object(),
-  //   inputHint: stringSchema,
-  // });
-  // const formRef = useRef();
-
-  const handleSubmit = (event: any) => {
-    event.preventDefault();
-    event.stopPropagation();
-    // if (formRef.current) {
-    //   //formRef.current.handleSubmit();
-    // }
-  };
   return (
     <FieldDefinitionInputForm
       initialValues={{
-        ...fieldDefinitions[0],
         label: LocalizedTextInput.createLocalizedString(
           projectLanguages,
           transformLocalizedFieldToLocalizedString(
             fieldDefinitions[0].labelAllLocales ?? []
           ) ?? {}
         ),
-        isSet: false,
+        name: fieldDefinitions[0].name,
+        inputHint: fieldDefinitions[0].inputHint || 'SingleLine',
         type: { name: fieldDefinitions[0].type.name, referenceTypeId: '' },
       }}
       onSubmit={handleSubmit}
-      isReadOnly={!canManage}
       dataLocale={dataLocale}
     >
       {(formProps) => {
@@ -142,10 +150,16 @@ const FieldDefinitionInput: FC<Props> = (props) => {
                   label={intl.formatMessage(messages.revert)}
                   iconLeft={<RevertIcon />}
                   onClick={props.onClose}
+                  isDisabled={
+                    formProps.isSubmitting || !formProps.isDirty || !canManage
+                  }
                 />
                 <CustomFormModalPage.FormPrimaryButton
                   label={messages.updateButton}
-                  onClick={handleSubmit}
+                  onClick={() => formProps.submitForm()}
+                  isDisabled={
+                    formProps.isSubmitting || !formProps.isDirty || !canManage
+                  }
                 />
               </>
             }

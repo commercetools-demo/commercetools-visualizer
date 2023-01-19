@@ -33,8 +33,7 @@ const referenceTypeOptions = REFERENCE_TYPES.map((t) => ({
 export type TFormValues = {
   label: Record<string, string>;
   name: string;
-  isSet: boolean;
-  required: boolean;
+  required?: boolean;
   inputHint: string;
   type: { name: string; referenceTypeId: string };
 };
@@ -58,8 +57,8 @@ type Props = {
     formikHelpers: FormikHelpers<TFormValues>
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
-  isReadOnly: boolean;
   dataLocale: string;
+  editMode?: boolean;
   children: (formProps: FormProps) => JSX.Element;
 };
 const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
@@ -77,6 +76,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
   children,
   initialValues,
   onSubmit,
+  editMode = false,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -88,7 +88,6 @@ const FieldDefinitionInputForm: FC<Props> = ({
     dataLocale: context.dataLocale ?? '',
   }));
   const intl = useIntl();
-  const editMode = false;
   const formElements = (
     <Spacings.Stack scale="m">
       <Grid
@@ -98,13 +97,14 @@ const FieldDefinitionInputForm: FC<Props> = ({
         <Grid.Item>
           <TextField
             name="name"
-            hint={<FormattedMessage {...messages.nameHint} />}
+            hint={intl.formatMessage(messages.nameHint)}
             value={formik.values.name}
-            title={<FormattedMessage {...messages.nameTitle} />}
+            title={intl.formatMessage(messages.nameTitle)}
             isRequired
             touched={formik.touched.name ? true : false}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
+            isDisabled={!editMode}
           />
           {/* {errors.name && touched.name ? (
               <ErrorMessage>{errors.name}</ErrorMessage>
@@ -115,7 +115,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
             name="label"
             selectedLanguage={dataLocale}
             value={formik.values.label}
-            title={<FormattedMessage {...messages.labelTitle} />}
+            title={intl.formatMessage(messages.labelTitle)}
             isRequired
             touched={formik.touched.label ? true : false}
             onBlur={formik.handleBlur}
@@ -125,14 +125,14 @@ const FieldDefinitionInputForm: FC<Props> = ({
         <Grid.Item>
           <SelectField
             name="type.name"
-            title={<FormattedMessage {...messages.typeTitle} />}
+            title={intl.formatMessage(messages.typeTitle)}
             isRequired
             value={formik.values.type.name}
             options={fieldTypes}
             touched={formik.touched.type?.name}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            isDisabled={editMode}
+            isDisabled={!editMode}
           />
         </Grid.Item>
         {
@@ -141,7 +141,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
             <Grid.Item>
               <SelectField
                 name="type.referenceTypeId"
-                title={<FormattedMessage {...messages.referenceTitle} />}
+                title={intl.formatMessage(messages.referenceTitle)}
                 isRequired
                 value={formik.values.type.referenceTypeId}
                 options={referenceTypeOptions}
@@ -160,7 +160,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
               onChange={formik.handleChange}
               isChecked={formik.values.isSet}
             >
-              <FormattedMessage {...messages.setTitle} />
+              intl.formatMessage(messages.setTitle)
             </CheckboxInput>
           </Card> */}
         <Grid.Item>
@@ -175,7 +175,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
         <Grid.Item>
           <SelectField
             name="inputHint"
-            title={<FormattedMessage {...messages.inputHintTitle} />}
+            title={intl.formatMessage(messages.inputHintTitle)}
             value={formik.values.inputHint}
             options={inputHints}
             touched={formik.touched.inputHint}

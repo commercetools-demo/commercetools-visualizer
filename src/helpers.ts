@@ -68,7 +68,22 @@ const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
           ),
         };
       }
+      break;
     }
+    case 'changeLabel': {
+      if ('fieldName' in actionPayload) {
+        actionValue = {
+          fieldName: actionPayload.fieldName,
+          label: transformLocalizedStringToLocalizedField(
+            actionPayload.label as Record<string, string>
+          ),
+        };
+      }
+      break;
+    }
+    default:
+      console.log('no mapping defined for ' + actionName);
+      break;
   }
 
   return {

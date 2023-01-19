@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import {
@@ -30,6 +30,7 @@ import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import TypeDefinitionDetailsForm from '../type-form/TypeDefinitionDetailsForm';
+
 import messages from './messages';
 
 type Props = {
@@ -55,7 +56,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
-  const { typeDefinition, error, loading } = useTypeDefinitionFetcher({
+  const { typeDefinition, error, loading, refetch } = useTypeDefinitionFetcher({
     id: id,
   });
 
@@ -74,6 +75,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
           domain: DOMAINS.SIDE,
           text: intl.formatMessage(messages.updateSuccess),
         });
+        refetch();
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
         if (transformedErrors.unmappedErrors.length > 0) {
@@ -86,7 +88,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
         formikHelpers.setErrors(transformedErrors.formErrors);
       }
     },
-    [intl, showNotification, typeDefinition, typeDefinitionUpdater]
+    [intl, refetch, showNotification, typeDefinition, typeDefinitionUpdater]
   );
 
   const handleDelete = async () => {
@@ -105,46 +107,6 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
       pathname: backToList,
     });
   };
-
-  // async function submitUpdateActions(updateActions) {
-  //   console.log('update actions', updateActions);
-  //   setError(false);
-  //   setLoading(true);
-  //   try {
-  //     const response = await asyncDispatch(
-  //       sdkActions.post({
-  //         service: 'types',
-  //         options: {
-  //           id: id,
-  //         },
-  //         payload: { version: data.version, actions: updateActions },
-  //       })
-  //     );
-  //     setData(response);
-  //     push(backToList);
-  //   } catch (error) {
-  //     console.log(error);
-  //     setError(true);
-  //     showApiErrorNotification({ errors: error.message });
-  //   }
-  //   setLoading(false);
-  // }
-
-  // function onSubmit(values) {
-  //   const { name, description, fieldDefinitions } = values;
-  //   console.log(values);
-  //   const syncTypes = createSyncTypes();
-  //   const newData = {
-  //     ...data,
-  //     name,
-  //     description,
-  //     fieldDefinitions,
-  //   };
-  //   console.log(data, newData);
-  //   const actions = syncTypes.buildActions(newData, data);
-  //   // Submit Updates
-  //   submitUpdateActions(actions);
-  // }
 
   if (error) {
     return (
@@ -219,27 +181,6 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
       }}
     </TypeDefinitionDetailsForm>
   );
-  // <View>
-  //   {data?.id ? (
-  //     <>
-  //       <ViewHeader
-  //         title={<FormattedMessage {...messages.title} />}
-  //         backToList={
-  //           <BackToList
-  //             href={backToList}
-  //             label={intl.formatMessage(messages.backButton)}
-  //           />
-  //         }
-  //         commands={<DeleteType typeId={id} typeVersion={data.version} />}
-  //       />
-  //       <Spacings.Inset scale="l">
-  //         <Spacings.Stack scale="m">
-  //           <TypeForm onSubmit={onSubmit} type={data} />
-  //         </Spacings.Stack>
-  //       </Spacings.Inset>
-  //     </>
-  //   ) : null}
-  // </View>
 };
 EditType.displayName = 'EditType';
 

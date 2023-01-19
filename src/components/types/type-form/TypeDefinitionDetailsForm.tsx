@@ -23,7 +23,7 @@ const resourceTypes = RESOURCE_TYPES.map((t) => ({ label: t, value: t }));
 type Formik = ReturnType<typeof useFormik>;
 
 type TErrors = {
-  key: { missing?: boolean };
+  key: { missing?: boolean; keyHint?: boolean };
 };
 
 const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
@@ -33,6 +33,12 @@ const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
 
   if (!formikValues.key || TextInput.isEmpty(formikValues.key)) {
     errors.key.missing = true;
+  }
+  if (
+    formikValues.key &&
+    (formikValues.key.length < 2 || formikValues.key.length > 256)
+  ) {
+    errors.key.keyHint = true;
   }
   return omitEmpty(errors);
 };
@@ -71,7 +77,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
   children,
   initialValues,
   onSubmit,
-  editMode = true,
+  isReadOnly,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -136,12 +142,19 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 title={intl.formatMessage(messages.keyTitle)}
                 hint={intl.formatMessage(messages.keyHint)}
                 isRequired
-                //errors={formik.errors.key}
+                errors={TextField.toFieldErrors<TFormValues>(formik.errors).key}
                 touched={formik.touched.key ? true : false}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 //renderError={(key, error) => error}
-                isDisabled={editMode}
+                isDisabled={isReadOnly}
+                renderError={(errorKey) => {
+                  console.log(errorKey);
+                  if (errorKey === 'keyHint') {
+                    return intl.formatMessage(messages.keyHint);
+                  }
+                  return null;
+                }}
               />
               {/* {formik.errors.key && formik.touched.key ? (
                 <ErrorMessage>{formik.errors.key}</ErrorMessage>
@@ -161,13 +174,13 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 touched={formik.touched.resourceTypeIds}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                isDisabled={editMode}
+                isDisabled={isReadOnly}
               />
             </Card>
           </Grid.Item>
         </Grid>
       </CollapsiblePanel>
-      {editMode && (
+      {!isReadOnly && (
         <CollapsiblePanel
           header={
             <CollapsiblePanel.Header>

@@ -6,7 +6,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, ApolloQueryResult } from '@apollo/client';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { createSyncTypes } from '@commercetools/sync-actions';
@@ -114,10 +114,13 @@ type TUseTypeDefinitionFetcher = (props: { id: string }) => {
   typeDefinition?: Maybe<TTypeDefinition>;
   error?: ApolloError;
   loading: boolean;
+  refetch: (
+    variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
+  ) => Promise<ApolloQueryResult<TQuery>>;
 };
 
 export const useTypeDefinitionFetcher: TUseTypeDefinitionFetcher = ({ id }) => {
-  const { data, error, loading } = useMcQuery<
+  const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_TypeDefinitionArgs
   >(FetchQuery, {
@@ -132,6 +135,7 @@ export const useTypeDefinitionFetcher: TUseTypeDefinitionFetcher = ({ id }) => {
     typeDefinition: data?.typeDefinition,
     error,
     loading,
+    refetch,
   };
 };
 

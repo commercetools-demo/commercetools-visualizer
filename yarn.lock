@@ -2544,7 +2544,7 @@
   resolved "https://registry.yarnpkg.com/@commercetools/sdk-middleware-logger/-/sdk-middleware-logger-2.1.2.tgz#6b8ce77699bf5d8e5ec4f243a2c9d691094ef0c7"
   integrity sha512-uGhhAUnZzLWO3ozzz6VDMUAKr5Y9ctVyqfExXVC7t37IgppLsKrrvLl6VMoU2uXjIGSNA0VN0Kxgj93rBBejTQ==
 
-"@commercetools/sync-actions@^5.1.0":
+"@commercetools/sync-actions@^5.3.1":
   version "5.3.1"
   resolved "https://registry.yarnpkg.com/@commercetools/sync-actions/-/sync-actions-5.3.1.tgz#7dec84e40785f0a245251785647a94f7bcb9a3b1"
   integrity sha512-qca3fmw46YweU1cMgmtm/lb8YoINyPo15SEVo8ZLUaXPl8pzXIhR0pXrp+Y6RRrn/oJqgLI7X/8Gj9y2IKAn2Q==

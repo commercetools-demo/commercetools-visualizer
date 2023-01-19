@@ -21,4 +21,9 @@ export default defineMessages({
     description: 'Error message for creating type',
     defaultMessage: 'Something went wrong. The Type was not saved. {message}',
   },
+  updateSuccess: {
+    id: 'EditType.form.message.update.success',
+    description: 'Success message for update type',
+    defaultMessage: 'Your Type has been updated.',
+  },
 });

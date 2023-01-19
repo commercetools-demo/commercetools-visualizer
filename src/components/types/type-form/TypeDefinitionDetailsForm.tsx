@@ -37,7 +37,7 @@ const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
   return omitEmpty(errors);
 };
 
-type TFormValues = {
+export type TFormValues = {
   id: string;
   key?: Maybe<string>;
   name: Record<string, string>;
@@ -102,7 +102,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 name="name"
                 selectedLanguage={dataLocale}
                 value={formik.values.name}
-                title={<FormattedMessage {...messages.nameTitle} />}
+                title={intl.formatMessage(messages.nameTitle)}
                 isRequired
                 //errors={formik.errors.name}
                 touched={formik.touched.name ? true : false}
@@ -118,7 +118,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 name="description"
                 selectedLanguage={dataLocale}
                 value={formik.values.description}
-                title={<FormattedMessage {...messages.descriptionTitle} />}
+                title={intl.formatMessage(messages.descriptionTitle)}
                 isRequired
                 //errors={formik.errors.description}
                 touched={formik.touched.description ? true : false}
@@ -133,8 +133,8 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
               <TextField
                 name="key"
                 value={formik.values.key || ''}
-                title={<FormattedMessage {...messages.keyTitle} />}
-                hint={<FormattedMessage {...messages.keyHint} />}
+                title={intl.formatMessage(messages.keyTitle)}
+                hint={intl.formatMessage(messages.keyHint)}
                 isRequired
                 //errors={formik.errors.key}
                 touched={formik.touched.key ? true : false}
@@ -152,7 +152,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
             <Card type="flat" insetScale="s">
               <SelectField
                 name="resourceTypeIds"
-                title={<FormattedMessage {...messages.resourceTypeIdsTitle} />}
+                title={intl.formatMessage(messages.resourceTypeIdsTitle)}
                 isRequired
                 isMulti
                 value={formik.values.resourceTypeIds}

@@ -20,7 +20,12 @@ import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
-import { useTypeDefinitionFetcher } from '../subscription-connectors';
+import { DOMAINS } from '@commercetools-frontend/constants';
+import {
+  formValuesToDoc,
+  useTypeDefinitionFetcher,
+  useTypeDefinitionUpdater,
+} from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
@@ -45,6 +50,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
   //   NOTIFICATION_KINDS_SIDE.success,
   //   messages.createSuccess
   // );
+  const typeDefinitionUpdater = useTypeDefinitionUpdater();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -56,18 +62,18 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
   const handleSubmit = useCallback(
     async (formikValues, formikHelpers) => {
       try {
-        // subscription &&
-        //   (await subscriptionKeyUpdater.execute({
-        //     originalDraft: subscription,
-        //     nextDraft: formikValues,
-        //   }));
-        // showNotification({
-        //   kind: 'success',
-        //   domain: DOMAINS.SIDE,
-        //   text: intl.formatMessage(messages.subscriptionUpdated, {
-        //     subscriptionKey: subscription?.key,
-        //   }),
-        // });
+        const data = formValuesToDoc(formikValues);
+        if (typeDefinition) {
+          await typeDefinitionUpdater.execute({
+            originalDraft: typeDefinition,
+            nextDraft: data,
+          });
+        }
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.updateSuccess),
+        });
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
         if (transformedErrors.unmappedErrors.length > 0) {
@@ -80,7 +86,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
         formikHelpers.setErrors(transformedErrors.formErrors);
       }
     },
-    [intl, showApiErrorNotification, showNotification]
+    [intl, showNotification, typeDefinition, typeDefinitionUpdater]
   );
 
   const handleDelete = async () => {

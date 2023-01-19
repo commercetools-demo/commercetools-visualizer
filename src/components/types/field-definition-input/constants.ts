@@ -1,16 +1,16 @@
 export const FIELD_TYPES = {
-  String: 'String',
-  LocalizedString: 'LocalizedString',
-  Number: 'Number',
   Boolean: 'Boolean',
-  Money: 'Money',
   Date: 'Date',
-  Time: 'Time',
   DateTime: 'DateTime',
   Enum: 'Enum',
   LocalizedEnum: 'LocalizedEnum',
-  Set: 'Set',
+  LocalizedString: 'LocalizedString',
+  Money: 'Money',
+  Number: 'Number',
   Reference: 'Reference',
+  Set: 'Set',
+  String: 'String',
+  Time: 'Time',
 };
 
 export const INPUT_HINTS = {

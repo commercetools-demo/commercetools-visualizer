@@ -16,7 +16,6 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import PrimaryButton from '@commercetools-uikit/primary-button';
 import { Maybe, TFieldDefinition } from '../../../types/generated/ctp';
 import messages from './messages';
-import styles from './form.module.css';
 import { RESOURCE_TYPES } from './constants';
 import FieldTable from './FieldTable';
 
@@ -92,14 +91,13 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
             <FormattedMessage {...messages.generalInformationTitle} />
           </CollapsiblePanel.Header>
         }
-        className={styles.panel}
       >
         <Grid
           gridTemplateColumns={`repeat(2, ${customProperties.constraint11})`}
           gridGap={customProperties.spacingM}
         >
           <Grid.Item>
-            <Card type="flat" className={styles['field-card']}>
+            <Card type="flat" insetScale="s">
               <LocalizedTextField
                 name="name"
                 selectedLanguage={dataLocale}
@@ -115,7 +113,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
             </Card>
           </Grid.Item>
           <Grid.Item>
-            <Card type="flat" className={styles['field-card']}>
+            <Card type="flat" insetScale="s">
               <LocalizedTextField
                 name="description"
                 selectedLanguage={dataLocale}
@@ -131,7 +129,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
             </Card>
           </Grid.Item>
           <Grid.Item>
-            <Card type="flat" className={styles['field-card']}>
+            <Card type="flat" insetScale="s">
               <TextField
                 name="key"
                 value={formik.values.key || ''}
@@ -151,7 +149,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
             </Card>
           </Grid.Item>
           <Grid.Item>
-            <Card type="flat" className={styles['field-card']}>
+            <Card type="flat" insetScale="s">
               <SelectField
                 name="resourceTypeIds"
                 title={<FormattedMessage {...messages.resourceTypeIdsTitle} />}
@@ -176,7 +174,6 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
               <FormattedMessage {...messages.typeInformationTitle} />
             </CollapsiblePanel.Header>
           }
-          className={styles.panel}
         >
           <FieldTable
             value={formik.values.fieldDefinitions}

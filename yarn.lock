@@ -1824,6 +1824,28 @@
     lodash "4.17.21"
     prop-types "15.8.1"
 
+"@commercetools-uikit/collapsible-panel@^15.9.0":
+  version "15.9.0"
+  resolved "https://registry.yarnpkg.com/@commercetools-uikit/collapsible-panel/-/collapsible-panel-15.9.0.tgz#fa54854237f2b3766ec65d6e60a0d660e9cb2282"
+  integrity sha512-maauZAE/KmjPWlj79lDAfZcjK7TB05ov4Imu3iE7v5pvM9jRj7ipvQFINgYLw8WgTFNFy0xIjb0g8caE+Xn2NA==
+  dependencies:
+    "@babel/runtime" "^7.19.0"
+    "@babel/runtime-corejs3" "^7.19.1"
+    "@commercetools-uikit/accessible-button" "15.9.0"
+    "@commercetools-uikit/collapsible-motion" "15.9.0"
+    "@commercetools-uikit/constraints" "15.9.0"
+    "@commercetools-uikit/design-system" "15.9.0"
+    "@commercetools-uikit/hooks" "15.9.0"
+    "@commercetools-uikit/icons" "15.9.0"
+    "@commercetools-uikit/spacings" "15.9.0"
+    "@commercetools-uikit/text" "15.9.0"
+    "@commercetools-uikit/utils" "15.9.0"
+    "@emotion/react" "^11.4.0"
+    "@emotion/styled" "^11.3.0"
+    lodash "4.17.21"
+    prop-types "15.8.1"
+    react-intl "^5.25.1"
+
 "@commercetools-uikit/constraints@15.9.0", "@commercetools-uikit/constraints@^15.9.0":
   version "15.9.0"
   resolved "https://registry.yarnpkg.com/@commercetools-uikit/constraints/-/constraints-15.9.0.tgz#70b2212c5f4a666fcfb8b2b892d137045b68c9a9"

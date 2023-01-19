@@ -226,7 +226,7 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
               sortedBy={tableSorting.value.key}
               sortDirection={tableSorting.value.order}
               onSortChange={tableSorting.onChange}
-              //onRowClick={(row) => push(`${linkToWelcome}/types/${row.id}`)}
+              onRowClick={(row) => push(`${linkToWelcome}/types/${row.id}`)}
             />
           </DataTableManager>
           <Pagination

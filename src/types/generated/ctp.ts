@@ -3324,6 +3324,7 @@ export type TFieldDefinitionInput = {
 };
 
 export type TFieldType = {
+  __typename?: 'FieldType';
   name: Scalars['String'];
 };
 

@@ -1,0 +1,49 @@
+query FetchType($id: String) {
+  typeDefinition(id: $id) {
+    id
+    nameAllLocales {
+      locale
+      value
+    }
+    descriptionAllLocales {
+      locale
+      value
+    }
+    key
+    resourceTypeIds
+    fieldDefinitions {
+      name
+      required
+      inputHint
+      labelAllLocales {
+        locale
+        value
+      }
+      type {
+        name
+        ... on ReferenceType {
+          referenceTypeId
+        }
+        ... on SetType {
+          elementType {
+            name
+          }
+        }
+      }
+    }
+    createdAt
+    createdBy {
+      isPlatformClient
+      externalUserId
+      anonymousId
+      clientId
+    }
+    lastModifiedAt
+    lastModifiedBy {
+      isPlatformClient
+      externalUserId
+      anonymousId
+      clientId
+    }
+  }
+}

@@ -11,10 +11,7 @@ import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
-import TextInput from '@commercetools-uikit/text-input';
 import { useIntl } from 'react-intl';
-import type { FormikErrors } from 'formik';
-import omitEmpty from 'omit-empty-es';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import {
   useShowNotification,
@@ -22,7 +19,6 @@ import {
   type TApiErrorNotificationOptions,
 } from '@commercetools-frontend/actions-global';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { TFormValues } from '../../types';
 import { getErrorMessage } from '../../helpers';
 import { PERMISSIONS } from '../../constants';
 import SubscriptionDetailsForm from './SubscriptionDetailsForm';
@@ -33,27 +29,6 @@ import {
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
 } from './subscription-connectors';
-
-export type TErrors = {
-  key: { missing?: boolean };
-};
-
-export const validate = (
-  formikValues: TFormValues
-): FormikErrors<TFormValues> => {
-  const errors: TErrors = {
-    key: {},
-  };
-
-  if (!formikValues.key || TextInput.isEmpty(formikValues.key)) {
-    errors.key.missing = true;
-  }
-  return omitEmpty(errors);
-};
-
-export const formValuesToDoc = (formValues: TFormValues) => ({
-  key: formValues.key,
-});
 
 type Props = {
   linkToWelcome: string;
@@ -79,12 +54,11 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
 
   const handleSubmit = useCallback(
     async (formikValues, formikHelpers) => {
-      const updatedValues = formValuesToDoc(formikValues);
       try {
         subscription &&
           (await subscriptionKeyUpdater.execute({
             originalDraft: subscription,
-            nextDraft: updatedValues,
+            nextDraft: formikValues,
           }));
         showNotification({
           kind: 'success',

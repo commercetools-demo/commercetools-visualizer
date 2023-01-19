@@ -1,12 +1,28 @@
 import { FC, ReactElement } from 'react';
-import { useFormik, type FormikHelpers } from 'formik';
+import { useFormik, type FormikHelpers, FormikErrors } from 'formik';
 import TextField from '@commercetools-uikit/text-field';
 import { useIntl } from 'react-intl';
+import TextInput from '@commercetools-uikit/text-input';
+import omitEmpty from 'omit-empty-es';
 import { TFormValues } from '../../types';
-import { validate } from './SubscriptionDetail';
 import messages from './messages';
 
 type Formik = ReturnType<typeof useFormik>;
+
+type TErrors = {
+  key: { missing?: boolean };
+};
+
+const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
+  const errors: TErrors = {
+    key: {},
+  };
+
+  if (!formikValues.key || TextInput.isEmpty(formikValues.key)) {
+    errors.key.missing = true;
+  }
+  return omitEmpty(errors);
+};
 
 type FormProps = {
   formElements: ReactElement;

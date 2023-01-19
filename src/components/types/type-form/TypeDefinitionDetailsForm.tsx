@@ -68,7 +68,7 @@ type Props = {
   isReadOnly: boolean;
   dataLocale: string;
   children: (formProps: FormProps) => JSX.Element;
-  editMode?: boolean;
+  linkToHome: string;
 };
 
 const TypeDefinitionDetailsForm: FC<Props> = ({
@@ -76,6 +76,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
   initialValues,
   onSubmit,
   isReadOnly,
+  linkToHome,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -187,8 +188,10 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
           }
         >
           <FieldTable
+            id={formik.values.id}
             value={formik.values.fieldDefinitions}
             onBlur={formik.handleBlur}
+            linkToHome={linkToHome}
             //onChange={setFieldValue}
           />
         </CollapsiblePanel>

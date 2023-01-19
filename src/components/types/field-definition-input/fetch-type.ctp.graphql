@@ -1,0 +1,25 @@
+query FetchTypeWithDefinitionByName($id: String, $includeNames: [String!]) {
+  typeDefinition(id: $id) {
+    fieldDefinitions(includeNames: $includeNames) {
+      name
+      required
+      inputHint
+      labelAllLocales {
+        locale
+        value
+      }
+      type {
+        name
+        ... on ReferenceType {
+          referenceTypeId
+        }
+        ... on SetType {
+          elementType {
+            name
+          }
+        }
+      }
+    }
+    version
+  }
+}

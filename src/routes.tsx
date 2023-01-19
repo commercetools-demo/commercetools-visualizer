@@ -40,10 +40,10 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
         <SubscriptionDetail linkToWelcome={`${match.url}/subscriptions`} />
       </Route>
       <Route path={`${match.path}/subscriptions`}>
-        <Subscriptions linkToWelcome={match.url} />
+        <Subscriptions linkToHome={match.url} />
       </Route>
       <Route path={`${match.path}/types/:id`}>
-        <EditType linkToWelcome={match.url} />
+        <EditType linkToHome={match.url} />
       </Route>
       <Route path={`${match.path}/types`}>
         <Types linkToWelcome={match.url} />

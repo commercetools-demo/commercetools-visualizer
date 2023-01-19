@@ -1,7 +1,8 @@
-import React, { FC, useState } from 'react';
+import React, { FC, lazy, useState } from 'react';
 import { useIntl } from 'react-intl';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
 import IconButton from '@commercetools-uikit/icon-button';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
 import {
   formatLocalizedString,
   transformLocalizedFieldToLocalizedString,
@@ -10,12 +11,14 @@ import {
   CheckActiveIcon,
   CheckInactiveIcon,
   BinFilledIcon,
+  PlusBoldIcon,
 } from '@commercetools-uikit/icons';
 import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
-import FieldDefinitionInput from '../field-definition-input';
+import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import {
   TFieldDefinition,
   TReferenceType,
@@ -23,6 +26,10 @@ import {
 } from '../../../types/generated/ctp';
 import createColumnDefinitions from './field-column-definitions';
 import messages from './field-messages';
+
+const FieldDefinitionInput = lazy(
+  () => import('../field-definition-input/FieldDefinitionInput')
+);
 
 type Props = {
   id?: string;
@@ -32,12 +39,15 @@ type Props = {
   isDisabled?: boolean;
   hasError?: boolean;
   hasWarning?: boolean;
+  linkToHome: string;
 };
 
 type TFieldDefinitionWithId = { id: string } & TFieldDefinition;
 
-const FieldTable: FC<Props> = ({ id, value, onChange }) => {
+const FieldTable: FC<Props> = ({ id, value, onChange, linkToHome }) => {
   const intl = useIntl();
+  const match = useRouteMatch();
+  const { push } = useHistory();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale,
     projectLanguages: context.project?.languages,
@@ -77,11 +87,16 @@ const FieldTable: FC<Props> = ({ id, value, onChange }) => {
     onChange && onChange('fieldDefinitions', newSet);
   };
 
-  const rowClick = (row: any, rowIndex: number, columnKey: string) => {
+  const rowClick = (
+    row: TFieldDefinitionWithId,
+    rowIndex: number,
+    columnKey: string
+  ) => {
     if (columnKey === 'delete') {
       deleteItem(row.name);
+    } else {
+      push(`${linkToHome}/types/${id}/${row.name}`);
     }
-    return;
   };
 
   const itemRendered = (
@@ -133,23 +148,24 @@ const FieldTable: FC<Props> = ({ id, value, onChange }) => {
   return (
     <>
       <div style={{ display: 'block', width: '100%' }}>
-        <FieldDefinitionInput
+        {/* <FieldDefinitionInput
           isOpen={FieldDefinitionInputOpen}
           onClose={() => {
             setFieldDefinitionInputOpen(false);
           }}
           onSubmit={updateFieldDefinition}
           existingFieldDefinition={FieldDefinitionInputData}
-        />
+        /> */}
         <Spacings.Stack scale="m">
           <Spacings.Inline justifyContent="space-between">
             <Text.Headline as="h3" intlMessage={messages.fieldHeaderTitle} />
-            {/* <SecondaryButton
-              onClick={() => {setFieldDefinitionInputOpen(true);}}
+            <SecondaryButton
+              onClick={() => {
+                return setFieldDefinitionInputOpen(true);
               }}
               iconLeft={<PlusBoldIcon />}
               label={intl.formatMessage(messages.addField)}
-            /> */}
+            />
           </Spacings.Inline>
           <DataTable<TFieldDefinitionWithId>
             columns={createColumnDefinitions(intl.formatMessage)}
@@ -158,6 +174,13 @@ const FieldTable: FC<Props> = ({ id, value, onChange }) => {
             itemRenderer={itemRendered}
             onRowClick={rowClick}
           />
+          <Switch>
+            <SuspendedRoute
+              path={`${linkToHome}/types/:id/:fieldDefinitionName`}
+            >
+              <FieldDefinitionInput onClose={() => push(`${match.url}`)} />
+            </SuspendedRoute>
+          </Switch>
         </Spacings.Stack>
       </div>
     </>

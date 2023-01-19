@@ -34,10 +34,10 @@ import TypeDefinitionDetailsForm from '../type-form/TypeDefinitionDetailsForm';
 import messages from './messages';
 
 type Props = {
-  linkToWelcome: string;
+  linkToHome: string;
 };
 
-const EditType: FC<Props> = ({ linkToWelcome }) => {
+const EditType: FC<Props> = ({ linkToHome }) => {
   const history = useHistory();
   const intl = useIntl();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
@@ -45,7 +45,7 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const { id } = useParams<{ id: string }>();
-  const backToList = `/${linkToWelcome}/types`;
+  const backToList = `/${linkToHome}/types`;
   const showNotification = useShowNotification();
   // const showSuccessNotification = useShowSideNotification(
   //   NOTIFICATION_KINDS_SIDE.success,
@@ -149,12 +149,13 @@ const EditType: FC<Props> = ({ linkToWelcome }) => {
       onSubmit={handleSubmit}
       isReadOnly={!canManage}
       dataLocale={dataLocale}
+      linkToHome={linkToHome}
     >
       {(formProps) => {
         return (
           <CustomFormDetailPage
             title={intl.formatMessage(messages.title)}
-            onPreviousPathClick={() => history.push(linkToWelcome + '/types')}
+            onPreviousPathClick={() => history.push(linkToHome + '/types')}
             formControls={
               <>
                 <CustomFormDetailPage.FormSecondaryButton

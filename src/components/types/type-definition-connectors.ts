@@ -24,12 +24,12 @@ import {
 } from '../../helpers';
 import FetchQuery from './edit/fetch-type.ctp.graphql';
 import UpdateTypeDefinitionIdMutation from './edit/update-type.ctp.graphql';
+import TypeWithDefinitionByName from './field-definition-input/fetch-type.ctp.graphql';
 import { TFormValues } from './type-form/TypeDefinitionDetailsForm';
 
 const syncTypes = createSyncTypes();
 
 export const convertToActionData = (draft: Partial<TTypeDefinition>) => ({
-  //...draft,
   name: transformLocalizedFieldToLocalizedString(draft.nameAllLocales || []),
   description: transformLocalizedFieldToLocalizedString(
     draft.descriptionAllLocales || []
@@ -133,6 +133,35 @@ export const useTypeDefinitionFetcher: TUseTypeDefinitionFetcher = ({ id }) => {
   });
   return {
     typeDefinition: data?.typeDefinition,
+    error,
+    loading,
+    refetch,
+  };
+};
+
+export type TQuery_TypeDefinitionWithDefinitionByNameArgs = {
+  id: string;
+  includeNames: Array<string>;
+};
+
+export const useTypeWithDefinitionByNameFetcher = (
+  id: string,
+  includeNames: Array<string>
+) => {
+  const { data, error, loading, refetch } = useMcQuery<
+    TQuery,
+    TQuery_TypeDefinitionWithDefinitionByNameArgs
+  >(TypeWithDefinitionByName, {
+    variables: {
+      id: id,
+      includeNames: includeNames,
+    },
+    context: {
+      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+    },
+  });
+  return {
+    fieldDefinitions: data?.typeDefinition?.fieldDefinitions,
     error,
     loading,
     refetch,

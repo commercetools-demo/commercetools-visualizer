@@ -30,7 +30,7 @@ import FetchQuery from './fetch-subscriptions.cpt.graphql';
 import messages from './messages';
 
 type Props = {
-  linkToWelcome: string;
+  linkToHome: string;
 };
 
 const Subscriptions = (props: Props) => {
@@ -145,7 +145,7 @@ const Subscriptions = (props: Props) => {
           <SecondaryButton
             iconLeft={<PlusBoldIcon />}
             as={Link}
-            to={props.linkToWelcome + '/subscription/new'}
+            to={props.linkToHome + '/subscription/new'}
             label={intl.formatMessage(messages.subscriptionAdd)}
           />
         </Spacings.Inline>
@@ -165,7 +165,7 @@ const Subscriptions = (props: Props) => {
             sortDirection={tableSorting.value.order}
             onSortChange={tableSorting.onChange}
             onRowClick={(row) =>
-              push(`${props.linkToWelcome}/subscription/${row.id}`)
+              push(`${props.linkToHome}/subscription/${row.id}`)
             }
           />
           <Pagination

@@ -170,7 +170,12 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
           />
           <Switch>
             <SuspendedRoute path={`${linkToHome}/types/:id/:version/new`}>
-              <NewFieldDefinitionInput onClose={() => push(`${match.url}`)} />
+              <NewFieldDefinitionInput
+                onClose={() => {
+                  refetch();
+                  push(`${match.url}`);
+                }}
+              />
             </SuspendedRoute>
             <SuspendedRoute
               path={`${linkToHome}/types/:id/:fieldDefinitionName`}

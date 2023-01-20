@@ -99,7 +99,7 @@ const FieldDefinitionInput: FC<Props> = (props) => {
         formikHelpers.setErrors(transformedErrors.formErrors);
       }
     },
-    [fieldDefinitions, intl, refetch, typeDefinitionUpdater, version]
+    [fieldDefinitions, id, intl, refetch, typeDefinitionUpdater, version]
   );
 
   if (error) {

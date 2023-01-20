@@ -91,11 +91,11 @@ export const useTypeDefinitionUpdater = () => {
     originalDraft: Partial<TTypeDefinition>;
     nextDraft: any;
   }) => {
-    const actions = syncTypes.buildActions(
-      nextDraft,
-      convertToActionData(originalDraft)
-    );
     try {
+      const actions = syncTypes.buildActions(
+        nextDraft,
+        convertToActionData(originalDraft)
+      );
       return await updateTypeDefinitionId({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,

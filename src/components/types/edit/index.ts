@@ -1,1 +1,1 @@
-export { default } from './edit-type';
+export { default } from './EditType';

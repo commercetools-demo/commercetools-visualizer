@@ -30,7 +30,7 @@ import {
   TTypeUpdateAction,
 } from '../../../types/generated/ctp';
 import NewFieldDefinitionInput from '../field-definition-input/NewFieldDefinitionInput';
-import { useTypeDefinitionCreator } from '../type-definition-connectors';
+import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
 import createColumnDefinitions from './field-column-definitions';
 import messages from './field-messages';
 
@@ -43,7 +43,7 @@ type Props = {
   version: number;
   value: Array<TFieldDefinition>;
   linkToHome: string;
-  refetch: (
+  refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
 };
@@ -54,7 +54,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
-  const typeDefinitionCreator = useTypeDefinitionCreator();
+  const typeDefinitionCreator = useTypeDefinitionEntryCreator();
   const showNotification = useShowNotification();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale,
@@ -78,7 +78,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
       domain: DOMAINS.SIDE,
       text: intl.formatMessage(messages.removeFieldDefinitionButtonSuccess),
     });
-    refetch();
+    refetch && refetch();
   };
 
   const rowClick = (
@@ -172,7 +172,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
             <SuspendedRoute path={`${linkToHome}/types/:id/:version/new`}>
               <NewFieldDefinitionInput
                 onClose={() => {
-                  refetch();
+                  refetch && refetch();
                   push(`${match.url}`);
                 }}
               />
@@ -182,7 +182,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
             >
               <FieldDefinitionInput
                 onClose={() => {
-                  refetch();
+                  refetch && refetch();
                   push(`${match.url}`);
                 }}
               />

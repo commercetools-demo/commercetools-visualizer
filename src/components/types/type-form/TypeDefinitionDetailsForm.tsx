@@ -71,12 +71,11 @@ type Props = {
     formikHelpers: FormikHelpers<TFormValues>
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
-  isReadOnly: boolean;
   dataLocale: string;
   children: (formProps: FormProps) => JSX.Element;
   linkToHome: string;
   version: number;
-  refetch: (
+  refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
   createNewMode?: boolean;
@@ -87,7 +86,6 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
   children,
   initialValues,
   onSubmit,
-  isReadOnly,
   linkToHome,
   refetch,
   createNewMode = false,
@@ -192,7 +190,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
           </Grid.Item>
         </Grid>
       </CollapsiblePanel>
-      {!isReadOnly && (
+      {!createNewMode && (
         <CollapsiblePanel
           header={
             <CollapsiblePanel.Header>

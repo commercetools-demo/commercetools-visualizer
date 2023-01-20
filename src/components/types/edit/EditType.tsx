@@ -23,6 +23,7 @@ import { transformLocalizedFieldToLocalizedString } from '@commercetools-fronten
 import { DOMAINS } from '@commercetools-frontend/constants';
 import {
   formValuesToDoc,
+  useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
   useTypeDefinitionUpdater,
 } from '../type-definition-connectors';
@@ -45,9 +46,9 @@ const EditType: FC<Props> = ({ linkToHome }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const { id } = useParams<{ id: string }>();
-  const backToList = `/${linkToHome}/types`;
   const showNotification = useShowNotification();
   const typeDefinitionUpdater = useTypeDefinitionUpdater();
+  const typeDefinitionDeleter = useTypeDefinitionDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -88,20 +89,21 @@ const EditType: FC<Props> = ({ linkToHome }) => {
   );
 
   const handleDelete = async () => {
-    // await subscriptionDeleter.execute({
-    //   id: subscription.id,
-    //   version: subscription.version,
-    // });
-    // showNotification({
-    //   kind: 'success',
-    //   domain: DOMAINS.SIDE,
-    //   text: intl.formatMessage(messages.subscriptionUpdated, {
-    //     subscriptionKey: subscription?.key,
-    //   }),
-    // });
-    history.replace({
-      pathname: backToList,
-    });
+    if (typeDefinition) {
+      await typeDefinitionDeleter.execute({
+        id: typeDefinition.id,
+        version: typeDefinition.version,
+      });
+      showNotification({
+        kind: 'success',
+        domain: DOMAINS.SIDE,
+        text: intl.formatMessage(messages.updateSuccess),
+      });
+      refetch();
+      history.replace({
+        pathname: `${linkToHome}/types`,
+      });
+    }
   };
 
   if (error) {
@@ -143,7 +145,6 @@ const EditType: FC<Props> = ({ linkToHome }) => {
         fieldDefinitions: typeDefinition.fieldDefinitions,
       }}
       onSubmit={handleSubmit}
-      isReadOnly={!canManage}
       dataLocale={dataLocale}
       linkToHome={linkToHome}
       version={typeDefinition.version}

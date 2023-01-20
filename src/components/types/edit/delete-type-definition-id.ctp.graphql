@@ -1,0 +1,5 @@
+mutation DeleteTypeDefintion($id: String, $version: Long!) {
+  deleteTypeDefinition(version: $version, id: $id) {
+    id
+  }
+}

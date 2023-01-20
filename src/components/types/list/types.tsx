@@ -28,6 +28,8 @@ import {
   transformLocalizedFieldToLocalizedString,
 } from '@commercetools-frontend/l10n';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { getErrorMessage } from '../../../helpers';
 import {
   TQuery,
@@ -39,10 +41,10 @@ import messages from './messages';
 import createColumnDefinitions from './column-definitions';
 
 type Props = {
-  linkToWelcome: string;
+  linkToHome: string;
 };
 
-const Types: FC<Props> = ({ linkToWelcome }) => {
+const Types: FC<Props> = ({ linkToHome }) => {
   const intl = useIntl();
   const { push } = useHistory();
   const { page, perPage } = usePaginationState();
@@ -194,13 +196,13 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
           <Text.Headline as="h2" intlMessage={messages.title} />
-          {/* <SecondaryButton
+          <SecondaryButton
             onClick={() => {
-              push(`/${linkToWelcome}/types/new`);
+              push(`${linkToHome}/types/new`);
             }}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addType)}
-          /> */}
+          />
         </Spacings.Inline>
       }
     >
@@ -226,7 +228,7 @@ const Types: FC<Props> = ({ linkToWelcome }) => {
               sortedBy={tableSorting.value.key}
               sortDirection={tableSorting.value.order}
               onSortChange={tableSorting.onChange}
-              onRowClick={(row) => push(`${linkToWelcome}/types/${row.id}`)}
+              onRowClick={(row) => push(`${linkToHome}/types/${row.id}`)}
             />
           </DataTableManager>
           <Pagination

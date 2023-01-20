@@ -18,13 +18,18 @@ import {
   TMutation,
   TMutation_UpdateTypeDefinitionArgs,
   TTypeUpdateAction,
+  TMutation_CreateTypeDefinitionArgs,
+  TTypeDefinitionDraft,
+  TMutation_DeleteTypeDefinitionArgs,
 } from '../../types/generated/ctp';
 import {
   createGraphQlUpdateActions,
   extractErrorFromGraphQlResponse,
 } from '../../helpers';
 import FetchQuery from './edit/fetch-type.ctp.graphql';
+import DeleteQuery from './edit/delete-type-definition-id.ctp.graphql';
 import UpdateTypeDefinitionIdMutation from './edit/update-type.ctp.graphql';
+import CreateTypeDefinitionMutation from './new/create-type.ctp.graphql';
 import TypeWithDefinitionByName from './field-definition-input/fetch-type.ctp.graphql';
 import { TFormValues } from './type-form/TypeDefinitionDetailsForm';
 
@@ -51,6 +56,33 @@ export const formValuesToDoc = (formValues: TFormValues) => ({
   description: LocalizedTextInput.omitEmptyTranslations(formValues.description),
   key: formValues.key,
 });
+
+export const useTypeDefinitionCreator = () => {
+  const [updateTypeDefinition, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_CreateTypeDefinitionArgs
+  >(CreateTypeDefinitionMutation);
+
+  const execute = async ({ draft }: { draft: TTypeDefinitionDraft }) => {
+    try {
+      return await updateTypeDefinition({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          draft: draft,
+        },
+      });
+    } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
 
 export const useTypeDefinitionUpdater = () => {
   const [updateTypeDefinitionId, { loading }] = useMcMutation<
@@ -91,7 +123,7 @@ export const useTypeDefinitionUpdater = () => {
   };
 };
 
-export const useTypeDefinitionCreator = () => {
+export const useTypeDefinitionEntryCreator = () => {
   const [createTypeDefinitionEntry, { loading }] = useMcMutation<
     TMutation,
     TMutation_UpdateTypeDefinitionArgs
@@ -187,30 +219,30 @@ export const useTypeWithDefinitionByNameFetcher = (
   };
 };
 
-// export const useSubscriptionDeleter = () => {
-//   const [deleteSubscriptionById, { loading }] = useMcMutation<
-//     TMutation,
-//     TMutation_DeleteSubscriptionArgs
-//   >(DeleteSubscriptionIdMutation);
+export const useTypeDefinitionDeleter = () => {
+  const [deleteTypeDefinitionById, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_DeleteTypeDefinitionArgs
+  >(DeleteQuery);
 
-//   const execute = async ({ id, version }: { id: string; version: number }) => {
-//     try {
-//       return await deleteSubscriptionById({
-//         context: {
-//           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-//         },
-//         variables: {
-//           id: id,
-//           version: version,
-//         },
-//       });
-//     } catch (graphQlResponse) {
-//       throw extractErrorFromGraphQlResponse(graphQlResponse);
-//     }
-//   };
+  const execute = async ({ id, version }: { id: string; version: number }) => {
+    try {
+      return await deleteTypeDefinitionById({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          id: id,
+          version: version,
+        },
+      });
+    } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
 
-//   return {
-//     loading,
-//     execute,
-//   };
-// };
+  return {
+    loading,
+    execute,
+  };
+};

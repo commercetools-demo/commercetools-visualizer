@@ -16,7 +16,7 @@ import {
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
-import { useTypeDefinitionCreator } from '../type-definition-connectors';
+import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import {
@@ -42,7 +42,7 @@ const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
 
   const showNotification = useShowNotification();
 
-  const typeDefinitionCreator = useTypeDefinitionCreator();
+  const typeDefinitionCreator = useTypeDefinitionEntryCreator();
 
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',

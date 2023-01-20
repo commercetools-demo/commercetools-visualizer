@@ -5,7 +5,10 @@ import { RevertIcon } from '@commercetools-uikit/icons';
 import { useParams } from 'react-router-dom';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import { transformLocalizedStringToLocalizedField } from '@commercetools-frontend/l10n';
+import {
+  transformLocalizedStringToLocalizedField,
+  transformLocalizedFieldToLocalizedString,
+} from '@commercetools-frontend/l10n';
 import {
   showApiErrorNotification,
   TApiErrorNotificationOptions,
@@ -41,8 +44,9 @@ const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
 
   const typeDefinitionCreator = useTypeDefinitionCreator();
 
-  const { dataLocale } = useApplicationContext((context) => ({
+  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
+    projectLanguages: context.project?.languages ?? [],
   }));
   const intl = useIntl();
 
@@ -144,20 +148,14 @@ const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
 
   return (
     <FieldDefinitionInputForm
-      // initialValues={{
-      //   label: LocalizedTextInput.createLocalizedString(
-      //     projectLanguages,
-      //     transformLocalizedFieldToLocalizedString([]) ?? {}
-      //   ),
-      //   name: '',
-      //   inputHint: 'SingleLine',
-      //   type: { name: '' },
-      // }}
       initialValues={{
-        label: { en: 'en', de: 'de' },
-        name: 'name',
-        inputHint: 'MultiLine',
-        type: { name: 'Boolean' },
+        label: LocalizedTextInput.createLocalizedString(
+          projectLanguages,
+          transformLocalizedFieldToLocalizedString([]) ?? {}
+        ),
+        name: '',
+        inputHint: 'SingleLine',
+        type: { name: '' },
       }}
       onSubmit={handleSubmit}
       createNewMode={true}

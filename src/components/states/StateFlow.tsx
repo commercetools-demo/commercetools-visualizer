@@ -72,8 +72,8 @@ interface Props {
 
 const StateFlow: FC<Props> = ({ items }) => {
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale,
-    projectLanguages: context.project?.languages,
+    dataLocale: context.dataLocale ?? '',
+    projectLanguages: context.project?.languages ?? [],
   }));
   const [isHorizontal, setHorizontal] = useState<boolean>(false);
   const initialNodes: Array<Node> = items.map((item) => {

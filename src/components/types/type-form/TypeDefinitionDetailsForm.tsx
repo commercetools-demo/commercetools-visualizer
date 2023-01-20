@@ -79,6 +79,7 @@ type Props = {
   refetch: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
+  createNewMode?: boolean;
 };
 
 const TypeDefinitionDetailsForm: FC<Props> = ({
@@ -89,6 +90,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
   isReadOnly,
   linkToHome,
   refetch,
+  createNewMode = false,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -157,8 +159,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 touched={formik.touched.key ? true : false}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                //renderError={(key, error) => error}
-                isDisabled={isReadOnly}
+                isDisabled={!createNewMode}
                 renderError={(errorKey) => {
                   console.log(errorKey);
                   if (errorKey === 'keyHint') {
@@ -185,7 +186,7 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
                 touched={formik.touched.resourceTypeIds}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                isDisabled={isReadOnly}
+                isDisabled={!createNewMode}
               />
             </Card>
           </Grid.Item>

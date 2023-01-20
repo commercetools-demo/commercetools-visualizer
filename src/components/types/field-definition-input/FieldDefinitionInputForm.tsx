@@ -35,7 +35,7 @@ export type TFormValues = {
   name: string;
   required?: boolean;
   inputHint: string;
-  type: { name: string; referenceTypeId: string };
+  type: { name: string; referenceTypeId?: string };
 };
 
 type TErrors = {
@@ -58,7 +58,7 @@ type Props = {
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
   dataLocale: string;
-  editMode?: boolean;
+  createNewMode?: boolean;
   children: (formProps: FormProps) => JSX.Element;
 };
 const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
@@ -76,7 +76,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
   children,
   initialValues,
   onSubmit,
-  editMode = false,
+  createNewMode = false,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -104,7 +104,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
             touched={formik.touched.name ? true : false}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            isDisabled={!editMode}
+            isDisabled={!createNewMode}
           />
           {/* {errors.name && touched.name ? (
               <ErrorMessage>{errors.name}</ErrorMessage>
@@ -127,12 +127,12 @@ const FieldDefinitionInputForm: FC<Props> = ({
             name="type.name"
             title={intl.formatMessage(messages.typeTitle)}
             isRequired
-            value={formik.values.type.name}
+            value={formik.values.type?.name}
             options={fieldTypes}
             touched={formik.touched.type?.name}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            isDisabled={!editMode}
+            isDisabled={!createNewMode}
           />
         </Grid.Item>
         {
@@ -148,7 +148,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
                 // touched={touched.type?.referenceTypeId}
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                isDisabled={editMode}
+                isDisabled={!createNewMode}
               />
             </Grid.Item>
           )
@@ -168,6 +168,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
             name="required"
             onChange={formik.handleChange}
             isChecked={formik.values.required}
+            isDisabled={!createNewMode}
           >
             <FormattedMessage {...messages.requiredTitle} />
           </CheckboxInput>
@@ -181,7 +182,7 @@ const FieldDefinitionInputForm: FC<Props> = ({
             touched={formik.touched.inputHint}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
-            isDisabled={editMode}
+            isDisabled={!createNewMode}
           />
         </Grid.Item>
       </Grid>

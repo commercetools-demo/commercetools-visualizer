@@ -12,7 +12,13 @@ import omitEmpty from 'omit-empty-es';
 import Grid from '@commercetools-uikit/grid';
 import SelectField from '@commercetools-uikit/select-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { Maybe, TFieldDefinition } from '../../../types/generated/ctp';
+import { ApolloQueryResult } from '@apollo/client';
+import {
+  Maybe,
+  TFieldDefinition,
+  TQuery,
+  TQuery_TypeDefinitionArgs,
+} from '../../../types/generated/ctp';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
 import FieldTable from './FieldTable';
@@ -69,14 +75,20 @@ type Props = {
   dataLocale: string;
   children: (formProps: FormProps) => JSX.Element;
   linkToHome: string;
+  version: number;
+  refetch: (
+    variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
+  ) => Promise<ApolloQueryResult<TQuery>>;
 };
 
 const TypeDefinitionDetailsForm: FC<Props> = ({
+  version,
   children,
   initialValues,
   onSubmit,
   isReadOnly,
   linkToHome,
+  refetch,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -189,10 +201,10 @@ const TypeDefinitionDetailsForm: FC<Props> = ({
         >
           <FieldTable
             id={formik.values.id}
+            version={version}
             value={formik.values.fieldDefinitions}
-            onBlur={formik.handleBlur}
             linkToHome={linkToHome}
-            //onChange={setFieldValue}
+            refetch={refetch}
           />
         </CollapsiblePanel>
       )}

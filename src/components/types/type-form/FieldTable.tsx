@@ -1,4 +1,4 @@
-import React, { FC, lazy, useState } from 'react';
+import React, { FC, lazy } from 'react';
 import { useIntl } from 'react-intl';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
 import IconButton from '@commercetools-uikit/icon-button';
@@ -16,14 +16,21 @@ import {
 import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
+import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+import { ApolloQueryResult } from '@apollo/client';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import {
   TFieldDefinition,
+  TQuery,
+  TQuery_TypeDefinitionArgs,
   TReferenceType,
   TSetType,
+  TTypeUpdateAction,
 } from '../../../types/generated/ctp';
+import NewFieldDefinitionInput from '../field-definition-input/NewFieldDefinitionInput';
+import { useTypeDefinitionCreator } from '../type-definition-connectors';
 import createColumnDefinitions from './field-column-definitions';
 import messages from './field-messages';
 
@@ -32,22 +39,23 @@ const FieldDefinitionInput = lazy(
 );
 
 type Props = {
-  id?: string;
+  id: string;
+  version: number;
   value: Array<TFieldDefinition>;
-  onChange?: (identifier: string, value: any) => void;
-  onBlur?: (e: React.FocusEvent<any>) => void;
-  isDisabled?: boolean;
-  hasError?: boolean;
-  hasWarning?: boolean;
   linkToHome: string;
+  refetch: (
+    variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
+  ) => Promise<ApolloQueryResult<TQuery>>;
 };
 
 type TFieldDefinitionWithId = { id: string } & TFieldDefinition;
 
-const FieldTable: FC<Props> = ({ id, value, onChange, linkToHome }) => {
+const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
+  const typeDefinitionCreator = useTypeDefinitionCreator();
+  const showNotification = useShowNotification();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale,
     projectLanguages: context.project?.languages,
@@ -55,36 +63,22 @@ const FieldTable: FC<Props> = ({ id, value, onChange, linkToHome }) => {
   const fields: Array<TFieldDefinitionWithId> = value.map((item, index) => {
     return { ...item, id: index + '' };
   });
-  const editField = null;
-  const addField = null;
 
-  const [FieldDefinitionInputOpen, setFieldDefinitionInputOpen] =
-    useState(false);
-
-  const [FieldDefinitionInputData, setFieldDefinitionInputData] = useState();
-
-  const deleteItem = (name: string) => {
-    const newSet = fields.filter((item) => item.name !== name);
-    onChange && onChange('fieldDefinitions', newSet);
-  };
-
-  function formToDoc(fd: any) {
-    if (!fd.isSet) {
-      return fd;
-    }
-    return {
-      ...fd,
-      type: {
-        name: 'Set',
-        elementType: fd.type,
-      },
+  const deleteItem = async (name: string) => {
+    const deleteAction: TTypeUpdateAction = {
+      removeFieldDefinition: { fieldName: name },
     };
-  }
-
-  const updateFieldDefinition = (FieldDefinition: any) => {
-    const newSet = fields.concat([formToDoc(FieldDefinition)]);
-    setFieldDefinitionInputOpen(false);
-    onChange && onChange('fieldDefinitions', newSet);
+    await typeDefinitionCreator.execute({
+      actions: [deleteAction],
+      id: id,
+      version: version,
+    });
+    showNotification({
+      kind: 'success',
+      domain: DOMAINS.SIDE,
+      text: intl.formatMessage(messages.removeFieldDefinitionButtonSuccess),
+    });
+    refetch();
   };
 
   const rowClick = (
@@ -161,7 +155,7 @@ const FieldTable: FC<Props> = ({ id, value, onChange, linkToHome }) => {
             <Text.Headline as="h3" intlMessage={messages.fieldHeaderTitle} />
             <SecondaryButton
               onClick={() => {
-                return setFieldDefinitionInputOpen(true);
+                push(`${linkToHome}/types/${id}/${version}/new`);
               }}
               iconLeft={<PlusBoldIcon />}
               label={intl.formatMessage(messages.addField)}
@@ -175,10 +169,18 @@ const FieldTable: FC<Props> = ({ id, value, onChange, linkToHome }) => {
             onRowClick={rowClick}
           />
           <Switch>
+            <SuspendedRoute path={`${linkToHome}/types/:id/:version/new`}>
+              <NewFieldDefinitionInput onClose={() => push(`${match.url}`)} />
+            </SuspendedRoute>
             <SuspendedRoute
               path={`${linkToHome}/types/:id/:fieldDefinitionName`}
             >
-              <FieldDefinitionInput onClose={() => push(`${match.url}`)} />
+              <FieldDefinitionInput
+                onClose={() => {
+                  refetch();
+                  push(`${match.url}`);
+                }}
+              />
             </SuspendedRoute>
           </Switch>
         </Spacings.Stack>

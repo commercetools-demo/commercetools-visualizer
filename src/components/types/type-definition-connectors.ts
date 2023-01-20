@@ -17,6 +17,7 @@ import {
   TQuery_TypeDefinitionArgs,
   TMutation,
   TMutation_UpdateTypeDefinitionArgs,
+  TTypeUpdateAction,
 } from '../../types/generated/ctp';
 import {
   createGraphQlUpdateActions,
@@ -51,33 +52,6 @@ export const formValuesToDoc = (formValues: TFormValues) => ({
   key: formValues.key,
 });
 
-// export const useSubscriptionCreator = () => {
-//   const [createSubscription, { loading }] = useMcMutation<
-//     TMutation,
-//     TMutation_CreateSubscriptionArgs
-//   >(CreateQuery);
-
-//   const execute = async ({ draft }: { draft: TSubscriptionDraft }) => {
-//     try {
-//       return await createSubscription({
-//         context: {
-//           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-//         },
-//         variables: {
-//           draft: draft,
-//         },
-//       });
-//     } catch (graphQlResponse) {
-//       throw extractErrorFromGraphQlResponse(graphQlResponse);
-//     }
-//   };
-
-//   return {
-//     loading,
-//     execute,
-//   };
-// };
-
 export const useTypeDefinitionUpdater = () => {
   const [updateTypeDefinitionId, { loading }] = useMcMutation<
     TMutation,
@@ -104,6 +78,43 @@ export const useTypeDefinitionUpdater = () => {
           id: originalDraft.id,
           version: originalDraft.version || 1,
           actions: createGraphQlUpdateActions(actions),
+        },
+      });
+    } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+
+export const useTypeDefinitionCreator = () => {
+  const [createTypeDefinitionEntry, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_UpdateTypeDefinitionArgs
+  >(UpdateTypeDefinitionIdMutation);
+
+  const execute = async ({
+    actions,
+    id,
+    version,
+  }: {
+    id: string;
+    version: number;
+    actions: Array<TTypeUpdateAction>;
+  }) => {
+    try {
+      return await createTypeDefinitionEntry({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          id: id,
+          version: version || 1,
+          actions: actions,
         },
       });
     } catch (graphQlResponse) {

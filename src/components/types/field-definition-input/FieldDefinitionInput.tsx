@@ -31,13 +31,10 @@ import messages from './messages';
 import FieldDefinitionInputForm from './FieldDefinitionInputForm';
 
 type Props = {
-  isOpen?: boolean;
-  onSubmit?: (values: any) => void;
   onClose: (event: any) => void;
-  existingFieldDefinition?: any;
 };
 
-const FieldDefinitionInput: FC<Props> = (props) => {
+const FieldDefinitionInput: FC<Props> = ({ onClose }) => {
   const { id, fieldDefinitionName } = useParams<{
     id: string;
     fieldDefinitionName: string;
@@ -140,7 +137,7 @@ const FieldDefinitionInput: FC<Props> = (props) => {
         return (
           <CustomFormModalPage
             isOpen
-            onClose={props.onClose}
+            onClose={onClose}
             title={intl.formatMessage(messages.modalTitle)}
             //subtitle={<LabelRequired />}
             topBarCurrentPathLabel={intl.formatMessage(messages.modalTitle)}
@@ -149,7 +146,7 @@ const FieldDefinitionInput: FC<Props> = (props) => {
                 <CustomFormModalPage.FormSecondaryButton
                   label={intl.formatMessage(messages.revert)}
                   iconLeft={<RevertIcon />}
-                  onClick={props.onClose}
+                  onClick={onClose}
                   isDisabled={
                     formProps.isSubmitting || !formProps.isDirty || !canManage
                   }

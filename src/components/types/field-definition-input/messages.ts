@@ -11,6 +11,11 @@ export default defineMessages({
     description: 'Submit button label',
     defaultMessage: 'Update Field Definition',
   },
+  newButton: {
+    id: 'FieldDefinitions.Details.newButton',
+    description: 'Submit button label',
+    defaultMessage: 'Create Field Definition',
+  },
   revert: {
     id: 'FieldDefinitions.Details.revert',
     description: 'Revert Changes',

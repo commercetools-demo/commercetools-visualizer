@@ -47,10 +47,6 @@ const EditType: FC<Props> = ({ linkToHome }) => {
   const { id } = useParams<{ id: string }>();
   const backToList = `/${linkToHome}/types`;
   const showNotification = useShowNotification();
-  // const showSuccessNotification = useShowSideNotification(
-  //   NOTIFICATION_KINDS_SIDE.success,
-  //   messages.createSuccess
-  // );
   const typeDefinitionUpdater = useTypeDefinitionUpdater();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -150,6 +146,8 @@ const EditType: FC<Props> = ({ linkToHome }) => {
       isReadOnly={!canManage}
       dataLocale={dataLocale}
       linkToHome={linkToHome}
+      version={typeDefinition.version}
+      refetch={refetch}
     >
       {(formProps) => {
         return (

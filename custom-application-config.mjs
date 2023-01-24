@@ -6,10 +6,10 @@ import { PERMISSIONS, entryPointUriPath } from './src/constants';
 const config = {
   name: 'Visualizer',
   entryPointUriPath,
-  cloudIdentifier: 'gcp-eu',
+  cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
   env: {
     development: {
-      initialProjectKey: 'learn-pho',
+      initialProjectKey: '${env:INITIAL_PROJECT_KEY}',
     },
     production: {
       applicationId: '${env:APPLICATION_ID}',

@@ -7,6 +7,5 @@ declare module '@commercetools/sync-actions' {
   export type Syncer = {
     buildActions: typeof buildActions;
   };
-  export function createSyncChannels(): Syncer;
   export function createSyncTypes(): Syncer;
 }

@@ -1,10 +1,13 @@
-import { ApolloError, type ServerError } from '@apollo/client';
-import { transformLocalizedStringToLocalizedField } from '@commercetools-frontend/l10n';
-import { TCommercetoolsSubscription } from './types/generated/ctp';
+import {
+  transformLocalizedStringToLocalizedField,
+  transformLocalizedFieldToLocalizedString,
+} from '@commercetools-frontend/l10n';
+import { isApolloError, ApolloError, type ServerError } from '@apollo/client';
+import type { TChannel } from './types/generated/ctp';
 import type {
-  TChangeNameActionPayload,
   TGraphqlUpdateAction,
   TSyncAction,
+  TChangeNameActionPayload,
 } from './types';
 
 export const getErrorMessage = (error: ApolloError) =>
@@ -17,9 +20,10 @@ const isServerError = (
 };
 
 export const extractErrorFromGraphQlResponse = (graphQlResponse: unknown) => {
-  if (graphQlResponse instanceof ApolloError) {
+  if (graphQlResponse instanceof Error && isApolloError(graphQlResponse)) {
     if (
       isServerError(graphQlResponse.networkError) &&
+      typeof graphQlResponse.networkError?.result !== 'string' &&
       graphQlResponse.networkError?.result?.errors.length > 0
     ) {
       return graphQlResponse?.networkError?.result.errors;
@@ -32,11 +36,6 @@ export const extractErrorFromGraphQlResponse = (graphQlResponse: unknown) => {
 
   return graphQlResponse;
 };
-export const convertToActionData = (
-  draft: Partial<TCommercetoolsSubscription>
-) => ({
-  ...draft,
-});
 
 const getNameFromPayload = (payload: TChangeNameActionPayload) => ({
   name: transformLocalizedStringToLocalizedField(payload.name),
@@ -50,44 +49,11 @@ const isChangeNameActionPayload = (
 
 const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
   const { action: actionName, ...actionPayload } = action;
-
-  let actionValue = actionPayload;
-
-  switch (actionName) {
-    case 'changeName': {
-      if (isChangeNameActionPayload(actionPayload)) {
-        actionValue = getNameFromPayload(actionPayload);
-      }
-      break;
-    }
-    case 'setDescription': {
-      if ('description' in actionPayload) {
-        actionValue = {
-          description: transformLocalizedStringToLocalizedField(
-            actionPayload.description as Record<string, string>
-          ),
-        };
-      }
-      break;
-    }
-    case 'changeLabel': {
-      if ('fieldName' in actionPayload) {
-        actionValue = {
-          fieldName: actionPayload.fieldName,
-          label: transformLocalizedStringToLocalizedField(
-            actionPayload.label as Record<string, string>
-          ),
-        };
-      }
-      break;
-    }
-    default:
-      console.log('no mapping defined for ' + actionName);
-      break;
-  }
-
   return {
-    [actionName]: actionValue,
+    [actionName]:
+      actionName === 'changeName' && isChangeNameActionPayload(actionPayload)
+        ? getNameFromPayload(actionPayload)
+        : actionPayload,
   };
 };
 
@@ -99,3 +65,8 @@ export const createGraphQlUpdateActions = (actions: TSyncAction[]) =>
     ],
     []
   );
+
+export const convertToActionData = (draft: Partial<TChannel>) => ({
+  ...draft,
+  name: transformLocalizedFieldToLocalizedString(draft.nameAllLocales || []),
+});

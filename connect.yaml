@@ -1,0 +1,32 @@
+deployAs:
+  - name: visualizer
+    applicationType: mc-app
+    endpoint: /
+    configuration:
+      standardConfiguration:
+        - key: CTP_PROJECT_KEY
+          description: Project key of the commercetools Composable Commerce Project
+          required: true
+          default: 'default-key'
+        - key: CTP_REGION
+          description: Region where the commercetools Composable Commerce Project is hosted
+          required: true
+        - key: APPLICATION_ID
+          description: The Custom Application ID
+          required: true
+        - key: CLOUD_IDENTIFIER
+          description: one of the following gcp-us, gcp-eu, aws-us, aws-eu
+          required: true
+          default: 'gcp-eu'
+        - key: INITIAL_PROJECT_KEY
+          description: development project key
+          required: false
+      securedConfiguration:
+        - key: CTP_CLIENT_ID
+          description: client_id of an API Client for the commercetools Composable Commerce Project
+          required: true
+        - key: CTP_CLIENT_SECRET
+          description: secret of an API Client for the commercetools Composable Commerce Project
+          required: true
+        - key: CTP_SCOPE
+          description: scope of an API Client for the commercetools Composable Commerce Project

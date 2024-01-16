@@ -17,7 +17,7 @@ type Props = {
 export const Steps: FC<Props> = ({
   steps,
   activeStepKey,
-  skin = Skin.grey,
+  skin = Skin.white,
 }) => {
   const activeStepIndex = steps.findIndex((step) => step.key === activeStepKey);
   return (

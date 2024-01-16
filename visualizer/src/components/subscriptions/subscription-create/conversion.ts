@@ -1,7 +1,7 @@
 import TextInput from '@commercetools-uikit/text-input';
 import type { FormikErrors } from 'formik';
 import omitEmpty from 'omit-empty-es';
-import { TErrors } from '../SubscriptionDetail';
+import { TErrors } from '../detail/SubscriptionDetailsForm';
 
 export type SubscriptionType = {
   // changes?: InputMaybe<Array<TChangeSubscriptionInput>>;

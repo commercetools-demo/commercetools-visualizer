@@ -1,9 +1,10 @@
 import type { TChannelRole } from './types/generated/ctp';
 
 export type TFormValues = {
+  id: string;
   key: string;
-  name: Record<string, string>;
-  roles: TChannelRole[];
+  name?: Record<string, string>;
+  roles?: TChannelRole[];
 };
 
 export type TSyncAction = { action: string; [x: string]: unknown };

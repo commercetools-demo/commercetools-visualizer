@@ -1,5 +1,4 @@
 import { FC, useCallback } from 'react';
-import Text from '@commercetools-uikit/text';
 import { useIntl } from 'react-intl';
 import { Route, Switch, useHistory, useParams } from 'react-router';
 import TextField from '@commercetools-uikit/text-field';
@@ -18,16 +17,16 @@ import { DOMAINS } from '@commercetools-frontend/constants';
 import Steps from '../../steps';
 import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { TFormValues } from '../../../types';
-import messages from '../messages';
+import messages from './messages';
 
-import styles from '../subscriptions.module.css';
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
-import { TErrors } from '../SubscriptionDetail';
-import { useSubscriptionCreator } from '../subscription-connectors';
+import { TErrors } from '../detail/SubscriptionDetailsForm';
 import { transformErrors } from '../transform-errors';
 import Destinations from './Destinations';
 import Changes from './Changes';
-import Messages from './Messages';
+import { useSubscriptionCreator } from '../../../hooks/use-subscription-connector';
+import MessageSelector from './MessageSelector';
+import { InfoDetailPage } from '@commercetools-frontend/application-components';
 
 type Props = {
   linkToWelcome: string;
@@ -43,7 +42,7 @@ export const SUBSCRIPTION_CREATE_TAB_NAMES = {
 
 type SubscriptionDraft = { destinationType: string } & TSubscriptionDraft;
 
-const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
+const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
   const intl = useIntl();
   const history = useHistory();
   const subscriptionCreator = useSubscriptionCreator();
@@ -150,18 +149,12 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
   });
 
   return (
-    <div className={styles.subscriptionNewPage}>
-      <div className={styles.subscriptionNewHeader}>
-        <div>
-          <Text.Headline as="h2">
-            {intl.formatMessage(messages.subscriptionAdd)}
-          </Text.Headline>
-          <div className={styles['add-subscription-page-module__tabs-list']}>
-            <Steps steps={createStepsDefinition} activeStepKey={step} />
-          </div>
-        </div>
-      </div>
-      <div className={styles.subscriptionNewContent}>
+    <InfoDetailPage
+      onPreviousPathClick={() => history.push(linkToWelcome + '/subscriptions')}
+      title={intl.formatMessage(messages.subscriptionAdd)}
+      subtitle={<Steps steps={createStepsDefinition} activeStepKey={step} />}
+    >
+      <div>
         <FormikProvider value={formik}>
           <Switch>
             <Route exact path={linkToWelcome + '/subscription/new'}>
@@ -276,7 +269,7 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
                 SUBSCRIPTION_CREATE_TAB_NAMES.MESSAGES
               }
             >
-              <Messages />
+              <MessageSelector />
             </Route>
           </Switch>
         </FormikProvider>
@@ -296,7 +289,7 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
           history.replace({
             pathname:
               linkToWelcome +
-              '/subscription/new/' +
+              '/subscription/subscription-create/' +
               createStepsDefinition[current + 1].key,
           });
           return;
@@ -305,7 +298,7 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
           history.replace({
             pathname:
               linkToWelcome +
-              '/subscription/new/' +
+              '/subscription/subscription-create/' +
               createStepsDefinition[current - 1].key,
           });
         }}
@@ -315,8 +308,8 @@ const NewSubscription: FC<Props> = ({ linkToWelcome }) => {
           });
         }}
       />
-    </div>
+    </InfoDetailPage>
   );
 };
 
-export default NewSubscription;
+export default SubscriptionCreate;

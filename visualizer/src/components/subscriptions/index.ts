@@ -1,1 +1,1 @@
-export { default } from './subscriptions';
+export { default } from './list/subscriptions';

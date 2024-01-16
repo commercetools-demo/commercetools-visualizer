@@ -1,9 +1,7 @@
-import { useQuery } from '@apollo/client';
 import {
   InfoMainPage,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import { useIntl } from 'react-intl';
 import { useHistory, Link } from 'react-router-dom';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
@@ -18,16 +16,12 @@ import {
 import { Pagination } from '@commercetools-uikit/pagination';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
-import { getErrorMessage } from '../../helpers';
-import {
-  TCommercetoolsSubscription,
-  TQuery,
-  TQuery_SubscriptionsArgs,
-} from '../../types/generated/ctp';
-import PubSub from './icons/google-cloud-pub-sub-logo.svg';
-import Destinations from './destinations/Destinations';
-import FetchQuery from './fetch-subscriptions.cpt.graphql';
+import { getErrorMessage } from '../../../helpers';
+import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
+import PubSub from '../icons/google-cloud-pub-sub-logo.svg';
+import Destinations from '../destinations/Destinations';
 import messages from './messages';
+import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
 
 type Props = {
   linkToHome: string;
@@ -38,20 +32,11 @@ const Subscriptions = (props: Props) => {
   const { push } = useHistory();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
   const { page, perPage } = usePaginationState();
-
-  const { data, error, loading } = useQuery<TQuery, TQuery_SubscriptionsArgs>(
-    FetchQuery,
-    {
-      variables: {
-        limit: perPage.value,
-        offset: (page.value - 1) * perPage.value,
-        sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
-      },
-      context: {
-        target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-      },
-    }
-  );
+  const { subscriptions, error, loading } = useSubscriptionsFetcher({
+    limit: perPage.value,
+    offset: (page.value - 1) * perPage.value,
+    sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+  });
 
   if (error) {
     return (
@@ -68,13 +53,11 @@ const Subscriptions = (props: Props) => {
     );
   }
 
-  if (!data || !data.subscriptions || !data.subscriptions.results) {
+  if (!subscriptions || !subscriptions.results) {
     return <PageNotFound />;
   }
 
-  const {
-    subscriptions: { results },
-  } = data;
+  const { results } = subscriptions;
 
   const columns: Array<TColumn> = [
     { key: 'key', label: 'Key', isSortable: true },
@@ -151,12 +134,12 @@ const Subscriptions = (props: Props) => {
         </Spacings.Inline>
       }
     >
-      {data.subscriptions.total === 0 && (
+      {subscriptions.total === 0 && (
         <div>{intl.formatMessage(messages.noResults)}</div>
       )}
-      {data.subscriptions.total > 0 && (
+      {subscriptions.total > 0 && (
         <Spacings.Stack>
-          <DataTable<NonNullable<TQuery['subscriptions']['results']>[0]>
+          <DataTable<NonNullable<TCommercetoolsSubscription>>
             isCondensed
             columns={columns}
             rows={results}
@@ -173,7 +156,7 @@ const Subscriptions = (props: Props) => {
             onPageChange={page.onChange}
             perPage={perPage.value}
             onPerPageChange={perPage.onChange}
-            totalItems={data.subscriptions.total}
+            totalItems={subscriptions.total}
           />
         </Spacings.Stack>
       )}

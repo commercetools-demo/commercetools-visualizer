@@ -36,48 +36,44 @@ const StepperToolbar: FC<Props> = ({
 
   return (
     <div className={styles.container}>
-      <div className={styles['list']}>
-        <div className={styles['list-item']}>
+      <ul className={styles['list-left']}>
+        <li className={styles['list-item']}>
           <SecondaryButton
             label={formatMessage(messages.cancel)}
             onClick={onCancel}
             {...buttonProps?.cancel}
-            className={styles['button']}
           />
-        </div>
-      </div>
+        </li>
+      </ul>
 
-      <div className={styles['list-right']}>
+      <ul className={styles['list-right']}>
         {currentStep > 1 ? (
-          <div className={styles['list-item']}>
+          <li className={styles['list-item']}>
             <SecondaryButton
               label={formatMessage(messages.back)}
               onClick={onBack}
               {...buttonProps?.back}
-              className={styles['button']}
             />
-          </div>
+          </li>
         ) : null}
-        <div className={styles['list-item']}>
+        <li className={styles['list-item']}>
           {currentStep !== totalSteps ? (
             onNext && (
               <PrimaryButton
                 label={formatMessage(messages.next)}
                 onClick={onNext}
                 {...buttonProps?.next}
-                className={styles['button-primary']}
               />
             )
           ) : (
             <PrimaryButton
               label={formatMessage(messages.save)}
               onClick={onSave}
-              className={styles['button-primary']}
               {...buttonProps?.save}
             />
           )}
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
   );
 };

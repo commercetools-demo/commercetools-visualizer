@@ -26,7 +26,7 @@ export const Step: FC<Props> = ({
   isActive,
   isDone,
   onClick,
-  skin = Skin.grey,
+  skin = Skin.white,
 }) => {
   return (
     <li

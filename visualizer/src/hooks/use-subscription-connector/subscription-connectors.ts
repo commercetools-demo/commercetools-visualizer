@@ -3,7 +3,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
-import { ApolloError } from '@apollo/client';
+import { ApolloError, ApolloQueryResult, useQuery } from "@apollo/client";
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import {
   TMutation,
@@ -15,11 +15,13 @@ import {
   Maybe,
   TMutation_DeleteSubscriptionArgs,
   TMutation_CreateSubscriptionArgs,
-  TSubscriptionDraft,
-} from '../../types/generated/ctp';
+  TSubscriptionDraft, TQuery_SubscriptionsArgs
+} from "../../types/generated/ctp";
 import UpdateSubscriptionKeyMutation from './update-subscription-key.ctp.graphql';
 import DeleteSubscriptionIdMutation from './delete-subscription-id.ctp.graphql';
 import FetchQuery from './fetch-subscription.cpt.graphql';
+
+import FetchSubscriptionsQuery from './fetch-subscriptions.cpt.graphql';
 import CreateQuery from './create-subscription.ctp.graphql';
 
 export const useSubscriptionCreator = () => {
@@ -140,3 +142,27 @@ export const useSubscriptionDeleter = () => {
     execute,
   };
 };
+
+type TUseSubscriptionsFetcher = (variables: TQuery_SubscriptionsArgs) => {
+  subscriptions?: TQuery['subscriptions'];
+  error?: ApolloError;
+  loading: boolean;
+  refetch(): Promise<ApolloQueryResult<TQuery>>;
+};
+export const useSubscriptionsFetcher:TUseSubscriptionsFetcher = (  variables: TQuery_SubscriptionsArgs)=>{
+  const { data, error, loading, refetch } = useQuery<TQuery, TQuery_SubscriptionsArgs>(
+    FetchSubscriptionsQuery,
+    {
+      variables: variables,
+      context: {
+        target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+      },
+    }
+  );
+  return {
+    subscriptions: data?.subscriptions,
+    error,
+    loading,
+    refetch,
+  };
+}

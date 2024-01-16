@@ -1,7 +1,7 @@
 import { TMessageSubscriptionInput } from '../../../types/generated/ctp';
 import CheckboxGroup from '../../checkbox/CheckboxGroup';
 
-const Messages = () => {
+const MessageSelector = () => {
   const entries = [
     {
       resourceTypeId: 'business-unit',
@@ -336,4 +336,4 @@ const Messages = () => {
   );
 };
 
-export default Messages;
+export default MessageSelector;

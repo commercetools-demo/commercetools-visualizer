@@ -4,12 +4,12 @@ import TextField from '@commercetools-uikit/text-field';
 import { useIntl } from 'react-intl';
 import TextInput from '@commercetools-uikit/text-input';
 import omitEmpty from 'omit-empty-es';
-import { TFormValues } from '../../types';
+import { TFormValues } from '../../../types';
 import messages from './messages';
 
 type Formik = ReturnType<typeof useFormik>;
 
-type TErrors = {
+export type TErrors = {
   key: { missing?: boolean };
 };
 

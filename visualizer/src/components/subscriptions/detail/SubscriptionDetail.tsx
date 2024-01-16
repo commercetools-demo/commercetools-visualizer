@@ -19,16 +19,16 @@ import {
   type TApiErrorNotificationOptions,
 } from '@commercetools-frontend/actions-global';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { getErrorMessage } from '../../helpers';
-import { PERMISSIONS } from '../../constants';
+import { getErrorMessage } from '../../../helpers';
+import { PERMISSIONS } from '../../../constants';
 import SubscriptionDetailsForm from './SubscriptionDetailsForm';
 import messages from './messages';
-import { transformErrors } from './transform-errors';
+import { transformErrors } from '../transform-errors';
 import {
   useSubscriptionDeleter,
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
-} from './subscription-connectors';
+} from '../../../hooks/use-subscription-connector';
 
 type Props = {
   linkToWelcome: string;
@@ -127,7 +127,7 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
     <SubscriptionDetailsForm
       initialValues={{
         id: subscription.id,
-        key: subscription.key,
+        key: subscription.key || '',
       }}
       onSubmit={handleSubmit}
       isReadOnly={!canManage}

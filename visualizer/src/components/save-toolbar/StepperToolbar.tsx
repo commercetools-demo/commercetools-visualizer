@@ -5,19 +5,22 @@ import { FC } from 'react';
 import styles from './save-toolbar.module.css';
 import messages from './messages';
 
+type ButtonProps = { isDisabled?: boolean; label?: string };
+
 type Props = {
   buttonProps?: {
-    cancel?: { label: string };
-    back?: object;
-    next?: object;
-    save?: object;
+    cancel?: ButtonProps;
+    back?: ButtonProps;
+    next?: ButtonProps;
+    save?: ButtonProps;
   };
   isVisible?: boolean;
+  isNextDisabled?: boolean;
   currentStep: number;
   totalSteps: number;
-  onSave: () => void;
+  onSave?: () => void;
   onNext?: () => void;
-  onBack: () => void;
+  onBack?: () => void;
   onCancel: () => void;
 };
 
@@ -47,7 +50,7 @@ const StepperToolbar: FC<Props> = ({
       </ul>
 
       <ul className={styles['list-right']}>
-        {currentStep > 1 ? (
+        {currentStep > 1 && onBack ? (
           <li className={styles['list-item']}>
             <SecondaryButton
               label={formatMessage(messages.back)}
@@ -57,21 +60,21 @@ const StepperToolbar: FC<Props> = ({
           </li>
         ) : null}
         <li className={styles['list-item']}>
-          {currentStep !== totalSteps ? (
-            onNext && (
-              <PrimaryButton
-                label={formatMessage(messages.next)}
-                onClick={onNext}
-                {...buttonProps?.next}
-              />
-            )
-          ) : (
-            <PrimaryButton
-              label={formatMessage(messages.save)}
-              onClick={onSave}
-              {...buttonProps?.save}
-            />
-          )}
+          {currentStep !== totalSteps
+            ? onNext && (
+                <PrimaryButton
+                  label={formatMessage(messages.next)}
+                  onClick={onNext}
+                  {...buttonProps?.next}
+                />
+              )
+            : onSave && (
+                <PrimaryButton
+                  label={formatMessage(messages.save)}
+                  onClick={onSave}
+                  {...buttonProps?.save}
+                />
+              )}
         </li>
       </ul>
     </div>

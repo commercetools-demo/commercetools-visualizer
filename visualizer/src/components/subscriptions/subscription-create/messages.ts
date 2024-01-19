@@ -24,7 +24,7 @@ export default defineMessages<string>({
   stepMessages: {
     id: 'Subscriptions.CreateSubscriptionForm.step.messages',
     description: 'The label of the tab navigation step',
-    defaultMessage: 'Configure MessageSelector',
+    defaultMessage: 'Configure Messages',
   },
   subscriptionCreated: {
     id: 'Subscriptions.subscriptionCreated',

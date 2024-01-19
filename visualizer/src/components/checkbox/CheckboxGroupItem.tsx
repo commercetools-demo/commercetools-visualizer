@@ -1,3 +1,5 @@
+import Grid from '@commercetools-uikit/grid';
+import CheckboxInput from '@commercetools-uikit/checkbox-input';
 import { useCheckboxContext } from './CheckboxContext';
 
 type Props<T> = {
@@ -18,21 +20,19 @@ export default function CheckboxGroupItem<T>({
   const { field, helpers } = useCheckboxContext<T>();
   const checked = isChecked(field.value, value);
   return (
-    <li>
-      <label style={{ display: 'block' }}>
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={() => {
-            if (checked) {
-              helpers.setValue(removeItem(field.value, value));
-            } else {
-              helpers.setValue(addItem(field.value, value));
-            }
-          }}
-        />
+    <Grid.Item>
+      <CheckboxInput
+        isChecked={checked}
+        onChange={() => {
+          if (checked) {
+            helpers.setValue(removeItem(field.value, value));
+          } else {
+            helpers.setValue(addItem(field.value, value));
+          }
+        }}
+      >
         {label}
-      </label>
-    </li>
+      </CheckboxInput>
+    </Grid.Item>
   );
 }

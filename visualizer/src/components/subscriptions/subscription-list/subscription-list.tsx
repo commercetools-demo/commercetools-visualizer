@@ -18,16 +18,16 @@ import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { getErrorMessage } from '../../../helpers';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
-import PubSub from '../icons/google-cloud-pub-sub-logo.svg';
 import Destinations from '../destinations/Destinations';
 import messages from './messages';
+import destinationMessages from '../subscription-destination-type-form/messages';
 import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
 
 type Props = {
   linkToHome: string;
 };
 
-const Subscriptions = (props: Props) => {
+const SubscriptionList = (props: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
@@ -64,8 +64,8 @@ const Subscriptions = (props: Props) => {
     { key: 'version', label: 'Version' },
     { key: 'createdAt', label: 'Created At' },
     { key: 'destinationType', label: 'Destination Type' },
-    { key: 'destination', label: 'Destination Specific' },
-    { key: 'messages', label: 'Messages' },
+    // { key: 'destination', label: 'Destination Specific' },
+    // { key: 'messages', label: 'Messages' },
   ];
 
   const itemRenderer = (
@@ -90,25 +90,19 @@ const Subscriptions = (props: Props) => {
         });
       }
       case 'key':
-        return item.key;
+        return item.key || '';
       case 'version':
         return item.version;
       case 'createdAt':
         return intl.formatDate(item.createdAt);
       case 'destinationType':
-        switch (item.destination.type) {
-          case 'GoogleCloudPubSub':
-            return (
-              <img
-                alt={item.destination.type}
-                title={item.destination.type}
-                src={PubSub}
-                width="30px"
-                height="100%"
-              />
-            );
-          default:
-            return item.destination.type;
+        try {
+          return intl.formatMessage(
+            // @ts-ignore
+            destinationMessages['destination' + item.destination.type]
+          );
+        } catch (e) {
+          return item.destination.type;
         }
       case 'destination':
         return <Destinations destination={item.destination} />;
@@ -139,7 +133,7 @@ const Subscriptions = (props: Props) => {
       )}
       {subscriptions.total > 0 && (
         <Spacings.Stack>
-          <DataTable<NonNullable<TCommercetoolsSubscription>>
+          <DataTable
             isCondensed
             columns={columns}
             rows={results}
@@ -164,6 +158,6 @@ const Subscriptions = (props: Props) => {
   );
 };
 
-Subscriptions.displayName = 'Subscriptions';
+SubscriptionList.displayName = 'Subscriptions';
 
-export default Subscriptions;
+export default SubscriptionList;

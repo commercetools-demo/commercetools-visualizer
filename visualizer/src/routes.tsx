@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Switch, Route, useRouteMatch } from 'react-router-dom';
 import Welcome from './components/welcome';
 import States from './components/states';
-import Subscriptions from './components/subscriptions';
+import SubscriptionList from './components/subscriptions';
 import SubscriptionDetail from './components/subscriptions/detail/SubscriptionDetail';
 import SubscriptionCreate from './components/subscriptions/subscription-create/subscription-create';
 import Types from './components/types/list/types';
@@ -41,7 +41,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
         <SubscriptionDetail linkToWelcome={`${match.url}/subscriptions`} />
       </Route>
       <Route path={`${match.path}/subscriptions`}>
-        <Subscriptions linkToHome={match.url} />
+        <SubscriptionList linkToHome={match.url} />
       </Route>
       <Route path={`${match.path}/types/new`}>
         <NewType linkToHome={match.url} />

@@ -1,3 +1,5 @@
 mutation CreateTypeDefinition($draft: TypeDefinitionDraft!) {
-  createTypeDefinition(draft:$draft){id}
+  createTypeDefinition(draft: $draft) {
+    id
+  }
 }

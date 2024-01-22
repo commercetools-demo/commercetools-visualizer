@@ -20,15 +20,13 @@ import {
   TApiErrorNotificationOptions,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import {
-  useTypeDefinitionUpdater,
-  useTypeWithDefinitionByNameFetcher,
-} from '../type-definition-connectors';
+import { useTypeWithDefinitionByNameFetcher } from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from './messages';
 import FieldDefinitionInputForm from './FieldDefinitionInputForm';
+import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
 
 type Props = {
   onClose: (event: any) => void;

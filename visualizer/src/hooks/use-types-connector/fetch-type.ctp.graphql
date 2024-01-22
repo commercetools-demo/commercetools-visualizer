@@ -1,5 +1,5 @@
-query FetchType($id: String) {
-  typeDefinition(id: $id) {
+query FetchType($id: String, $key: String) {
+  typeDefinition(id: $id, key: $key) {
     id
     nameAllLocales {
       locale

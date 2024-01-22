@@ -22,6 +22,23 @@ export default defineMessages({
     defaultMessage:
       'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
   },
+  duplicateKey: {
+    id: 'Type.form.GeneralInfoForm.duplicateKey',
+    description: 'The message shown when the business unit key already exists',
+    defaultMessage: 'A subscription with this key already exists.',
+  },
+  requiredKey: {
+    id: 'Type.form.GeneralInfoForm.requiredKey',
+    description: 'The message shown when the business unit key is not provided',
+    defaultMessage: 'This field is required. Provide at least one value.',
+  },
+  invalidKey: {
+    id: 'Type.form.GeneralInfoForm.invalidKey',
+    description:
+      'The message shown when the business unit key has invalid characters',
+    defaultMessage:
+      'Key must contain between 2 and 256 alphanumeric characters, underscores and/or hyphens',
+  },
   resourceTypeIdsTitle: {
     id: 'Type.form.resourceTypeIds.title',
     description: 'Title for Resource Type IDs field',

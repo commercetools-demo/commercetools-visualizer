@@ -1,11 +1,7 @@
-import { FC, useState } from 'react';
+import { FC, lazy, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
-import { useMcQuery } from '@commercetools-frontend/application-shell';
-import {
-  GRAPHQL_TARGETS,
-  NO_VALUE_FALLBACK,
-} from '@commercetools-frontend/constants';
+import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import {
   usePaginationState,
   useDataTableSortingState,
@@ -31,40 +27,31 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { getErrorMessage } from '../../../helpers';
-import {
-  TQuery,
-  TQuery_TypeDefinitionsArgs,
-  TTypeDefinition,
-} from '../../../types/generated/ctp';
-import FetchTypesQuery from './fetch-types.ctp.graphql';
+import { TQuery, TTypeDefinition } from '../../../types/generated/ctp';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
+import { useTypesFetcher } from '../../../hooks/use-types-connector/types-connector';
+import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+const TypesCreate = lazy(() => import('../types-create/types-create'));
 
-type Props = {
-  linkToHome: string;
-};
+const TypesEdit = lazy(() => import('../types-edit/types-edit'));
 
-const Types: FC<Props> = ({ linkToHome }) => {
+type Props = {};
+
+const TypesList: FC<Props> = () => {
   const intl = useIntl();
   const { push } = useHistory();
+  const match = useRouteMatch();
   const { page, perPage } = usePaginationState();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale,
     projectLanguages: context.project?.languages,
   }));
-  const { data, error, loading } = useMcQuery<
-    TQuery,
-    TQuery_TypeDefinitionsArgs
-  >(FetchTypesQuery, {
-    variables: {
-      limit: perPage.value,
-      offset: (page.value - 1) * perPage.value,
-      sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
-    },
-    context: {
-      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-    },
+  const { typeDefinitions, error, loading, refetch } = useTypesFetcher({
+    limit: perPage.value,
+    offset: (page.value - 1) * perPage.value,
+    sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
   });
 
   const [tableData, setTableData] = useState({
@@ -75,7 +62,7 @@ const Types: FC<Props> = ({ linkToHome }) => {
     ),
   });
 
-  const [isCondensed, setIsCondensed] = useState<boolean>(false);
+  const [isCondensed, setIsCondensed] = useState<boolean>(true);
   const [isWrappingText, setIsWrappingText] = useState<boolean>(false);
 
   if (error) {
@@ -94,13 +81,11 @@ const Types: FC<Props> = ({ linkToHome }) => {
     );
   }
 
-  if (!data || !data.typeDefinitions || !data.typeDefinitions.results) {
+  if (!typeDefinitions || !typeDefinitions.results) {
     return <PageNotFound />;
   }
 
-  const {
-    typeDefinitions: { results, total },
-  } = data;
+  const { results, total } = typeDefinitions;
 
   const itemRenderer = (
     item: TTypeDefinition,
@@ -158,7 +143,6 @@ const Types: FC<Props> = ({ linkToHome }) => {
     hideableColumns: tableData.columns,
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
-
   const onSettingChange = (action: string, nextValue: boolean | string[]) => {
     const {
       COLUMNS_UPDATE,
@@ -197,9 +181,8 @@ const Types: FC<Props> = ({ linkToHome }) => {
         <Spacings.Inline justifyContent="space-between">
           <Text.Headline as="h2" intlMessage={messages.title} />
           <SecondaryButton
-            onClick={() => {
-              push(`${linkToHome}/types/new`);
-            }}
+            as={Link}
+            to={`${match.url}/new`}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addType)}
           />
@@ -228,7 +211,7 @@ const Types: FC<Props> = ({ linkToHome }) => {
               sortedBy={tableSorting.value.key}
               sortDirection={tableSorting.value.order}
               onSortChange={tableSorting.onChange}
-              onRowClick={(row) => push(`${linkToHome}/types/${row.id}`)}
+              onRowClick={(row) => push(`${match.url}/${row.id}`)}
             />
           </DataTableManager>
           <Pagination
@@ -240,9 +223,33 @@ const Types: FC<Props> = ({ linkToHome }) => {
           />
         </Spacings.Stack>
       ) : null}
+      <Switch>
+        <SuspendedRoute path={`${match.path}/new`}>
+          <TypesCreate
+            linkToHome={match.url}
+            onClose={() => {
+              refetch();
+              push(`${match.url}`);
+            }}
+            onCreate={(id: string) => {
+              refetch();
+              push(`${match.url}/${id}`);
+            }}
+          />
+        </SuspendedRoute>
+        <SuspendedRoute path={`${match.path}/:id`}>
+          <TypesEdit
+            onClose={() => {
+              refetch();
+              push(`${match.url}`);
+            }}
+            linkToHome={match.url}
+          />
+        </SuspendedRoute>
+      </Switch>
     </InfoMainPage>
   );
 };
-Types.displayName = 'Types';
+TypesList.displayName = 'Types';
 
-export default Types;
+export default TypesList;

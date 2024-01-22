@@ -1,4 +1,4 @@
-import React, { FC, lazy } from 'react';
+import { FC, lazy } from 'react';
 import { useIntl } from 'react-intl';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
 import IconButton from '@commercetools-uikit/icon-button';

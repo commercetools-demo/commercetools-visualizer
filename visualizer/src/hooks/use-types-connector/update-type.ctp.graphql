@@ -1,0 +1,5 @@
+mutation UpdateTypeDefinition($id: String, $key: String, $version: Long!, $actions: [TypeUpdateAction!]!) {
+  updateTypeDefinition(id: $id, key: $key, version: $version, actions: $actions) {
+    id
+  }
+}

@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import {
   showApiErrorNotification,
@@ -21,25 +21,27 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import {
-  formValuesToDoc,
-  useTypeDefinitionDeleter,
-  useTypeDefinitionFetcher,
-  useTypeDefinitionUpdater,
-} from '../type-definition-connectors';
+import { formValuesToDoc } from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
-import TypeDefinitionDetailsForm from '../type-form/TypeDefinitionDetailsForm';
+import TypeDefinitionForm, {
+  TFormValues,
+} from '../type-definition-form/type-definition-form';
 
 import messages from './messages';
+import {
+  useTypeDefinitionDeleter,
+  useTypeDefinitionFetcher,
+  useTypeDefinitionUpdater,
+} from '../../../hooks/use-types-connector';
 
 type Props = {
   linkToHome: string;
+  onClose: () => void;
 };
 
-const EditType: FC<Props> = ({ linkToHome }) => {
-  const history = useHistory();
+const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   const intl = useIntl();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
@@ -58,7 +60,7 @@ const EditType: FC<Props> = ({ linkToHome }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues, formikHelpers) => {
+    async (formikValues: TFormValues, formikHelpers) => {
       try {
         const data = formValuesToDoc(formikValues);
         if (typeDefinition) {
@@ -99,10 +101,7 @@ const EditType: FC<Props> = ({ linkToHome }) => {
         domain: DOMAINS.SIDE,
         text: intl.formatMessage(messages.updateSuccess),
       });
-      refetch();
-      history.replace({
-        pathname: `${linkToHome}/types`,
-      });
+      onClose();
     }
   };
 
@@ -125,7 +124,7 @@ const EditType: FC<Props> = ({ linkToHome }) => {
   }
 
   return (
-    <TypeDefinitionDetailsForm
+    <TypeDefinitionForm
       initialValues={{
         id: typeDefinition.id,
         key: typeDefinition.key,
@@ -152,9 +151,10 @@ const EditType: FC<Props> = ({ linkToHome }) => {
     >
       {(formProps) => {
         return (
-          <CustomFormDetailPage
+          <CustomFormModalPage
+            isOpen
             title={intl.formatMessage(messages.title)}
-            onPreviousPathClick={() => history.push(linkToHome + '/types')}
+            onClose={onClose}
             formControls={
               <>
                 <CustomFormDetailPage.FormSecondaryButton
@@ -176,12 +176,12 @@ const EditType: FC<Props> = ({ linkToHome }) => {
             }
           >
             {typeDefinition && formProps.formElements}
-          </CustomFormDetailPage>
+          </CustomFormModalPage>
         );
       }}
-    </TypeDefinitionDetailsForm>
+    </TypeDefinitionForm>
   );
 };
-EditType.displayName = 'EditType';
+TypesEdit.displayName = 'EditType';
 
-export default EditType;
+export default TypesEdit;

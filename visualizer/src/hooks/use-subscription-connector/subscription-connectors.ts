@@ -3,7 +3,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
-import { ApolloError, ApolloQueryResult, useQuery } from "@apollo/client";
+import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import {
   TMutation,
@@ -15,14 +15,16 @@ import {
   Maybe,
   TMutation_DeleteSubscriptionArgs,
   TMutation_CreateSubscriptionArgs,
-  TSubscriptionDraft, TQuery_SubscriptionsArgs
-} from "../../types/generated/ctp";
+  TSubscriptionDraft,
+  TQuery_SubscriptionsArgs,
+} from '../../types/generated/ctp';
 import UpdateSubscriptionKeyMutation from './update-subscription-key.ctp.graphql';
 import DeleteSubscriptionIdMutation from './delete-subscription-id.ctp.graphql';
 import FetchQuery from './fetch-subscription.cpt.graphql';
 
 import FetchSubscriptionsQuery from './fetch-subscriptions.cpt.graphql';
 import CreateQuery from './create-subscription.ctp.graphql';
+import { TFormValues } from '../../components/subscriptions/subscription-details-form/subscription-details-form';
 
 export const useSubscriptionCreator = () => {
   const [createSubscription, { loading }] = useMcMutation<
@@ -57,17 +59,83 @@ export const useSubscriptionKeyUpdater = () => {
     TMutation_UpdateSubscriptionArgs
   >(UpdateSubscriptionKeyMutation);
 
+  const sortStringArray = (a: string, b: string) => a.localeCompare(b);
+  const compareStringArrays = (
+    array1: Array<string> | undefined | null,
+    array2: Array<string> | undefined | null
+  ): boolean => {
+    if (!array1 && !array2) {
+      return true;
+    } else if (!array1 || !array2) {
+      return false;
+    } else {
+      const sortedArray1 = array1.sort(sortStringArray);
+      const sortedArray2 = array2.sort(sortStringArray);
+      const areEqual: boolean =
+        sortedArray1.length === sortedArray2.length &&
+        sortedArray1.every((value, index) => value === sortedArray2[index]);
+      return areEqual;
+    }
+  };
+
   const execute = async ({
     originalDraft,
     nextDraft,
   }: {
     originalDraft: NonNullable<TCommercetoolsSubscription>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    nextDraft: any;
+    nextDraft: TFormValues;
   }) => {
-    const actions: Array<TSubscriptionUpdateAction> = [
-      { setKey: { key: nextDraft.key } },
-    ];
+    const actions: Array<TSubscriptionUpdateAction> = [];
+    if (nextDraft.key && originalDraft.key !== nextDraft.key) {
+      actions.push({ setKey: { key: nextDraft.key } });
+    }
+    if (nextDraft.changes) {
+      if (
+        !compareStringArrays(
+          originalDraft.changes.map((value) => value.resourceTypeId),
+          nextDraft.changes.map((value) => value.resourceTypeId)
+        )
+      ) {
+        actions.push({ setChanges: { changes: nextDraft.changes } });
+      }
+    }
+    if (nextDraft.messages) {
+      const originalResourceTypes = originalDraft.messages.map(
+        (value) => value.resourceTypeId
+      );
+      const nextResourceTypes = nextDraft.messages.map(
+        (value) => value.resourceTypeId
+      );
+      const setMessagesAction = {
+        setMessages: {
+          messages: nextDraft.messages.map((message) => ({
+            resourceTypeId: message.resourceTypeId,
+            types: message.types,
+          })),
+        },
+      };
+
+      if (!compareStringArrays(originalResourceTypes, nextResourceTypes)) {
+        actions.push(setMessagesAction);
+      } else {
+        for (const value of nextDraft.messages) {
+          const nextResourceId = value.resourceTypeId;
+          const nextTypes = value.types;
+
+          const originalMessage = originalDraft.messages.find(
+            (value) => value.resourceTypeId === nextResourceId
+          );
+          if (!compareStringArrays(nextTypes, originalMessage?.types)) {
+            actions.push(setMessagesAction);
+            break;
+          }
+        }
+      }
+    }
+    if (actions.length === 0) {
+      return;
+    }
     try {
       return await updateSubscriptionKey({
         context: {
@@ -94,24 +162,26 @@ type TUseSubscriptionFetcher = (props: { id: string }) => {
   subscription?: Maybe<TCommercetoolsSubscription>;
   error?: ApolloError;
   loading: boolean;
+  refetch(): Promise<ApolloQueryResult<TQuery>>;
 };
 
 export const useSubscriptionFetcher: TUseSubscriptionFetcher = ({ id }) => {
-  const { data, error, loading } = useMcQuery<TQuery, TQuery_SubscriptionArgs>(
-    FetchQuery,
-    {
-      variables: {
-        id: id,
-      },
-      context: {
-        target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-      },
-    }
-  );
+  const { data, error, loading, refetch } = useMcQuery<
+    TQuery,
+    TQuery_SubscriptionArgs
+  >(FetchQuery, {
+    variables: {
+      id: id,
+    },
+    context: {
+      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+    },
+  });
   return {
     subscription: data?.subscription,
     error,
     loading,
+    refetch,
   };
 };
 
@@ -149,20 +219,22 @@ type TUseSubscriptionsFetcher = (variables: TQuery_SubscriptionsArgs) => {
   loading: boolean;
   refetch(): Promise<ApolloQueryResult<TQuery>>;
 };
-export const useSubscriptionsFetcher:TUseSubscriptionsFetcher = (  variables: TQuery_SubscriptionsArgs)=>{
-  const { data, error, loading, refetch } = useQuery<TQuery, TQuery_SubscriptionsArgs>(
-    FetchSubscriptionsQuery,
-    {
-      variables: variables,
-      context: {
-        target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-      },
-    }
-  );
+export const useSubscriptionsFetcher: TUseSubscriptionsFetcher = (
+  variables: TQuery_SubscriptionsArgs
+) => {
+  const { data, error, loading, refetch } = useQuery<
+    TQuery,
+    TQuery_SubscriptionsArgs
+  >(FetchSubscriptionsQuery, {
+    variables: variables,
+    context: {
+      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+    },
+  });
   return {
     subscriptions: data?.subscriptions,
     error,
     loading,
     refetch,
   };
-}
+};

@@ -1,11 +1,6 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
-  generalInformationHeader: {
-    id: 'Customers.BusinessUnits.GeneralInfoForm.generalInformationHeader',
-    description: 'The header for the collapsible general info panel',
-    defaultMessage: 'General information',
-  },
   subscriptionKeyLabel: {
     id: 'Customers.BusinessUnits.GeneralInfoForm.keyFieldLabel',
     description:

@@ -15,11 +15,11 @@ export const validateInput = (key: string) => {
 
 const GoogleCloudPubSubDestination: FC = () => {
   const [topicField, topicMeta, topicHelpers] = useField<string>({
-    name: 'GoogleCloudPubSub.topic',
+    name: 'destination.GoogleCloudPubSub.topic',
     validate: validateInput,
   });
   const [projectIdField, projectIdMeta, projectIdHelpers] = useField<string>({
-    name: 'GoogleCloudPubSub.projectId',
+    name: 'destination.GoogleCloudPubSub.projectId',
     validate: validateInput,
   });
   return (

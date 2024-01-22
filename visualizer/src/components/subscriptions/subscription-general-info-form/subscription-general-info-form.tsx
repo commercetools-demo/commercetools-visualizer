@@ -4,7 +4,6 @@ import messages from './messages';
 import { FormattedMessage } from 'react-intl';
 import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import { customProperties } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 
@@ -40,44 +39,34 @@ const SubscriptionGeneralInfoForm = () => {
     validate: (key) => validateKeyInput(key),
   });
   return (
-    <CollapsiblePanel
-      header={
-        <CollapsiblePanel.Header>
-          <FormattedMessage {...messages.generalInformationHeader} />
-        </CollapsiblePanel.Header>
-      }
-    >
-      <Constraints.Horizontal max="scale">
-        <Grid
-          gridGap={customProperties.spacing50}
-          gridTemplateColumns={`repeat(auto-fill, '')`}
-        >
-          <Grid.Item>
-            <Constraints.Horizontal max="scale">
-              <Card insetScale="s" type="flat">
-                <TextField
-                  errors={JSON.parse(keyMeta.error || '{}')}
-                  name={keyField.name}
-                  isRequired={true}
-                  onBlur={() => {
-                    keyHelpers.setTouched(true);
-                  }}
-                  onChange={(event) => {
-                    keyHelpers.setValue(event.target.value);
-                  }}
-                  renderError={renderBusinessUnitKeyInputErrors}
-                  title={
-                    <FormattedMessage {...messages.subscriptionKeyLabel} />
-                  }
-                  touched={keyMeta.touched}
-                  value={keyMeta.value || ''}
-                />
-              </Card>
-            </Constraints.Horizontal>
-          </Grid.Item>
-        </Grid>
-      </Constraints.Horizontal>
-    </CollapsiblePanel>
+    <Constraints.Horizontal max="scale">
+      <Grid
+        gridGap={customProperties.spacing50}
+        gridTemplateColumns={`repeat(auto-fill, '')`}
+      >
+        <Grid.Item>
+          <Constraints.Horizontal max="scale">
+            <Card insetScale="s" type="flat">
+              <TextField
+                errors={JSON.parse(keyMeta.error || '{}')}
+                name={keyField.name}
+                isRequired={true}
+                onBlur={() => {
+                  keyHelpers.setTouched(true);
+                }}
+                onChange={(event) => {
+                  keyHelpers.setValue(event.target.value);
+                }}
+                renderError={renderBusinessUnitKeyInputErrors}
+                title={<FormattedMessage {...messages.subscriptionKeyLabel} />}
+                touched={keyMeta.touched}
+                value={keyMeta.value || ''}
+              />
+            </Card>
+          </Constraints.Horizontal>
+        </Grid.Item>
+      </Grid>
+    </Constraints.Horizontal>
   );
 };
 

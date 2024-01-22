@@ -1,8 +1,10 @@
-import type { TChannelRole } from './types/generated/ctp';
+import { TChannelRole, TDestinationInput } from './types/generated/ctp';
 
 export type TFormValues = {
   id: string;
   key: string;
+  destinationType: string;
+  destination: TDestinationInput;
   name?: Record<string, string>;
   roles?: TChannelRole[];
 };

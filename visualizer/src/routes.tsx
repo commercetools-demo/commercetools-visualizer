@@ -3,7 +3,7 @@ import { Switch, Route, useRouteMatch } from 'react-router-dom';
 import Welcome from './components/welcome';
 import States from './components/states';
 import SubscriptionList from './components/subscriptions';
-import SubscriptionDetail from './components/subscriptions/detail/SubscriptionDetail';
+import SubscriptionDetailsPage from './components/subscriptions/subscription-details-page/subscription-details-page';
 import SubscriptionCreate from './components/subscriptions/subscription-create/subscription-create';
 import Types from './components/types/list/types';
 import EditType from './components/types/edit';
@@ -38,7 +38,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
         <SubscriptionCreate linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/subscription/:id`}>
-        <SubscriptionDetail linkToWelcome={`${match.url}/subscriptions`} />
+        <SubscriptionDetailsPage linkToWelcome={`${match.url}/subscriptions`} />
       </Route>
       <Route path={`${match.path}/subscriptions`}>
         <SubscriptionList linkToHome={match.url} />

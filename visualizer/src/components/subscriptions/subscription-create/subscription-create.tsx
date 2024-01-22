@@ -52,7 +52,7 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
             formikValues.subscriptionStepsDraft[1].key !== ''
               ? formikValues.subscriptionStepsDraft[1].key
               : undefined,
-          destination: formikValues.subscriptionStepsDraft[3],
+          ...formikValues.subscriptionStepsDraft[3],
           changes:
             formikValues.subscriptionStepsDraft[4].changes &&
             formikValues.subscriptionStepsDraft[4].changes.length > 0
@@ -95,7 +95,11 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
       subscriptionStepsDraft: {
         1: { key: null },
         2: { destinationType: null },
-        3: { GoogleCloudPubSub: { topic: '', projectId: '' } },
+        3: {
+          destination: {
+            GoogleCloudPubSub: { topic: '', projectId: '' },
+          },
+        },
         4: { changes: [] },
         5: { messages: [] },
       },

@@ -4,6 +4,7 @@ import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import { customProperties } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
+import Spacings from '@commercetools-uikit/spacings';
 
 type Props = {
   destinationType: string;
@@ -26,7 +27,7 @@ const SubscriptionDestinationForm: FC<Props> = ({ destinationType }) => {
         <Grid.Item>
           <Constraints.Horizontal max="scale">
             <Card insetScale="s" type="flat">
-              {toRender}
+              <Spacings.Stack scale="m">{toRender}</Spacings.Stack>
             </Card>
           </Constraints.Horizontal>
         </Grid.Item>

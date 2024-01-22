@@ -21,7 +21,9 @@ import {
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
-import SubscriptionDetailsForm from './SubscriptionDetailsForm';
+import SubscriptionDetailsForm, {
+  TFormValues,
+} from '../subscription-details-form/subscription-details-form';
 import messages from './messages';
 import { transformErrors } from '../transform-errors';
 import {
@@ -29,12 +31,13 @@ import {
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
 } from '../../../hooks/use-subscription-connector';
+import { TGoogleCloudPubSubDestination } from '../../../types/generated/ctp';
 
 type Props = {
   linkToWelcome: string;
 };
 
-const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
+const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   const subscriptionKeyUpdater = useSubscriptionKeyUpdater();
   const subscriptionDeleter = useSubscriptionDeleter();
   const intl = useIntl();
@@ -50,10 +53,11 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
   }));
 
   const params = useParams<{ id: string }>();
-  const { loading, error, subscription } = useSubscriptionFetcher(params);
+  const { loading, error, subscription, refetch } =
+    useSubscriptionFetcher(params);
 
   const handleSubmit = useCallback(
-    async (formikValues, formikHelpers) => {
+    async (formikValues: TFormValues, formikHelpers) => {
       try {
         subscription &&
           (await subscriptionKeyUpdater.execute({
@@ -67,6 +71,7 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
             subscriptionKey: subscription?.key,
           }),
         });
+        refetch();
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
         if (transformedErrors.unmappedErrors.length > 0) {
@@ -122,12 +127,24 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
       pathname: linkToWelcome + '/subscriptions',
     });
   };
+  let dest: { GoogleCloudPubSub: TGoogleCloudPubSubDestination } | undefined;
+
+  if (subscription.destination.type === 'GoogleCloudPubSub') {
+    dest = {
+      GoogleCloudPubSub:
+        subscription.destination as TGoogleCloudPubSubDestination,
+    };
+  }
 
   return (
     <SubscriptionDetailsForm
       initialValues={{
         id: subscription.id,
         key: subscription.key || '',
+        destinationType: subscription.destination.type || '',
+        destination: dest,
+        changes: subscription.changes,
+        messages: subscription.messages,
       }}
       onSubmit={handleSubmit}
       isReadOnly={!canManage}
@@ -169,4 +186,4 @@ const SubscriptionDetail: FC<Props> = ({ linkToWelcome }) => {
   );
 };
 
-export default SubscriptionDetail;
+export default SubscriptionDetailsPage;

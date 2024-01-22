@@ -8,7 +8,7 @@ import {
 export type Step1 = { key: string | undefined | null };
 export type Step2 = { destinationType: string | undefined | null };
 export type Step3 = {
-  GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput;
+  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput };
 };
 export type Step4 = {
   changes?: Array<TChangeSubscriptionInput> | null;

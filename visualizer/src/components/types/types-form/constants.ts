@@ -21,6 +21,8 @@ export const REFERENCE_BY = {
 export const RESOURCE_TYPES = [
   'address',
   'asset',
+  'approval-flow',
+  'associate-role',
   'business-unit',
   'cart-discount',
   'category',
@@ -41,7 +43,7 @@ export const RESOURCE_TYPES = [
   'product-price',
   'product-selection',
   'quote',
-  'review',
+  'shipping',
   'shipping-method',
   'shopping-list',
   'shopping-list-text-line-item',

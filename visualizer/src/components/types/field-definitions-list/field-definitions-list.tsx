@@ -14,7 +14,6 @@ import {
   PlusBoldIcon,
 } from '@commercetools-uikit/icons';
 import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
@@ -29,13 +28,15 @@ import {
   TSetType,
   TTypeUpdateAction,
 } from '../../../types/generated/ctp';
-import NewFieldDefinitionInput from '../field-definition-input/NewFieldDefinitionInput';
 import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
-import createColumnDefinitions from './field-column-definitions';
-import messages from './field-messages';
+import createColumnDefinitions from './field-definitions-list-column-definitions';
+import messages from './messages';
 
+const NewFieldDefinitionInput = lazy(
+  () => import('../field-definition-create/field-definition-create')
+);
 const FieldDefinitionInput = lazy(
-  () => import('../field-definition-input/FieldDefinitionInput')
+  () => import('../field-definition-edit/field-definition-edit')
 );
 
 type Props = {
@@ -50,7 +51,13 @@ type Props = {
 
 type TFieldDefinitionWithId = { id: string } & TFieldDefinition;
 
-const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
+const FieldDefinitionsList: FC<Props> = ({
+  id,
+  value,
+  refetch,
+  linkToHome,
+  version,
+}) => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
@@ -81,15 +88,15 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
     refetch && refetch();
   };
 
-  const rowClick = (
+  const rowClick = async (
     row: TFieldDefinitionWithId,
-    rowIndex: number,
+    _rowIndex: number,
     columnKey: string
   ) => {
     if (columnKey === 'delete') {
-      deleteItem(row.name);
+      await deleteItem(row.name);
     } else {
-      push(`${linkToHome}/types/${id}/${row.name}`);
+      push(`${match.url}/${row.name}`);
     }
   };
 
@@ -116,9 +123,9 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
         );
       case 'required':
         if (item.required) {
-          return <CheckActiveIcon />;
+          return <CheckActiveIcon color={'neutral60'} />;
         } else {
-          return <CheckInactiveIcon />;
+          return <CheckInactiveIcon color={'neutral60'} />;
         }
       case 'type': {
         switch (item.type.name) {
@@ -134,7 +141,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
         return item.type.name;
       }
       case 'delete':
-        return <IconButton label="" icon={<BinFilledIcon />} />;
+        return <IconButton label="" size={'medium'} icon={<BinFilledIcon />} />;
       default:
         return (item as any)[column.key] || '';
     }
@@ -151,25 +158,25 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
           existingFieldDefinition={FieldDefinitionInputData}
         /> */}
         <Spacings.Stack scale="m">
-          <Spacings.Inline justifyContent="space-between">
-            <Text.Headline as="h3" intlMessage={messages.fieldHeaderTitle} />
+          <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
             <SecondaryButton
               onClick={() => {
-                push(`${linkToHome}/types/${id}/${version}/new`);
+                console.log(linkToHome);
+                push(`${linkToHome}/${id}/${version}/new`);
               }}
               iconLeft={<PlusBoldIcon />}
               label={intl.formatMessage(messages.addField)}
             />
-          </Spacings.Inline>
+          </div>
           <DataTable<TFieldDefinitionWithId>
             columns={createColumnDefinitions(intl.formatMessage)}
-            isCondensed={false}
+            isCondensed={true}
             rows={fields}
             itemRenderer={itemRendered}
             onRowClick={rowClick}
           />
           <Switch>
-            <SuspendedRoute path={`${linkToHome}/types/:id/:version/new`}>
+            <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
               <NewFieldDefinitionInput
                 onClose={() => {
                   refetch && refetch();
@@ -177,9 +184,7 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
                 }}
               />
             </SuspendedRoute>
-            <SuspendedRoute
-              path={`${linkToHome}/types/:id/:fieldDefinitionName`}
-            >
+            <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
               <FieldDefinitionInput
                 onClose={() => {
                   refetch && refetch();
@@ -194,6 +199,6 @@ const FieldTable: FC<Props> = ({ id, value, refetch, linkToHome, version }) => {
   );
 };
 
-FieldTable.displayName = 'FieldTable';
+FieldDefinitionsList.displayName = 'FieldTable';
 
-export default FieldTable;
+export default FieldDefinitionsList;

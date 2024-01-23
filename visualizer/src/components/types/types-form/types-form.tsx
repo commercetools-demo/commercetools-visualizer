@@ -20,7 +20,7 @@ import {
 } from '../../../types/generated/ctp';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
-import FieldTable from './FieldTable';
+import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { PageContentWide } from '@commercetools-frontend/application-components';
 
@@ -107,7 +107,7 @@ type Props = {
   createNewMode?: boolean;
 };
 
-const TypeDefinitionForm: FC<Props> = ({
+const TypesForm: FC<Props> = ({
   version,
   children,
   initialValues,
@@ -232,7 +232,7 @@ const TypeDefinitionForm: FC<Props> = ({
                 </CollapsiblePanel.Header>
               }
             >
-              <FieldTable
+              <FieldDefinitionsList
                 id={formik.values.id}
                 version={version}
                 value={formik.values.fieldDefinitions}
@@ -256,6 +256,6 @@ const TypeDefinitionForm: FC<Props> = ({
   });
 };
 
-TypeDefinitionForm.displayName = 'TypeDefinitionDetailsForm';
+TypesForm.displayName = 'TypeDefinitionDetailsForm';
 
-export default TypeDefinitionForm;
+export default TypesForm;

@@ -1,5 +1,5 @@
 import memoize from 'memoize-one';
-import messages from './field-messages';
+import messages from './messages';
 
 export default memoize((formatMessage) => [
   {

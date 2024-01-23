@@ -18,7 +18,7 @@ import {
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import UpdateTypeDefinitionIdMutation from '../../hooks/use-types-connector/update-type.ctp.graphql';
 import TypeWithDefinitionByName from './field-definition-input/fetch-type.ctp.graphql';
-import { TFormValues } from './type-definition-form/type-definition-form';
+import { TFormValues } from './types-form/types-form';
 
 export const convertToActionData = (draft: Partial<TTypeDefinition>) => ({
   name: transformLocalizedFieldToLocalizedString(draft.nameAllLocales || []),

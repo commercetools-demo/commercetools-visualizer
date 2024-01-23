@@ -1,4 +1,4 @@
-export const FIELD_TYPES = {
+export const FIELD_TYPES: { [name: string]: string } = {
   Boolean: 'Boolean',
   Date: 'Date',
   DateTime: 'DateTime',
@@ -23,6 +23,9 @@ export const REFERENCE_BY = {
 };
 
 export const REFERENCE_TYPES = [
+  'approval-flow',
+  'associate-role',
+  'business-unit',
   'cart',
   'category',
   'channel',

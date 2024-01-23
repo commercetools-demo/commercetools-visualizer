@@ -24,15 +24,15 @@ import { useTypeWithDefinitionByNameFetcher } from '../type-definition-connector
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
-import messages from './messages';
-import FieldDefinitionInputForm from './FieldDefinitionInputForm';
+import messages from '../field-definition-input/messages';
+import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
 
 type Props = {
   onClose: (event: any) => void;
 };
 
-const FieldDefinitionInput: FC<Props> = ({ onClose }) => {
+const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
   const { id, fieldDefinitionName } = useParams<{
     id: string;
     fieldDefinitionName: string;
@@ -116,7 +116,7 @@ const FieldDefinitionInput: FC<Props> = ({ onClose }) => {
   }
 
   return (
-    <FieldDefinitionInputForm
+    <FieldDefinitionInput
       initialValues={{
         label: LocalizedTextInput.createLocalizedString(
           projectLanguages,
@@ -163,10 +163,10 @@ const FieldDefinitionInput: FC<Props> = ({ onClose }) => {
           </CustomFormModalPage>
         );
       }}
-    </FieldDefinitionInputForm>
+    </FieldDefinitionInput>
   );
 };
 
-FieldDefinitionInput.displayName = 'FieldDefinitionInput';
+FieldDefinitionEdit.displayName = 'FieldDefinitionInput';
 
-export default FieldDefinitionInput;
+export default FieldDefinitionEdit;

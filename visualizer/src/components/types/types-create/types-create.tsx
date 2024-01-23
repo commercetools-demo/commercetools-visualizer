@@ -16,7 +16,7 @@ import {
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
-import TypeDefinitionForm from '../type-definition-form/type-definition-form';
+import TypesForm from '../types-form/types-form';
 
 import { TTypeDefinitionDraft } from '../../../types/generated/ctp';
 import messages from './messages';
@@ -80,7 +80,7 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
   );
 
   return (
-    <TypeDefinitionForm
+    <TypesForm
       initialValues={{
         id: '',
         key: '',
@@ -118,7 +118,7 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
           </FormModalPage>
         );
       }}
-    </TypeDefinitionForm>
+    </TypesForm>
   );
 };
 TypesCreate.displayName = 'NewType';

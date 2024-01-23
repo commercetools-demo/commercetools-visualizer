@@ -23,14 +23,14 @@ import {
   TFieldDefinitionInput,
   TFieldTypeInput,
 } from '../../../types/generated/ctp';
-import messages from './messages';
-import FieldDefinitionInputForm from './FieldDefinitionInputForm';
+import messages from '../field-definition-input/messages';
+import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 
 type Props = {
   onClose: () => void;
 };
 
-const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
+const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   const { id, version } = useParams<{
     id: string;
     version: string;
@@ -147,7 +147,7 @@ const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
   );
 
   return (
-    <FieldDefinitionInputForm
+    <FieldDefinitionInput
       initialValues={{
         label: LocalizedTextInput.createLocalizedString(
           projectLanguages,
@@ -193,10 +193,10 @@ const NewFieldDefinitionInput: FC<Props> = ({ onClose }) => {
           </CustomFormModalPage>
         );
       }}
-    </FieldDefinitionInputForm>
+    </FieldDefinitionInput>
   );
 };
 
-NewFieldDefinitionInput.displayName = 'NewFieldDefinitionInput';
+FieldDefinitionCreate.displayName = 'NewFieldDefinitionInput';
 
-export default NewFieldDefinitionInput;
+export default FieldDefinitionCreate;

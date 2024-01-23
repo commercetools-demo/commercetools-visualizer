@@ -25,9 +25,7 @@ import { formValuesToDoc } from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
-import TypeDefinitionForm, {
-  TFormValues,
-} from '../type-definition-form/type-definition-form';
+import TypesForm, { TFormValues } from '../types-form/types-form';
 
 import messages from './messages';
 import {
@@ -124,7 +122,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   }
 
   return (
-    <TypeDefinitionForm
+    <TypesForm
       initialValues={{
         id: typeDefinition.id,
         key: typeDefinition.key,
@@ -179,7 +177,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
           </CustomFormModalPage>
         );
       }}
-    </TypeDefinitionForm>
+    </TypesForm>
   );
 };
 TypesEdit.displayName = 'EditType';

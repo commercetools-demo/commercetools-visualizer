@@ -16,6 +16,7 @@ export type TFormValues = {
   name: string;
   required?: boolean;
   isMultiLine: boolean;
+  isLocalized: boolean;
   type: { name: string; referenceTypeId?: string };
 };
 export const fromFormValuesToTFieldDefinitionInput = (
@@ -36,16 +37,12 @@ export const fromFormValuesToTFieldDefinitionInput = (
       type = { DateTime: {} };
       break;
     }
-    // case 'Enum': {
-    //   type = { Enum: {} };
-    //   break;
-    // }
-    // case 'LocalizedEnum': {
-    //   type = { LocalizedEnum: {} };
-    //   break;
-    // }
-    case 'LocalizedString': {
-      type = { LocalizedString: {} };
+    case 'Enum': {
+      if (values.isLocalized) {
+        type = { LocalizedEnum: { values: [] } };
+      } else {
+        type = { Enum: { values: [] } };
+      }
       break;
     }
     case 'Money': {
@@ -69,7 +66,11 @@ export const fromFormValuesToTFieldDefinitionInput = (
     //   break;
     // }
     case 'String': {
-      type = { String: {} };
+      if (values.isLocalized) {
+        type = { LocalizedString: {} };
+      } else {
+        type = { String: {} };
+      }
       break;
     }
     case 'Time': {
@@ -96,6 +97,12 @@ export const initialValuesFromFieldDefinition = (
   fieldDefinition: TFieldDefinition | undefined,
   projectLanguages: Array<string>
 ): TFormValues => {
+  const typeName = fieldDefinition?.type?.name
+    ? fieldDefinition?.type?.name === 'LocalizedEnum' ||
+      fieldDefinition?.type?.name === 'LocalizedString'
+      ? 'String'
+      : fieldDefinition?.type?.name
+    : '';
   return {
     label: LocalizedTextInput.createLocalizedString(
       projectLanguages,
@@ -105,8 +112,11 @@ export const initialValuesFromFieldDefinition = (
     ),
     name: fieldDefinition?.name || '',
     isMultiLine: (fieldDefinition?.inputHint || 'SingleLine') === 'MultiLine',
+    isLocalized:
+      fieldDefinition?.type?.name === 'LocalizedEnum' ||
+      fieldDefinition?.type?.name === 'LocalizedString',
     type: {
-      name: fieldDefinition?.type?.name || '',
+      name: typeName,
       referenceTypeId:
         fieldDefinition?.type?.name === 'Reference'
           ? (fieldDefinition.type as TReferenceType).referenceTypeId

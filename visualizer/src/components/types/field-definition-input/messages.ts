@@ -90,4 +90,9 @@ export default defineMessages({
     defaultMessage:
       'Key must contain between 2 and 256 alphanumeric characters, underscores and/or hyphens',
   },
+  localizedLabel: {
+    id: 'ProjectSettings.ProductTypes.Details.localizedLabel',
+    description: 'Text of label to indicate localized fields',
+    defaultMessage: 'Localized',
+  },
 });

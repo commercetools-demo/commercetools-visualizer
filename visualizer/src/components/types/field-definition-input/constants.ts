@@ -3,8 +3,6 @@ export const FIELD_TYPES: { [name: string]: string } = {
   Date: 'Date',
   DateTime: 'DateTime',
   Enum: 'Enum',
-  LocalizedEnum: 'LocalizedEnum',
-  LocalizedString: 'LocalizedString',
   Money: 'Money',
   Number: 'Number',
   Reference: 'Reference',

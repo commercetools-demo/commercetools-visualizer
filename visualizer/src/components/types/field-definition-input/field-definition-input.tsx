@@ -143,18 +143,33 @@ const FieldDefinitionInput: FC<Props> = ({
             LocalizedTextField.toFieldErrors<TFormValues>(formik.errors).label
           }
         />
-        <SelectField
-          name="type.name"
-          title={intl.formatMessage(messages.typeTitle)}
-          isRequired
-          value={formik.values.type?.name}
-          options={fieldTypes}
-          touched={formik.touched.type?.name}
-          onBlur={formik.handleBlur}
-          onChange={formik.handleChange}
-          isDisabled={!createNewMode}
-          errors={SelectField.toFieldErrors<any>(formik.errors).typeName}
-        />
+        <Spacings.Inline alignItems="flex-end">
+          <SelectField
+            name="type.name"
+            title={intl.formatMessage(messages.typeTitle)}
+            isRequired
+            value={formik.values.type?.name}
+            options={fieldTypes}
+            touched={formik.touched.type?.name}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            isDisabled={!createNewMode}
+            errors={SelectField.toFieldErrors<any>(formik.errors).typeName}
+          />
+          {(formik.values.type.name === 'String' ||
+            formik.values.type.name === 'LocalizedString') && (
+            <CheckboxInput
+              name="isLocalized"
+              isDisabled={!createNewMode}
+              isChecked={formik.values.isLocalized}
+              onChange={(event) => {
+                formik.handleChange(event);
+              }}
+            >
+              <FormattedMessage {...messages.localizedLabel} />
+            </CheckboxInput>
+          )}
+        </Spacings.Inline>
         {
           // Only display 'reference' drop-down if reference type selected.
           formik.values.type.name === 'Reference' && (

@@ -18,23 +18,25 @@ export type TFormValues = {
   isMultiLine: boolean;
   isLocalized: boolean;
   type: { name: string; referenceTypeId?: string };
+  format: 'date' | 'datetime' | 'time';
 };
 export const fromFormValuesToTFieldDefinitionInput = (
   values: TFormValues
 ): TFieldDefinitionInput => {
   let type: TFieldTypeInput = { Boolean: {} };
-
   switch (values.type.name) {
     case 'Boolean': {
       type = { Boolean: {} };
       break;
     }
     case 'Date': {
-      type = { Date: {} };
-      break;
-    }
-    case 'DateTime': {
-      type = { DateTime: {} };
+      if (values.format === 'date') {
+        type = { Date: {} };
+      } else if (values.format === 'datetime') {
+        type = { DateTime: {} };
+      } else if (values.format === 'time') {
+        type = { Time: {} };
+      }
       break;
     }
     case 'Enum': {
@@ -73,10 +75,6 @@ export const fromFormValuesToTFieldDefinitionInput = (
       }
       break;
     }
-    case 'Time': {
-      type = { Time: {} };
-      break;
-    }
   }
 
   const actionDraft: TFieldDefinitionInput = {
@@ -97,12 +95,29 @@ export const initialValuesFromFieldDefinition = (
   fieldDefinition: TFieldDefinition | undefined,
   projectLanguages: Array<string>
 ): TFormValues => {
-  const typeName = fieldDefinition?.type?.name
-    ? fieldDefinition?.type?.name === 'LocalizedEnum' ||
-      fieldDefinition?.type?.name === 'LocalizedString'
-      ? 'String'
-      : fieldDefinition?.type?.name
-    : '';
+  let isLocalized = false;
+  let typeName = '';
+  let format: 'date' | 'datetime' | 'time' = 'date';
+  if (fieldDefinition?.type?.name) {
+    if (fieldDefinition?.type?.name === 'DateTime') {
+      format = 'datetime';
+      typeName = 'Date';
+    } else if (fieldDefinition?.type?.name === 'Time') {
+      format = 'time';
+      typeName = 'Date';
+    } else if (fieldDefinition?.type?.name === 'Date') {
+      format = 'date';
+      typeName = 'Date';
+    }
+  } else if (fieldDefinition?.type?.name === 'LocalizedEnum') {
+    isLocalized = true;
+    typeName = 'Enum';
+  } else if (fieldDefinition?.type?.name === 'LocalizedString') {
+    isLocalized = true;
+    typeName = 'String';
+  }
+
+  console.log();
   return {
     label: LocalizedTextInput.createLocalizedString(
       projectLanguages,
@@ -112,9 +127,8 @@ export const initialValuesFromFieldDefinition = (
     ),
     name: fieldDefinition?.name || '',
     isMultiLine: (fieldDefinition?.inputHint || 'SingleLine') === 'MultiLine',
-    isLocalized:
-      fieldDefinition?.type?.name === 'LocalizedEnum' ||
-      fieldDefinition?.type?.name === 'LocalizedString',
+    format: format,
+    isLocalized: isLocalized,
     type: {
       name: typeName,
       referenceTypeId:

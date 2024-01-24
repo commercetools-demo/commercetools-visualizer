@@ -1,14 +1,12 @@
 export const FIELD_TYPES: { [name: string]: string } = {
   Boolean: 'Boolean',
-  Date: 'Date',
-  DateTime: 'DateTime',
+  Date: 'Date/Time',
   Enum: 'Enum',
   Money: 'Money',
   Number: 'Number',
   Reference: 'Reference',
   Set: 'Set',
   String: 'String',
-  Time: 'Time',
 };
 
 export const REFERENCE_TYPES = [

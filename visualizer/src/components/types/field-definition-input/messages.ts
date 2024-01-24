@@ -95,4 +95,19 @@ export default defineMessages({
     description: 'Text of label to indicate localized fields',
     defaultMessage: 'Localized',
   },
+  optionDate: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDate',
+    description: '',
+    defaultMessage: 'Date',
+  },
+  optionTime: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionTime',
+    description: '',
+    defaultMessage: 'Time',
+  },
+  optionDateTime: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDateTime',
+    description: '',
+    defaultMessage: 'Date and Time',
+  },
 });

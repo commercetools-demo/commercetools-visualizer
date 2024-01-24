@@ -161,7 +161,6 @@ const FieldDefinitionsList: FC<Props> = ({
           <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
             <SecondaryButton
               onClick={() => {
-                console.log(linkToHome);
                 push(`${linkToHome}/${id}/${version}/new`);
               }}
               iconLeft={<PlusBoldIcon />}

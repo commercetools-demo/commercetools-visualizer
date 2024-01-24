@@ -12,12 +12,13 @@ import { FIELD_TYPES, REFERENCE_TYPES } from './constants';
 import messages from './messages';
 import { PageContentNarrow } from '@commercetools-frontend/application-components';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import RadioInput from '@commercetools-uikit/radio-input';
 import { TFormValues } from './helpers';
 
 type Formik = ReturnType<typeof useFormik>;
 
 const fieldTypes = Object.entries(FIELD_TYPES).map(([key, value]) => {
-  return { label: key, value: value };
+  return { value: key, label: value };
 });
 const referenceTypeOptions = REFERENCE_TYPES.map((t) => ({
   label: t,
@@ -156,8 +157,7 @@ const FieldDefinitionInput: FC<Props> = ({
             isDisabled={!createNewMode}
             errors={SelectField.toFieldErrors<any>(formik.errors).typeName}
           />
-          {(formik.values.type.name === 'String' ||
-            formik.values.type.name === 'LocalizedString') && (
+          {formik.values.type.name === 'String' && (
             <CheckboxInput
               name="isLocalized"
               isDisabled={!createNewMode}
@@ -168,6 +168,27 @@ const FieldDefinitionInput: FC<Props> = ({
             >
               <FormattedMessage {...messages.localizedLabel} />
             </CheckboxInput>
+          )}
+          {formik.values.type.name === 'Date' && (
+            <RadioInput.Group
+              direction="inline"
+              onChange={formik.handleChange}
+              value={formik.values.format}
+              name="format"
+              isDisabled={!createNewMode}
+            >
+              <RadioInput.Option value="date">
+                <FormattedMessage {...messages.optionDate} />
+              </RadioInput.Option>
+              <RadioInput.Option value="time">
+                <FormattedMessage {...messages.optionTime} />
+              </RadioInput.Option>
+              <RadioInput.Option value="datetime">
+                <span style={{ whiteSpace: 'nowrap' }}>
+                  <FormattedMessage {...messages.optionDateTime} />
+                </span>
+              </RadioInput.Option>
+            </RadioInput.Group>
           )}
         </Spacings.Inline>
         {
@@ -209,8 +230,7 @@ const FieldDefinitionInput: FC<Props> = ({
         </CheckboxInput>
         {
           // Only display 'inputHint' drop-down if string or LocalizedString type selected.
-          (formik.values.type.name === 'String' ||
-            formik.values.type.name === 'LocalizedString') && (
+          formik.values.type.name === 'String' && (
             <CheckboxInput
               name="isMultiLine"
               onChange={formik.handleChange}

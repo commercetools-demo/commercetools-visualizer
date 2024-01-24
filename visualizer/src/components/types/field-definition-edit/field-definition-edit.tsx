@@ -27,6 +27,7 @@ import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
+import { TReferenceType } from '../../../types/generated/ctp';
 
 type Props = {
   onClose: (event: any) => void;
@@ -126,7 +127,13 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
         ),
         name: fieldDefinitions[0].name,
         inputHint: fieldDefinitions[0].inputHint || 'SingleLine',
-        type: { name: fieldDefinitions[0].type.name, referenceTypeId: '' },
+        type: {
+          name: fieldDefinitions[0].type.name,
+          referenceTypeId:
+            fieldDefinitions[0].type.name === 'Reference'
+              ? (fieldDefinitions[0].type as TReferenceType).referenceTypeId
+              : '',
+        },
       }}
       onSubmit={handleSubmit}
       dataLocale={dataLocale}

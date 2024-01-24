@@ -13,15 +13,6 @@ export const FIELD_TYPES: { [name: string]: string } = {
   Time: 'Time',
 };
 
-export const INPUT_HINTS = {
-  SingleLine: 'SingleLine',
-  MultiLine: 'MultiLine',
-};
-export const REFERENCE_BY = {
-  Key: 'key',
-  Id: 'id',
-};
-
 export const REFERENCE_TYPES = [
   'approval-flow',
   'associate-role',

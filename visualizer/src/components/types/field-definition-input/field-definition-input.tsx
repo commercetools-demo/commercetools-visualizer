@@ -1,6 +1,6 @@
-import { ReactElement, FC } from 'react';
+import { FC, ReactElement } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useFormik, type FormikHelpers, FormikErrors } from 'formik';
+import { FormikErrors, type FormikHelpers, useFormik } from 'formik';
 import omitEmpty from 'omit-empty-es';
 import CheckboxInput from '@commercetools-uikit/checkbox-input';
 import LocalizedTextField from '@commercetools-uikit/localized-text-field';
@@ -8,31 +8,21 @@ import SelectField from '@commercetools-uikit/select-field';
 import Spacings from '@commercetools-uikit/spacings';
 import TextField from '@commercetools-uikit/text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { FIELD_TYPES, INPUT_HINTS, REFERENCE_TYPES } from './constants';
+import { FIELD_TYPES, REFERENCE_TYPES } from './constants';
 import messages from './messages';
 import { PageContentNarrow } from '@commercetools-frontend/application-components';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import { TFormValues } from './helpers';
 
 type Formik = ReturnType<typeof useFormik>;
 
 const fieldTypes = Object.entries(FIELD_TYPES).map(([key, value]) => {
   return { label: key, value: value };
 });
-const inputHints = Object.entries(INPUT_HINTS).map(([key, value]) => {
-  return { label: key, value: value };
-});
 const referenceTypeOptions = REFERENCE_TYPES.map((t) => ({
   label: t,
   value: t,
 }));
-
-export type TFormValues = {
-  label: Record<string, string>;
-  name: string;
-  required?: boolean;
-  inputHint: string;
-  type: { name: string; referenceTypeId?: string };
-};
 
 type TErrors = {
   name: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
@@ -206,16 +196,14 @@ const FieldDefinitionInput: FC<Props> = ({
           // Only display 'inputHint' drop-down if string or LocalizedString type selected.
           (formik.values.type.name === 'String' ||
             formik.values.type.name === 'LocalizedString') && (
-            <SelectField
-              name="inputHint"
-              title={intl.formatMessage(messages.inputHintTitle)}
-              value={formik.values.inputHint}
-              options={inputHints}
-              touched={formik.touched.inputHint}
-              onBlur={formik.handleBlur}
+            <CheckboxInput
+              name="isMultiLine"
               onChange={formik.handleChange}
               isDisabled={!createNewMode}
-            />
+              isChecked={formik.values.isMultiLine}
+            >
+              <FormattedMessage {...messages.inputHintTitle} />
+            </CheckboxInput>
           )
         }
       </Spacings.Stack>

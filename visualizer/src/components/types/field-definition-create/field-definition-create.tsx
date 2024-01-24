@@ -6,25 +6,21 @@ import { useParams } from 'react-router-dom';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import {
-  transformLocalizedStringToLocalizedField,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
-import {
   showApiErrorNotification,
   TApiErrorNotificationOptions,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
-import {
-  TFieldDefinitionInput,
-  TFieldTypeInput,
-} from '../../../types/generated/ctp';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
+import {
+  fromFormValuesToTFieldDefinitionInput,
+  initialValuesFromFieldDefinition,
+  TFormValues,
+} from '../field-definition-input/helpers';
 
 type Props = {
   onClose: () => void;
@@ -51,74 +47,9 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   const intl = useIntl();
 
   const handleSubmit = useCallback(
-    async (formikValues, formikHelpers) => {
+    async (formikValues: TFormValues, formikHelpers) => {
       try {
-        let type: TFieldTypeInput = { Boolean: {} };
-
-        switch (formikValues.type.name) {
-          case 'Boolean': {
-            type = { Boolean: {} };
-            break;
-          }
-          case 'Date': {
-            type = { Date: {} };
-            break;
-          }
-          case 'DateTime': {
-            type = { DateTime: {} };
-            break;
-          }
-          // case 'Enum': {
-          //   type = { Enum: {} };
-          //   break;
-          // }
-          // case 'LocalizedEnum': {
-          //   type = { LocalizedEnum: {} };
-          //   break;
-          // }
-          case 'LocalizedString': {
-            type = { LocalizedString: {} };
-            break;
-          }
-          case 'Money': {
-            type = { Money: {} };
-            break;
-          }
-          case 'Number': {
-            type = { Number: {} };
-            break;
-          }
-          case 'Reference': {
-            type = {
-              Reference: { referenceTypeId: formikValues.type.referenceTypeId },
-            };
-            break;
-          }
-          // case 'Set': {
-          //   type = { Set: {} };
-          //   break;
-          // }
-          case 'String': {
-            type = { String: {} };
-            break;
-          }
-          case 'Time': {
-            type = { Time: {} };
-            break;
-          }
-        }
-
-        const actionDraft: TFieldDefinitionInput = {
-          name: formikValues.name,
-          required: formikValues.required || false,
-          inputHint: formikValues.inputHint || {
-            SingleLine: 'SingleLine',
-          },
-          type: type,
-          label: transformLocalizedStringToLocalizedField(
-            LocalizedTextInput.omitEmptyTranslations(formikValues.label)
-          ),
-        };
+        const actionDraft = fromFormValuesToTFieldDefinitionInput(formikValues);
         await typeDefinitionCreator.execute({
           id: id,
           version: Number(version),
@@ -148,15 +79,10 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
 
   return (
     <FieldDefinitionInput
-      initialValues={{
-        label: LocalizedTextInput.createLocalizedString(
-          projectLanguages,
-          transformLocalizedFieldToLocalizedString([]) ?? {}
-        ),
-        name: '',
-        inputHint: 'SingleLine',
-        type: { name: '' },
-      }}
+      initialValues={initialValuesFromFieldDefinition(
+        undefined,
+        projectLanguages
+      )}
       onSubmit={handleSubmit}
       createNewMode={true}
       dataLocale={dataLocale}

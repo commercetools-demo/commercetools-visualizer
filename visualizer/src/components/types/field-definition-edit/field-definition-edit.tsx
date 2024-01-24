@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, SyntheticEvent, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
   CustomFormModalPage,
@@ -12,8 +12,6 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
-import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import {
   showNotification,
   showApiErrorNotification,
@@ -27,10 +25,14 @@ import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
-import { TReferenceType } from '../../../types/generated/ctp';
+import {
+  fromFormValuesToTFieldDefinitionInput,
+  initialValuesFromFieldDefinition,
+  TFormValues,
+} from '../field-definition-input/helpers';
 
 type Props = {
-  onClose: (event: any) => void;
+  onClose: (event: SyntheticEvent) => void;
 };
 
 const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
@@ -55,26 +57,20 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
     useTypeWithDefinitionByNameFetcher(id, [fieldDefinitionName]);
 
   const handleSubmit = useCallback(
-    async (formikValues, formikHelpers) => {
+    async (formikValues: TFormValues, formikHelpers) => {
       try {
+        const fieldDefinitionInput =
+          fromFormValuesToTFieldDefinitionInput(formikValues);
         const data = {
-          fieldDefinitions: [
-            {
-              name: formikValues.name,
-              label: LocalizedTextInput.omitEmptyTranslations(
-                formikValues.label
-              ),
-            },
-          ],
+          name: fieldDefinitionInput.name,
+          label: fieldDefinitionInput.label,
         };
         if (fieldDefinitions) {
           await typeDefinitionUpdater.execute({
-            originalDraft: {
-              id: id,
-              fieldDefinitions: [fieldDefinitions[0]],
-              version: version,
-            },
+            originalDraft: fieldDefinitions[0],
             nextDraft: data,
+            id: id,
+            version: version || 1,
           });
         }
         refetch();
@@ -112,29 +108,16 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
       </Spacings.Stack>
     );
   }
-  if (!fieldDefinitions) {
+  if (!fieldDefinitions || fieldDefinitions.length < 1) {
     return <PageNotFound />;
   }
 
   return (
     <FieldDefinitionInput
-      initialValues={{
-        label: LocalizedTextInput.createLocalizedString(
-          projectLanguages,
-          transformLocalizedFieldToLocalizedString(
-            fieldDefinitions[0].labelAllLocales ?? []
-          ) ?? {}
-        ),
-        name: fieldDefinitions[0].name,
-        inputHint: fieldDefinitions[0].inputHint || 'SingleLine',
-        type: {
-          name: fieldDefinitions[0].type.name,
-          referenceTypeId:
-            fieldDefinitions[0].type.name === 'Reference'
-              ? (fieldDefinitions[0].type as TReferenceType).referenceTypeId
-              : '',
-        },
-      }}
+      initialValues={initialValuesFromFieldDefinition(
+        fieldDefinitions[0],
+        projectLanguages
+      )}
       onSubmit={handleSubmit}
       dataLocale={dataLocale}
     >

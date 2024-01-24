@@ -50,12 +50,13 @@ export default defineMessages({
   inputHintTitle: {
     id: 'FieldForm.inputHint.title',
     description: 'Title for fieldDefinitions inputHint field',
-    defaultMessage: 'Input Hint',
+    defaultMessage:
+      'Allow multiple line field (an expandable field recommended for longer texts)',
   },
   requiredTitle: {
     id: 'FieldForm.required.title',
     description: 'Title for fieldDefinitions required field',
-    defaultMessage: 'Required Field',
+    defaultMessage: 'Required: make attribute mandatory (indicated by *)',
   },
   setTitle: {
     id: 'FieldForm.isSet.title',

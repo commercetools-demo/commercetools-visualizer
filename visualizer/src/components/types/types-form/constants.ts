@@ -1,23 +1,3 @@
-export const TYPES = {
-  String: 'String',
-  LocalizedString: 'LocalizedString',
-  Number: 'Number',
-  Boolean: 'Boolean',
-  Money: 'Money',
-  Date: 'Date',
-  Time: 'Time',
-  DateTime: 'DateTime',
-  Enum: 'Enum',
-  LocalizedEnum: 'LocalizedEnum',
-  Object: 'Object',
-  Reference: 'Reference',
-};
-
-export const REFERENCE_BY = {
-  Key: 'key',
-  Id: 'id',
-};
-
 export const RESOURCE_TYPES = [
   'address',
   'asset',

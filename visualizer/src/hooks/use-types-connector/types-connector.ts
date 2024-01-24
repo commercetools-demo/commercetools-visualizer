@@ -1,5 +1,7 @@
 import {
   Maybe,
+  TFieldDefinition,
+  TFieldDefinitionInput,
   TMutation,
   TMutation_CreateTypeDefinitionArgs,
   TMutation_DeleteTypeDefinitionArgs,
@@ -29,6 +31,12 @@ import { createSyncTypes } from '@commercetools/sync-actions';
 import DeleteQuery from './delete-type-definition-id.ctp.graphql';
 import FetchQuery from './fetch-type.ctp.graphql';
 const syncTypes = createSyncTypes();
+
+export type DeepPartial<T> = T extends object
+  ? {
+      [P in keyof T]?: DeepPartial<T[P]>;
+    }
+  : T;
 
 export const useTypeDefinitionCreator = () => {
   const [createTypeDefinition, { loading }] = useMcMutation<
@@ -66,20 +74,28 @@ export const useTypeDefinitionUpdater = () => {
   const execute = async ({
     originalDraft,
     nextDraft,
+    id,
+    version,
   }: {
-    originalDraft: Partial<TTypeDefinition>;
-    nextDraft: any;
+    originalDraft: TFieldDefinition;
+    nextDraft: Partial<TFieldDefinitionInput>;
+    id: string;
+    version: number;
   }) => {
     try {
-      console.log(nextDraft, convertToActionData(originalDraft));
+      console.log(
+        nextDraft,
+        convertToActionData({
+          fieldDefinitions: [originalDraft],
+        })
+      );
       const actions = syncTypes.buildActions(
         {
-          ...nextDraft,
-          fieldDefinitions: nextDraft.fieldDefinitions
-            ? nextDraft.fieldDefinitions
-            : [],
+          fieldDefinitions: [nextDraft],
         },
-        convertToActionData(originalDraft)
+        convertToActionData({
+          fieldDefinitions: [originalDraft],
+        })
       );
 
       return await updateTypeDefinitionId({
@@ -87,8 +103,8 @@ export const useTypeDefinitionUpdater = () => {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
         variables: {
-          id: originalDraft.id,
-          version: originalDraft.version || 1,
+          id: id,
+          version: version || 1,
           actions: createGraphQlUpdateActions(actions),
         },
       });

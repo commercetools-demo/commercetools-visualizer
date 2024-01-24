@@ -1,4 +1,14 @@
-export const FIELD_TYPES: { [name: string]: string } = {
+export type Fields =
+  | 'Boolean'
+  | 'Date'
+  | 'Enum'
+  | 'Money'
+  | 'Number'
+  | 'Reference'
+  | 'Set'
+  | 'String';
+
+export const FIELD_TYPES: { [key in Fields]: string } = {
   Boolean: 'Boolean',
   Date: 'Date/Time',
   Enum: 'Enum',

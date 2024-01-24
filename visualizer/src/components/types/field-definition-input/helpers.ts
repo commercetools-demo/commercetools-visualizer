@@ -10,6 +10,7 @@ import {
   transformLocalizedFieldToLocalizedString,
   transformLocalizedStringToLocalizedField,
 } from '@commercetools-frontend/l10n';
+import { Fields } from './constants';
 
 export type TFormValues = {
   label: Record<string, string>;
@@ -17,7 +18,7 @@ export type TFormValues = {
   required?: boolean;
   isMultiLine: boolean;
   isLocalized: boolean;
-  typeName: string;
+  typeName: Fields;
   referenceTypeId: string;
   format: 'date' | 'datetime' | 'time';
 };
@@ -97,7 +98,7 @@ export const initialValuesFromFieldDefinition = (
   projectLanguages: Array<string>
 ): TFormValues => {
   let isLocalized = false;
-  let typeName = fieldDefinition?.type?.name || '';
+  let typeName: Fields = (fieldDefinition?.type?.name as Fields) || '';
   let format: 'date' | 'datetime' | 'time' = 'date';
   if (fieldDefinition?.type?.name) {
     if (fieldDefinition?.type?.name === 'DateTime') {

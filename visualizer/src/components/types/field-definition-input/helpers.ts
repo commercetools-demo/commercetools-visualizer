@@ -17,14 +17,15 @@ export type TFormValues = {
   required?: boolean;
   isMultiLine: boolean;
   isLocalized: boolean;
-  type: { name: string; referenceTypeId?: string };
+  typeName: string;
+  referenceTypeId: string;
   format: 'date' | 'datetime' | 'time';
 };
 export const fromFormValuesToTFieldDefinitionInput = (
   values: TFormValues
 ): TFieldDefinitionInput => {
   let type: TFieldTypeInput = { Boolean: {} };
-  switch (values.type.name) {
+  switch (values.typeName) {
     case 'Boolean': {
       type = { Boolean: {} };
       break;
@@ -58,7 +59,7 @@ export const fromFormValuesToTFieldDefinitionInput = (
     case 'Reference': {
       type = {
         Reference: {
-          referenceTypeId: values.type.referenceTypeId || 'product',
+          referenceTypeId: values.referenceTypeId,
         },
       };
       break;
@@ -96,7 +97,7 @@ export const initialValuesFromFieldDefinition = (
   projectLanguages: Array<string>
 ): TFormValues => {
   let isLocalized = false;
-  let typeName = '';
+  let typeName = fieldDefinition?.type?.name || '';
   let format: 'date' | 'datetime' | 'time' = 'date';
   if (fieldDefinition?.type?.name) {
     if (fieldDefinition?.type?.name === 'DateTime') {
@@ -108,16 +109,15 @@ export const initialValuesFromFieldDefinition = (
     } else if (fieldDefinition?.type?.name === 'Date') {
       format = 'date';
       typeName = 'Date';
+    } else if (fieldDefinition?.type?.name === 'LocalizedEnum') {
+      isLocalized = true;
+      typeName = 'Enum';
+    } else if (fieldDefinition?.type?.name === 'LocalizedString') {
+      isLocalized = true;
+      typeName = 'String';
     }
-  } else if (fieldDefinition?.type?.name === 'LocalizedEnum') {
-    isLocalized = true;
-    typeName = 'Enum';
-  } else if (fieldDefinition?.type?.name === 'LocalizedString') {
-    isLocalized = true;
-    typeName = 'String';
   }
 
-  console.log();
   return {
     label: LocalizedTextInput.createLocalizedString(
       projectLanguages,
@@ -129,12 +129,10 @@ export const initialValuesFromFieldDefinition = (
     isMultiLine: (fieldDefinition?.inputHint || 'SingleLine') === 'MultiLine',
     format: format,
     isLocalized: isLocalized,
-    type: {
-      name: typeName,
-      referenceTypeId:
-        fieldDefinition?.type?.name === 'Reference'
-          ? (fieldDefinition.type as TReferenceType).referenceTypeId
-          : '',
-    },
+    typeName: typeName,
+    referenceTypeId:
+      typeName === 'Reference'
+        ? (fieldDefinition?.type as TReferenceType).referenceTypeId
+        : '',
   };
 };

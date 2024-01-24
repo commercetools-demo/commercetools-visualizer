@@ -71,17 +71,10 @@ const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
   if (LocalizedTextInput.isEmpty(formikValues.label)) {
     errors.label.missing = true;
   }
-  if (
-    !formikValues.type ||
-    !formikValues.type.name ||
-    formikValues.type.name.length === 0
-  ) {
+  if (!formikValues.typeName || formikValues.typeName.length === 0) {
     errors.typeName.missing = true;
   }
-  if (
-    formikValues.type.name === 'Reference' &&
-    !formikValues.type.referenceTypeId
-  ) {
+  if (formikValues.typeName === 'Reference' && !formikValues.referenceTypeId) {
     errors.referenceTypeId.missing = true;
   }
   return omitEmpty(errors);
@@ -146,18 +139,21 @@ const FieldDefinitionInput: FC<Props> = ({
         />
         <Spacings.Inline alignItems="flex-end">
           <SelectField
-            name="type.name"
+            name="typeName"
             title={intl.formatMessage(messages.typeTitle)}
             isRequired
-            value={formik.values.type?.name}
+            value={formik.values.typeName}
             options={fieldTypes}
-            touched={formik.touched.type?.name}
+            touched={formik.touched.typeName}
             onBlur={formik.handleBlur}
             onChange={formik.handleChange}
             isDisabled={!createNewMode}
-            errors={SelectField.toFieldErrors<any>(formik.errors).typeName}
+            errors={
+              SelectField.toFieldErrors<TFormValues>(formik.errors).typeName
+            }
           />
-          {formik.values.type.name === 'String' && (
+          {(formik.values.typeName === 'String' ||
+            formik.values.typeName === 'Enum') && (
             <CheckboxInput
               name="isLocalized"
               isDisabled={!createNewMode}
@@ -169,7 +165,7 @@ const FieldDefinitionInput: FC<Props> = ({
               <FormattedMessage {...messages.localizedLabel} />
             </CheckboxInput>
           )}
-          {formik.values.type.name === 'Date' && (
+          {formik.values.typeName === 'Date' && (
             <RadioInput.Group
               direction="inline"
               onChange={formik.handleChange}
@@ -193,19 +189,20 @@ const FieldDefinitionInput: FC<Props> = ({
         </Spacings.Inline>
         {
           // Only display 'reference' drop-down if reference type selected.
-          formik.values.type.name === 'Reference' && (
+          formik.values.typeName === 'Reference' && (
             <SelectField
-              name="type.referenceTypeId"
+              name="referenceTypeId"
               title={intl.formatMessage(messages.referenceTitle)}
               isRequired
-              value={formik.values.type?.referenceTypeId}
+              value={formik.values.referenceTypeId}
               options={referenceTypeOptions}
-              touched={formik.touched.type?.referenceTypeId}
+              touched={formik.touched.referenceTypeId}
               onBlur={formik.handleBlur}
               onChange={formik.handleChange}
               isDisabled={!createNewMode}
               errors={
-                SelectField.toFieldErrors<any>(formik.errors).referenceTypeId
+                SelectField.toFieldErrors<TFormValues>(formik.errors)
+                  .referenceTypeId
               }
             />
           )
@@ -230,7 +227,7 @@ const FieldDefinitionInput: FC<Props> = ({
         </CheckboxInput>
         {
           // Only display 'inputHint' drop-down if string or LocalizedString type selected.
-          formik.values.type.name === 'String' && (
+          formik.values.typeName === 'String' && (
             <CheckboxInput
               name="isMultiLine"
               onChange={formik.handleChange}

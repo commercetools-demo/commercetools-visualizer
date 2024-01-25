@@ -1,87 +1,94 @@
-import type { ReactNode } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import type { FC } from 'react';
+import { useHistory, useRouteMatch } from 'react-router-dom';
 import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
-import { AngleRightIcon } from '@commercetools-uikit/icons';
+import { ListIcon } from '@commercetools-uikit/icons';
 import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import messages from './messages';
-import styles from './welcome.module.css';
-import WebDeveloperSvg from './web-developer.svg';
-
-type TWrapWithProps = {
-  children: ReactNode;
-  condition: boolean;
-  wrapper: (children: ReactNode) => ReactNode;
-};
-const WrapWith = (props: TWrapWithProps) => (
-  <>{props.condition ? props.wrapper(props.children) : props.children}</>
-);
-WrapWith.displayName = 'WrapWith';
+import { PageContentWide } from '@commercetools-frontend/application-components';
+import { customProperties } from '@commercetools-uikit/design-system';
+import Card from '@commercetools-uikit/card';
+import FlatButton from '@commercetools-uikit/flat-button';
+import AccessibleButton from '@commercetools-uikit/accessible-button';
 
 type TInfoCardProps = {
   title: string;
   content: string;
-  linkTo: string;
-  isExternal?: boolean;
+  target: string;
 };
 
-const InfoCard = (props: TInfoCardProps) => (
-  <Grid.Item>
-    <div className={styles.infoCard}>
-      <Spacings.Stack scale="m">
-        <Text.Headline as="h3">
-          <WrapWith
-            condition={true}
-            wrapper={(children) =>
-              props.isExternal ? (
-                <a
-                  className={styles.infoCardLink}
-                  href={props.linkTo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {children}
-                </a>
-              ) : (
-                <RouterLink className={styles.infoCardLink} to={props.linkTo}>
-                  {children}
-                </RouterLink>
-              )
+const InfoCard: FC<TInfoCardProps> = ({
+  title,
+  content,
+  target,
+}: TInfoCardProps) => {
+  const { push } = useHistory();
+  const match = useRouteMatch();
+  return (
+    <Grid.Item>
+      <Card type={'raised'} insetScale={'m'} theme={'light'}>
+        <Spacings.Stack alignItems={'stretch'}>
+          <Text.Headline as={'h2'}>{title}</Text.Headline>
+          <Text.Body>{content}</Text.Body>
+          <FlatButton
+            label={`View ${title}`}
+            onClick={() => push(`${match.url}/${target}`)}
+            icon={
+              <AccessibleButton
+                as={'a'}
+                type={'button'}
+                label={`View ${title}`}
+              >
+                <ListIcon></ListIcon>
+              </AccessibleButton>
             }
-          >
-            <Spacings.Inline scale="s" alignItems="center">
-              <span>{props.title}</span>
-              <AngleRightIcon size="big" color="primary" />
-            </Spacings.Inline>
-          </WrapWith>
-        </Text.Headline>
-        <Text.Body>{props.content}</Text.Body>
-      </Spacings.Stack>
-    </div>
-  </Grid.Item>
-);
+          ></FlatButton>
+        </Spacings.Stack>
+      </Card>
+    </Grid.Item>
+  );
+};
 InfoCard.displayName = 'InfoCard';
 
 const Welcome = () => {
   return (
     <Spacings.Inset scale="l">
-      <Constraints.Horizontal max={16}>
-        <Spacings.Stack scale="xl">
-          <Text.Headline as="h1" intlMessage={messages.title} />
-          <div>
-            <div className={styles.imageContainer}>
-              <img
-                alt="web developer"
-                src={WebDeveloperSvg}
-                width="100%"
-                height="100%"
+      <PageContentWide>
+        <Constraints.Horizontal max={16}>
+          <Spacings.Stack scale="xl">
+            <Text.Headline as="h1" intlMessage={messages.title} />
+            <Grid
+              gridTemplateColumns={`repeat(2,1fr)`}
+              gridGap={customProperties.spacingM}
+              gridAutoColumns={'1fr'}
+            >
+              <InfoCard
+                title={'Types'}
+                content={
+                  ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
+                }
+                target={'types'}
               />
-            </div>
-          </div>
-          <Text.Subheadline as="h4" intlMessage={messages.subtitle} />
-        </Spacings.Stack>
-      </Constraints.Horizontal>
+
+              <InfoCard
+                title={'Subscriptions'}
+                content={
+                  'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
+                }
+                target={'subscriptions'}
+              />
+              <InfoCard
+                title={'States'}
+                content={
+                  'States allow you to model finite state machines reflecting custom business logic. '
+                }
+                target={'states'}
+              />
+            </Grid>
+          </Spacings.Stack>
+        </Constraints.Horizontal>
+      </PageContentWide>
     </Spacings.Inset>
   );
 };

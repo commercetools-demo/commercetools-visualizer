@@ -12,6 +12,7 @@ import {
   TTypeDefinition,
   TTypeDefinitionDraft,
   TTypeDefinitionQueryResult,
+  TTypeUpdateAction,
 } from '../../types/generated/ctp';
 import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
 import FetchTypeDefinitionsQuery from './fetch-types.ctp.graphql';
@@ -30,6 +31,8 @@ import { convertToActionData } from '../../components/types/type-definition-conn
 import { createSyncTypes } from '@commercetools/sync-actions';
 import DeleteQuery from './delete-type-definition-id.ctp.graphql';
 import FetchQuery from './fetch-type.ctp.graphql';
+import TypeWithDefinitionByName from './fetch-type-definition-field-by-name.ctp.graphql';
+
 const syncTypes = createSyncTypes();
 
 export const useTypeDefinitionCreator = () => {
@@ -234,5 +237,69 @@ export const useTypeDefinitionDeleter = () => {
   return {
     loading,
     execute,
+  };
+};
+export const useTypeDefinitionEntryCreator = () => {
+  const [createTypeDefinitionEntry, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_UpdateTypeDefinitionArgs
+  >(UpdateTypeDefinitionIdMutation);
+
+  const execute = async ({
+    actions,
+    id,
+    version,
+  }: {
+    id: string;
+    version: number;
+    actions: Array<TTypeUpdateAction>;
+  }) => {
+    try {
+      return await createTypeDefinitionEntry({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          id: id,
+          version: version || 1,
+          actions: actions,
+        },
+      });
+    } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+export type TQuery_TypeDefinitionWithDefinitionByNameArgs = {
+  id: string;
+  includeNames: Array<string>;
+};
+export const useTypeWithDefinitionByNameFetcher = (
+  id: string,
+  includeNames: Array<string>
+) => {
+  const { data, error, loading, refetch } = useMcQuery<
+    TQuery,
+    TQuery_TypeDefinitionWithDefinitionByNameArgs
+  >(TypeWithDefinitionByName, {
+    variables: {
+      id: id,
+      includeNames: includeNames,
+    },
+    context: {
+      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+    },
+  });
+  return {
+    fieldDefinitions: data?.typeDefinition?.fieldDefinitions,
+    version: data?.typeDefinition?.version,
+    error,
+    loading,
+    refetch,
   };
 };

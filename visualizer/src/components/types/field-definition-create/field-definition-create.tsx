@@ -11,7 +11,6 @@ import {
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from '../field-definition-input/messages';
@@ -21,6 +20,7 @@ import {
   initialValuesFromFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
+import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
 
 type Props = {
   onClose: () => void;

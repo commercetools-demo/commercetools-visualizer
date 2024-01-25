@@ -18,7 +18,6 @@ import {
   TApiErrorNotificationOptions,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { useTypeWithDefinitionByNameFetcher } from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
@@ -30,6 +29,7 @@ import {
   initialValuesFromFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
+import { useTypeWithDefinitionByNameFetcher } from '../../../hooks/use-types-connector/types-connector';
 
 type Props = {
   onClose: (event: SyntheticEvent) => void;

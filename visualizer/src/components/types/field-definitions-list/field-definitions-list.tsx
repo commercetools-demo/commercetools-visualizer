@@ -28,9 +28,9 @@ import {
   TSetType,
   TTypeUpdateAction,
 } from '../../../types/generated/ctp';
-import { useTypeDefinitionEntryCreator } from '../type-definition-connectors';
 import createColumnDefinitions from './field-definitions-list-column-definitions';
 import messages from './messages';
+import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')

@@ -1,7 +1,12 @@
 import {
+  TEnumType,
+  TEnumValueInput,
   TFieldDefinition,
   TFieldDefinitionInput,
   TFieldTypeInput,
+  TLocalizedEnumType,
+  TLocalizedEnumValueInput,
+  TLocalizedStringItemInputType,
   TReferenceType,
   TTextInputHint,
 } from '../../../types/generated/ctp';
@@ -11,6 +16,10 @@ import {
   transformLocalizedStringToLocalizedField,
 } from '@commercetools-frontend/l10n';
 import { Fields } from './constants';
+import {
+  Item,
+  LocalizedString,
+} from '../field-definition-input-for-enum/constants';
 
 export type TFormValues = {
   label: Record<string, string>;
@@ -21,6 +30,7 @@ export type TFormValues = {
   typeName: Fields;
   referenceTypeId: string;
   format: 'date' | 'datetime' | 'time';
+  enumValues: Array<Item> | undefined;
 };
 export const fromFormValuesToTFieldDefinitionInput = (
   values: TFormValues
@@ -42,10 +52,30 @@ export const fromFormValuesToTFieldDefinitionInput = (
       break;
     }
     case 'Enum': {
+      console.log(values.enumValues);
       if (values.isLocalized) {
-        type = { LocalizedEnum: { values: [] } };
+        const newValue: Array<TLocalizedEnumValueInput> =
+          values.enumValues
+            ?.filter((value) => value.key && value.key.trim().length > 0)
+            .map((value) => {
+              const label: Array<TLocalizedStringItemInputType> =
+                Object.entries(value.label as LocalizedString).map(
+                  ([key, value]) => ({ locale: key, value: value })
+                ) || [];
+              return { key: value.key || '', label: label };
+            }) || [];
+        type = { LocalizedEnum: { values: newValue } };
       } else {
-        type = { Enum: { values: [] } };
+        const newValue: Array<TEnumValueInput> =
+          values.enumValues
+            ?.filter(
+              (value) => value.key && value.key.trim().length > 0 && value.label
+            )
+            .map((value) => {
+              const label = value.label as string | undefined;
+              return { key: value.key || '', label: label || '' };
+            }) || [];
+        type = { Enum: { values: newValue } };
       }
       break;
     }
@@ -100,6 +130,7 @@ export const initialValuesFromFieldDefinition = (
   let isLocalized = false;
   let typeName: Fields = (fieldDefinition?.type?.name as Fields) || '';
   let format: 'date' | 'datetime' | 'time' = 'date';
+  let enumValues: Array<Item> = [];
   if (fieldDefinition?.type?.name) {
     if (fieldDefinition?.type?.name === 'DateTime') {
       format = 'datetime';
@@ -113,6 +144,21 @@ export const initialValuesFromFieldDefinition = (
     } else if (fieldDefinition?.type?.name === 'LocalizedEnum') {
       isLocalized = true;
       typeName = 'Enum';
+      let type = fieldDefinition.type as TLocalizedEnumType;
+      enumValues = type.values.map(
+        (value): Item => ({
+          key: value.key,
+          label: value.labelAllLocales.reduce(
+            (a, v) => ({ ...a, [v.locale]: v.value }),
+            {}
+          ),
+        })
+      );
+    } else if (fieldDefinition?.type?.name === 'Enum') {
+      let type = fieldDefinition.type as TEnumType;
+      enumValues = type.values.map(
+        (value): Item => ({ key: value.key, label: value.label })
+      );
     } else if (fieldDefinition?.type?.name === 'LocalizedString') {
       isLocalized = true;
       typeName = 'String';
@@ -135,5 +181,10 @@ export const initialValuesFromFieldDefinition = (
       typeName === 'Reference'
         ? (fieldDefinition?.type as TReferenceType).referenceTypeId
         : '',
+    enumValues: enumValues,
+    // [
+    //   { key: 'key1', label: 'label' }, //{ 'en-GB': 'engb' } },
+    //   // { key: 'key2', label: { 'en-GB': 'engb' } },
+    // ],
   };
 };

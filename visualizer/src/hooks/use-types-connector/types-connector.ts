@@ -83,12 +83,6 @@ export const useTypeDefinitionUpdater = () => {
     version: number;
   }) => {
     try {
-      console.log(
-        nextDraft,
-        convertToActionData({
-          fieldDefinitions: [originalDraft],
-        })
-      );
       const actions = syncTypes.buildActions(
         {
           fieldDefinitions: [nextDraft],

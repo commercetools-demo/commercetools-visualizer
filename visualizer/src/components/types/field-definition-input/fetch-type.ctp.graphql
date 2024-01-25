@@ -18,6 +18,21 @@ query FetchTypeWithDefinitionByName($id: String, $includeNames: [String!]) {
             name
           }
         }
+        ... on EnumType {
+          values {
+            key
+            label
+          }
+        }
+        ... on LocalizedEnumType {
+          values {
+            key
+            labelAllLocales {
+              locale
+              value
+            }
+          }
+        }
       }
     }
     version

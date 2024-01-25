@@ -20,23 +20,27 @@ import UpdateTypeDefinitionIdMutation from '../../hooks/use-types-connector/upda
 import TypeWithDefinitionByName from './field-definition-input/fetch-type.ctp.graphql';
 import { TFormValues } from './types-form/types-form';
 
-export const convertToActionData = (draft: Partial<TTypeDefinition>) => ({
+export const convertToActionData = (
+  draft: Partial<TTypeDefinition>,
+  ignoreFieldDefinitions = false
+) => ({
   name: transformLocalizedFieldToLocalizedString(draft.nameAllLocales || []),
   description:
     transformLocalizedFieldToLocalizedString(
       draft.descriptionAllLocales || []
     ) || {},
   key: draft.key,
-  fieldDefinitions: draft.fieldDefinitions
-    ? draft.fieldDefinitions?.map((item) => {
-        return {
-          name: item.name,
-          label: transformLocalizedFieldToLocalizedString(
-            item.labelAllLocales || []
-          ),
-        };
-      })
-    : undefined,
+  fieldDefinitions:
+    !ignoreFieldDefinitions && draft.fieldDefinitions
+      ? draft.fieldDefinitions?.map((item) => {
+          return {
+            name: item.name,
+            label: transformLocalizedFieldToLocalizedString(
+              item.labelAllLocales || []
+            ),
+          };
+        })
+      : undefined,
 });
 
 export const formValuesToDoc = (formValues: TFormValues) => ({

@@ -8,6 +8,7 @@ import type {
   TGraphqlUpdateAction,
   TSyncAction,
   TChangeNameActionPayload,
+  TSetDescriptionActionPayload,
 } from './types';
 
 export const getErrorMessage = (error: ApolloError) =>
@@ -41,19 +42,41 @@ const getNameFromPayload = (payload: TChangeNameActionPayload) => ({
   name: transformLocalizedStringToLocalizedField(payload.name),
 });
 
+const getDescriptionFromPayload = (payload: TSetDescriptionActionPayload) => ({
+  description: transformLocalizedStringToLocalizedField(payload.description),
+});
+
 const isChangeNameActionPayload = (
   actionPayload: Record<string, unknown>
 ): actionPayload is TChangeNameActionPayload => {
   return (actionPayload as TChangeNameActionPayload)?.name !== undefined;
 };
-
+const isSetDescriptionActionPayload = (
+  actionPayload: Record<string, unknown>
+): actionPayload is TSetDescriptionActionPayload => {
+  return (
+    (actionPayload as TSetDescriptionActionPayload)?.description !== undefined
+  );
+};
 const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
   const { action: actionName, ...actionPayload } = action;
+  let actionPL = actionPayload;
+  switch (actionName) {
+    case 'changeName': {
+      if (isChangeNameActionPayload(actionPayload)) {
+        actionPL = getNameFromPayload(actionPayload);
+      }
+      break;
+    }
+    case 'setDescription': {
+      if (isSetDescriptionActionPayload(actionPayload)) {
+        actionPL = getDescriptionFromPayload(actionPayload);
+      }
+      break;
+    }
+  }
   return {
-    [actionName]:
-      actionName === 'changeName' && isChangeNameActionPayload(actionPayload)
-        ? getNameFromPayload(actionPayload)
-        : actionPayload,
+    [actionName]: actionPL,
   };
 };
 

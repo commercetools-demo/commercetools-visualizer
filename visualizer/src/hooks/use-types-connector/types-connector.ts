@@ -32,12 +32,6 @@ import DeleteQuery from './delete-type-definition-id.ctp.graphql';
 import FetchQuery from './fetch-type.ctp.graphql';
 const syncTypes = createSyncTypes();
 
-export type DeepPartial<T> = T extends object
-  ? {
-      [P in keyof T]?: DeepPartial<T[P]>;
-    }
-  : T;
-
 export const useTypeDefinitionCreator = () => {
   const [createTypeDefinition, { loading }] = useMcMutation<
     TMutation,
@@ -55,6 +49,49 @@ export const useTypeDefinitionCreator = () => {
         },
       });
     } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+
+export const useTypeUpdater = () => {
+  const [updateTypeId, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_UpdateTypeDefinitionArgs
+  >(UpdateTypeDefinitionIdMutation);
+
+  const execute = async ({
+    originalDraft,
+    nextDraft,
+    id,
+    version,
+  }: {
+    originalDraft: TTypeDefinition;
+    nextDraft: any;
+    id: string;
+    version: number;
+  }) => {
+    try {
+      const originalConverted = convertToActionData(originalDraft, true);
+      const actions = syncTypes.buildActions(nextDraft, originalConverted);
+
+      return await updateTypeId({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          id: id,
+          version: version || 1,
+          actions: createGraphQlUpdateActions(actions),
+        },
+      });
+    } catch (graphQlResponse) {
+      console.log(graphQlResponse);
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };

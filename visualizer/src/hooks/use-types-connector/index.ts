@@ -4,4 +4,5 @@ export {
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
   useTypesFetcher,
+  useTypeUpdater,
 } from './types-connector';

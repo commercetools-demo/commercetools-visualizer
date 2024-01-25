@@ -31,7 +31,7 @@ import messages from './messages';
 import {
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
-  useTypeDefinitionUpdater,
+  useTypeUpdater,
 } from '../../../hooks/use-types-connector';
 
 type Props = {
@@ -47,7 +47,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const typeDefinitionUpdater = useTypeDefinitionUpdater();
+  const typeUpdater = useTypeUpdater();
   const typeDefinitionDeleter = useTypeDefinitionDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -62,9 +62,11 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
       try {
         const data = formValuesToDoc(formikValues);
         if (typeDefinition) {
-          await typeDefinitionUpdater.execute({
+          await typeUpdater.execute({
             originalDraft: typeDefinition,
             nextDraft: data,
+            id: typeDefinition.id,
+            version: typeDefinition.version,
           });
         }
         showNotification({
@@ -85,7 +87,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
         formikHelpers.setErrors(transformedErrors.formErrors);
       }
     },
-    [intl, refetch, showNotification, typeDefinition, typeDefinitionUpdater]
+    [intl, refetch, showNotification, typeDefinition, typeUpdater]
   );
 
   const handleDelete = async () => {

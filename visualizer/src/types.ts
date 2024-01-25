@@ -16,3 +16,7 @@ export type TGraphqlUpdateAction = Record<string, Record<string, unknown>>;
 export type TChangeNameActionPayload = {
   name: Record<string, string>;
 };
+
+export type TSetDescriptionActionPayload = {
+  description: Record<string, string>;
+};

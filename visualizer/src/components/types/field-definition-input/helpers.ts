@@ -52,15 +52,16 @@ export const fromFormValuesToTFieldDefinitionInput = (
       break;
     }
     case 'Enum': {
-      console.log(values.enumValues);
       if (values.isLocalized) {
         const newValue: Array<TLocalizedEnumValueInput> =
           values.enumValues
             ?.filter((value) => value.key && value.key.trim().length > 0)
             .map((value) => {
               const label: Array<TLocalizedStringItemInputType> =
-                Object.entries(value.label as LocalizedString).map(
-                  ([key, value]) => ({ locale: key, value: value })
+                transformLocalizedStringToLocalizedField(
+                  LocalizedTextInput.omitEmptyTranslations(
+                    value.label as LocalizedString
+                  )
                 ) || [];
               return { key: value.key || '', label: label };
             }) || [];

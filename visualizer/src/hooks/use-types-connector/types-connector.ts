@@ -27,7 +27,10 @@ import {
   extractErrorFromGraphQlResponse,
 } from '../../helpers';
 import UpdateTypeDefinitionIdMutation from './update-type.ctp.graphql';
-import { convertToActionData } from '../../components/types/type-definition-connectors';
+import {
+  convertFieldDefinitionToActionData,
+  convertToActionData,
+} from '../../components/types/type-definition-connectors';
 import { createSyncTypes } from '@commercetools/sync-actions';
 import DeleteQuery from './delete-type-definition-id.ctp.graphql';
 import FetchQuery from './fetch-type.ctp.graphql';
@@ -123,14 +126,14 @@ export const useTypeDefinitionUpdater = () => {
     version: number;
   }) => {
     try {
-      const actions = syncTypes.buildActions(
-        {
-          fieldDefinitions: [nextDraft],
-        },
-        convertToActionData({
-          fieldDefinitions: [originalDraft],
-        })
-      );
+      let originalDraft1 = convertToActionData({
+        fieldDefinitions: [originalDraft],
+      });
+      let nextDraft1 = {
+        fieldDefinitions: [convertFieldDefinitionToActionData(nextDraft)],
+      };
+
+      const actions = syncTypes.buildActions(nextDraft1, originalDraft1);
 
       return await updateTypeDefinitionId({
         context: {

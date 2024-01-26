@@ -4,11 +4,12 @@ import {
 } from '@commercetools-frontend/l10n';
 import { isApolloError, ApolloError, type ServerError } from '@apollo/client';
 import type { TChannel } from './types/generated/ctp';
-import type {
+import {
   TGraphqlUpdateAction,
   TSyncAction,
   TChangeNameActionPayload,
   TSetDescriptionActionPayload,
+  TChangeLocalizedEnumValueLabelActionPayload,
 } from './types';
 
 export const getErrorMessage = (error: ApolloError) =>
@@ -45,6 +46,17 @@ const getNameFromPayload = (payload: TChangeNameActionPayload) => ({
 const getDescriptionFromPayload = (payload: TSetDescriptionActionPayload) => ({
   description: transformLocalizedStringToLocalizedField(payload.description),
 });
+const getChangeLocalizedEnumValueFromPayload = (
+  payload: TChangeLocalizedEnumValueLabelActionPayload
+) => {
+  return {
+    fieldName: payload.fieldName,
+    value: {
+      key: payload.value.key,
+      label: transformLocalizedStringToLocalizedField(payload.value.label),
+    },
+  };
+};
 
 const isChangeNameActionPayload = (
   actionPayload: Record<string, unknown>
@@ -56,6 +68,16 @@ const isSetDescriptionActionPayload = (
 ): actionPayload is TSetDescriptionActionPayload => {
   return (
     (actionPayload as TSetDescriptionActionPayload)?.description !== undefined
+  );
+};
+const isUpdateLocalizedEnumValueLabel = (
+  actionPayload: Record<string, unknown>
+): actionPayload is TChangeLocalizedEnumValueLabelActionPayload => {
+  return (
+    (actionPayload as TChangeLocalizedEnumValueLabelActionPayload)
+      ?.fieldName !== undefined &&
+    (actionPayload as TChangeLocalizedEnumValueLabelActionPayload)?.value !==
+      undefined
   );
 };
 const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
@@ -73,6 +95,17 @@ const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
         actionPL = getDescriptionFromPayload(actionPayload);
       }
       break;
+    }
+    case 'changeLocalizedEnumValueLabel': {
+      if (isUpdateLocalizedEnumValueLabel(actionPayload)) {
+        actionPL = getChangeLocalizedEnumValueFromPayload(actionPayload);
+      }
+      break;
+    }
+    case 'addLocalizedEnumValue': {
+      if (isUpdateLocalizedEnumValueLabel(actionPayload)) {
+        actionPL = getChangeLocalizedEnumValueFromPayload(actionPayload);
+      }
     }
   }
   return {

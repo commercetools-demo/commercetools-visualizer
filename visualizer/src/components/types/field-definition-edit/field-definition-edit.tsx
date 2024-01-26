@@ -61,14 +61,10 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
       try {
         const fieldDefinitionInput =
           fromFormValuesToTFieldDefinitionInput(formikValues);
-        const data = {
-          name: fieldDefinitionInput.name,
-          label: fieldDefinitionInput.label,
-        };
         if (fieldDefinitions) {
           await typeDefinitionUpdater.execute({
             originalDraft: fieldDefinitions[0],
-            nextDraft: data,
+            nextDraft: fieldDefinitionInput,
             id: id,
             version: version || 1,
           });

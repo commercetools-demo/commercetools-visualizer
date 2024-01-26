@@ -121,14 +121,10 @@ const FieldDefinitionInput: FC<Props> = ({
   };
 
   const handleRemoveEnumValue = (absoluteIndex: number) => {
-    // console.log(absoluteIndex);
     if (formik.values.enumValues && formik.values.enumValues[absoluteIndex]) {
-      const nextEnumDraftItems = [...formik.values.enumValues].splice(
-        absoluteIndex,
-        1
-      );
-
-      formik.setFieldValue('enumValues', nextEnumDraftItems, false);
+      const newArray = [...formik.values.enumValues];
+      newArray.splice(absoluteIndex, 1);
+      formik.setFieldValue('enumValues', newArray, false);
     }
   };
 
@@ -296,7 +292,6 @@ const FieldDefinitionInput: FC<Props> = ({
             onAddEnumValue={handleAddEnumValue}
             onChangeEnumValue={handleChangeEnumValue}
             onRemoveEnumValue={handleRemoveEnumValue}
-            isDisabled={!createNewMode}
           />
         </PageContentFull>
       )}

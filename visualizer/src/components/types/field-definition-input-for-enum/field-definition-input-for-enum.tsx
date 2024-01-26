@@ -25,7 +25,7 @@ const getLocalizedEnumLabel = (
   if (!docLabel) {
     return '';
   }
-  return docLabel[formColumnKey.split('_')[1]];
+  return docLabel[formColumnKey.split('_')[1]] || '';
 };
 const formToDocLocalizedEnumLabel = (formColumnKey: string) =>
   formColumnKey.replace('_', '.');

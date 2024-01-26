@@ -165,9 +165,7 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
     const value =
       isLocalized && key.startsWith('label')
         ? getLocalizedEnumLabel(row.label as LocalizedString, key)
-        : key in row
-        ? row.key || ''
-        : '';
+        : (row[key as keyof RowItem] as string) || '';
     switch (key) {
       case 'delete':
         return (

@@ -85,6 +85,13 @@ const Welcome = () => {
                 }
                 target={'states'}
               />
+              <InfoCard
+                title={'API Extensions'}
+                content={
+                  'Extend the behavior of an API with your business logic.'
+                }
+                target={'extensions'}
+              />
             </Grid>
           </Spacings.Stack>
         </Constraints.Horizontal>

@@ -1,0 +1,39 @@
+query GetExtension($id: String, $key: String) {
+    extension(id: $id, key: $key) {
+        id
+        version
+        createdAt
+        lastModifiedAt
+        key
+        destination {
+            type
+            ... on AWSLambdaDestination {
+                arn
+                accessKey
+                accessSecret
+            }
+            ... on GoogleCloudFunctionDestination {
+                url
+            }
+            ... on HttpDestination {
+                type
+                url
+                authentication {
+                    type
+                    ... on AuthorizationHeader {
+                        headerValue
+                    }
+                    ... on AzureFunctionsAuthentication {
+                        key
+                    }
+                }
+            }
+        }
+        triggers {
+            resourceTypeId
+            actions
+            condition
+        }
+        timeoutInMs
+    }
+}

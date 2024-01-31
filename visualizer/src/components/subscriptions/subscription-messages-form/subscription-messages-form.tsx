@@ -775,7 +775,6 @@ const SubscriptionMessagesForm = () => {
                       key={item.resourceTypeId}
                       name="messages"
                       label={item.label}
-                      columns={3}
                     >
                       {item.types.map((entry, index) => {
                         return (

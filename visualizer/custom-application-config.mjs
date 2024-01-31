@@ -18,7 +18,7 @@ const config = {
   },
   oAuthScopes: {
     view: ['view_states', 'view_types'],
-    manage: ['manage_states', 'manage_subscriptions', 'manage_types'],
+    manage: ['manage_states', 'manage_subscriptions', 'manage_types', 'manage_extensions'],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
   mainMenuLink: {
@@ -42,6 +42,12 @@ const config = {
     {
       uriPath: 'types',
       defaultLabel: 'Types',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'extensions',
+      defaultLabel: 'Extensions',
       labelAllLocales: [],
       permissions: [PERMISSIONS.View],
     },

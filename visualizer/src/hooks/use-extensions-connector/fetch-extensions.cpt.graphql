@@ -1,0 +1,43 @@
+query FetchExtensions($where: String, $sort: [String!], $limit: Int, $offset: Int) {
+  extensions(where: $where, sort: $sort, limit: $limit, offset: $offset) {
+    count
+    total
+    offset
+    results {
+      id
+      version
+      createdAt
+      lastModifiedAt
+      key
+      destination {
+        type
+        ... on AWSLambdaDestination {
+          arn
+          accessKey
+          accessSecret
+        }
+        ... on GoogleCloudFunctionDestination {
+          url
+        }
+        ... on HttpDestination {
+          type
+          url
+          authentication {
+            type
+            ... on AuthorizationHeader {
+              headerValue
+            }
+            ... on AzureFunctionsAuthentication {
+              key
+            }
+          }
+        }
+      }
+      triggers {
+        resourceTypeId
+        actions
+      }
+      timeoutInMs
+    }
+  }
+}

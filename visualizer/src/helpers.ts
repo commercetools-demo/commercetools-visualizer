@@ -12,6 +12,24 @@ import {
   TChangeLocalizedEnumValueLabelActionPayload,
 } from './types';
 
+const sortStringArray = (a: string, b: string) => a.localeCompare(b);
+export const compareStringArrays = (
+  array1: Array<string> | undefined | null,
+  array2: Array<string> | undefined | null
+): boolean => {
+  if (!array1 && !array2) {
+    return true;
+  } else if (!array1 || !array2) {
+    return false;
+  } else {
+    const sortedArray1 = array1.sort(sortStringArray);
+    const sortedArray2 = array2.sort(sortStringArray);
+    const areEqual: boolean =
+      sortedArray1.length === sortedArray2.length &&
+      sortedArray1.every((value, index) => value === sortedArray2[index]);
+    return areEqual;
+  }
+};
 export const getErrorMessage = (error: ApolloError) =>
   error.graphQLErrors?.map((e) => e.message).join('\n') || error.message;
 

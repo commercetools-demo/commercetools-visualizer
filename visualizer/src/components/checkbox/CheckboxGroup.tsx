@@ -7,12 +7,11 @@ import Grid from '@commercetools-uikit/grid';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 
 type Props = PropsWithChildren<{
-  columns?: number;
   name: string;
   label: string;
 }>;
 
-function CheckboxGroup<T>({ name, label, columns = 1, children }: Props) {
+function CheckboxGroup<T>({ name, label, children }: Props) {
   const [field, meta, helpers] = useField<Array<T>>(name);
   return (
     <CheckboxProvider<T> value={{ field, helpers, meta }}>

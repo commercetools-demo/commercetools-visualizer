@@ -128,7 +128,6 @@ const SubscriptionChangesForm = () => {
               <CheckboxGroup
                 name="changes"
                 label="Choose Changes you want to listen to."
-                columns={3}
               >
                 {possibilities(intl).map((entry, index) => {
                   return (

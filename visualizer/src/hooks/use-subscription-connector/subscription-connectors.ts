@@ -4,7 +4,10 @@ import {
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
-import { extractErrorFromGraphQlResponse } from '../../helpers';
+import {
+  compareStringArrays,
+  extractErrorFromGraphQlResponse,
+} from '../../helpers';
 import {
   TMutation,
   TMutation_UpdateSubscriptionArgs,
@@ -58,25 +61,6 @@ export const useSubscriptionKeyUpdater = () => {
     TMutation,
     TMutation_UpdateSubscriptionArgs
   >(UpdateSubscriptionKeyMutation);
-
-  const sortStringArray = (a: string, b: string) => a.localeCompare(b);
-  const compareStringArrays = (
-    array1: Array<string> | undefined | null,
-    array2: Array<string> | undefined | null
-  ): boolean => {
-    if (!array1 && !array2) {
-      return true;
-    } else if (!array1 || !array2) {
-      return false;
-    } else {
-      const sortedArray1 = array1.sort(sortStringArray);
-      const sortedArray2 = array2.sort(sortStringArray);
-      const areEqual: boolean =
-        sortedArray1.length === sortedArray2.length &&
-        sortedArray1.every((value, index) => value === sortedArray2[index]);
-      return areEqual;
-    }
-  };
 
   const execute = async ({
     originalDraft,

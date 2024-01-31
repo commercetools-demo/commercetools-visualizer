@@ -1,6 +1,6 @@
 deployAs:
   - name: visualizer
-    applicationType: mc-app
+    applicationType: merchant-center-custom-application
     endpoint: /
     configuration:
       standardConfiguration:

@@ -18,7 +18,6 @@ import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { getErrorMessage } from '../../../helpers';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
-import Destinations from '../destinations/Destinations';
 import messages from './messages';
 import destinationMessages from '../subscription-destination-type-form/messages';
 import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
@@ -64,7 +63,6 @@ const SubscriptionList = (props: Props) => {
     { key: 'version', label: 'Version' },
     { key: 'createdAt', label: 'Created At' },
     { key: 'destinationType', label: 'Destination Type' },
-    // { key: 'destination', label: 'Destination Specific' },
     // { key: 'messages', label: 'Messages' },
   ];
 
@@ -104,8 +102,6 @@ const SubscriptionList = (props: Props) => {
         } catch (e) {
           return item.destination.type;
         }
-      case 'destination':
-        return <Destinations destination={item.destination} />;
       default:
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (item as any)[column.key];

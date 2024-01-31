@@ -136,7 +136,6 @@ const ExtensionsForm: FC<Props> = ({
     enableReinitialize: true,
   });
   const intl = useIntl();
-  console.log(formik.values);
 
   const formElements = (
     <PageContentWide columns="2/1" gapSize="20">

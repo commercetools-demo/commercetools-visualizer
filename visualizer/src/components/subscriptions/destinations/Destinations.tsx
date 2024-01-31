@@ -9,7 +9,6 @@ const Destinations: FC<Props> = ({ destination }) => {
   switch (destination.type) {
     default: {
       const casted: any = destination as any;
-      // eslint-disable-next-line unused-imports/no-unused-vars
       const { type, __typename, ...rest } = casted;
       return (
         <>

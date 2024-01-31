@@ -2,5 +2,5 @@ export {
   useSubscriptionDeleter,
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
-  useSubscriptionCreator
+  useSubscriptionCreator,
 } from './subscription-connectors';

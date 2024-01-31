@@ -3,8 +3,8 @@ import { entryPointUriPathToPermissionKeys } from '@commercetools-frontend/appli
 
 declare const window: Window &
   typeof globalThis & {
-  app: { entryPointUriPath: string };
-};
+    app: { entryPointUriPath: string };
+  };
 
 export const entryPointUriPath =
   typeof window === 'undefined' ? 'visualizer' : window.app.entryPointUriPath;

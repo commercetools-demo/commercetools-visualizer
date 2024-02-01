@@ -9,6 +9,11 @@ export default defineMessages<string>({
     id: 'States.title',
     defaultMessage: 'States list',
   },
+  addState: {
+    id: 'States.addState',
+    description: 'add state button label',
+    defaultMessage: 'Add New State',
+  },
   LineItemState: {
     id: 'States.LineItemState',
     defaultMessage: 'Line Item State ({amount})',

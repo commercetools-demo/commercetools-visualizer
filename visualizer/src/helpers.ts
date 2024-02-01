@@ -10,6 +10,7 @@ import {
   TChangeNameActionPayload,
   TSetDescriptionActionPayload,
   TChangeLocalizedEnumValueLabelActionPayload,
+  TSetNameActionPayload,
 } from './types';
 
 const sortStringArray = (a: string, b: string) => a.localeCompare(b);
@@ -76,6 +77,11 @@ const getChangeLocalizedEnumValueFromPayload = (
   };
 };
 
+const isSetNameActionPayload = (
+  actionPayload: Record<string, unknown>
+): actionPayload is TSetNameActionPayload => {
+  return (actionPayload as TSetNameActionPayload)?.name !== undefined;
+};
 const isChangeNameActionPayload = (
   actionPayload: Record<string, unknown>
 ): actionPayload is TChangeNameActionPayload => {
@@ -102,6 +108,12 @@ const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
   const { action: actionName, ...actionPayload } = action;
   let actionPL = actionPayload;
   switch (actionName) {
+    case 'setName': {
+      if (isSetNameActionPayload(actionPayload)) {
+        actionPL = getNameFromPayload(actionPayload);
+      }
+      break;
+    }
     case 'changeName': {
       if (isChangeNameActionPayload(actionPayload)) {
         actionPL = getNameFromPayload(actionPayload);

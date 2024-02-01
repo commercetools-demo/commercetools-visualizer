@@ -4,7 +4,6 @@ import {
   Maybe,
   TQuery,
   TQuery_TypeDefinitionArgs,
-  TStateType,
 } from '../../../types/generated/ctp';
 import { ApolloQueryResult } from '@apollo/client';
 import { PageContentWide } from '@commercetools-frontend/application-components';
@@ -19,7 +18,18 @@ import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import TextField from '@commercetools-uikit/text-field';
 import omitEmpty from 'omit-empty-es';
+import SelectField from '@commercetools-uikit/select-field';
 type Formik = ReturnType<typeof useFormik>;
+
+export const resourceTypes = [
+  { value: 'OrderState', label: 'Order State' },
+  { value: 'LineItemState', label: 'Line Item State' },
+  { value: 'ProductState', label: 'Product State' },
+  { value: 'PaymentState', label: 'Payment State' },
+  { value: 'QuoteRequestState', label: 'Quote Request State' },
+  { value: 'StagedQuoteState', label: 'Staged Quote State' },
+  { value: 'QuoteState', label: 'Quote State' },
+];
 
 type FormProps = {
   formElements: ReactElement;
@@ -31,10 +41,10 @@ type FormProps = {
 };
 
 export type TFormValues = {
-  type: TStateType;
   key?: Maybe<string>;
   name: Record<string, string>;
   description: Record<string, string>;
+  stateType: string;
 };
 
 type TErrors = {
@@ -137,6 +147,29 @@ const StatesForm: FC<Props> = ({
               </Grid.Item>
               <Grid.Item>
                 <Card type="flat" insetScale="s">
+                  <SelectField
+                    name="resourceTypeIds"
+                    title={intl.formatMessage(messages.stateTypeTitle)}
+                    isRequired
+                    value={formik.values.stateType}
+                    options={resourceTypes}
+                    errors={
+                      SelectField.toFieldErrors<TFormValues>(formik.errors)
+                        .stateType
+                    }
+                    touched={
+                      formik.touched.stateType
+                        ? formik.touched.stateType
+                        : undefined
+                    }
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    isDisabled={!createNewMode}
+                  />
+                </Card>
+              </Grid.Item>
+              <Grid.Item>
+                <Card type="flat" insetScale="s">
                   <LocalizedTextField
                     name="name"
                     selectedLanguage={dataLocale}
@@ -171,49 +204,6 @@ const StatesForm: FC<Props> = ({
                   />
                 </Card>
               </Grid.Item>
-              {/*<Grid.Item>*/}
-              {/*  <Card type="flat" insetScale="s">*/}
-              {/*    <TextField*/}
-              {/*      name="key"*/}
-              {/*      value={formik.values.key || ''}*/}
-              {/*      title={intl.formatMessage(messages.keyTitle)}*/}
-              {/*      hint={intl.formatMessage(messages.keyHint)}*/}
-              {/*      isRequired*/}
-              {/*      errors={*/}
-              {/*        TextField.toFieldErrors<TFormValues>(formik.errors).key*/}
-              {/*      }*/}
-              {/*      touched={!!formik.touched.key}*/}
-              {/*      onBlur={formik.handleBlur}*/}
-              {/*      onChange={formik.handleChange}*/}
-              {/*      isDisabled={!createNewMode}*/}
-              {/*      renderError={renderKeyInputErrors}*/}
-              {/*    />*/}
-              {/*  </Card>*/}
-              {/*</Grid.Item>*/}
-              {/*<Grid.Item>*/}
-              {/*  <Card type="flat" insetScale="s">*/}
-              {/*    <SelectField*/}
-              {/*      name="resourceTypeIds"*/}
-              {/*      title={intl.formatMessage(messages.resourceTypeIdsTitle)}*/}
-              {/*      isRequired*/}
-              {/*      isMulti*/}
-              {/*      value={formik.values.resourceTypeIds}*/}
-              {/*      options={resourceTypes}*/}
-              {/*      errors={*/}
-              {/*        SelectField.toFieldErrors<TFormValues>(formik.errors)*/}
-              {/*          .resourceTypeIds*/}
-              {/*      }*/}
-              {/*      touched={*/}
-              {/*        formik.touched.resourceTypeIds*/}
-              {/*          ? formik.touched.resourceTypeIds*/}
-              {/*          : undefined*/}
-              {/*      }*/}
-              {/*      onBlur={formik.handleBlur}*/}
-              {/*      onChange={formik.handleChange}*/}
-              {/*      isDisabled={!createNewMode}*/}
-              {/*    />*/}
-              {/*  </Card>*/}
-              {/*</Grid.Item>*/}
             </Grid>
           </CollapsiblePanel>
         </Spacings.Stack>

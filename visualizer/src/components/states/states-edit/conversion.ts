@@ -11,7 +11,7 @@ export const stateToFormValues = (
   state?: TState
 ): TFormValues => {
   return {
-    type: state?.type || TStateType.LineItemState,
+    stateType: state?.type || TStateType.LineItemState,
     key: state?.key || '',
     name: LocalizedTextInput.createLocalizedString(
       projectLanguages,
@@ -28,7 +28,7 @@ export const stateToFormValues = (
 };
 export const formValuesToState = (formValues: TFormValues): TStateDraft => {
   return {
-    type: formValues.type,
+    type: formValues.stateType as TStateType,
     key: formValues.key || '',
     name: transformLocalizedStringToLocalizedField(
       LocalizedTextInput.omitEmptyTranslations(formValues.name)

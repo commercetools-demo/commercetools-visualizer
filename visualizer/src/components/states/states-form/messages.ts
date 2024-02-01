@@ -44,4 +44,9 @@ export default defineMessages({
     defaultMessage:
       'Key must contain between 2 and 256 alphanumeric characters, underscores and/or hyphens',
   },
+  stateTypeTitle: {
+    id: 'State.form.stateType.title',
+    description: 'Title for State Type ID field',
+    defaultMessage: 'State Type',
+  },
 });

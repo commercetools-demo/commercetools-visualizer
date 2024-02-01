@@ -76,6 +76,7 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
             isOpen
             onPrimaryButtonClick={() => formProps.submitForm()}
             onSecondaryButtonClick={onClose}
+            onClose={onClose}
             hideControls={false}
             labelPrimaryButton={intl.formatMessage(FormModalPage.Intl.save)}
             isPrimaryButtonDisabled={

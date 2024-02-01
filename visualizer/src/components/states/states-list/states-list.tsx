@@ -3,6 +3,7 @@ import {
   Route,
   Switch,
   useHistory,
+  useParams,
   useRouteMatch,
 } from 'react-router-dom';
 import Text from '@commercetools-uikit/text';
@@ -54,6 +55,11 @@ const StatesList = (props: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
   const match = useRouteMatch();
+  const { type, id } = useParams<{ type: string; id: string }>();
+  let url = match.url;
+  if (type && match.url.endsWith(`/${type}`)) {
+    url = url.substring(0, url.indexOf(`/${type}`));
+  }
 
   const { states, error, loading, refetch } = useStatesFetcher({
     limit: 100,
@@ -116,7 +122,7 @@ const StatesList = (props: Props) => {
           <TabHeader
             exactPathMatch={true}
             key={index}
-            to={`${match.url}${
+            to={`${url}${
               index === 0 ? '' : `/${item.title.toLocaleLowerCase()}`
             }`}
             label={intl.formatMessage(
@@ -130,7 +136,19 @@ const StatesList = (props: Props) => {
       })}
     </>
   );
+  //Major CF
+  //we want the first tab to be / --> therefore a normal link resolving does not work
 
+  let backUrl = match.url;
+  //if there is an id and a type the page is e.g. /orderitem/123-123-123
+  if (id && type && backUrl.endsWith(`/${id}`)) {
+    backUrl = backUrl.substring(0, backUrl.indexOf(`/${id}`));
+    //if there is a type the page is e.g. /123-123-123
+  } else if (type && backUrl.endsWith(`/${type}`)) {
+    backUrl = backUrl.substring(0, backUrl.indexOf(`/${type}`));
+  }
+
+  console.log(backUrl);
   return (
     <TabularDetailPage
       onPreviousPathClick={() => push(props.linkToWelcome)}
@@ -153,7 +171,8 @@ const StatesList = (props: Props) => {
           return (
             <Route
               key={index}
-              path={`${match.url}${
+              exact={true}
+              path={`${url}${
                 index === itemsToRender.length - 1
                   ? ''
                   : `/${item.title.toLocaleLowerCase()}`
@@ -169,11 +188,11 @@ const StatesList = (props: Props) => {
           <StateCreate
             onClose={() => {
               refetch();
-              push(`${match.url}`);
+              push(backUrl);
             }}
             onCreate={(id: string) => {
               refetch();
-              push(`${match.url}/${id}`);
+              push(`${backUrl}/${id}`);
             }}
           />
         </SuspendedRoute>
@@ -181,7 +200,7 @@ const StatesList = (props: Props) => {
           <StatesEdit
             onClose={() => {
               refetch();
-              push(`${match.url}`);
+              push(backUrl);
             }}
           />
         </SuspendedRoute>

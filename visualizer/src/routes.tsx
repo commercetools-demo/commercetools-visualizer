@@ -27,7 +27,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
 
   return (
     <Switch>
-      <Route path={`${match.path}/states`}>
+      <Route path={`${match.path}/states/:type?/:id?`}>
         <StatesList linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/subscription/new/:step`}>

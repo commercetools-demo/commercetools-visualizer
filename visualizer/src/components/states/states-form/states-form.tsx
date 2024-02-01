@@ -4,6 +4,7 @@ import {
   Maybe,
   TQuery,
   TQuery_TypeDefinitionArgs,
+  TStateType,
 } from '../../../types/generated/ctp';
 import { ApolloQueryResult } from '@apollo/client';
 import { PageContentWide } from '@commercetools-frontend/application-components';
@@ -44,7 +45,7 @@ export type TFormValues = {
   key?: Maybe<string>;
   name: Record<string, string>;
   description: Record<string, string>;
-  stateType: string;
+  stateType: TStateType;
 };
 
 type TErrors = {

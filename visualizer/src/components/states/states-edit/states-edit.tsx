@@ -25,10 +25,14 @@ import {
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import {
+  useStateDeleter,
   useStateFetcher,
   useStateUpdater,
 } from '../../../hooks/use-states-hook';
-import { formValuesToState, stateToFormValues } from './conversion';
+import {
+  formValuesToState,
+  stateToFormValues,
+} from '../states-form/conversion';
 
 type Props = {
   onClose: () => void;
@@ -42,6 +46,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
   const showNotification = useShowNotification();
   const { id } = useParams<{ id: string }>();
   const stateUpdater = useStateUpdater();
+  const stateDeleter = useStateDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -82,6 +87,19 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     },
     [intl, refetch, showNotification, state]
   );
+
+  const handleDelete = async () => {
+    await stateDeleter.execute({
+      id: state?.id,
+      version: state?.version || 1,
+    });
+    showNotification({
+      kind: 'success',
+      domain: DOMAINS.SIDE,
+      text: intl.formatMessage(messages.stateDeleted),
+    });
+    onClose();
+  };
 
   if (error) {
     return (
@@ -126,9 +144,9 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
                   onClick={() => formProps.submitForm()}
                   label={FormModalPage.Intl.save}
                 />
-                {/*<CustomFormModalPage.FormDeleteButton*/}
-                {/*  onClick={() => handleDelete()}*/}
-                {/*/>*/}
+                <CustomFormModalPage.FormDeleteButton
+                  onClick={() => handleDelete()}
+                />
               </>
             }
           >

@@ -1,6 +1,8 @@
 import {
   Maybe,
   TMutation,
+  TMutation_CreateStateArgs,
+  TMutation_DeleteStateArgs,
   TMutation_UpdateStateArgs,
   TQuery,
   TQuery_StateArgs,
@@ -25,8 +27,37 @@ import {
 } from '../../helpers';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import { StateDraft } from '@commercetools/platform-sdk';
+import CreateStateMutation from './create-state.ctp.graphql';
+import DeleteQuery from './delete-state.ctp.graphql';
 
 const syncStates = createSyncStates();
+
+export const useStateCreator = () => {
+  const [createState, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_CreateStateArgs
+  >(CreateStateMutation);
+
+  const execute = async ({ draft }: { draft: TStateDraft }) => {
+    try {
+      return await createState({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          draft: draft,
+        },
+      });
+    } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
 
 type TUseStatesFetcher = (variables: TQuery_StatesArgs) => {
   states?: TQuery['states'];
@@ -145,6 +176,35 @@ export const useStateUpdater = () => {
       }
     } catch (graphQlResponse) {
       console.log(graphQlResponse);
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+
+export const useStateDeleter = () => {
+  const [deleteStateById, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_DeleteStateArgs
+  >(DeleteQuery);
+
+  const execute = async ({ id, key, version }: TMutation_DeleteStateArgs) => {
+    try {
+      return await deleteStateById({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          id: id,
+          key: key,
+          version: version,
+        },
+      });
+    } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };

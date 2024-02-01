@@ -11,4 +11,9 @@ export default defineMessages({
     description: 'Success message for update state',
     defaultMessage: 'Your State has been updated.',
   },
+  stateDeleted: {
+    id: 'EditState.form.message.delete.success',
+    description: 'Success message for delete state',
+    defaultMessage: 'Your State has been deleted.',
+  },
 });

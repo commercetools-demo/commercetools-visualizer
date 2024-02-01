@@ -1,5 +1,5 @@
 import { TState, TStateDraft, TStateType } from '../../../types/generated/ctp';
-import { TFormValues } from '../states-form/states-form';
+import { TFormValues } from './states-form';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import {
   transformLocalizedFieldToLocalizedString,

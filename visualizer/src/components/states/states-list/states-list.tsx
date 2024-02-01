@@ -1,4 +1,10 @@
-import { Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import {
+  Link,
+  Route,
+  Switch,
+  useHistory,
+  useRouteMatch,
+} from 'react-router-dom';
 import Text from '@commercetools-uikit/text';
 import { useIntl } from 'react-intl';
 import {
@@ -7,7 +13,7 @@ import {
   TabularDetailPage,
 } from '@commercetools-frontend/application-components';
 import { ContentNotification } from '@commercetools-uikit/notifications';
-import { ReactNode } from 'react';
+import { lazy, ReactNode } from 'react';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { TState } from '../../../types/generated/ctp';
@@ -16,7 +22,12 @@ import messages from './messages';
 import StateFlow from './states-flow';
 import { useStatesFetcher } from '../../../hooks/use-states-hook';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
-import StatesEdit from '../states-edit/states-edit';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
+import { PlusBoldIcon } from '@commercetools-uikit/icons';
+
+const StateCreate = lazy(() => import('../states-create/states-create'));
+
+const StatesEdit = lazy(() => import('../states-edit/states-edit'));
 
 type Props = {
   linkToWelcome: string;
@@ -124,7 +135,17 @@ const StatesList = (props: Props) => {
     <TabularDetailPage
       onPreviousPathClick={() => push(props.linkToWelcome)}
       previousPathLabel={intl.formatMessage(messages.backToWelcome)}
-      title={intl.formatMessage(messages.title)}
+      customTitleRow={
+        <Spacings.Inline justifyContent="space-between">
+          <Text.Headline as="h2" intlMessage={messages.title} />
+          <SecondaryButton
+            as={Link}
+            to={`${match.url}/new`}
+            iconLeft={<PlusBoldIcon />}
+            label={intl.formatMessage(messages.addState)}
+          />
+        </Spacings.Inline>
+      }
       tabControls={tab}
     >
       <Switch>
@@ -144,6 +165,18 @@ const StatesList = (props: Props) => {
         })}
       </Switch>
       <Switch>
+        <SuspendedRoute path={`${match.path}/new`}>
+          <StateCreate
+            onClose={() => {
+              refetch();
+              push(`${match.url}`);
+            }}
+            onCreate={(id: string) => {
+              refetch();
+              push(`${match.url}/${id}`);
+            }}
+          />
+        </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <StatesEdit
             onClose={() => {

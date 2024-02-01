@@ -104,6 +104,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     <StatesForm
       initialValues={stateToFormValues(projectLanguages, state)}
       onSubmit={handleSubmit}
+      createNewMode={!(state?.builtIn && state?.builtIn === true)}
     >
       {(formProps) => {
         return (

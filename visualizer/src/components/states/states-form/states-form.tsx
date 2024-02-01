@@ -11,12 +11,14 @@ import { PageContentWide } from '@commercetools-frontend/application-components'
 import Spacings from '@commercetools-uikit/spacings';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import { FormattedMessage, useIntl } from 'react-intl';
-import messages from '../../types/types-form/messages';
+import messages from './messages';
 import Grid from '@commercetools-uikit/grid';
 import { customProperties } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import TextField from '@commercetools-uikit/text-field';
+import omitEmpty from 'omit-empty-es';
 type Formik = ReturnType<typeof useFormik>;
 
 type FormProps = {
@@ -35,6 +37,40 @@ export type TFormValues = {
   description: Record<string, string>;
 };
 
+type TErrors = {
+  key: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
+};
+
+const validate = (formikValues: TFormValues) => {
+  const errors: TErrors = {
+    key: {},
+  };
+
+  if (formikValues.key && formikValues.key.length > 0) {
+    const keyValue = formikValues.key.trim();
+    const keyLength = keyValue.length;
+    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
+      errors.key.invalidInput = true;
+  } else {
+    errors.key.missing = true;
+  }
+
+  return omitEmpty<TErrors>(errors);
+};
+
+const renderKeyInputErrors = (key: string) => {
+  switch (key) {
+    case 'invalidInput':
+      return <FormattedMessage {...messages.invalidKey} />;
+    case 'duplicate':
+      return <FormattedMessage {...messages.duplicateKey} />;
+    case 'missing':
+      return <FormattedMessage {...messages.requiredKey} />;
+    default:
+      return null;
+  }
+};
+
 type Props = {
   onSubmit: (
     values: TFormValues,
@@ -45,12 +81,19 @@ type Props = {
   refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
+  createNewMode?: boolean;
 };
 
-const StatesForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
+const StatesForm: FC<Props> = ({
+  initialValues,
+  onSubmit,
+  children,
+  createNewMode = false,
+}) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
+    validate: validate,
     enableReinitialize: true,
   });
   const intl = useIntl();
@@ -75,12 +118,30 @@ const StatesForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
             >
               <Grid.Item>
                 <Card type="flat" insetScale="s">
+                  <TextField
+                    name="key"
+                    value={formik.values.key || ''}
+                    title={intl.formatMessage(messages.keyTitle)}
+                    hint={intl.formatMessage(messages.keyHint)}
+                    isRequired
+                    errors={
+                      TextField.toFieldErrors<TFormValues>(formik.errors).key
+                    }
+                    isDisabled={!createNewMode}
+                    touched={!!formik.touched.key}
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    renderError={renderKeyInputErrors}
+                  />
+                </Card>
+              </Grid.Item>
+              <Grid.Item>
+                <Card type="flat" insetScale="s">
                   <LocalizedTextField
                     name="name"
                     selectedLanguage={dataLocale}
                     value={formik.values.name}
                     title={intl.formatMessage(messages.nameTitle)}
-                    isRequired
                     errors={
                       LocalizedTextField.toFieldErrors<TFormValues>(
                         formik.errors

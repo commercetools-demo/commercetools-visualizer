@@ -115,7 +115,6 @@ const FieldDefinitionInput: FC<Props> = ({
   const intl = useIntl();
 
   const handleAddEnumValue = (enumTemplate: Item) => {
-    // console.log(enumTemplate);
     const enumDraftItemIndexes = formik.values.enumValues?.length || 0;
     formik.setFieldValue(`enumValues.${enumDraftItemIndexes}`, enumTemplate);
   };

@@ -148,7 +148,6 @@ const StatesList = (props: Props) => {
     backUrl = backUrl.substring(0, backUrl.indexOf(`/${type}`));
   }
 
-  console.log(backUrl);
   return (
     <TabularDetailPage
       onPreviousPathClick={() => push(props.linkToWelcome)}

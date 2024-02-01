@@ -160,7 +160,6 @@ export const useStateUpdater = () => {
       const nextConverted = convertTStateDraftToStateDraft(nextDraft);
       //returns a list of rest based update actions
       const actions = syncStates.buildActions(nextConverted, originalConverted);
-      console.log(actions);
       if (actions.length > 0) {
         await updateStateId({
           context: {

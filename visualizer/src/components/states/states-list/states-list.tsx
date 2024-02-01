@@ -55,7 +55,7 @@ const StatesList = (props: Props) => {
   const intl = useIntl();
   const { push, replace } = useHistory();
   const match = useRouteMatch();
-  const { type } = useParams<{ type: string; id: string }>();
+  const { type } = useParams<{ type: string }>();
   const baseUrl = props.linkToWelcome + '/states';
 
   const { states, error, loading, refetch } = useStatesFetcher({

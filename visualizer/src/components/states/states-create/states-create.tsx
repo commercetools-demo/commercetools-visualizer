@@ -18,6 +18,8 @@ import {
   stateToFormValues,
 } from '../states-form/conversion';
 import { useStateCreator } from '../../../hooks/use-states-hook';
+import { useParams } from 'react-router-dom';
+import { TStateType } from '../../../types/generated/ctp';
 
 type Props = {
   onClose: () => void;
@@ -28,6 +30,7 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
   const { projectLanguages } = useApplicationContext((context) => ({
     projectLanguages: context.project?.languages ?? [],
   }));
+  const { type } = useParams<{ type: string }>();
   const showNotification = useShowNotification();
   const stateCreator = useStateCreator();
   const canManage = useIsAuthorized({
@@ -46,8 +49,7 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
           domain: DOMAINS.SIDE,
           text: intl.formatMessage(messages.createSuccess),
         });
-        result.data?.createTypeDefinition?.id &&
-          onCreate(result.data?.createTypeDefinition?.id);
+        result.data?.createState?.id && onCreate(result.data?.createState?.id);
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
         if (transformedErrors.unmappedErrors.length > 0) {
@@ -63,9 +65,15 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
     [intl, stateCreator]
   );
 
+  const newType = Object.keys(TStateType).find(
+    (value) => value.toLocaleLowerCase() === type.toLocaleLowerCase()
+  );
+
   return (
     <StatesForm
-      initialValues={stateToFormValues(projectLanguages)}
+      initialValues={stateToFormValues(projectLanguages, {
+        type: newType as TStateType,
+      })}
       onSubmit={handleSubmit}
       createNewMode={true}
     >

@@ -8,7 +8,7 @@ import {
 
 export const stateToFormValues = (
   projectLanguages: Array<string>,
-  state?: TState
+  state?: Partial<TState>
 ): TFormValues => {
   return {
     stateType: state?.type || TStateType.LineItemState,

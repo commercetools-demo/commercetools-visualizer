@@ -175,6 +175,7 @@ const StatesList = (props: Props) => {
             }}
             onCreate={(id: string) => {
               refetch();
+              console.log(`${match.url}/${id}`);
               push(`${match.url}/${id}`);
             }}
           />

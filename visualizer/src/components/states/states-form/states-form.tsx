@@ -149,7 +149,7 @@ const StatesForm: FC<Props> = ({
               <Grid.Item>
                 <Card type="flat" insetScale="s">
                   <SelectField
-                    name="resourceTypeIds"
+                    name="stateType"
                     title={intl.formatMessage(messages.stateTypeTitle)}
                     isRequired
                     value={formik.values.stateType}

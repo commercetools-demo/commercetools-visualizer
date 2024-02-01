@@ -2553,7 +2553,17 @@
     "@commercetools/sdk-middleware-http" "^7.0.0"
     "@commercetools/sdk-middleware-logger" "^3.0.0"
 
-"@commercetools/sdk-client-v2@^2.1.6":
+"@commercetools/platform-sdk@^7.2.0-alpha.4":
+  version "7.2.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-7.2.0-alpha.4.tgz#05e894abe1b42a42c9d34b350b7435805745c1ad"
+  integrity sha512-SdWuZcDfYxCoS4diV9mkzojeiBucaNyVqeFKOvy7HV2O7mcTmxMFZw1WkByAb+yOOcWzZ0ZTSc1Cgc4P+D9R6g==
+  dependencies:
+    "@commercetools/sdk-client-v2" "^2.2.2"
+    "@commercetools/sdk-middleware-auth" "^7.0.0"
+    "@commercetools/sdk-middleware-http" "^7.0.0"
+    "@commercetools/sdk-middleware-logger" "^3.0.0"
+
+"@commercetools/sdk-client-v2@^2.1.6", "@commercetools/sdk-client-v2@^2.2.2":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@commercetools/sdk-client-v2/-/sdk-client-v2-2.3.0.tgz#c3659d0a64da870926b5338dec60d7d880f732c4"
   integrity sha512-+vS6qRoKBbkunZCpdozung+7te97nFxaidLPqOTlz/9TmJaRfMMcYC/KUZCTS8S5a/4BFfY6DYujddolaU7e6Q==

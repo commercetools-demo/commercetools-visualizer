@@ -6,17 +6,17 @@ import {
   TabHeader,
   TabularDetailPage,
 } from '@commercetools-frontend/application-components';
-import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
-import { useQuery } from '@apollo/client';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import { ReactNode } from 'react';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import { TQuery, TQuery_StatesArgs, TState } from '../../types/generated/ctp';
-import { getErrorMessage } from '../../helpers';
-import FetchStatesQuery from './fetch-states.cpt.graphql';
+import { TState } from '../../../types/generated/ctp';
+import { getErrorMessage } from '../../../helpers';
 import messages from './messages';
-import StateFlow from './StateFlow';
+import StateFlow from './states-flow';
+import { useStatesFetcher } from '../../../hooks/use-states-hook';
+import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+import StatesEdit from '../states-edit/states-edit';
 
 type Props = {
   linkToWelcome: string;
@@ -39,23 +39,15 @@ const availableStates = [
   'StagedQuoteState',
 ];
 
-const States = (props: Props) => {
+const StatesList = (props: Props) => {
   const intl = useIntl();
-  const history = useHistory();
+  const { push } = useHistory();
   const match = useRouteMatch();
 
-  const { data, error, loading } = useQuery<TQuery, TQuery_StatesArgs>(
-    FetchStatesQuery,
-    {
-      variables: {
-        limit: 100,
-        offset: 0,
-      },
-      context: {
-        target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
-      },
-    }
-  );
+  const { states, error, loading, refetch } = useStatesFetcher({
+    limit: 100,
+    offset: 0,
+  });
 
   if (error) {
     return (
@@ -72,7 +64,7 @@ const States = (props: Props) => {
     );
   }
 
-  if (!data || !data.states || !data.states.results) {
+  if (!states || !states.results) {
     return <PageNotFound />;
   }
 
@@ -82,14 +74,15 @@ const States = (props: Props) => {
     return (
       <>
         <div>Items: {itemStates.length}</div>
-        <StateFlow items={itemStates} />
+        <StateFlow
+          items={itemStates}
+          onNodeClick={(id: string) => push(`${match.url}/${id}`)}
+        />
       </>
     );
   };
 
-  const {
-    states: { results },
-  } = data;
+  const { results } = states;
 
   availableStates.forEach((value) => {
     const itemStates = results.filter((item) => {
@@ -129,7 +122,7 @@ const States = (props: Props) => {
 
   return (
     <TabularDetailPage
-      onPreviousPathClick={() => history.push(props.linkToWelcome)}
+      onPreviousPathClick={() => push(props.linkToWelcome)}
       previousPathLabel={intl.formatMessage(messages.backToWelcome)}
       title={intl.formatMessage(messages.title)}
       tabControls={tab}
@@ -150,10 +143,20 @@ const States = (props: Props) => {
           );
         })}
       </Switch>
+      <Switch>
+        <SuspendedRoute path={`${match.path}/:id`}>
+          <StatesEdit
+            onClose={() => {
+              refetch();
+              push(`${match.url}`);
+            }}
+          />
+        </SuspendedRoute>
+      </Switch>
     </TabularDetailPage>
   );
 };
 
-States.displayName = 'States';
+StatesList.displayName = 'States';
 
-export default States;
+export default StatesList;

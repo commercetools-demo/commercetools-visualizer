@@ -1,0 +1,20 @@
+query FetchState($id: String, $key: String) {
+    state(id: $id, key: $key) {
+        transitions {
+            id
+        }
+        id
+        initial
+        type
+        key
+        nameAllLocales {
+            locale
+            value
+        }
+        descriptionAllLocales {
+            locale
+            value
+        }
+        version
+    }
+}

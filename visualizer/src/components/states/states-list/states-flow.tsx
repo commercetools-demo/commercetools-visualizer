@@ -19,7 +19,7 @@ import ReactFlow, {
   Controls,
 } from 'reactflow';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { TState } from '../../types/generated/ctp';
+import { TState } from '../../../types/generated/ctp';
 import 'reactflow/dist/style.css';
 
 const dagreGraph = new dagre.graphlib.Graph();
@@ -68,9 +68,10 @@ const getLayoutedElements = (
 
 interface Props {
   items: Array<TState>;
+  onNodeClick?: (id: string) => void;
 }
 
-const StateFlow: FC<Props> = ({ items }) => {
+const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -174,6 +175,9 @@ const StateFlow: FC<Props> = ({ items }) => {
           onConnect={onConnect}
           connectionLineType={ConnectionLineType.SmoothStep}
           fitView
+          onNodeClick={
+            onNodeClick ? (_event, node) => onNodeClick(node.id) : undefined
+          }
         >
           <Background />
           <Controls />

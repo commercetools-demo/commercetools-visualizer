@@ -11,6 +11,7 @@ query FetchStates($limit: Int!, $offset: Int!, $sort: [String!], $where: String)
       initial
       type
       key
+      builtIn
       nameAllLocales {
         locale
         value

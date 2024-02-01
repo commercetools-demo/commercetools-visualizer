@@ -53,13 +53,10 @@ const availableStates = [
 
 const StatesList = (props: Props) => {
   const intl = useIntl();
-  const { push } = useHistory();
+  const { push, replace } = useHistory();
   const match = useRouteMatch();
-  const { type, id } = useParams<{ type: string; id: string }>();
-  let url = match.url;
-  if (type && match.url.endsWith(`/${type}`)) {
-    url = url.substring(0, url.indexOf(`/${type}`));
-  }
+  const { type } = useParams<{ type: string; id: string }>();
+  const baseUrl = props.linkToWelcome + '/states';
 
   const { states, error, loading, refetch } = useStatesFetcher({
     limit: 100,
@@ -100,6 +97,13 @@ const StatesList = (props: Props) => {
   };
 
   const { results } = states;
+  if (!type) {
+    replace(
+      match.url +
+        '/' +
+        results.filter((item) => item.builtIn)[0].type.toLocaleLowerCase()
+    );
+  }
 
   availableStates.forEach((value) => {
     const itemStates = results.filter((item) => {
@@ -122,9 +126,7 @@ const StatesList = (props: Props) => {
           <TabHeader
             exactPathMatch={true}
             key={index}
-            to={`${url}${
-              index === 0 ? '' : `/${item.title.toLocaleLowerCase()}`
-            }`}
+            to={`${baseUrl}/${item.title.toLocaleLowerCase()}`}
             label={intl.formatMessage(
               {
                 ...messages[item.title],
@@ -136,17 +138,6 @@ const StatesList = (props: Props) => {
       })}
     </>
   );
-  //Major CF
-  //we want the first tab to be / --> therefore a normal link resolving does not work
-
-  let backUrl = match.url;
-  //if there is an id and a type the page is e.g. /orderitem/123-123-123
-  if (id && type && backUrl.endsWith(`/${id}`)) {
-    backUrl = backUrl.substring(0, backUrl.indexOf(`/${id}`));
-    //if there is a type the page is e.g. /123-123-123
-  } else if (type && backUrl.endsWith(`/${type}`)) {
-    backUrl = backUrl.substring(0, backUrl.indexOf(`/${type}`));
-  }
 
   return (
     <TabularDetailPage
@@ -171,27 +162,20 @@ const StatesList = (props: Props) => {
             <Route
               key={index}
               exact={true}
-              path={`${url}${
-                index === itemsToRender.length - 1
-                  ? ''
-                  : `/${item.title.toLocaleLowerCase()}`
-              }`}
+              path={`${baseUrl}/${item.title.toLocaleLowerCase()}`}
             >
               <div>{item.content}</div>
             </Route>
           );
         })}
-      </Switch>
-      <Switch>
         <SuspendedRoute path={`${match.path}/new`}>
           <StateCreate
             onClose={() => {
-              refetch();
-              push(backUrl);
+              push(match.url);
             }}
             onCreate={(id: string) => {
               refetch();
-              push(`${backUrl}/${id}`);
+              push(`${match.url}/${id}`);
             }}
           />
         </SuspendedRoute>
@@ -199,7 +183,7 @@ const StatesList = (props: Props) => {
           <StatesEdit
             onClose={() => {
               refetch();
-              push(backUrl);
+              push(match.url);
             }}
           />
         </SuspendedRoute>

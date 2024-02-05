@@ -26,7 +26,10 @@ import {
   extractErrorFromGraphQlResponse,
 } from '../../helpers';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
-import { StateDraft } from '@commercetools/platform-sdk';
+import {
+  StateDraft,
+  StateResourceIdentifier,
+} from '@commercetools/platform-sdk';
 import CreateStateMutation from './create-state.ctp.graphql';
 import DeleteQuery from './delete-state.ctp.graphql';
 
@@ -124,6 +127,13 @@ export const convertTStateToStateDraft = (
     transformLocalizedFieldToLocalizedString(
       draft.descriptionAllLocales || []
     ) || {},
+  transitions: draft.transitions?.map(
+    (transition): StateResourceIdentifier => ({
+      typeId: 'state',
+      id: transition.id,
+    })
+  ),
+  initial: draft.initial,
 });
 
 //GraphQL --> Rest
@@ -135,6 +145,13 @@ export const convertTStateDraftToStateDraft = (
   name: transformLocalizedFieldToLocalizedString(draft.name || []) || {},
   description:
     transformLocalizedFieldToLocalizedString(draft.description || []) || {},
+  transitions: draft.transitions?.map(
+    (transition): StateResourceIdentifier => ({
+      typeId: 'state',
+      id: transition.id,
+    })
+  ),
+  initial: draft.initial === true || false,
 });
 
 export const useStateUpdater = () => {
@@ -204,6 +221,7 @@ export const useStateDeleter = () => {
         },
       });
     } catch (graphQlResponse) {
+      console.log(graphQlResponse);
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };

@@ -11,6 +11,8 @@ export const stateToFormValues = (
   state?: Partial<TState>
 ): TFormValues => {
   return {
+    id: state?.id,
+    initial: state?.initial || true,
     stateType: state?.type || TStateType.LineItemState,
     key: state?.key || '',
     name: LocalizedTextInput.createLocalizedString(
@@ -24,6 +26,10 @@ export const stateToFormValues = (
         state?.descriptionAllLocales ?? []
       ) ?? {}
     ),
+    transitions:
+      state?.transitions?.map((value) => {
+        return value.id;
+      }) || [],
   };
 };
 export const formValuesToState = (formValues: TFormValues): TStateDraft => {
@@ -36,5 +42,10 @@ export const formValuesToState = (formValues: TFormValues): TStateDraft => {
     description: transformLocalizedStringToLocalizedField(
       LocalizedTextInput.omitEmptyTranslations(formValues.description)
     ),
+    transitions: formValues.transitions.map((transition) => ({
+      typeId: formValues.stateType,
+      id: transition,
+    })),
+    initial: formValues.initial,
   };
 };

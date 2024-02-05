@@ -49,4 +49,10 @@ export default defineMessages({
     description: 'Title for State Type ID field',
     defaultMessage: 'State Type',
   },
+  initialTitle: {
+    id: 'FieldForm.initialTitle.title',
+    description: 'Title for initial field',
+    defaultMessage:
+      'Set to false if the State is not the first step in a workflow.',
+  },
 });

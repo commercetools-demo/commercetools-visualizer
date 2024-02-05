@@ -7,7 +7,10 @@ import {
   TStateType,
 } from '../../../types/generated/ctp';
 import { ApolloQueryResult } from '@apollo/client';
-import { PageContentWide } from '@commercetools-frontend/application-components';
+import {
+  PageContentWide,
+  PageNotFound,
+} from '@commercetools-frontend/application-components';
 import Spacings from '@commercetools-uikit/spacings';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import { FormattedMessage, useIntl } from 'react-intl';
@@ -19,7 +22,15 @@ import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import TextField from '@commercetools-uikit/text-field';
 import omitEmpty from 'omit-empty-es';
-import SelectField from '@commercetools-uikit/select-field';
+import SelectField, { TOption } from '@commercetools-uikit/select-field';
+import { useStatesFetcher } from '../../../hooks/use-states-hook';
+import { ContentNotification } from '@commercetools-uikit/notifications';
+import Text from '@commercetools-uikit/text';
+import { getErrorMessage } from '../../../helpers';
+import LoadingSpinner from '@commercetools-uikit/loading-spinner';
+import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
+import CheckboxInput from '@commercetools-uikit/checkbox-input';
 type Formik = ReturnType<typeof useFormik>;
 
 export const resourceTypes = [
@@ -42,10 +53,13 @@ type FormProps = {
 };
 
 export type TFormValues = {
+  id?: Maybe<string>;
   key?: Maybe<string>;
   name: Record<string, string>;
   description: Record<string, string>;
   stateType: TStateType;
+  transitions: Array<string>;
+  initial: boolean;
 };
 
 type TErrors = {
@@ -108,9 +122,40 @@ const StatesForm: FC<Props> = ({
     enableReinitialize: true,
   });
   const intl = useIntl();
-  const { dataLocale } = useApplicationContext((context) => ({
+  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
+    projectLanguages: context.project?.languages ?? [],
   }));
+
+  let where = `type="${formik.values.stateType}"`;
+  if (formik.values.id) {
+    where = `${where} and id != "${formik.values.id}"`;
+  }
+
+  const { states, error, loading } = useStatesFetcher({
+    limit: 100,
+    offset: 0,
+    where: where,
+  });
+
+  if (error) {
+    return (
+      <ContentNotification type="error">
+        <Text.Body>{getErrorMessage(error)}</Text.Body>
+      </ContentNotification>
+    );
+  }
+  if (loading) {
+    return (
+      <Spacings.Stack alignItems="center">
+        <LoadingSpinner />
+      </Spacings.Stack>
+    );
+  }
+
+  if (!states || !states.results) {
+    return <PageNotFound />;
+  }
 
   const formElements = (
     <PageContentWide columns="2/1" gapSize="20">
@@ -167,6 +212,13 @@ const StatesForm: FC<Props> = ({
                     onChange={formik.handleChange}
                     isDisabled={!createNewMode}
                   />
+                  <CheckboxInput
+                    name="initial"
+                    isChecked={formik.values.initial}
+                    onChange={formik.handleChange}
+                  >
+                    <FormattedMessage {...messages.initialTitle} />
+                  </CheckboxInput>
                 </Card>
               </Grid.Item>
               <Grid.Item>
@@ -200,6 +252,40 @@ const StatesForm: FC<Props> = ({
                       ).description
                     }
                     touched={!!formik.touched.description}
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                  />
+                </Card>
+              </Grid.Item>
+              <Grid.Item>
+                <Card type="flat" insetScale="s">
+                  <SelectField
+                    name="transitions"
+                    options={states.results.map((result): TOption => {
+                      const name = LocalizedTextInput.createLocalizedString(
+                        projectLanguages,
+                        transformLocalizedFieldToLocalizedString(
+                          result.nameAllLocales ?? []
+                        ) ?? {}
+                      );
+                      return {
+                        value: result.id,
+                        label: name[dataLocale] || name['en'] || '',
+                      };
+                    })}
+                    isMulti={true}
+                    isClearable={true}
+                    value={formik.values.transitions}
+                    title={'Transitions'}
+                    errors={
+                      SelectField.toFieldErrors<TFormValues>(formik.errors)
+                        .transitions
+                    }
+                    touched={
+                      formik.touched.transitions
+                        ? formik.touched.transitions
+                        : undefined
+                    }
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                   />

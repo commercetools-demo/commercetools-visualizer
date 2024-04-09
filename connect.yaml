@@ -1,7 +1,6 @@
 deployAs:
   - name: visualizer
     applicationType: merchant-center-custom-application
-    endpoint: /
     configuration:
       standardConfiguration:
         - key: CUSTOM_APPLICATION_ID

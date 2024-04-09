@@ -1,18 +1,18 @@
-import { PERMISSIONS, entryPointUriPath } from './src/constants';
+import { PERMISSIONS } from './src/constants';
 
 /**
  * @type {import('@commercetools-frontend/application-config').ConfigOptionsForCustomApplication}
  */
 const config = {
   name: 'Visualizer',
-  entryPointUriPath,
+  entryPointUriPath: '${env:ENTRY_POINT_URI_PATH}',
   cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
   env: {
     development: {
       initialProjectKey: '${env:INITIAL_PROJECT_KEY}',
     },
     production: {
-      applicationId: '${env:APPLICATION_ID}',
+      applicationId: '${env:CUSTOM_APPLICATION_ID}',
       url: '${env:APPLICATION_URL}',
     },
   },

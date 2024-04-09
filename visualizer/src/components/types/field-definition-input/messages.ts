@@ -61,7 +61,7 @@ export default defineMessages({
   setTitle: {
     id: 'FieldForm.isSet.title',
     description: 'Title for fieldDefinitions isSet field',
-    defaultMessage: 'Set',
+    defaultMessage: 'Create a set with this type',
   },
   referenceTitle: {
     id: 'FieldForm.reference.title',
@@ -109,5 +109,46 @@ export default defineMessages({
     id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDateTime',
     description: '',
     defaultMessage: 'Date and Time',
+  },
+  setCannotBeRequiredTooltip: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.setCannotBeRequiredTooltip',
+    description: 'Label for disabled isSet checkbox',
+    defaultMessage:
+      'A set cannot be required. Please deselect the required setting to make this attribute a set.',
+  },
+  typeBoolean: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeBoolean',
+    description: '',
+    defaultMessage: 'Yes / No (boolean)',
+  },
+  typeEnum: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeEnum',
+    description: '',
+    defaultMessage: 'List (enum)',
+  },
+  typeText: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeText',
+    description: '',
+    defaultMessage: 'Text',
+  },
+  typeNumber: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeNumber',
+    description: '',
+    defaultMessage: 'Number',
+  },
+  typeMoney: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeMoney',
+    description: '',
+    defaultMessage: 'Money',
+  },
+  typeDate: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeDate',
+    description: '',
+    defaultMessage: 'Date/Time',
+  },
+  typeReference: {
+    id: 'ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.typeReference',
+    description: '',
+    defaultMessage: 'Reference',
   },
 });

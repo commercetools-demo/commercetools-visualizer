@@ -8,6 +8,7 @@ import {
   TLocalizedEnumValueInput,
   TLocalizedStringItemInputType,
   TReferenceType,
+  TSetType,
   TTextInputHint,
 } from '../../../types/generated/ctp';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
@@ -27,6 +28,7 @@ export type TFormValues = {
   required?: boolean;
   isMultiLine: boolean;
   isLocalized: boolean;
+  isSet: boolean;
   typeName: Fields;
   referenceTypeId: string;
   format: 'date' | 'datetime' | 'time';
@@ -96,10 +98,6 @@ export const fromFormValuesToTFieldDefinitionInput = (
       };
       break;
     }
-    // case 'Set': {
-    //   type = { Set: {} };
-    //   break;
-    // }
     case 'String': {
       if (values.isLocalized) {
         type = { LocalizedString: {} };
@@ -108,6 +106,9 @@ export const fromFormValuesToTFieldDefinitionInput = (
       }
       break;
     }
+  }
+  if (values.isSet) {
+    type = { Set: { elementType: type } };
   }
 
   const actionDraft: TFieldDefinitionInput = {
@@ -129,23 +130,31 @@ export const initialValuesFromFieldDefinition = (
   projectLanguages: Array<string>
 ): TFormValues => {
   let isLocalized = false;
-  let typeName: Fields = (fieldDefinition?.type?.name as Fields) || '';
+  let isSet = false;
+  let typeName = fieldDefinition?.type?.name || '';
   let format: 'date' | 'datetime' | 'time' = 'date';
   let enumValues: Array<Item> = [];
+
   if (fieldDefinition?.type?.name) {
-    if (fieldDefinition?.type?.name === 'DateTime') {
+    if (fieldDefinition?.type?.name === 'Set') {
+      console.log(fieldDefinition?.type);
+      const setType = fieldDefinition?.type as TSetType;
+      isSet = true;
+      typeName = setType.elementType.name;
+    }
+    if (typeName === 'DateTime') {
       format = 'datetime';
       typeName = 'Date';
-    } else if (fieldDefinition?.type?.name === 'Time') {
+    } else if (typeName === 'Time') {
       format = 'time';
       typeName = 'Date';
-    } else if (fieldDefinition?.type?.name === 'Date') {
+    } else if (typeName === 'Date') {
       format = 'date';
       typeName = 'Date';
-    } else if (fieldDefinition?.type?.name === 'LocalizedEnum') {
+    } else if (typeName === 'LocalizedEnum') {
       isLocalized = true;
       typeName = 'Enum';
-      let type = fieldDefinition.type as TLocalizedEnumType;
+      let type = fieldDefinition?.type as TLocalizedEnumType;
       enumValues = type.values.map(
         (value): Item => ({
           key: value.key,
@@ -155,12 +164,12 @@ export const initialValuesFromFieldDefinition = (
           ),
         })
       );
-    } else if (fieldDefinition?.type?.name === 'Enum') {
-      let type = fieldDefinition.type as TEnumType;
+    } else if (typeName === 'Enum') {
+      let type = fieldDefinition?.type as TEnumType;
       enumValues = type.values.map(
         (value): Item => ({ key: value.key, label: value.label })
       );
-    } else if (fieldDefinition?.type?.name === 'LocalizedString') {
+    } else if (typeName === 'LocalizedString') {
       isLocalized = true;
       typeName = 'String';
     }
@@ -177,15 +186,12 @@ export const initialValuesFromFieldDefinition = (
     isMultiLine: (fieldDefinition?.inputHint || 'SingleLine') === 'MultiLine',
     format: format,
     isLocalized: isLocalized,
-    typeName: typeName,
+    typeName: typeName as Fields,
     referenceTypeId:
       typeName === 'Reference'
         ? (fieldDefinition?.type as TReferenceType).referenceTypeId
         : '',
     enumValues: enumValues,
-    // [
-    //   { key: 'key1', label: 'label' }, //{ 'en-GB': 'engb' } },
-    //   // { key: 'key2', label: { 'en-GB': 'engb' } },
-    // ],
+    isSet: isSet,
   };
 };

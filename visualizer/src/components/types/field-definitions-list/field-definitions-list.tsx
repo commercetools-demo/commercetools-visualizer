@@ -24,13 +24,12 @@ import {
   TFieldDefinition,
   TQuery,
   TQuery_TypeDefinitionArgs,
-  TReferenceType,
-  TSetType,
   TTypeUpdateAction,
 } from '../../../types/generated/ctp';
 import createColumnDefinitions from './field-definitions-list-column-definitions';
 import messages from './messages';
 import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
+import { renderAttributeTypeName } from './render-attribute-type-name';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')
@@ -123,22 +122,20 @@ const FieldDefinitionsList: FC<Props> = ({
         );
       case 'required':
         if (item.required) {
-          return <CheckActiveIcon color={'neutral60'} />;
+          return <CheckActiveIcon color={'primary'} />;
         } else {
           return <CheckInactiveIcon color={'neutral60'} />;
         }
       case 'type': {
+        return renderAttributeTypeName(item.type);
+      }
+      case 'set': {
         switch (item.type.name) {
-          case 'Reference': {
-            const ref = item.type as TReferenceType;
-            return `${ref.name} (${ref.referenceTypeId})`;
-          }
           case 'Set': {
-            const ref = item.type as TSetType;
-            return `${ref.name} (${ref.elementType.name})`;
+            return <CheckActiveIcon color={'primary'} />;
           }
         }
-        return item.type.name;
+        return <CheckInactiveIcon color={'neutral60'} />;
       }
       case 'delete':
         return <IconButton label="" size={'medium'} icon={<BinFilledIcon />} />;

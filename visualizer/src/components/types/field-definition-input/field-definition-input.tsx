@@ -1,4 +1,4 @@
-import { FC, ReactElement } from 'react';
+import { FC, Fragment, ReactElement } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FormikErrors, type FormikHelpers, useFormik } from 'formik';
 import omitEmpty from 'omit-empty-es';
@@ -8,13 +8,14 @@ import SelectField from '@commercetools-uikit/select-field';
 import Spacings from '@commercetools-uikit/spacings';
 import TextField from '@commercetools-uikit/text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { FIELD_TYPES, REFERENCE_TYPES } from './constants';
+import { REFERENCE_TYPES } from './constants';
 import messages from './messages';
 import {
   PageContentFull,
   PageContentNarrow,
 } from '@commercetools-frontend/application-components';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import Tooltip from '@commercetools-uikit/tooltip';
 import RadioInput from '@commercetools-uikit/radio-input';
 import { TFormValues } from './helpers';
 import FieldDefinitionInputForEnum from '../field-definition-input-for-enum/field-definition-input-for-enum';
@@ -22,9 +23,37 @@ import { Item } from '../field-definition-input-for-enum/constants';
 
 type Formik = ReturnType<typeof useFormik>;
 
-const fieldTypes = Object.entries(FIELD_TYPES).map(([key, value]) => {
-  return { value: key, label: value };
-});
+const fieldTypes = [
+  {
+    value: 'Boolean',
+    label: <FormattedMessage {...messages.typeBoolean} />,
+  },
+  {
+    value: 'String',
+    label: <FormattedMessage {...messages.typeText} />,
+  },
+  {
+    value: 'Number',
+    label: <FormattedMessage {...messages.typeNumber} />,
+  },
+  {
+    value: 'Money',
+    label: <FormattedMessage {...messages.typeMoney} />,
+  },
+  {
+    value: 'Date',
+    label: <FormattedMessage {...messages.typeDate} />,
+  },
+  {
+    value: 'Reference',
+    label: <FormattedMessage {...messages.typeReference} />,
+  },
+  {
+    value: 'Enum',
+    label: <FormattedMessage {...messages.typeEnum} />,
+  },
+];
+
 const referenceTypeOptions = REFERENCE_TYPES.map((t) => ({
   label: t,
   value: t,
@@ -232,6 +261,30 @@ const FieldDefinitionInput: FC<Props> = ({
               </RadioInput.Group>
             )}
           </Spacings.Inline>
+          {formik.values.typeName && (
+            <Fragment>
+              <Tooltip
+                off={!formik.values.required}
+                placement="top"
+                title={intl.formatMessage(messages.setCannotBeRequiredTooltip)}
+              >
+                {/*
+                The tooltip requires a div, it won't show up when the CheckboxInput
+                is the direct child.
+              */}
+                <div>
+                  <CheckboxInput
+                    name="isSet"
+                    isDisabled={!createNewMode || formik.values.required}
+                    isChecked={formik.values.isSet}
+                    onChange={formik.handleChange}
+                  >
+                    <FormattedMessage {...messages.setTitle} />
+                  </CheckboxInput>
+                </div>
+              </Tooltip>
+            </Fragment>
+          )}
           {
             // Only display 'reference' drop-down if reference type selected.
             formik.values.typeName === 'Reference' && (
@@ -252,15 +305,6 @@ const FieldDefinitionInput: FC<Props> = ({
               />
             )
           }
-          {/* <Card type="flat" theme="dark">
-            <CheckboxInput
-              name="isSet"
-              onChange={formik.handleChange}
-              isChecked={formik.values.isSet}
-            >
-              intl.formatMessage(messages.setTitle)
-            </CheckboxInput>
-          </Card> */}
           <CheckboxInput
             name="required"
             onChange={formik.handleChange}

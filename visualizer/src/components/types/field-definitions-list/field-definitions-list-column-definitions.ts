@@ -26,6 +26,12 @@ export default memoize((formatMessage) => [
     isSortable: false,
   },
   {
+    key: 'set',
+    label: formatMessage(messages.columnFieldSet),
+    flexGrow: 1,
+    isSortable: false,
+  },
+  {
     key: 'delete',
     label: '',
     flexGrow: 1,

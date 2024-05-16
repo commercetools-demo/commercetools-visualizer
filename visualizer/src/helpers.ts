@@ -3,7 +3,11 @@ import {
   transformLocalizedFieldToLocalizedString,
 } from '@commercetools-frontend/l10n';
 import { isApolloError, ApolloError, type ServerError } from '@apollo/client';
-import type { TChannel } from './types/generated/ctp';
+import {
+  TBaseMoney,
+  TChannel,
+  THighPrecisionMoney,
+} from './types/generated/ctp';
 import {
   TGraphqlUpdateAction,
   TSyncAction,
@@ -12,6 +16,8 @@ import {
   TChangeLocalizedEnumValueLabelActionPayload,
   TSetNameActionPayload,
 } from './types';
+import { PRECISION_TYPES } from './constants';
+import { IntlShape } from 'react-intl';
 
 const sortStringArray = (a: string, b: string) => a.localeCompare(b);
 export const compareStringArrays = (
@@ -156,3 +162,39 @@ export const convertToActionData = (draft: Partial<TChannel>) => ({
   ...draft,
   name: transformLocalizedFieldToLocalizedString(draft.nameAllLocales || []),
 });
+
+export function getFractionedAmount(moneyValue: TBaseMoney) {
+  const { fractionDigits = 2 } = moneyValue;
+
+  // the amount should be available on preciseAmount for highPrecision
+  const amount =
+    moneyValue.type === PRECISION_TYPES.highPrecision
+      ? (moneyValue as THighPrecisionMoney).preciseAmount
+      : moneyValue.centAmount;
+
+  return amount / 10 ** fractionDigits;
+}
+
+export function formatMoney(
+  moneyValue: TBaseMoney | undefined | null,
+  intl: IntlShape,
+  options?: Record<string, unknown>
+) {
+  if (!moneyValue) {
+    return '';
+  }
+  return intl.formatNumber(getFractionedAmount(moneyValue), {
+    style: 'currency',
+    currency: moneyValue.currencyCode,
+    minimumFractionDigits: moneyValue.fractionDigits,
+    ...options,
+  });
+}
+
+export function formatPercentage(percentage: number) {
+  return `${percentage}%`;
+}
+
+export function convertRatioToPercentage(ratio: number) {
+  return parseFloat((ratio * 100).toFixed(2));
+}

@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import { ListIcon } from '@commercetools-uikit/icons';
 import Spacings from '@commercetools-uikit/spacings';
@@ -55,46 +54,51 @@ const Welcome = () => {
   return (
     <Spacings.Inset scale="l">
       <PageContentWide>
-        <Constraints.Horizontal max={16}>
-          <Spacings.Stack scale="xl">
-            <Text.Headline as="h1" intlMessage={messages.title} />
-            <Grid
-              gridTemplateColumns={`repeat(2,1fr)`}
-              gridGap={customProperties.spacingM}
-              gridAutoColumns={'1fr'}
-            >
-              <InfoCard
-                title={'Types'}
-                content={
-                  ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
-                }
-                target={'types'}
-              />
+        <Spacings.Stack scale="xl">
+          <Text.Headline as="h1" intlMessage={messages.title} />
+          <Grid
+            gridTemplateColumns={`repeat(3,1fr)`}
+            gridGap={customProperties.spacingM}
+            gridAutoColumns={'1fr'}
+          >
+            <InfoCard
+              title={'Types'}
+              content={
+                ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
+              }
+              target={'types'}
+            />
 
-              <InfoCard
-                title={'Subscriptions'}
-                content={
-                  'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
-                }
-                target={'subscriptions'}
-              />
-              <InfoCard
-                title={'States'}
-                content={
-                  'States allow you to model finite state machines reflecting custom business logic. '
-                }
-                target={'states'}
-              />
-              <InfoCard
-                title={'API Extensions'}
-                content={
-                  'Extend the behavior of an API with your business logic.'
-                }
-                target={'extensions'}
-              />
-            </Grid>
-          </Spacings.Stack>
-        </Constraints.Horizontal>
+            <InfoCard
+              title={'Subscriptions'}
+              content={
+                'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
+              }
+              target={'subscriptions'}
+            />
+            <InfoCard
+              title={'States'}
+              content={
+                'States allow you to model finite state machines reflecting custom business logic. '
+              }
+              target={'states'}
+            />
+            <InfoCard
+              title={'API Extensions'}
+              content={
+                'Extend the behavior of an API with your business logic.'
+              }
+              target={'extensions'}
+            />
+            <InfoCard
+              title={'Carts'}
+              content={
+                'A Cart is a representation of a shopping cart containing items that a customer intends to purchase.'
+              }
+              target={'carts'}
+            />
+          </Grid>
+        </Spacings.Stack>
       </PageContentWide>
     </Spacings.Inset>
   );

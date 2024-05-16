@@ -11,6 +11,7 @@ query FetchCarts($limit: Int!, $offset: Int!, $sort: [String!], $where: String) 
       customerEmail
       anonymousId
       createdAt
+      shippingMode
       lastModifiedAt
       lineItems {
         id

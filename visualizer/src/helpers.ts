@@ -198,3 +198,9 @@ export function formatPercentage(percentage: number) {
 export function convertRatioToPercentage(ratio: number) {
   return parseFloat((ratio * 100).toFixed(2));
 }
+
+export function notEmpty<TValue>(
+  value: TValue | null | undefined
+): value is TValue {
+  return value !== null && value !== undefined;
+}

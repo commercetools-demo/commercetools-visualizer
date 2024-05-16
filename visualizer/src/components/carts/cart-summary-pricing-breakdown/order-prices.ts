@@ -1,29 +1,48 @@
 import isEqual from 'lodash/isEqual';
 import { SHIPPING_MODES } from '../addresses-panel/addresses-panel';
-import { getFractionedAmount } from '../../../helpers';
+import { getFractionedAmount, notEmpty } from '../../../helpers';
 import { PRECISION_TYPES } from '../../../constants';
-import { TBaseMoney, TCart } from '../../../types/generated/ctp';
+import {
+  TBaseMoney,
+  TCart,
+  TCustomLineItem,
+  TDiscountedLineItemPortion,
+  TDiscountedLineItemPriceForQuantity,
+  THighPrecisionMoney,
+  TLineItem,
+  TMoney,
+  TProductPrice,
+  TShipping,
+  TTaxPortion,
+  TTaxRate,
+} from '../../../types/generated/ctp';
+
+export type NetAndGross = {
+  net: TBaseMoney | undefined;
+  gross: TBaseMoney | undefined;
+};
 
 /*
 ---------------------------------------------------------------
 Helpful Functions
 ---------------------------------------------------------------
 */
-export const filterPerMethodTaxRateByTarget = (lineItem: any) =>
-  lineItem?.perMethodTaxRate?.filter(
-    (perMethodTax: any) =>
-      lineItem?.shippingDetails?.targets?.findIndex(
-        (target: any) =>
-          target?.shippingMethodKey === perMethodTax?.shippingMethodKey
-      ) >= 0
-  );
-export const isTaxIncludedInPrice = (lineItem: any) => {
+export const filterPerMethodTaxRateByTarget = (
+  lineItem: TLineItem | TCustomLineItem
+) =>
+  lineItem.perMethodTaxRate?.filter((perMethodTax) => {
+    let findIndex = lineItem.shippingDetails?.targets?.findIndex((target) => {
+      return target.shippingMethodKey === perMethodTax.shippingMethodKey;
+    });
+    return findIndex && findIndex >= 0;
+  });
+export const isTaxIncludedInPrice = (lineItem: TLineItem | TCustomLineItem) => {
   const filteredPerMethodTaxRates = filterPerMethodTaxRateByTarget(lineItem);
 
   // If order is multi shipping mode
   if (filteredPerMethodTaxRates?.length > 0) {
     return filteredPerMethodTaxRates.some(
-      (perMethodTax: any) =>
+      (perMethodTax) =>
         perMethodTax.taxRate && perMethodTax.taxRate.includedInPrice
     );
   }
@@ -50,14 +69,16 @@ export const determineIfTaxIncludedInPrice = (order: TCart) => {
   );
 };
 
-export const isTaxRateSameInMultiMode = (lineItem: any) => {
+export const isTaxRateSameInMultiMode = (
+  lineItem: TLineItem | TCustomLineItem
+) => {
   if (lineItem?.perMethodTaxRate?.length < 2) return true;
 
   const filteredPerMethodTaxRates = filterPerMethodTaxRateByTarget(lineItem);
 
   if (filteredPerMethodTaxRates?.length < 2) return true;
 
-  return filteredPerMethodTaxRates?.every((item: any) =>
+  return filteredPerMethodTaxRates?.every((item) =>
     isEqual(filteredPerMethodTaxRates[0]?.taxRate, item?.taxRate)
   );
 };
@@ -91,12 +112,15 @@ export const getMultiShippings = (order: TCart) => {
         (target) => target?.shippingMethodKey
       )
     )
-    .filter(Boolean);
+    .filter(notEmpty);
 
   return hasMultiShippingInfo
-    ? order.shipping.filter((shipping) =>
-        shippingKeys.includes(shipping.shippingKey)
-      )
+    ? order.shipping.filter((shipping) => {
+        if (!shipping.shippingKey) {
+          return false;
+        }
+        return shippingKeys.includes(shipping.shippingKey);
+      })
     : [];
 };
 
@@ -105,10 +129,9 @@ function getShippingDiscountsMulti(order: TCart) {
 
   return shippings
     .flatMap(
-      (shipping: any) =>
-        shipping?.shippingInfo?.discountedPrice?.includedDiscounts
+      (shipping) => shipping?.shippingInfo?.discountedPrice?.includedDiscounts
     )
-    .filter(Boolean);
+    .filter(notEmpty);
 }
 
 export function getCartDiscountOnTotalPrice(order: TCart) {
@@ -119,7 +142,7 @@ export function getNetCartDiscountOnTotalPrice(order: TCart) {
   return order?.discountOnTotalPrice?.discountedNetAmount;
 }
 
-const getProductDiscountForLineItem = (lineItem: any) => {
+const getProductDiscountForLineItem = (lineItem: TLineItem) => {
   if (lineItem.price?.discounted) {
     const regularPrice = getFractionedAmount(lineItem.price.value);
     const discountedPrice = getFractionedAmount(
@@ -128,31 +151,33 @@ const getProductDiscountForLineItem = (lineItem: any) => {
     return (
       (regularPrice - discountedPrice) *
       lineItem.quantity *
-      10 ** lineItem.totalPrice.fractionDigits
+      10 ** (lineItem.totalPrice?.fractionDigits || 2)
     );
   }
 
   return 0;
 };
 
-export function getTotalProductDiscount(lineItems: any) {
+export function getTotalProductDiscount(lineItems: Array<TLineItem>) {
   return lineItems.reduce(
-    (total: any, lineItem: any) =>
-      total + getProductDiscountForLineItem(lineItem),
+    (total, lineItem) => total + getProductDiscountForLineItem(lineItem),
     0
   );
 }
 
-const getTotalAmountForDiscountedLineItem = (includedDiscounts: any) =>
+const getTotalAmountForDiscountedLineItem = (
+  includedDiscounts: Array<TDiscountedLineItemPortion>
+) =>
   includedDiscounts.reduce(
-    (acc: any, discount: any) =>
-      acc + getFractionedAmount(discount.discountedAmount),
+    (acc, discount) => acc + getFractionedAmount(discount.discountedAmount),
     0
   );
 
-const getTotalPriceForDiscountedLineItem = (discountedPerQuantity: any) =>
+const getTotalPriceForDiscountedLineItem = (
+  discountedPerQuantity: Array<TDiscountedLineItemPriceForQuantity>
+) =>
   discountedPerQuantity.reduce(
-    (total: any, discounted: any) =>
+    (total, discounted) =>
       total +
       getTotalAmountForDiscountedLineItem(
         discounted.discountedPrice.includedDiscounts
@@ -161,25 +186,34 @@ const getTotalPriceForDiscountedLineItem = (discountedPerQuantity: any) =>
     0
   );
 
-const getCartDiscountForLineItem = (lineItem: any) =>
+const getCartDiscountForLineItem = (lineItem: TLineItem | TCustomLineItem) =>
   getTotalPriceForDiscountedLineItem(lineItem.discountedPricePerQuantity) *
-  10 ** lineItem.totalPrice.fractionDigits;
+  10 ** (lineItem.totalPrice?.fractionDigits || 2);
 
-export function getTotalCartDiscount(lineItems: any) {
+export function getTotalCartDiscount(
+  lineItems: Array<TLineItem | TCustomLineItem>
+) {
   return lineItems.reduce(
-    (acc: any, lineItem: any) => acc + getCartDiscountForLineItem(lineItem),
+    (acc, lineItem) => acc + getCartDiscountForLineItem(lineItem),
     0
   );
 }
 
-function findTaxRatesAndQuantitiesForItem(item: any) {
+type TaxRateAndQuantity = {
+  quantity: number;
+  taxRate: TTaxRate | undefined | null;
+};
+
+const findTaxRatesAndQuantitiesForItem = (
+  item: TLineItem | TCustomLineItem
+): Array<TaxRateAndQuantity> => {
   if (!item.shippingDetails || item.shippingDetails.targets.length === 0)
     return [];
 
   return item.shippingDetails.targets
-    .map((target: any) => {
+    .map((target) => {
       const perMethodTaxRate = item.perMethodTaxRate.find(
-        (perMethodTaxRateItem: any) =>
+        (perMethodTaxRateItem) =>
           perMethodTaxRateItem.shippingMethodKey === target.shippingMethodKey
       );
 
@@ -192,33 +226,53 @@ function findTaxRatesAndQuantitiesForItem(item: any) {
 
       return null;
     })
-    .filter(Boolean);
-}
+    .filter(notEmpty);
+};
 
 function mapTaxRatesAndQuantitiesToItems(
-  item: any,
-  taxRatesAndQuantities: any
-) {
-  const isCustomLineItem = item.hasOwnProperty('money');
-  const itemPriceProperty = isCustomLineItem ? 'money' : 'price';
+  item: TLineItem | TCustomLineItem,
+  taxRatesAndQuantities: Array<TaxRateAndQuantity>
+): Array<
+  | (TaxRateAndQuantity & { money: TBaseMoney })
+  | (TaxRateAndQuantity & { price: TProductPrice })
+> {
+  if ('money' in item) {
+    // if the current items doesn't have any shipping targets (thus no tax rates) then we return just the price, quantity and an empty taxRate object
+    // this case is for digitial items for exmaple that doesn't require shipping
+    // we still need to return it as an array so it can be flap mapped into the main function
+    if (taxRatesAndQuantities.length === 0) {
+      return [
+        {
+          money: item.money,
+          quantity: item.quantity,
+          taxRate: null,
+        },
+      ];
+    }
 
-  // if the current items doesn't have any shipping targets (thus no tax rates) then we return just the price, quantity and an empty taxRate object
-  // this case is for digitial items for exmaple that doesn't require shipping
-  // we still need to return it as an array so it can be flap mapped into the main function
-  if (taxRatesAndQuantities.length === 0) {
-    return [
-      {
-        [itemPriceProperty]: isCustomLineItem ? item.money : item.price,
-        quantity: item.quantity,
-        taxRate: {},
-      },
-    ];
+    return taxRatesAndQuantities.map((taxRateAndQuantity) => ({
+      money: item.money,
+      ...taxRateAndQuantity,
+    }));
+  } else {
+    // if the current items doesn't have any shipping targets (thus no tax rates) then we return just the price, quantity and an empty taxRate object
+    // this case is for digitial items for exmaple that doesn't require shipping
+    // we still need to return it as an array so it can be flap mapped into the main function
+    if (taxRatesAndQuantities.length === 0) {
+      return [
+        {
+          price: item.price,
+          quantity: item.quantity,
+          taxRate: null,
+        },
+      ];
+    }
+
+    return taxRatesAndQuantities.map((taxRateAndQuantity) => ({
+      price: item.price,
+      ...taxRateAndQuantity,
+    }));
   }
-
-  return taxRatesAndQuantities.map((taxRateAndQuantity: any) => ({
-    [itemPriceProperty]: isCustomLineItem ? item.money : item.price,
-    ...taxRateAndQuantity,
-  }));
 }
 
 /*
@@ -251,8 +305,12 @@ output: ----------
   }
 ]
 */
-function transformItemsFromMultiToSingle(allItems: any) {
-  if (allItems.length === 0) return [];
+function transformItemsFromMultiToSingle(
+  allItems: Array<TLineItem | TCustomLineItem>
+) {
+  if (allItems.length === 0) {
+    return [];
+  }
 
   // map over each item and for each item
   // map over shipping targets and for each target
@@ -261,7 +319,7 @@ function transformItemsFromMultiToSingle(allItems: any) {
 
   // for each item we will have an array of objects representing that item with several tax rates coming from the different shipping targets
   // so we flat map those objects to get an array represeting all the items with all their different tax rates
-  return allItems.flatMap((item: any) => {
+  return allItems.flatMap((item) => {
     const taxRatesAndQuantities = findTaxRatesAndQuantitiesForItem(item);
 
     // to avoid mapping the whole line item or custom line item object (since it's quite large in the case of multiple shipping methods)
@@ -270,10 +328,25 @@ function transformItemsFromMultiToSingle(allItems: any) {
   });
 }
 
-function calculateSubtotalCentAmount(allItems: any, orderFractionDigits: any) {
-  return allItems.reduce((acc: any, item: any) => {
+function calculateSubtotalCentAmount(
+  allItems: Array<
+    | {
+        money: TBaseMoney;
+        quantity: number;
+        taxRate?: TTaxRate | null;
+      }
+    | {
+        price: { value: TBaseMoney };
+        quantity: number;
+        taxRate?: TTaxRate | null;
+      }
+  >,
+  orderFractionDigits: number
+) {
+  return allItems.reduce((acc, item) => {
     // if item is a custom line item then `money` is defined, otherwise `price` is defined
-    const itemPrice = item?.money ?? item.price.value;
+    const itemPrice: TBaseMoney =
+      'money' in item ? item?.money : item.price.value;
 
     let totalCentAmount;
     // should accept 0 value
@@ -285,7 +358,8 @@ function calculateSubtotalCentAmount(allItems: any, orderFractionDigits: any) {
     if (itemPrice?.type === PRECISION_TYPES.highPrecision) {
       // use the precise amount to get the total price for the item, this helps to get accurate numbers when the precise is low compared to the fraction digits
       // Example preciseAmount: 12 and fractionDigits: 6 and quantity 200
-      const totalItemPreciseAmount = itemPrice.preciseAmount * item.quantity;
+      const totalItemPreciseAmount =
+        (itemPrice as THighPrecisionMoney).preciseAmount * item.quantity;
 
       // Convert the precise amount to its unit price representation. This is achieved by "unscaling" the
       // preciseAmount based on its fraction digits. For example, if preciseAmount represents a value with 4 fraction
@@ -316,10 +390,10 @@ function calculateSubtotalCentAmount(allItems: any, orderFractionDigits: any) {
   }, 0);
 }
 
-function combineShippingTaxPortions(taxPortions: any) {
-  const combined: Array<any> = [];
+function combineShippingTaxPortions(taxPortions: Array<TaxPortion>) {
+  const combined: Array<TaxPortion> = [];
 
-  taxPortions.forEach((portion: any) => {
+  taxPortions.forEach((portion) => {
     // Check if this name and amount already exists in the combined array
     const existingIndex = combined.findIndex(
       (item) => item.name === portion.name && item.amount === portion.amount
@@ -337,9 +411,9 @@ function combineShippingTaxPortions(taxPortions: any) {
   return combined;
 }
 
-function getMultiShippingTaxPortions(shipping: any) {
+function getMultiShippingTaxPortions(shipping: Array<TShipping>) {
   const taxPortions = shipping
-    .flatMap((sh: any) => {
+    .flatMap((sh) => {
       // if a shipping method has no tax rate, then ignore it
       if (!sh?.shippingInfo?.taxRate) return null;
 
@@ -348,7 +422,8 @@ function getMultiShippingTaxPortions(shipping: any) {
       });
 
       const shippingTaxAmount =
-        shippingPrice?.gross?.centAmount - shippingPrice?.net.centAmount;
+        (shippingPrice?.gross?.centAmount || 0) -
+        (shippingPrice?.net?.centAmount || 0);
 
       // calculate tax portions from tax rate (if tax rate has subrates then include those as tax portions, if not then include tax rate as tax portion)
       return getShippingTaxPortionsFromTaxRate(
@@ -356,36 +431,41 @@ function getMultiShippingTaxPortions(shipping: any) {
         shippingTaxAmount
       );
     })
-    .filter(Boolean);
+    .filter(notEmpty);
 
   return combineShippingTaxPortions(taxPortions);
 }
 
+type TaxPortion = { name: string; taxAmount: number; amount: number };
+
 function getShippingTaxPortionsFromTaxRate(
-  taxRate: any,
-  shippingTaxAmount: any
-) {
+  taxRate: TTaxRate | undefined | null,
+  shippingTaxAmount: number
+): Array<TaxPortion> {
   // if there are not subrates, then return just the tax rate as an array
   // so this function can always return array for easier processing
-  if (taxRate.subRates.length === 0)
+  if (taxRate && taxRate.subRates.length === 0) {
     return [{ ...taxRate, taxAmount: shippingTaxAmount }];
+  }
 
-  return taxRate.subRates.map((subrate: any) => ({
-    ...subrate,
-    taxAmount: Math.round(
-      (shippingTaxAmount * subrate.amount) / taxRate.amount
-    ),
-  }));
+  return (
+    taxRate?.subRates.map((subrate) => ({
+      ...subrate,
+      taxAmount: Math.round(
+        (shippingTaxAmount * subrate.amount) / taxRate.amount
+      ),
+    })) || []
+  );
 }
 
 function extractLineItemTaxPortions(
-  taxPortions: any,
-  shippingTaxPortions: any
+  taxPortions: Array<TTaxPortion>,
+  shippingTaxPortions: Array<TaxPortion>
 ) {
-  return taxPortions.map((taxPortion: any) => {
+  return taxPortions.map((taxPortion) => {
     // find the tax rate from shipping matching the tax portion
     const foundShippingTaxPortion = shippingTaxPortions.find(
-      (shippingTaxPortion: any) =>
+      (shippingTaxPortion) =>
         shippingTaxPortion.name === taxPortion.name &&
         shippingTaxPortion.amount === taxPortion.rate
     );
@@ -411,23 +491,27 @@ Main Functions
 ---------------------------------------------------------------
 */
 
-export function getShippingPrices(order: TCart) {
+export function getShippingPrices(
+  order: Pick<TCart, 'shippingInfo'>
+): NetAndGross | null {
   const { shippingInfo } = order;
 
-  if (!shippingInfo) return null;
+  if (!shippingInfo) {
+    return null;
+  }
 
   const hasTaxes = Boolean(shippingInfo.taxedPrice);
   const hasDiscounts = Boolean(shippingInfo.discountedPrice?.value);
 
   if (hasTaxes)
     return {
-      net: shippingInfo.taxedPrice.totalNet,
-      gross: shippingInfo.taxedPrice.totalGross,
+      net: shippingInfo.taxedPrice?.totalNet,
+      gross: shippingInfo.taxedPrice?.totalGross,
     };
   if (hasDiscounts)
     return {
-      net: shippingInfo.discountedPrice.value,
-      gross: shippingInfo.discountedPrice.value,
+      net: shippingInfo.discountedPrice?.value,
+      gross: shippingInfo.discountedPrice?.value,
     };
 
   return {
@@ -439,25 +523,32 @@ export function getShippingPrices(order: TCart) {
 export function getShippingPricesMulti(order: TCart) {
   const shippings = getMultiShippings(order);
 
-  const initialPrice = {
-    net: { centAmount: 0 },
-    gross: { centAmount: 0 },
+  const initialPrice: NetAndGross = {
+    net: { centAmount: 0, fractionDigits: 2, type: '', currencyCode: '' },
+    gross: { centAmount: 0, fractionDigits: 2, type: '', currencyCode: '' },
   };
 
-  return shippings.reduce((acc: any, currentShipping: any) => {
+  return shippings.reduce((acc, currentShipping): NetAndGross => {
     const currentShippingPrice = getShippingPrices({
       shippingInfo: currentShipping.shippingInfo,
     });
 
     return {
       net: {
-        ...currentShippingPrice?.net,
-        centAmount: acc.net.centAmount + currentShippingPrice?.net.centAmount,
+        type: currentShippingPrice?.net?.type || '',
+        fractionDigits: currentShippingPrice?.net?.fractionDigits || 2,
+        currencyCode: currentShippingPrice?.net?.currencyCode || '',
+        centAmount:
+          (acc.net?.centAmount || 0) +
+          (currentShippingPrice?.net?.centAmount || 0),
       },
       gross: {
-        ...currentShippingPrice?.gross,
+        type: currentShippingPrice?.gross?.type || '',
+        fractionDigits: currentShippingPrice?.gross?.fractionDigits || 2,
+        currencyCode: currentShippingPrice?.gross?.currencyCode || '',
         centAmount:
-          acc.gross.centAmount + currentShippingPrice?.gross.centAmount,
+          (acc.gross?.centAmount || 0) +
+          (currentShippingPrice?.gross?.centAmount || 0),
       },
     };
   }, initialPrice);
@@ -469,7 +560,7 @@ export function getNetPriceWithoutShipping(order: TCart) {
   const { taxedPrice, totalPrice } = order;
   const orderTotalPrice = taxedPrice ? taxedPrice.totalNet : totalPrice;
 
-  if (shippingPrices && cartDiscountOnTotalPrice) {
+  if (shippingPrices && cartDiscountOnTotalPrice && shippingPrices.net) {
     return {
       ...orderTotalPrice,
       centAmount:
@@ -479,7 +570,7 @@ export function getNetPriceWithoutShipping(order: TCart) {
     };
   }
 
-  if (shippingPrices)
+  if (shippingPrices && shippingPrices.net)
     return {
       ...orderTotalPrice,
       centAmount: orderTotalPrice.centAmount - shippingPrices.net.centAmount,
@@ -502,7 +593,7 @@ export function getGrossPriceWithoutShipping(order: TCart) {
   const { taxedPrice, totalPrice } = order;
   const orderTotalPrice = taxedPrice ? taxedPrice.totalGross : totalPrice;
 
-  if (shippingPrices && cartDiscountOnTotalPrice)
+  if (shippingPrices && cartDiscountOnTotalPrice && shippingPrices.gross)
     return {
       ...orderTotalPrice,
       centAmount:
@@ -511,7 +602,7 @@ export function getGrossPriceWithoutShipping(order: TCart) {
         shippingPrices.gross.centAmount,
     };
 
-  if (shippingPrices)
+  if (shippingPrices && shippingPrices.gross)
     return {
       ...orderTotalPrice,
       centAmount: orderTotalPrice.centAmount - shippingPrices.gross.centAmount,
@@ -540,13 +631,14 @@ export function getGrossPriceWithoutShippingMulti(order: TCart) {
       centAmount:
         orderTotalPrice.centAmount +
         cartDiscountOnTotalPrice.centAmount -
-        shippingPrices.gross.centAmount,
+        (shippingPrices.gross?.centAmount || 0),
     };
 
   if (shippingPrices)
     return {
       ...orderTotalPrice,
-      centAmount: orderTotalPrice.centAmount - shippingPrices.gross.centAmount,
+      centAmount:
+        orderTotalPrice.centAmount - (shippingPrices.gross?.centAmount || 0),
     };
 
   if (cartDiscountOnTotalPrice) {
@@ -580,18 +672,21 @@ export const getTotalDiscount = (order: TCart) => {
 };
 
 export const getNetTotalDiscount = (
-  subtotalWithoutDiscounts: any,
+  subtotalWithoutDiscounts: TMoney,
   order: TCart
 ) => {
   const AllLineItems = [...order.lineItems, ...order.customLineItems];
 
   // discounted total price of each item before taxes
   const allLineItemsTotalNetPrice = AllLineItems.reduce(
-    (acc, item) =>
-      acc +
-      (item.taxedPrice
-        ? item.taxedPrice.totalNet.centAmount
-        : item.totalPrice.centAmount),
+    (acc, item) => {
+      return (
+        acc +
+        (item.taxedPrice
+          ? item.taxedPrice.totalNet.centAmount
+          : item.totalPrice?.centAmount || 0)
+      );
+    },
 
     0
   );
@@ -602,7 +697,7 @@ export const getNetTotalDiscount = (
   };
 };
 
-export function subtotalWithoutDiscounts(order: TCart) {
+export function subtotalWithoutDiscounts(order: TCart): TMoney {
   const allItems = [...order.lineItems, ...order.customLineItems];
 
   return {
@@ -629,16 +724,20 @@ export function subtotalWithoutDiscountsMutli(order: TCart) {
 }
 
 export function getOrderSubtotalAfterDiscount(
-  subtotalWithoutDiscounts: any,
-  totalDiscount: any
+  subtotalWithoutDiscounts: TMoney,
+  totalDiscount: TMoney | null
 ) {
   return {
     ...subtotalWithoutDiscounts,
-    centAmount: subtotalWithoutDiscounts.centAmount - totalDiscount.centAmount,
+    centAmount:
+      subtotalWithoutDiscounts.centAmount - (totalDiscount?.centAmount || 0),
   };
 }
 
-export function getTotalNetWithoutDiscounts(subtotal: any, totalDiscount: any) {
+export function getTotalNetWithoutDiscounts(
+  subtotal: TMoney,
+  totalDiscount: TMoney
+) {
   return totalDiscount
     ? {
         ...subtotal,
@@ -669,8 +768,15 @@ export function getTotalShippingDiscounts(
     : initialPrice;
 }
 
-export function getTotalShippingDiscountsMulti(order: TCart) {
-  const initialPrice = { centAmount: 0, currencyCode: '' };
+export function getTotalShippingDiscountsMulti(
+  order: TCart
+): TBaseMoney | null {
+  const initialPrice = {
+    centAmount: 0,
+    currencyCode: '',
+    fractionDigits: 2,
+    type: '',
+  };
 
   const shippingDiscounts = getShippingDiscountsMulti(order);
   return shippingDiscounts
@@ -684,20 +790,24 @@ export function getTotalShippingDiscountsMulti(order: TCart) {
     : null;
 }
 
-export function getAllNonShippingTaxes(order: TCart) {
+export function getAllNonShippingTaxes(
+  order: Pick<TCart, 'taxedPrice' | 'shippingInfo'>
+) {
   const { taxedPrice, shippingInfo } = order;
 
   // no taxes for this order
-  if (!taxedPrice) return [];
+  if (!taxedPrice || !shippingInfo) return [];
 
   // shipping has no taxes, return all taxes
-  if (taxedPrice && (!shippingInfo || !shippingInfo.taxedPrice))
+  if (taxedPrice && (!shippingInfo || !shippingInfo.taxedPrice)) {
     return taxedPrice.taxPortions;
+  }
 
   // final option
   const shippingPrice = getShippingPrices({ shippingInfo });
   const shippingTaxAmount =
-    shippingPrice?.gross.centAmount - shippingPrice?.net.centAmount;
+    (shippingPrice?.gross?.centAmount || 0) -
+    (shippingPrice?.net?.centAmount || 0);
   const { taxRate } = shippingInfo;
 
   // if tax rate has subrates then treat the subrates as separate tax rates and calculate their `taxAmount`
@@ -709,9 +819,9 @@ export function getAllNonShippingTaxes(order: TCart) {
 
   // find tax portions that are applied only to items and not shipping
   const filteredTaxPortions = taxedPrice.taxPortions.filter(
-    (taxedPricePortion: any) => {
+    (taxedPricePortion) => {
       return !shippingTaxPortions.some(
-        (shippingTaxPortion: any) =>
+        (shippingTaxPortion) =>
           taxedPricePortion.name === shippingTaxPortion.name &&
           taxedPricePortion.rate === shippingTaxPortion.amount &&
           taxedPricePortion.amount.centAmount === shippingTaxPortion.taxAmount
@@ -723,7 +833,9 @@ export function getAllNonShippingTaxes(order: TCart) {
   return extractLineItemTaxPortions(filteredTaxPortions, shippingTaxPortions);
 }
 
-export function getAllNonShippingMultiTaxes(order: TCart) {
+export function getAllNonShippingMultiTaxes(
+  order: Pick<TCart, 'shipping' | 'taxedPrice'>
+) {
   const { taxedPrice, shipping } = order;
 
   // no taxes for this order
@@ -744,7 +856,7 @@ export function getAllNonShippingMultiTaxes(order: TCart) {
 
   // find tax portions that are applied only to items and not shipping
   const filteredTaxPortions = taxedPrice.taxPortions.filter(
-    (taxedPricePortion: any) => {
+    (taxedPricePortion) => {
       return !shippingTaxPortions.some(
         (shippingTaxPortion) =>
           taxedPricePortion.name === shippingTaxPortion.name &&

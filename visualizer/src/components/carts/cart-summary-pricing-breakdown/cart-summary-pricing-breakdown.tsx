@@ -82,12 +82,14 @@ const CartSummaryPricingBreakdown: FC<Props> = ({ cart }) => {
       : null;
 
   const netTotalDiscount =
-    hasSingleShippingInfo || (isSingleShippingMode && hasNoShipping)
+    (hasSingleShippingInfo || (isSingleShippingMode && hasNoShipping)) &&
+    subtotalWithoutDiscounts
       ? getNetTotalDiscount(subtotalWithoutDiscounts, cart)
       : null;
 
   const orderSubtotalAfterDiscount =
-    hasSingleShippingInfo || (isSingleShippingMode && hasNoShipping)
+    (hasSingleShippingInfo || (isSingleShippingMode && hasNoShipping)) &&
+    subtotalWithoutDiscounts
       ? getOrderSubtotalAfterDiscount(
           subtotalWithoutDiscounts,
           netTotalDiscount
@@ -118,12 +120,14 @@ const CartSummaryPricingBreakdown: FC<Props> = ({ cart }) => {
       : null;
 
   const netTotalDiscountMulti =
-    hasMultiShippingInfo || (isMultiShippingMode && hasNoShipping)
+    (hasMultiShippingInfo || (isMultiShippingMode && hasNoShipping)) &&
+    subtotalWithoutDiscountsMulti
       ? getNetTotalDiscount(subtotalWithoutDiscountsMulti, cart)
       : null;
 
   const orderSubtotalAfterDiscountMulti =
-    hasMultiShippingInfo || (isMultiShippingMode && hasNoShipping)
+    (hasMultiShippingInfo || (isMultiShippingMode && hasNoShipping)) &&
+    subtotalWithoutDiscountsMulti
       ? getOrderSubtotalAfterDiscount(
           subtotalWithoutDiscountsMulti,
           netTotalDiscountMulti
@@ -347,22 +351,26 @@ const CartSummaryPricingBreakdown: FC<Props> = ({ cart }) => {
                 />
               </Spacings.Inline>
 
-              <Text.Detail>
-                {`+ ${formatMoney(
-                  {
-                    ...shippingPricesMulti.gross,
-                    centAmount:
-                      shippingPricesMulti.gross.centAmount +
-                      totalShippingDiscountMulti.centAmount,
-                  },
-                  intl
-                )}`}
-              </Text.Detail>
+              {shippingPricesMulti &&
+                totalShippingDiscountMulti &&
+                shippingPricesMulti.gross && (
+                  <Text.Detail>
+                    {`+ ${formatMoney(
+                      {
+                        ...shippingPricesMulti.gross,
+                        centAmount:
+                          shippingPricesMulti.gross.centAmount +
+                          totalShippingDiscountMulti.centAmount,
+                      },
+                      intl
+                    )}`}
+                  </Text.Detail>
+                )}
             </Spacings.Inline>
           )}
 
           {hasSingleShippingInfo &&
-            Boolean(totalShippingDiscount?.centAmount) && (
+            totalShippingDiscount?.centAmount !== undefined && (
               <Spacings.Inline justifyContent="space-between" scale="m">
                 <Text.Detail
                   intlMessage={messages.shippingDiscount}
@@ -375,7 +383,7 @@ const CartSummaryPricingBreakdown: FC<Props> = ({ cart }) => {
             )}
 
           {isMultiShippingMode &&
-            Boolean(totalShippingDiscountMulti.centAmount) && (
+            totalShippingDiscountMulti?.centAmount !== undefined && (
               <Spacings.Inline justifyContent="space-between" scale="m">
                 <Text.Detail tone="secondary">
                   <FormattedMessage {...messages.shippingDiscount} />

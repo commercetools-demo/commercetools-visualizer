@@ -30,5 +30,10 @@ export const createHiddenColumnDefinitions = memoize(
       label: formatMessage(messages.columnLastModifiedAt),
       isSortable: true,
     },
+    {
+      key: 'shippingMode',
+      label: 'shippingMode',
+      isSortable: true,
+    },
   ]
 );

@@ -41,7 +41,10 @@ const CartsList = () => {
   const { push } = useHistory();
   console.log(match.url);
 
-  const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
+  const tableSorting = useDataTableSortingState({
+    key: 'createdAt',
+    order: 'desc',
+  });
   const { page, perPage } = usePaginationState();
 
   const [searchOption, setSearchOption] = useState(ALL_FIELDS);

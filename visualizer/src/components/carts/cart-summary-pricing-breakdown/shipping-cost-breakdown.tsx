@@ -12,10 +12,13 @@ import { TBaseMoney, TShipping } from '../../../types/generated/ctp';
 interface ShippingCostBreakdownProps {
   isOpen: boolean;
   onClose: (...args: unknown[]) => unknown;
-  shippingPricesMulti?: {
-    gross?: TBaseMoney;
-  };
-  totalShippingDiscountMulti?: TBaseMoney;
+  shippingPricesMulti:
+    | {
+        gross?: TBaseMoney;
+      }
+    | undefined
+    | null;
+  totalShippingDiscountMulti?: TBaseMoney | null;
   shippings?: Array<TShipping>;
 }
 

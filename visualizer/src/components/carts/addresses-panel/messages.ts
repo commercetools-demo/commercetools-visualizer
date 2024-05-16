@@ -56,8 +56,7 @@ export default defineMessages({
   multipleShippingMethodsHint: {
     id: 'Orders.Details.General.Addresses.multipleShippingMethodsHint',
     description: 'Hint message when multiple shipping methods are available',
-    defaultMessage:
-      "This order contains multiple addresses.<newLine></newLine>To see addresses' details go to <shippingAndDeliveryTabLink>Shipping & delivery</shippingAndDeliveryTabLink> tab",
+    defaultMessage: 'This cart contains multiple addresses.',
   },
   viewCustomFieldsLabel: {
     id: 'Orders.Details.General.Addresses.viewCustomFields',

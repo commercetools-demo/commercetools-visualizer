@@ -59,19 +59,15 @@ const CartDetails: FC<Props> = ({ onClose }) => {
       isOpen
       onClose={onClose}
     >
-      <Spacings.Stack scale="xxxl">
-        <PageContentWide>
-          <Spacings.Stack scale="xl">
-            <CartDetailsGeneralInfoHeader cart={cart} />
-            <Card type="raised">
-              <CartSummaryPricingBreakdown cart={cart} />
-            </Card>
-          </Spacings.Stack>
-        </PageContentWide>
-        <PageContentWide>
+      <PageContentWide>
+        <Spacings.Stack scale="xl">
+          <CartDetailsGeneralInfoHeader cart={cart} />
+          <Card type="raised">
+            <CartSummaryPricingBreakdown cart={cart} />
+          </Card>
           <AddressesPanel cart={cart} />
-        </PageContentWide>
-      </Spacings.Stack>
+        </Spacings.Stack>
+      </PageContentWide>
     </InfoModalPage>
   );
 };

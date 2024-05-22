@@ -773,7 +773,7 @@ export function getTotalShippingDiscountsMulti(
 ): TBaseMoney | null {
   const initialPrice = {
     centAmount: 0,
-    currencyCode: '',
+    currencyCode: 'EUR',
     fractionDigits: 2,
     type: '',
   };

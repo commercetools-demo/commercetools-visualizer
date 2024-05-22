@@ -180,7 +180,7 @@ export function formatMoney(
   intl: IntlShape,
   options?: Record<string, unknown>
 ) {
-  if (!moneyValue) {
+  if (!moneyValue || !moneyValue.currencyCode) {
     return '';
   }
   return intl.formatNumber(getFractionedAmount(moneyValue), {

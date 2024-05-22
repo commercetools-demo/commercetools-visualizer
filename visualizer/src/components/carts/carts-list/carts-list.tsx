@@ -39,7 +39,6 @@ const CartsList = () => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
-  console.log(match.url);
 
   const tableSorting = useDataTableSortingState({
     key: 'createdAt',
@@ -57,11 +56,11 @@ const CartsList = () => {
 
   const [tableData, setTableData] = useState({
     columns: [
-      ...createVisibleColumnDefinitions(intl.formatMessage),
+      ...createVisibleColumnDefinitions(),
       ...createHiddenColumnDefinitions(intl.formatMessage),
     ],
-    visibleColumns: createVisibleColumnDefinitions(intl.formatMessage),
-    visibleColumnKeys: createVisibleColumnDefinitions(intl.formatMessage).map(
+    visibleColumns: createVisibleColumnDefinitions(),
+    visibleColumnKeys: createVisibleColumnDefinitions().map(
       (column) => column.key
     ),
   });

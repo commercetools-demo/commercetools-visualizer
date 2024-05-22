@@ -3,7 +3,7 @@ import memoize from 'memoize-one';
 import messages from './messages';
 
 export const createVisibleColumnDefinitions = memoize(
-  (formatMessage): Array<TColumn> => [
+  (): Array<TColumn> => [
     { key: 'customerEmail', label: 'customerEmail' },
     { key: 'anonymousId', label: 'anonymousId' },
     { key: 'amountOfLineitems', label: 'Amount of Lineitems' },

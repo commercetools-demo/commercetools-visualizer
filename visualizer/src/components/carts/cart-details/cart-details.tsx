@@ -19,6 +19,7 @@ import CartDetailsGeneralInfoHeader from '../cart-details-general-info-header';
 import Card from '@commercetools-uikit/card';
 import CartSummaryPricingBreakdown from '../cart-summary-pricing-breakdown';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import CartDetailsItems from '../cart-details-items/cart-details-items';
 
 type Props = {
   onClose: () => void;
@@ -62,6 +63,7 @@ const CartDetails: FC<Props> = ({ onClose }) => {
       <PageContentWide>
         <Spacings.Stack scale="xl">
           <CartDetailsGeneralInfoHeader cart={cart} />
+          <CartDetailsItems cart={cart} />
           <Card type="raised">
             <CartSummaryPricingBreakdown cart={cart} />
           </Card>

@@ -5,8 +5,10 @@ A visualizer for all non out-of-the-box types in Merchant Center
 
 This repository contains components rendering non out-of-the-box types as a custom app. Currently these are:
  * Subscriptions
+ * API Extensions
  * Types
  * States
+ * Carts
 
 ## Known issues
  - On Subscriptions:

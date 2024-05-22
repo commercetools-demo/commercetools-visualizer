@@ -4,9 +4,10 @@ import messages from './messages';
 
 export const createVisibleColumnDefinitions = memoize(
   (): Array<TColumn> => [
-    { key: 'customerEmail', label: 'customerEmail' },
+    { key: 'customerEmail', label: 'Customer Email' },
     { key: 'anonymousId', label: 'anonymousId' },
     { key: 'amountOfLineitems', label: 'Amount of Lineitems' },
+    { key: 'cartState', label: 'Cart State' },
   ]
 );
 

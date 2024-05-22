@@ -191,6 +191,7 @@ query FetchCart($id: String!, $locale: Locale!) {
         customerId
         lastModifiedAt
         shippingMode
+        cartState
         store {
             id
             key

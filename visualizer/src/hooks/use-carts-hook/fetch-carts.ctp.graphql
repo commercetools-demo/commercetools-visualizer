@@ -16,6 +16,7 @@ query FetchCarts($limit: Int!, $offset: Int!, $sort: [String!], $where: String) 
       lineItems {
         id
       }
+      cartState
     }
   }
 }

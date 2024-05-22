@@ -11,4 +11,9 @@ export default defineMessages({
     description: 'The label for the date modified info.',
     defaultMessage: 'Date modified: {datetime}',
   },
+  cartState: {
+    id: 'MetaDates.dateModified',
+    description: 'The label for the date modified info.',
+    defaultMessage: 'Cart State: {cartState}',
+  },
 });

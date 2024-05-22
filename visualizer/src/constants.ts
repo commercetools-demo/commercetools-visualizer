@@ -17,3 +17,9 @@ export const PRECISION_TYPES = {
   highPrecision: 'highPrecision',
   centPrecision: 'centPrecision',
 };
+
+export const DISCOUNT_VALUE_TYPES = {
+  ABSOLUTE: 'absolute',
+  RELATIVE: 'relative',
+  DIRECT: 'direct-discount',
+};

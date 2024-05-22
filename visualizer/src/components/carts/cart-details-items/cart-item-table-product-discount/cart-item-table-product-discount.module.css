@@ -1,0 +1,21 @@
+:root {
+  --discount-tooltip-margin: 90px;
+}
+
+.regular-price-block {
+  text-decoration: line-through;
+  color: var(--color-solid);
+}
+
+.discounted-price {
+  color: var(--color-solid);
+  letter-spacing: 0;
+}
+
+.discount-text {
+  color: var(--color-info);
+}
+
+.discount-text > div {
+  margin-right: var(--discount-tooltip-margin);
+}

@@ -6,7 +6,9 @@ import { isApolloError, ApolloError, type ServerError } from '@apollo/client';
 import {
   TBaseMoney,
   TChannel,
+  TCustomLineItem,
   THighPrecisionMoney,
+  TLineItem,
 } from './types/generated/ctp';
 import {
   TGraphqlUpdateAction,
@@ -204,3 +206,15 @@ export function notEmpty<TValue>(
 ): value is TValue {
   return value !== null && value !== undefined;
 }
+
+export const isCustomLineItem = (
+  object: TCustomLineItem | TLineItem
+): object is TCustomLineItem => {
+  return 'money' in object;
+};
+
+export const isLineItem = (
+  object: TCustomLineItem | TLineItem
+): object is TLineItem => {
+  return 'price' in object;
+};

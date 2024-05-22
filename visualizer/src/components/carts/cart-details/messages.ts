@@ -42,4 +42,9 @@ export default defineMessages<string>({
     description: 'The label for a missing address (billing)',
     defaultMessage: 'No billing address was provided for this Order.',
   },
+  deleteSuccess: {
+    id: 'EditExtensions.form.message.update.success',
+    description: 'Success message for update type',
+    defaultMessage: 'Your Cart has been deleted.',
+  },
 });

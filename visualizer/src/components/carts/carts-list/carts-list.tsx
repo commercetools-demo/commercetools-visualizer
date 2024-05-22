@@ -22,7 +22,6 @@ import { Pagination } from '@commercetools-uikit/pagination';
 import { useCartsFetcher } from '../../../hooks/use-carts-hook';
 import { useCallback, useState } from 'react';
 import CartsSearchbar from './carts-searchbar/carts-searchbar';
-import Constraints from '@commercetools-uikit/constraints';
 import { ALL_FIELDS } from './constants';
 import { TCustomEvent } from '@commercetools-uikit/selectable-search-input';
 import DataTableManager, {
@@ -180,36 +179,34 @@ const CartsList = () => {
         {carts.total > 0 && (
           <PageContentFull>
             <Spacings.Stack scale="m">
-              <Constraints.Horizontal max="scale">
-                <DataTableManager
+              <DataTableManager
+                columns={tableData.visibleColumns}
+                columnManager={columnManager}
+                onSettingsChange={onSettingChange}
+                displaySettings={{
+                  isWrappingText,
+                  isCondensed,
+                  disableDisplaySettings: false,
+                }}
+              >
+                <DataTable
+                  isCondensed
                   columns={tableData.visibleColumns}
-                  columnManager={columnManager}
-                  onSettingsChange={onSettingChange}
-                  displaySettings={{
-                    isWrappingText,
-                    isCondensed,
-                    disableDisplaySettings: false,
-                  }}
-                >
-                  <DataTable
-                    isCondensed
-                    columns={tableData.visibleColumns}
-                    rows={results}
-                    itemRenderer={itemRenderer}
-                    sortedBy={tableSorting.value.key}
-                    sortDirection={tableSorting.value.order}
-                    onSortChange={tableSorting.onChange}
-                    onRowClick={(row) => push(`${match.url}/${row.id}`)}
-                  />
-                </DataTableManager>
-                <Pagination
-                  page={page.value}
-                  onPageChange={page.onChange}
-                  perPage={perPage.value}
-                  onPerPageChange={perPage.onChange}
-                  totalItems={carts.total}
+                  rows={results}
+                  itemRenderer={itemRenderer}
+                  sortedBy={tableSorting.value.key}
+                  sortDirection={tableSorting.value.order}
+                  onSortChange={tableSorting.onChange}
+                  onRowClick={(row) => push(`${match.url}/${row.id}`)}
                 />
-              </Constraints.Horizontal>
+              </DataTableManager>
+              <Pagination
+                page={page.value}
+                onPageChange={page.onChange}
+                perPage={perPage.value}
+                onPerPageChange={perPage.onChange}
+                totalItems={carts.total}
+              />
             </Spacings.Stack>
           </PageContentFull>
         )}

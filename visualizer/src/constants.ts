@@ -12,3 +12,14 @@ export const entryPointUriPath =
     : window.app.entryPointUriPath;
 
 export const PERMISSIONS = entryPointUriPathToPermissionKeys(entryPointUriPath);
+
+export const PRECISION_TYPES = {
+  highPrecision: 'highPrecision',
+  centPrecision: 'centPrecision',
+};
+
+export const DISCOUNT_VALUE_TYPES = {
+  ABSOLUTE: 'absolute',
+  RELATIVE: 'relative',
+  DIRECT: 'direct-discount',
+};

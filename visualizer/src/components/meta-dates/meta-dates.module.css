@@ -1,0 +1,9 @@
+.container {
+  display: flex;
+  align-items: center;
+  margin: 0 0 var(--spacing-s);
+}
+
+.container > :first-of-type {
+  flex: 1 0 auto;
+}

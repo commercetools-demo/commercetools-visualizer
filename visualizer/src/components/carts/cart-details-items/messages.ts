@@ -111,4 +111,9 @@ export default defineMessages({
     description: 'Title of the table column (columnInventory)',
     defaultMessage: 'Inventory entry',
   },
+  totalLabel: {
+    id: 'OrderTotalsLastRow.totalLabel',
+    description: 'Total of table label',
+    defaultMessage: 'Total',
+  },
 });

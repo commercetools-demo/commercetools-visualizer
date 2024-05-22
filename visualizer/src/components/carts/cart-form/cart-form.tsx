@@ -6,7 +6,7 @@ import omitEmpty from 'omit-empty-es';
 import { PageContentWide } from '@commercetools-frontend/application-components';
 import Spacings from '@commercetools-uikit/spacings';
 import SelectField from '@commercetools-uikit/select-field';
-import messages from '../../states/states-form/messages';
+import messages from './messages';
 type Formik = ReturnType<typeof useFormik>;
 
 type TErrors = {
@@ -71,7 +71,7 @@ const CartForm: FC<Props> = ({
         <Spacings.Stack scale="m">
           <SelectField
             name="currency"
-            title={intl.formatMessage(messages.stateTypeTitle)}
+            title={intl.formatMessage(messages.currencyTitle)}
             isRequired
             value={formik.values.currency}
             options={currencies.map((currency) => {

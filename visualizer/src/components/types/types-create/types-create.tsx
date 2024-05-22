@@ -30,8 +30,7 @@ type Props = {
 
 const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
   const intl = useIntl();
-  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale ?? '',
+  const { projectLanguages } = useApplicationContext((context) => ({
     projectLanguages: context.project?.languages ?? [],
   }));
   const showNotification = useShowNotification();
@@ -96,7 +95,6 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
         fieldDefinitions: [],
       }}
       onSubmit={handleSubmit}
-      dataLocale={dataLocale}
       linkToHome={linkToHome}
       version={-1}
       createNewMode={true}

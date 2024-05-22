@@ -29,4 +29,9 @@ export default defineMessages<string>({
     description: 'Title of the table column (ID)',
     defaultMessage: 'Id',
   },
+  addCart: {
+    id: 'Cart.addType',
+    description: 'add cart button label',
+    defaultMessage: 'Add New Cart',
+  },
 });

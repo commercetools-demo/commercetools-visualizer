@@ -1,7 +1,9 @@
 import {
   Maybe,
   TCart,
+  TCartDraft,
   TMutation,
+  TMutation_CreateCartArgs,
   TMutation_DeleteCartArgs,
   TQuery,
   TQuery_CartArgs,
@@ -17,6 +19,7 @@ import FetchAllQuery from './fetch-carts.ctp.graphql';
 import FetchQuery from './fetch-cart.ctp.graphql';
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import DeleteQuery from './delete-cart.ctp.graphql';
+import CreateQuery from './create-cart.ctp.graphql';
 
 type TUseCartsFetcher = (variables: TQuery_CartsArgs) => {
   carts?: TQuery['carts'];
@@ -92,6 +95,33 @@ export const useCartDeleter = () => {
       });
     } catch (graphQlResponse) {
       console.log(graphQlResponse);
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+
+export const useCartCreator = () => {
+  const [createCart, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_CreateCartArgs
+  >(CreateQuery);
+
+  const execute = async ({ draft }: { draft: TCartDraft }) => {
+    try {
+      return await createCart({
+        context: {
+          target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+        },
+        variables: {
+          draft: draft,
+        },
+      });
+    } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };

@@ -97,7 +97,6 @@ type Props = {
     formikHelpers: FormikHelpers<TFormValues>
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
-  dataLocale: string;
   children: (formProps: FormProps) => JSX.Element;
   linkToHome: string;
   version: number;

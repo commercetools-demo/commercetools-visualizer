@@ -30,7 +30,7 @@ import { getErrorMessage } from '../../../helpers';
 import { TQuery, TTypeDefinition } from '../../../types/generated/ctp';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
-import { useTypesFetcher } from '../../../hooks/use-types-connector/types-connector';
+import { useTypesFetcher } from '../../../hooks/use-types-connector';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 const TypesCreate = lazy(() => import('../types-create/types-create'));
 
@@ -179,7 +179,7 @@ const TypesList: FC<Props> = () => {
     <InfoMainPage
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h2" intlMessage={messages.title} />
+          <Text.Headline as="h1" intlMessage={messages.title} />
           <SecondaryButton
             as={Link}
             to={`${match.url}/new`}

@@ -1,0 +1,5 @@
+mutation CreateCart($draft: CartDraft!, $storeKey: KeyReferenceInput) {
+    createCart(draft: $draft, storeKey: $storeKey) {
+        id
+    }
+}

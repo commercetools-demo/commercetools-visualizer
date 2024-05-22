@@ -1,5 +1,5 @@
 import { useIntl } from 'react-intl';
-import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import {
   useDataTableSortingState,
   usePaginationState,
@@ -33,6 +33,9 @@ import {
 } from './column-definitions';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CartDetails from '../cart-details/cart-details';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
+import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import CartCreate from '../cart-create/cart-create';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -165,7 +168,19 @@ const CartsList = () => {
   };
 
   return (
-    <InfoMainPage title={intl.formatMessage(messages.title)}>
+    <InfoMainPage
+      customTitleRow={
+        <Spacings.Inline justifyContent="space-between">
+          <Text.Headline as="h1" intlMessage={messages.title} />
+          <SecondaryButton
+            as={Link}
+            to={`${match.url}/new`}
+            iconLeft={<PlusBoldIcon />}
+            label={intl.formatMessage(messages.addCart)}
+          />
+        </Spacings.Inline>
+      }
+    >
       <Spacings.Stack scale="m">
         <CartsSearchbar
           text={searchText}
@@ -212,6 +227,18 @@ const CartsList = () => {
         )}
       </Spacings.Stack>
       <Switch>
+        <SuspendedRoute path={`${match.path}/new`}>
+          <CartCreate
+            onClose={() => {
+              refetch();
+              push(`${match.url}`);
+            }}
+            onCreate={(id: string) => {
+              refetch();
+              push(`${match.url}/${id}`);
+            }}
+          />
+        </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <CartDetails
             onClose={() => {

@@ -1,0 +1,25 @@
+query FetchSearchPoweredCustomersQuery(
+  $where: String
+  $limit: Int
+  $offset: Int
+  $sort: [String!]
+) {
+  customers(where: $where, limit: $limit, offset: $offset, sort: $sort)
+     {
+    total
+    count
+    offset
+    results {
+      ...CustomerListFragment
+    }
+  }
+}
+
+fragment CustomerListFragment on Customer {
+  id
+  version
+  firstName
+  lastName
+  companyName
+  email
+}

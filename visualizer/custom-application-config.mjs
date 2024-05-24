@@ -17,7 +17,7 @@ const config = {
     },
   },
   oAuthScopes: {
-    view: ['view_states', 'view_types', 'view_orders'],
+    view: ['view_states', 'view_types', 'view_orders', 'view_customers'],
     manage: ['manage_states', 'manage_subscriptions', 'manage_types', 'manage_extensions', 'manage_orders'],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',

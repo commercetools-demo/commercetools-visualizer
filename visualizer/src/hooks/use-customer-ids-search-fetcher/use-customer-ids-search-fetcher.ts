@@ -5,9 +5,10 @@ import type {
   TSdkActionPayloadBody,
   TSdkActionPayloadForUri,
 } from '@commercetools-frontend/sdk';
+import { SearchParams } from '../use-customer-search-fetcher/use-customer-search-fetcher';
 
 const useCustomerIdsSearchFetcher = (
-  searchQuery: string,
+  searchParams: SearchParams,
   projectKey: string
 ) => {
   const dispatch = useDispatch<
@@ -30,12 +31,14 @@ const useCustomerIdsSearchFetcher = (
           payload: {
             query: {
               field: 'all',
-              value: searchQuery,
+              value: searchParams.searchQuery,
+              limit: searchParams.perPage,
+              offset: (searchParams.page - 1) * searchParams.perPage,
             },
           },
         })
       ),
-    [dispatch, projectKey, searchQuery]
+    [dispatch, projectKey, searchParams]
   );
 };
 

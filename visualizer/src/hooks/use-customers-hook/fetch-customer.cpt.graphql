@@ -1,0 +1,63 @@
+fragment FullAddress on Address {
+    id
+    key
+    streetName
+    streetNumber
+    apartment
+    building
+    pOBox
+    city
+    postalCode
+    region
+    state
+    country
+    additionalStreetInfo
+    additionalAddressInfo
+    firstName
+    lastName
+    salutation
+    title
+    company
+    department
+    email
+    phone
+    mobile
+    fax
+    externalId
+}
+
+
+fragment CustomerDetailsAddressesFragment on Customer {
+    id
+    firstName
+    lastName
+    email
+    version
+    stores {
+        id
+        key
+    }
+    defaultBillingAddress {
+        ...FullAddress
+    }
+    defaultBillingAddressId
+    defaultShippingAddress {
+        ...FullAddress
+    }
+    defaultShippingAddressId
+    addresses {
+        ...FullAddress
+    }
+    billingAddresses {
+        ...FullAddress
+    }
+    shippingAddresses {
+        ...FullAddress
+    }
+}
+
+query CustomerDetailsAddressesQuery($id: String!) {
+    customer(id: $id) {
+        ...CustomerDetailsAddressesFragment
+    }
+}

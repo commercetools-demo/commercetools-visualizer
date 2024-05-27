@@ -3,4 +3,5 @@ export {
   useCartFetcher,
   useCartDeleter,
   useCartCreator,
+  useCartUpdater,
 } from './carts-connector';

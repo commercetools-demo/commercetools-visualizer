@@ -1,0 +1,10 @@
+fragment TaxRateFragmentOnOrder on TaxRate {
+    name
+    amount
+    includedInPrice
+    id
+    subRates {
+        name
+        amount
+    }
+}

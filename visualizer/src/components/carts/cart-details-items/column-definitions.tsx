@@ -2,10 +2,7 @@ import memoize from 'memoize-one';
 import messages from './messages';
 import { FormattedMessage } from 'react-intl';
 import { TColumn } from '@commercetools-uikit/data-table';
-
-export const INVENTORY_MODES = {
-  NONE: 'None',
-};
+import { INVENTORY_MODES } from '../../../constants';
 
 const createSelectedColumnsDefinition = memoize(
   ({

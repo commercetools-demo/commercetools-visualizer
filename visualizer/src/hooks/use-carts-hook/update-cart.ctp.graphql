@@ -1,0 +1,7 @@
+#import './fragments/cart-fragment.ctp.graphql'
+
+mutation UpdateCart($id: String, $key: String, $version: Long!, $actions: [CartUpdateAction!]!, $locale: Locale!) {
+    updateCart(id: $id, key: $key, version: $version, actions: $actions) {
+        ...CartFragment
+    }
+}

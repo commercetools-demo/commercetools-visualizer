@@ -8,6 +8,8 @@ import SubscriptionCreate from './components/subscriptions/subscription-create/s
 import TypesList from './components/types/types-list/types-list';
 import ExtensionsList from './components/extensions/extensions-list/extensions-list';
 import CartsList from './components/carts/carts-list';
+import CartCreate from './components/carts/cart-create/cart-create';
+import CartEdit from './components/carts/cart-edit/cart-edit';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -34,7 +36,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       <Route path={`${match.path}/subscription/new/:step`}>
         <SubscriptionCreate linkToWelcome={match.url} />
       </Route>
-      <Route path={`${match.path}/subscription/new`}>
+      <Route path={`${match.path}/subscription/new`} exact={true}>
         <SubscriptionCreate linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/subscription/:id`}>
@@ -48,6 +50,14 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/types`}>
         <TypesList />
+      </Route>
+      <Route
+        path={[`${match.path}/carts/new/:id/:step`, `${match.path}/carts/new`]}
+      >
+        <CartCreate linkToWelcome={match.url} />
+      </Route>
+      <Route path={`${match.path}/carts/edit/:id`}>
+        <CartEdit />
       </Route>
       <Route path={`${match.path}/carts`}>
         <CartsList />

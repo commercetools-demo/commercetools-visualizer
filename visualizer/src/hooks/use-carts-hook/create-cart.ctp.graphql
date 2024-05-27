@@ -1,5 +1,7 @@
-mutation CreateCart($draft: CartDraft!, $storeKey: KeyReferenceInput) {
+#import './fragments/cart-fragment.ctp.graphql'
+
+mutation CreateCart($draft: CartDraft!, $storeKey: KeyReferenceInput, $locale: Locale!) {
     createCart(draft: $draft, storeKey: $storeKey) {
-        id
+        ...CartFragment
     }
 }

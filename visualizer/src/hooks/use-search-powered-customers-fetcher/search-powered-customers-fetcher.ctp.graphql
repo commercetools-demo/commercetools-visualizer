@@ -13,13 +13,28 @@ query FetchSearchPoweredCustomersQuery(
       ...CustomerListFragment
     }
   }
+  allCustomers: customers {
+    total
+  }
 }
 
 fragment CustomerListFragment on Customer {
   id
   version
+  createdAt
+  lastModifiedAt
+  customerNumber
+  externalId
   firstName
   lastName
   companyName
   email
+  customerGroup {
+    id
+    version
+    name
+  }
+  middleName
+  vatId
+  dateOfBirth
 }

@@ -1,0 +1,586 @@
+#import './address-fragment.ctp.graphql'
+#import './money-fragment.ctp.graphql'
+#import './tax-rate-on-order-fragment.ctp.graphql'
+#import './discounted-price-per-quantity-fragment.ctp.graphql'
+
+fragment CartFragment on Cart {
+    id
+    key
+    version
+    customerId
+    customerEmail
+    version
+    createdAt
+    customerEmail
+    customerId
+    lastModifiedAt
+    shippingMode
+    cartState
+    store {
+        id
+        key
+        createdAt
+        lastModifiedAt
+        nameAllLocales {
+            locale
+            value
+        }
+    }
+    discountCodes {
+        discountCode {
+            id
+            code
+            cartDiscounts {
+                id
+            }
+            name(locale: $locale)
+        }
+        state
+    }
+    taxedPrice {
+        taxPortions {
+            rate
+            name
+            amount {
+                ...MoneyFragment
+            }
+        }
+        totalNet {
+            ...MoneyFragment
+        }
+        totalGross {
+            ...MoneyFragment
+        }
+    }
+    taxedShippingPrice {
+        taxPortions {
+            rate
+            name
+            amount {
+                ...MoneyFragment
+            }
+        }
+        totalNet {
+            ...MoneyFragment
+        }
+        totalGross {
+            ...MoneyFragment
+        }
+    }
+    shippingInfo {
+        shippingMethodName
+        shippingMethod {
+            id
+        }
+        taxRate {
+            ...TaxRateFragmentOnOrder
+        }
+        discountedPrice {
+            value {
+                type
+                fractionDigits
+                currencyCode
+                ... on HighPrecisionMoney {
+                    preciseAmount
+                }
+                ... on Money {
+                    centAmount
+                }
+            }
+            includedDiscounts {
+                discountRef {
+                    id
+                    typeId
+                }
+                discount {
+                    id
+                    nameAllLocales {
+                        locale
+                        value
+                    }
+                    target {
+                        type
+                    }
+                    value {
+                        type
+                        ... on AbsoluteDiscountValue {
+                            money {
+                                fractionDigits
+                                centAmount
+                                currencyCode
+                            }
+                        }
+                        ... on RelativeDiscountValue {
+                            permyriad
+                        }
+                    }
+                }
+                discountedAmount {
+                    type
+                    fractionDigits
+                    currencyCode
+                    ... on HighPrecisionMoney {
+                        preciseAmount
+                    }
+                    ... on Money {
+                        centAmount
+                    }
+                }
+            }
+        }
+        taxedPrice {
+            totalNet {
+                ...MoneyFragment
+            }
+            totalGross {
+                ...MoneyFragment
+            }
+        }
+        price {
+            ...MoneyFragment
+        }
+        deliveries {
+            id
+            createdAt
+            address {
+                ...Address
+            }
+            items {
+                lineItemId: id
+                quantity
+            }
+            parcels {
+                id
+                createdAt
+                measurements {
+                    widthInMillimeter
+                    heightInMillimeter
+                    lengthInMillimeter
+                    weightInGram
+                }
+                trackingData {
+                    trackingId
+                    carrier
+                    provider
+                    providerTransaction
+                    isReturn
+                }
+                custom {
+                    type {
+                        ...CustomFieldsTypeFragment
+                    }
+                    customFieldsRaw {
+                        name
+                        value
+                    }
+                }
+            }
+            custom {
+                type {
+                    ...CustomFieldsTypeFragment
+                }
+                customFieldsRaw {
+                    name
+                    value
+                }
+            }
+        }
+    }
+    totalPrice {
+        ...MoneyFragment
+    }
+    shipping {
+        shippingKey
+        shippingAddress {
+            ...Address
+        }
+        shippingInfo {
+            shippingMethodName
+            taxRate {
+                ...TaxRateFragmentOnOrder
+            }
+            discountedPrice {
+                value {
+                    type
+                    fractionDigits
+                    currencyCode
+                    ... on HighPrecisionMoney {
+                        preciseAmount
+                    }
+                    ... on Money {
+                        centAmount
+                    }
+                }
+                includedDiscounts {
+                    discountRef {
+                        id
+                        typeId
+                    }
+                    discount {
+                        id
+                        nameAllLocales {
+                            locale
+                            value
+                        }
+                        target {
+                            type
+                        }
+                        value {
+                            type
+                            ... on AbsoluteDiscountValue {
+                                money {
+                                    fractionDigits
+                                    centAmount
+                                    currencyCode
+                                }
+                            }
+                            ... on RelativeDiscountValue {
+                                permyriad
+                            }
+                        }
+                    }
+                    discountedAmount {
+                        type
+                        fractionDigits
+                        currencyCode
+                        ... on HighPrecisionMoney {
+                            preciseAmount
+                        }
+                        ... on Money {
+                            centAmount
+                        }
+                    }
+                }
+            }
+            taxedPrice {
+                totalNet {
+                    ...MoneyFragment
+                }
+                totalGross {
+                    ...MoneyFragment
+                }
+            }
+            price {
+                ...MoneyFragment
+            }
+            deliveries {
+                id
+                createdAt
+                address {
+                    ...Address
+                }
+                items {
+                    lineItemId: id
+                    quantity
+                }
+                parcels {
+                    id
+                    createdAt
+                    measurements {
+                        widthInMillimeter
+                        heightInMillimeter
+                        lengthInMillimeter
+                        weightInGram
+                    }
+                    trackingData {
+                        trackingId
+                        carrier
+                        provider
+                        providerTransaction
+                        isReturn
+                    }
+                }
+            }
+        }
+    }
+    billingAddress {
+        ...Address
+    }
+    shippingAddress {
+        ...Address
+    }
+    totalPrice {
+        currencyCode
+        fractionDigits
+    }
+    discountOnTotalPrice {
+        discountedAmount {
+            type
+            fractionDigits
+            currencyCode
+            ... on HighPrecisionMoney {
+                preciseAmount
+            }
+            ... on Money {
+                centAmount
+            }
+        }
+        discountedNetAmount {
+            type
+            fractionDigits
+            currencyCode
+            ... on HighPrecisionMoney {
+                preciseAmount
+            }
+            ... on Money {
+                centAmount
+            }
+        }
+        discountedGrossAmount {
+            type
+            fractionDigits
+            currencyCode
+            ... on HighPrecisionMoney {
+                preciseAmount
+            }
+            ... on Money {
+                centAmount
+            }
+        }
+        includedDiscounts {
+            discountRef {
+                id
+                typeId
+            }
+            discount {
+                id
+                nameAllLocales {
+                    locale
+                    value
+                }
+                target {
+                    type
+                }
+                value {
+                    type
+                    ... on AbsoluteDiscountValue {
+                        money {
+                            fractionDigits
+                            centAmount
+                            currencyCode
+                        }
+                    }
+                    ... on RelativeDiscountValue {
+                        permyriad
+                    }
+                }
+            }
+            discountedAmount {
+                type
+                fractionDigits
+                currencyCode
+                ... on HighPrecisionMoney {
+                    preciseAmount
+                }
+                ... on Money {
+                    centAmount
+                }
+            }
+        }
+    }
+    customLineItems {
+        id
+        quantity
+        slug
+        taxedPricePortions {
+            shippingMethodKey
+            taxedPrice {
+                totalNet {
+                    ...MoneyFragment
+                }
+                totalGross {
+                    ...MoneyFragment
+                }
+                totalTax {
+                    ...MoneyFragment
+                }
+            }
+        }
+        perMethodTaxRate {
+            shippingMethodKey
+            taxRate {
+                ...TaxRateFragmentOnOrder
+            }
+        }
+        shippingDetails {
+            targets {
+                addressKey
+                quantity
+                shippingMethodKey
+            }
+        }
+        nameAllLocales {
+            locale
+            value
+        }
+        custom {
+            type {
+                ...CustomFieldsTypeFragment
+            }
+            customFieldsRaw {
+                name
+                value
+            }
+        }
+        discountedPricePerQuantity {
+            ...DiscountedPricePerQuantityFragment
+        }
+        totalPrice {
+            ...MoneyFragment
+        }
+        taxedPrice {
+            totalNet {
+                ...MoneyFragment
+            }
+            totalGross {
+                ...MoneyFragment
+            }
+        }
+        taxRate {
+            ...TaxRateFragmentOnOrder
+        }
+        money {
+            type
+            fractionDigits
+            currencyCode
+            ... on HighPrecisionMoney {
+                preciseAmount
+            }
+            ... on Money {
+                centAmount
+            }
+        }
+    }
+    inventoryMode
+    itemShippingAddresses {
+        ...Address
+    }
+    shippingKey
+    shippingMode
+    lineItems {
+        lineItemMode
+        taxedPricePortions {
+            shippingMethodKey
+            taxedPrice {
+                totalNet {
+                    ...MoneyFragment
+                }
+                totalGross {
+                    ...MoneyFragment
+                }
+                totalTax {
+                    ...MoneyFragment
+                }
+            }
+        }
+        perMethodTaxRate {
+            shippingMethodKey
+            taxRate {
+                ...TaxRateFragmentOnOrder
+            }
+        }
+        shippingDetails {
+            targets {
+                addressKey
+                quantity
+                shippingMethodKey
+            }
+        }
+        id
+        productId
+        productSlug(locale: $locale)
+        quantity
+        nameAllLocales {
+            locale
+            value
+        }
+        custom {
+            type {
+                ...CustomFieldsTypeFragment
+            }
+            customFieldsRaw {
+                name
+                value
+            }
+        }
+        discountedPricePerQuantity {
+            ...DiscountedPricePerQuantityFragment
+        }
+        totalPrice {
+            ...MoneyFragment
+        }
+        variant {
+            sku
+            key
+            images {
+                label
+                url
+                dimensions {
+                    width
+                    height
+                }
+            }
+        }
+        taxRate {
+            ...TaxRateFragmentOnOrder
+        }
+        taxedPrice {
+            totalNet {
+                ...MoneyFragment
+            }
+            totalGross {
+                ...MoneyFragment
+            }
+        }
+        price {
+            value {
+                type
+                fractionDigits
+                currencyCode
+                ... on HighPrecisionMoney {
+                    preciseAmount
+                }
+                ... on Money {
+                    centAmount
+                }
+            }
+            discounted {
+                value {
+                    type
+                    fractionDigits
+                    currencyCode
+                    ... on HighPrecisionMoney {
+                        preciseAmount
+                    }
+                    ... on Money {
+                        centAmount
+                    }
+                }
+                discount {
+                    id
+                    nameAllLocales {
+                        locale
+                        value
+                    }
+                    value {
+                        type
+                        ... on AbsoluteDiscountValue {
+                            money {
+                                fractionDigits
+                                centAmount
+                                currencyCode
+                            }
+                        }
+                        ... on RelativeDiscountValue {
+                            permyriad
+                        }
+                    }
+                }
+            }
+        }
+        supplyChannel {
+            id
+            key
+        }
+    }
+}

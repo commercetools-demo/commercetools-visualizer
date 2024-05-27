@@ -1,46 +1,64 @@
+import { useCallback, useState } from 'react';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import useCustomerIdsSearchFetcher from '../use-customer-ids-search-fetcher';
 import useSearchPoweredCustomersFetcher from '../use-search-powered-customers-fetcher';
-import { TCustomer } from '../../types/generated/ctp';
+
+export type SearchParams = {
+  searchQuery: string;
+  perPage: number;
+  page: number;
+};
 
 const useCustomerSearchFetcher = (
-  searchQuery: string,
-  handleError: (error: any) => void
+  searchParams: SearchParams,
+  handleError: Function
 ) => {
+  const [idSearchTotal, setIdSearchTotal] = useState(0);
   const { projectKey } = useApplicationContext((context) => ({
     projectKey: context.project?.key ?? '',
   }));
+  const searchPoweredCustomerFetcher = useSearchPoweredCustomersFetcher();
+
+  const customerData = searchPoweredCustomerFetcher;
+
   const customerIdsSearchFetcher = useCustomerIdsSearchFetcher(
-    searchQuery,
+    searchParams,
     projectKey
   );
-  const { refetch } = useSearchPoweredCustomersFetcher({
-    limit: 20,
-    offset: 0,
-    sort: [],
-    where: '',
-  });
 
-  const fetch = (): Promise<Array<TCustomer>> => {
-    return customerIdsSearchFetcher()
-      .then((result) => {
-        return refetch({
-          limit: 100,
-          offset: 0,
-          where: `id in (${result.hits
-            .map((hit) => hit.id)
-            .map((requestedId) => `"${requestedId}"`)})`,
-          sort: ['email asc'],
-        }).then((response) => {
-          return response.data.customers.results;
+  const fetchCustomers = useCallback(() => {
+    const customerIdsSearch = customerIdsSearchFetcher();
+    customerIdsSearch
+      .then((res) => {
+        setIdSearchTotal(res.total);
+        const customerIds = res.hits.map((hit) => hit.id);
+        searchPoweredCustomerFetcher.handleSearch({
+          limit: customerIds.length > 0 ? searchParams.perPage : 0,
+          offset: (searchParams.page - 1) * searchParams.perPage,
+          where:
+            'id in (' +
+            customerIds.map((requestedId) => `\"${requestedId}\"`) +
+            ')',
         });
       })
       .catch((err) => {
         if (handleError) {
           handleError(err);
         }
-        return [];
       });
+  }, [
+    customerIdsSearchFetcher,
+    searchPoweredCustomerFetcher,
+    searchParams,
+    handleError,
+  ]);
+
+  return {
+    customerData: {
+      ...customerData,
+      customers: { ...customerData.customers, total: idSearchTotal },
+    },
+    fetchCustomers,
   };
 
   return { fetch };

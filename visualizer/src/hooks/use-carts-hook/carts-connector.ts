@@ -2,9 +2,11 @@ import {
   Maybe,
   TCart,
   TCartDraft,
+  TCartUpdateAction,
   TMutation,
   TMutation_CreateCartArgs,
   TMutation_DeleteCartArgs,
+  TMutation_UpdateCartArgs,
   TQuery,
   TQuery_CartArgs,
   TQuery_CartsArgs,
@@ -20,6 +22,7 @@ import FetchQuery from './fetch-cart.ctp.graphql';
 import { extractErrorFromGraphQlResponse } from '../../helpers';
 import DeleteQuery from './delete-cart.ctp.graphql';
 import CreateQuery from './create-cart.ctp.graphql';
+import UpdateQuery from './update-cart.ctp.graphql';
 
 type TUseCartsFetcher = (variables: TQuery_CartsArgs) => {
   carts?: TQuery['carts'];
@@ -108,10 +111,16 @@ export const useCartDeleter = () => {
 export const useCartCreator = () => {
   const [createCart, { loading }] = useMcMutation<
     TMutation,
-    TMutation_CreateCartArgs
+    TMutation_CreateCartArgs & { locale: string }
   >(CreateQuery);
 
-  const execute = async ({ draft }: { draft: TCartDraft }) => {
+  const execute = async ({
+    draft,
+    locale,
+  }: {
+    draft: TCartDraft;
+    locale: string;
+  }) => {
     try {
       return await createCart({
         context: {
@@ -119,9 +128,54 @@ export const useCartCreator = () => {
         },
         variables: {
           draft: draft,
+          locale: locale,
         },
       });
     } catch (graphQlResponse) {
+      throw extractErrorFromGraphQlResponse(graphQlResponse);
+    }
+  };
+
+  return {
+    loading,
+    execute,
+  };
+};
+
+export const useCartUpdater = () => {
+  const [updateCartId, { loading }] = useMcMutation<
+    TMutation,
+    TMutation_UpdateCartArgs & { locale: string }
+  >(UpdateQuery);
+
+  const execute = async ({
+    updateActions,
+    id,
+    version,
+    locale,
+  }: {
+    updateActions: Array<TCartUpdateAction>;
+    id: string;
+    version: number;
+    locale: string;
+  }) => {
+    try {
+      if (updateActions.length > 0) {
+        return await updateCartId({
+          context: {
+            target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
+          },
+          variables: {
+            id: id,
+            version: version || 1,
+            actions: updateActions,
+            locale: locale,
+          },
+        });
+      }
+      return Promise.resolve(undefined);
+    } catch (graphQlResponse) {
+      console.log(graphQlResponse);
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };

@@ -4,7 +4,7 @@ import {
   PageContentWide,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import messages from './messages';
 import { useCartDeleter, useCartFetcher } from '../../../hooks/use-carts-hook';
@@ -25,10 +25,12 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 
 type Props = {
   onClose: () => void;
+  linkToHome: string;
 };
 
-const CartDetails: FC<Props> = ({ onClose }) => {
+const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
   const { id } = useParams<{ id: string }>();
+  const { push } = useHistory();
   const showNotification = useShowNotification();
   const intl = useIntl();
   const { dataLocale } = useApplicationContext((context) => ({
@@ -81,6 +83,10 @@ const CartDetails: FC<Props> = ({ onClose }) => {
       onClose={onClose}
       formControls={
         <>
+          <CustomFormModalPage.FormPrimaryButton
+            label={intl.formatMessage(messages.edit)}
+            onClick={() => push(`${linkToHome}/edit/${id}`)}
+          />
           <CustomFormModalPage.FormDeleteButton
             onClick={() => handleDelete()}
           />

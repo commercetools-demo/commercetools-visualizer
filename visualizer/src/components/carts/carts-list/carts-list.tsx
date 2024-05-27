@@ -35,7 +35,6 @@ import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CartDetails from '../cart-details/cart-details';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import CartCreate from '../cart-create/cart-create';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -227,24 +226,25 @@ const CartsList = () => {
         )}
       </Spacings.Stack>
       <Switch>
-        <SuspendedRoute path={`${match.path}/new`}>
-          <CartCreate
-            onClose={() => {
-              refetch();
-              push(`${match.url}`);
-            }}
-            onCreate={(id: string) => {
-              refetch();
-              push(`${match.url}/${id}`);
-            }}
-          />
-        </SuspendedRoute>
+        {/*<SuspendedRoute path={`${match.path}/new`}>*/}
+        {/*  <CartCreate*/}
+        {/*    onClose={() => {*/}
+        {/*      refetch();*/}
+        {/*      push(`${match.url}`);*/}
+        {/*    }}*/}
+        {/*    onCreate={(id: string) => {*/}
+        {/*      refetch();*/}
+        {/*      push(`${match.url}/${id}`);*/}
+        {/*    }}*/}
+        {/*  />*/}
+        {/*</SuspendedRoute>*/}
         <SuspendedRoute path={`${match.path}/:id`}>
           <CartDetails
             onClose={() => {
               refetch();
               push(`${match.url}`);
             }}
+            linkToHome={match.url}
           />
         </SuspendedRoute>
       </Switch>

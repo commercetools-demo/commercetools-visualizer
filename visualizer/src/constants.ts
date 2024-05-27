@@ -23,3 +23,12 @@ export const DISCOUNT_VALUE_TYPES = {
   RELATIVE: 'relative',
   DIRECT: 'direct-discount',
 };
+
+export enum SHORT_ADDRESS_TYPE {
+  BILLING = 'billing',
+  SHIPPING = 'shipping',
+}
+
+export const INVENTORY_MODES = {
+  NONE: 'None',
+};

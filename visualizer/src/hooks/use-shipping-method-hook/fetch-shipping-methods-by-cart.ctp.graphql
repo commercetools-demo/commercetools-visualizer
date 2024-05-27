@@ -1,0 +1,30 @@
+query FetchShippingMethodsByCartQuery($id: String!, $locale: Locale!) {
+  shippingMethodsByCart(id: $id) {
+    ...ShippingMethod
+  }
+}
+
+fragment ShippingMethod on ShippingMethod {
+  id
+  name
+  localizedDescription(locale: $locale)
+  isDefault
+  taxCategory {
+    name
+  }
+  zoneRates {
+    shippingRates {
+      isMatching
+      freeAbove {
+        currencyCode
+        centAmount
+        fractionDigits
+      }
+      price {
+        centAmount
+        currencyCode
+        fractionDigits
+      }
+    }
+  }
+}

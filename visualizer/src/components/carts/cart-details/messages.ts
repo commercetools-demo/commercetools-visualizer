@@ -5,6 +5,10 @@ export default defineMessages<string>({
     id: 'Cart.title',
     defaultMessage: 'Cart {id}',
   },
+  edit: {
+    id: 'Cart.edit',
+    defaultMessage: 'Edit',
+  },
   panelCustomerTitle: {
     id: 'Orders.Details.General.Addresses.panelTitle',
     description: 'Header text for the panel label (customer addresses).',

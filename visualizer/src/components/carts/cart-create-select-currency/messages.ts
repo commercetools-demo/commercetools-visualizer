@@ -6,6 +6,11 @@ export default defineMessages({
     description: 'Title for currency field',
     defaultMessage: 'Currency',
   },
+  countryTitle: {
+    id: 'cart.form.country.title',
+    description: 'Title for country field',
+    defaultMessage: 'Country',
+  },
   createSuccess: {
     id: 'CreateCart.form.message.success',
     description: 'Success message for create cart',

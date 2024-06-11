@@ -84,13 +84,7 @@ const CartCreate: FC<Props> = ({ linkToWelcome }) => {
       subtitle={<Steps steps={stepsDefinition} activeStepKey={step} />}
     >
       <Switch>
-        <Route
-          exact
-          path={[
-            linkToWelcome + '/carts/new',
-            `${linkToWelcome}/carts/new/${id}/${CART_CREATE_TAB_NAMES.CURRENCY}`,
-          ]}
-        >
+        <Route exact path={linkToWelcome + '/carts/new'}>
           <CartCreateSelectCurrency
             currentStep={current + 1}
             goToNextStep={(newId) => {
@@ -103,6 +97,36 @@ const CartCreate: FC<Props> = ({ linkToWelcome }) => {
             totalSteps={stepsDefinition.length}
             linkToWelcome={linkToWelcome}
           />
+        </Route>
+        <Route
+          exact
+          path={`${linkToWelcome}/carts/new/${id}/${CART_CREATE_TAB_NAMES.CURRENCY}`}
+        >
+          <CartConnector cartId={id}>
+            {({ cartFetcher }) =>
+              cartFetcher.isLoading ? (
+                <LoadingSpinner />
+              ) : (
+                <Fragment>
+                  {cartFetcher.cart && (
+                    <CartCreateSelectCurrency
+                      currentStep={current + 1}
+                      goToNextStep={() => {
+                        history.replace({
+                          pathname: `${linkToWelcome}/carts/new/${id}/${
+                            stepsDefinition[current + 1].key
+                          }`,
+                        });
+                      }}
+                      cart={cartFetcher.cart}
+                      totalSteps={stepsDefinition.length}
+                      linkToWelcome={linkToWelcome}
+                    />
+                  )}
+                </Fragment>
+              )
+            }
+          </CartConnector>
         </Route>
         <Route
           exact

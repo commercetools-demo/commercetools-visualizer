@@ -15,35 +15,48 @@ import {
   TApiErrorNotificationOptions,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
-import { TCartDraft } from '../../../types/generated/ctp';
+import { TCart, TCartDraft } from '../../../types/generated/ctp';
+import Spacings from '@commercetools-uikit/spacings';
 
-type Props = StepProps;
+type Props = StepProps & {
+  cart?: TCart;
+};
 
-export type Step1 = { currency: string | undefined };
+export type Step1 = {
+  currency: string | undefined;
+  country: string | undefined;
+};
 
 export const CartCreateSelectCurrency: FC<Props> = ({
   currentStep,
   totalSteps,
   linkToWelcome,
   goToNextStep,
+  cart,
 }) => {
   const intl = useIntl();
   const history = useHistory();
-  const { currencies, dataLocale } = useApplicationContext((context) => ({
-    currencies: context.project?.currencies ?? [],
-    dataLocale: context.dataLocale ?? '',
-  }));
+  const { currencies, dataLocale, countries } = useApplicationContext(
+    (context) => ({
+      currencies: context.project?.currencies ?? [],
+      countries: context.project?.countries ?? [],
+      dataLocale: context.dataLocale ?? '',
+    })
+  );
   const showNotification = useShowNotification();
   const cartCreator = useCartCreator();
-
   return (
     <Formik<Step1>
       enableReinitialize={true}
-      initialValues={{ currency: undefined }}
+      initialValues={{
+        currency: cart?.totalPrice.currencyCode || undefined,
+        country: cart?.country || undefined,
+      }}
       onSubmit={async (formikValues, formikHelpers) => {
         try {
           const draft: TCartDraft = {
             currency: formikValues.currency || 'EUR',
+            country: formikValues.country || undefined,
           };
 
           const { data } = await cartCreator.execute({
@@ -62,7 +75,6 @@ export const CartCreateSelectCurrency: FC<Props> = ({
               domain: DOMAINS.SIDE,
               text: intl.formatMessage(messages.createSuccess),
             });
-            // formik?.setFieldValue('cartId', data.createCart.id);
             goToNextStep(data.createCart.id);
           }
         } catch (graphQLErrors) {
@@ -79,7 +91,7 @@ export const CartCreateSelectCurrency: FC<Props> = ({
       }}
     >
       {(formikProps) => (
-        <>
+        <Spacings.Stack scale="xl">
           <SelectField
             name="currency"
             title={intl.formatMessage(messages.currencyTitle)}
@@ -94,6 +106,26 @@ export const CartCreateSelectCurrency: FC<Props> = ({
             touched={
               formikProps.touched.currency
                 ? formikProps.touched.currency
+                : undefined
+            }
+            onBlur={formikProps.handleBlur}
+            onChange={formikProps.handleChange}
+            isDisabled={cart !== undefined}
+          />
+          <SelectField
+            name="country"
+            title={intl.formatMessage(messages.countryTitle)}
+            isRequired
+            value={formikProps.values.country}
+            options={countries.map((country) => {
+              return { value: country, label: country };
+            })}
+            errors={
+              SelectField.toFieldErrors<Step1>(formikProps.errors).country
+            }
+            touched={
+              formikProps.touched.country
+                ? formikProps.touched.country
                 : undefined
             }
             onBlur={formikProps.handleBlur}
@@ -113,7 +145,7 @@ export const CartCreateSelectCurrency: FC<Props> = ({
               });
             }}
           />
-        </>
+        </Spacings.Stack>
       )}
     </Formik>
   );

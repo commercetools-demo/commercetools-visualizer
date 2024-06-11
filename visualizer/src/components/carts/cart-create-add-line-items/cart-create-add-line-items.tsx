@@ -100,24 +100,33 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
     ]);
   };
   const handleAddVariantToCart = async (variant: ProductValue) => {
-    const updateActions: Array<TCartUpdateAction> = [];
-    updateActions.push({ addLineItem: { sku: variant.sku, quantity: 1 } });
-    const result = await cartUpdater.execute({
-      updateActions: updateActions,
-      id: cart.id,
-      version: cart.version,
-      locale: dataLocale,
-    });
-    if (!result) {
-      return;
-    }
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: intl.formatMessage(messages.addVariantSuccess, {
-        sku: variant.sku,
-      }),
-    });
+    await cartUpdater
+      .execute({
+        updateActions: [{ addLineItem: { sku: variant.sku, quantity: 1 } }],
+        id: cart.id,
+        version: cart.version,
+        locale: dataLocale,
+      })
+      .then((result) => {
+        if (!result) {
+          return;
+        }
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.addVariantSuccess, {
+            sku: variant.sku,
+          }),
+        });
+      })
+      .catch((e) => {
+        const transformedErrors = transformErrors(e);
+        if (transformedErrors.unmappedErrors.length > 0) {
+          showApiErrorNotification({
+            errors: transformedErrors.unmappedErrors,
+          });
+        }
+      });
   };
 
   const handleRemoveLineItem = async (

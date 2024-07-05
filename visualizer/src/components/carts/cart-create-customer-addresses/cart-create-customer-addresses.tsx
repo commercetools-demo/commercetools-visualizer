@@ -106,7 +106,7 @@ const CartCreateCustomerAddresses: FC<Props> = ({
           domain: DOMAINS.SIDE,
           text: intl.formatMessage(messages.updateSuccess),
         });
-        goToNextStep();
+        goToNextStep && goToNextStep();
       }}
     >
       {(formikProps) => {
@@ -175,6 +175,9 @@ const CartCreateCustomerAddresses: FC<Props> = ({
               currentStep={currentStep}
               totalSteps={totalSteps}
               onNext={() => {
+                formikProps.handleSubmit();
+              }}
+              onSave={() => {
                 formikProps.handleSubmit();
               }}
               onBack={goToPreviousStep}

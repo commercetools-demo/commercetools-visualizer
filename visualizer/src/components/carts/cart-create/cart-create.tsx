@@ -16,7 +16,7 @@ import memoize from 'memoize-one';
 
 export type StepProps = {
   currentStep: number;
-  goToNextStep: (id?: string) => void;
+  goToNextStep?: (id?: string) => void;
   goToPreviousStep?: () => void;
   totalSteps: number;
   linkToWelcome: string;

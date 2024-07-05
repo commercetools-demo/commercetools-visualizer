@@ -16,6 +16,11 @@ export default defineMessages({
     description: 'Success message for create cart',
     defaultMessage: 'Your cart has been created.',
   },
+  updateSuccess: {
+    id: 'UpdateCart.form.message.success',
+    description: 'Success message for update cart',
+    defaultMessage: 'Your cart has been updated.',
+  },
   createError: {
     id: 'CreateCart.message.create.error',
     description: 'Error message for creating cart',

@@ -57,7 +57,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
         <CartCreate linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/carts/edit/:id`}>
-        <CartEdit />
+        <CartEdit linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/carts`}>
         <CartsList />

@@ -254,18 +254,16 @@ const CartCreate: FC<Props> = ({ linkToWelcome }) => {
                       currentStep={current + 1}
                       goToNextStep={() => {
                         history.replace({
-                          pathname:
-                            linkToWelcome +
-                            '/carts/new/' +
-                            stepsDefinition[current + 1].key,
+                          pathname: `${linkToWelcome}/carts/new/${id}/${
+                            stepsDefinition[current + 1].key
+                          }`,
                         });
                       }}
                       goToPreviousStep={() => {
                         history.replace({
-                          pathname:
-                            linkToWelcome +
-                            '/carts/new/' +
-                            stepsDefinition[current - 1].key,
+                          pathname: `${linkToWelcome}/carts/new/${id}/${
+                            stepsDefinition[current - 1].key
+                          }`,
                         });
                       }}
                       totalSteps={stepsDefinition.length}

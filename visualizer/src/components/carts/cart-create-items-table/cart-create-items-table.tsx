@@ -5,19 +5,6 @@ import {
   ProjectExtensionProviderForImageRegex,
   useApplicationContext,
 } from '@commercetools-frontend/application-shell-connectors';
-// import { getSymbolFromCurrency } from '@commercetools-frontend/l10n';
-
-// import { selectAllLineItems } from '../../utils/cart-selectors';
-// import OrderCreateConnector from '../order-create-connector';
-// import OrderItemTableInventoryCell from '../order-item-table-inventory-cell';
-// import OrderItemTableProductCell from '../order-item-table-product-cell';
-// import OrderItemTableSubtotalPriceCell from '../order-item-table-subtotal-price-cell';
-// import OrderItemTableTaxRateCell from '../order-item-table-tax-rate-cell';
-// import OrderItemTableTotalPriceCell from '../order-item-table-total-price-cell';
-// import OrderItemTableUnitGrossPriceCell from '../order-item-table-unit-gross-price-cell';
-// import OrderItemTableUnitNetPriceCell from '../order-item-table-unit-net-price-cell';
-// import OrderItemTableUnitPriceCell from '../order-item-table-unit-price-cell';
-// import QuantitySelector from '../quantity-selector';
 import messages from './messages';
 import {
   TCart,

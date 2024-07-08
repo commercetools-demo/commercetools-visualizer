@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import {
+  useShoppingListDeleter,
   useShoppingListFetcher,
   useShoppingListUpdater,
 } from '../../../hooks/use-shopping-lists-hook';
@@ -52,6 +53,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const shoppingListUpdater = useShoppingListUpdater();
+  const shoppingListDeleter = useShoppingListDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -84,6 +86,19 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
   if (!shoppingList) {
     return <PageNotFound />;
   }
+
+  const handleDelete = async () => {
+    await shoppingListDeleter.execute({
+      id: shoppingList.id,
+      version: shoppingList.version,
+    });
+    showNotification({
+      kind: 'success',
+      domain: DOMAINS.SIDE,
+      text: 'The Shopping list has been deleted.',
+    });
+    onClose();
+  };
 
   const handleRemoveLineItem = async (id: string) => {
     const action: TShoppingListUpdateAction = {
@@ -220,21 +235,13 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
       isOpen
       title={'Edit Shopping List'}
       onClose={onClose}
-      // formControls={
-      //   <>
-      //     <CustomFormModalPage.FormSecondaryButton
-      //       label={'Revert'}
-      //       iconLeft={<RevertIcon />}
-      //       onClick={onClose}
-      //       isDisabled={!canManage}
-      //     />
-      //     <CustomFormModalPage.FormPrimaryButton
-      //       label={messages.updateButton}
-      //       onClick={() => console.log('blub')}
-      //       isDisabled={!canManage}
-      //     />
-      //   </>
-      // }
+      formControls={
+        <>
+          <CustomFormModalPage.FormDeleteButton
+            onClick={() => handleDelete()}
+          />
+        </>
+      }
     >
       <Spacings.Stack scale="xxl">
         <Spacings.Stack scale="s">

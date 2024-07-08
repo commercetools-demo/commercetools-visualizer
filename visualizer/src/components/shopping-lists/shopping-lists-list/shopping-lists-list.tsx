@@ -20,24 +20,28 @@ import { usePaginationState } from '@commercetools-uikit/hooks';
 import { Pagination } from '@commercetools-uikit/pagination';
 import { useState } from 'react';
 import CheckboxInput from '@commercetools-uikit/checkbox-input';
-import TextInput from '@commercetools-uikit/text-input';
-import FieldLabel from '@commercetools-uikit/field-label';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ShoppingListsEdit from '../shopping-lists-edit/shopping-lists-edit';
+import useCustomerSearchFetcher from '../../../hooks/use-customer-search-fetcher';
+import formatCustomerName from '../../../utils/format-customer-name';
+import AsyncSelectField from '@commercetools-uikit/async-select-field';
 
 export const ShoppingListsList = () => {
   const { page, perPage } = usePaginationState();
   const { push } = useHistory();
   const match = useRouteMatch();
-  const [userId, setUserId] = useState<string | undefined>(undefined);
+  const [userId, setUserId] = useState<
+    { value: string; label: string } | undefined
+  >(undefined);
   const [onlyItemsWithCustomer, setOnlyItemsWithCustomer] =
     useState<boolean>(false);
+  const { fetchCustomers, customerData } = useCustomerSearchFetcher(() => {});
   const { shoppingLists, loading, error, refetch } = useShoppingListsFetcher({
     limit: perPage.value,
     offset: (page.value - 1) * perPage.value,
     where: userId
-      ? `customer(id="${userId}")`
+      ? `customer(id="${userId.value}")`
       : onlyItemsWithCustomer
       ? 'customer is defined'
       : undefined,
@@ -99,19 +103,36 @@ export const ShoppingListsList = () => {
         return item[column.key as keyof TShoppingList];
     }
   };
-  //{"offset": 0,"limit": 200, "where": "customer(id=\"f52e4230-a1f9-4f49-b6eb-af33fba3ddad\")"}
   return (
     <InfoMainPage title={'Shopping Lists'}>
       <Spacings.Stack scale={'l'}>
         <Spacings.Inline scale={'s'} alignItems={'center'}>
-          <FieldLabel title={'User Id'} horizontalConstraint={3}></FieldLabel>
-          <TextInput
+          <AsyncSelectField
+            title={'Customer'}
+            value={userId}
+            isClearable
+            isSearchable
+            loadOptions={async (text) => {
+              fetchCustomers({
+                searchQuery: text,
+                perPage: 20,
+                page: 1,
+              });
+              return (
+                customerData.customers.results?.map((customer) => {
+                  return {
+                    value: customer.id,
+                    label: formatCustomerName(customer),
+                  };
+                }) || []
+              );
+            }}
+            onChange={(event) => {
+              // @ts-ignore
+              setUserId(event.target.value);
+            }}
             horizontalConstraint={8}
-            value={userId || ''}
-            onChange={(event) => setUserId(event.target.value)}
           />
-        </Spacings.Inline>
-        <Spacings.Inline scale={'s'} alignItems={'center'}>
           <CheckboxInput
             onChange={() => setOnlyItemsWithCustomer(!onlyItemsWithCustomer)}
             isChecked={onlyItemsWithCustomer}

@@ -7,10 +7,7 @@ import type {
 } from '@commercetools-frontend/sdk';
 import { SearchParams } from '../use-customer-search-fetcher/use-customer-search-fetcher';
 
-const useCustomerIdsSearchFetcher = (
-  searchParams: SearchParams,
-  projectKey: string
-) => {
+const useCustomerIdsSearchFetcher = (projectKey: string) => {
   const dispatch = useDispatch<
     (payload: TSdkActionPayloadForUri & TSdkActionPayloadBody) => Promise<{
       hits: Array<{ id: string; relevance: number }>;
@@ -21,7 +18,7 @@ const useCustomerIdsSearchFetcher = (
   >();
 
   return useCallback(
-    () =>
+    (searchParams: SearchParams) =>
       dispatch(
         // @ts-ignore
         sdkActions.post({
@@ -38,7 +35,7 @@ const useCustomerIdsSearchFetcher = (
           },
         })
       ),
-    [dispatch, projectKey, searchParams]
+    [dispatch, projectKey]
   );
 };
 

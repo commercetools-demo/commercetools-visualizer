@@ -9,10 +9,7 @@ export type SearchParams = {
   page: number;
 };
 
-const useCustomerSearchFetcher = (
-  searchParams: SearchParams,
-  handleError: Function
-) => {
+const useCustomerSearchFetcher = (handleError: Function) => {
   const [idSearchTotal, setIdSearchTotal] = useState(0);
   const { projectKey } = useApplicationContext((context) => ({
     projectKey: context.project?.key ?? '',
@@ -21,37 +18,33 @@ const useCustomerSearchFetcher = (
 
   const customerData = searchPoweredCustomerFetcher;
 
-  const customerIdsSearchFetcher = useCustomerIdsSearchFetcher(
-    searchParams,
-    projectKey
-  );
+  const customerIdsSearchFetcher = useCustomerIdsSearchFetcher(projectKey);
 
-  const fetchCustomers = useCallback(() => {
-    const customerIdsSearch = customerIdsSearchFetcher();
-    customerIdsSearch
-      .then((res) => {
-        setIdSearchTotal(res.total);
-        const customerIds = res.hits.map((hit) => hit.id);
-        searchPoweredCustomerFetcher.handleSearch({
-          limit: customerIds.length > 0 ? searchParams.perPage : 0,
-          offset: (searchParams.page - 1) * searchParams.perPage,
-          where:
-            'id in (' +
-            customerIds.map((requestedId) => `\"${requestedId}\"`) +
-            ')',
+  const fetchCustomers = useCallback(
+    (searchParams: SearchParams) => {
+      const customerIdsSearch = customerIdsSearchFetcher(searchParams);
+      customerIdsSearch
+        .then((res) => {
+          setIdSearchTotal(res.total);
+          const customerIds = res.hits.map((hit) => hit.id);
+          searchPoweredCustomerFetcher.handleSearch({
+            limit: customerIds.length > 0 ? searchParams.perPage : 0,
+            offset: (searchParams.page - 1) * searchParams.perPage,
+            where:
+              'id in (' +
+              customerIds.map((requestedId) => `"${requestedId}"`) +
+              ')',
+          });
+          return Promise.resolve();
+        })
+        .catch((err) => {
+          if (handleError) {
+            handleError(err);
+          }
         });
-      })
-      .catch((err) => {
-        if (handleError) {
-          handleError(err);
-        }
-      });
-  }, [
-    customerIdsSearchFetcher,
-    searchPoweredCustomerFetcher,
-    searchParams,
-    handleError,
-  ]);
+    },
+    [customerIdsSearchFetcher, searchPoweredCustomerFetcher, handleError]
+  );
 
   return {
     customerData: {
@@ -60,8 +53,6 @@ const useCustomerSearchFetcher = (
     },
     fetchCustomers,
   };
-
-  return { fetch };
 };
 
 export default useCustomerSearchFetcher;

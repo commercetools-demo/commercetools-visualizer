@@ -149,10 +149,8 @@ export const CartCreateCustomerPick: FC<Props> = ({
     }
   };
 
-  const { customerData, fetchCustomers } = useCustomerSearchFetcher(
-    { searchQuery: searchValue, page: page.value, perPage: perPage.value },
-    handleErrors
-  );
+  const { customerData, fetchCustomers } =
+    useCustomerSearchFetcher(handleErrors);
 
   const debouncedSearch = useCallback(
     debounce((searchQuery) => {
@@ -162,7 +160,12 @@ export const CartCreateCustomerPick: FC<Props> = ({
   );
 
   useEffect(() => {
-    fetchCustomers && fetchCustomers();
+    fetchCustomers &&
+      fetchCustomers({
+        searchQuery: searchValue,
+        page: page.value,
+        perPage: perPage.value,
+      });
   }, [searchValue, page.value, perPage.value]);
   if (!customerData || customerData.isLoading) {
     return <LoadingSpinner />;

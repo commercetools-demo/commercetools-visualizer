@@ -128,6 +128,7 @@ export const ShoppingListsList = () => {
               // @ts-ignore
               setUserId(event.target.value);
             }}
+            horizontalConstraint={6}
           />
           <CheckboxInput
             onChange={() => setOnlyItemsWithCustomer(!onlyItemsWithCustomer)}

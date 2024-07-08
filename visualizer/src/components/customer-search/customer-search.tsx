@@ -19,6 +19,7 @@ interface Props {
   errors?: TAsyncSelectFieldProps['errors'];
   touched?: TAsyncSelectFieldProps['touched'];
   onBlur?: TAsyncSelectFieldProps['onBlur'];
+  horizontalConstraint?: TAsyncSelectFieldProps['horizontalConstraint'];
 }
 
 export const CustomerSearch: FC<Props> = ({
@@ -29,10 +30,12 @@ export const CustomerSearch: FC<Props> = ({
   errors,
   touched,
   onBlur,
+  horizontalConstraint,
 }) => {
   const { fetchCustomers, customerData } = useCustomerSearchFetcher(() => {});
   return (
     <AsyncSelectField
+      horizontalConstraint={horizontalConstraint}
       title={title}
       value={value}
       name={name}

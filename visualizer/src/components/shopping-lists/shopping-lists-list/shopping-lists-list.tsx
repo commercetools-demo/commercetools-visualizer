@@ -20,12 +20,13 @@ import { usePaginationState } from '@commercetools-uikit/hooks';
 import { Pagination } from '@commercetools-uikit/pagination';
 import { useState } from 'react';
 import CheckboxInput from '@commercetools-uikit/checkbox-input';
-import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ShoppingListsEdit from '../shopping-lists-edit/shopping-lists-edit';
-import useCustomerSearchFetcher from '../../../hooks/use-customer-search-fetcher';
-import formatCustomerName from '../../../utils/format-customer-name';
-import AsyncSelectField from '@commercetools-uikit/async-select-field';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
+import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import ShoppingListsCreate from '../shopping-lists-create/shopping-lists-create';
+import CustomerSearch from '../../customer-search/customer-search';
 
 export const ShoppingListsList = () => {
   const { page, perPage } = usePaginationState();
@@ -36,7 +37,6 @@ export const ShoppingListsList = () => {
   >(undefined);
   const [onlyItemsWithCustomer, setOnlyItemsWithCustomer] =
     useState<boolean>(false);
-  const { fetchCustomers, customerData } = useCustomerSearchFetcher(() => {});
   const { shoppingLists, loading, error, refetch } = useShoppingListsFetcher({
     limit: perPage.value,
     offset: (page.value - 1) * perPage.value,
@@ -104,34 +104,30 @@ export const ShoppingListsList = () => {
     }
   };
   return (
-    <InfoMainPage title={'Shopping Lists'}>
+    <InfoMainPage
+      customTitleRow={
+        <Spacings.Inline justifyContent="space-between">
+          <Text.Headline as="h2">Shopping Lists</Text.Headline>
+
+          <SecondaryButton
+            iconLeft={<PlusBoldIcon />}
+            as={Link}
+            to={`${match.url}/new`}
+            label={'New Shopping List'}
+          />
+        </Spacings.Inline>
+      }
+    >
       <Spacings.Stack scale={'l'}>
         <Spacings.Inline scale={'s'} alignItems={'center'}>
-          <AsyncSelectField
+          <CustomerSearch
             title={'Customer'}
+            name={'customer'}
             value={userId}
-            isClearable
-            isSearchable
-            loadOptions={async (text) => {
-              fetchCustomers({
-                searchQuery: text,
-                perPage: 20,
-                page: 1,
-              });
-              return (
-                customerData.customers.results?.map((customer) => {
-                  return {
-                    value: customer.id,
-                    label: formatCustomerName(customer),
-                  };
-                }) || []
-              );
-            }}
             onChange={(event) => {
               // @ts-ignore
               setUserId(event.target.value);
             }}
-            horizontalConstraint={8}
           />
           <CheckboxInput
             onChange={() => setOnlyItemsWithCustomer(!onlyItemsWithCustomer)}
@@ -157,6 +153,17 @@ export const ShoppingListsList = () => {
         />
       </Spacings.Stack>
       <Switch>
+        <SuspendedRoute path={`${match.path}/new`}>
+          <ShoppingListsCreate
+            onClose={() => {
+              push(match.url);
+            }}
+            onCreate={async (id: string) => {
+              await refetch();
+              push(`${match.url}/${id}`);
+            }}
+          />
+        </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <ShoppingListsEdit
             onClose={() => {

@@ -1,4 +1,4 @@
-mutation CreateShoppingList($draft: ShoppingList!) {
+mutation CreateShoppingList($draft: ShoppingListDraft!) {
     createShoppingList(draft: $draft) {
         id
     }

@@ -20,6 +20,7 @@ interface Props {
   touched?: TAsyncSelectFieldProps['touched'];
   onBlur?: TAsyncSelectFieldProps['onBlur'];
   horizontalConstraint?: TAsyncSelectFieldProps['horizontalConstraint'];
+  isRequired?: boolean;
 }
 
 export const CustomerSearch: FC<Props> = ({
@@ -31,6 +32,7 @@ export const CustomerSearch: FC<Props> = ({
   touched,
   onBlur,
   horizontalConstraint,
+  isRequired,
 }) => {
   const { fetchCustomers, customerData } = useCustomerSearchFetcher(() => {});
   return (
@@ -41,6 +43,7 @@ export const CustomerSearch: FC<Props> = ({
       name={name}
       isClearable
       isSearchable
+      isRequired={isRequired}
       loadOptions={async (text) => {
         fetchCustomers({
           searchQuery: text,

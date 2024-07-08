@@ -10,13 +10,21 @@ import { PERMISSIONS } from '../../../constants';
 import Spacings from '@commercetools-uikit/spacings';
 import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
-import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
+import {
+  transformLocalizedFieldToLocalizedString,
+  transformLocalizedStringToLocalizedField,
+} from '@commercetools-frontend/l10n';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import CustomerSearch, {
   CustomerValue,
 } from '../../customer-search/customer-search';
 import omitEmpty from 'omit-empty-es';
 import AsyncSelectField from '@commercetools-uikit/async-select-field';
+import { TShoppingListDraft } from '../../../types/generated/ctp';
+import { useShoppingListCreator } from '../../../hooks/use-shopping-lists-hook';
+import { DOMAINS } from '@commercetools-frontend/constants';
+import messages from '../../types/types-create/messages';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 
 type TFormValues = {
   name: Record<string, string>;
@@ -48,12 +56,32 @@ type Props = {
   onCreate: (id: string) => void;
 };
 
-export const ShoppingListsCreate: FC<Props> = ({ onClose }) => {
+export const ShoppingListsCreate: FC<Props> = ({ onClose, onCreate }) => {
   const intl = useIntl();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
+  const showNotification = useShowNotification();
+  const shoppingListCreator = useShoppingListCreator();
+  const submit = async (values: TFormValues) => {
+    const draft: TShoppingListDraft = {
+      name: transformLocalizedStringToLocalizedField(
+        LocalizedTextInput.omitEmptyTranslations(values.name)
+      ),
+    };
+    if (values.customer) {
+      draft.customer = { id: values.customer?.value, typeId: 'customer' };
+    }
+    const result = await shoppingListCreator.execute({ draft: draft });
+    showNotification({
+      kind: 'success',
+      domain: DOMAINS.SIDE,
+      text: intl.formatMessage(messages.createSuccess),
+    });
+    result.data?.createShoppingList?.id &&
+      onCreate(result.data?.createShoppingList?.id);
+  };
   const formik = useFormik<TFormValues>({
     initialValues: {
       name: LocalizedTextInput.createLocalizedString(
@@ -61,7 +89,7 @@ export const ShoppingListsCreate: FC<Props> = ({ onClose }) => {
         transformLocalizedFieldToLocalizedString([]) ?? {}
       ),
     },
-    onSubmit: (values) => console.log(values),
+    onSubmit: submit,
     validate: validate,
   });
   const canManage = useIsAuthorized({
@@ -108,6 +136,7 @@ export const ShoppingListsCreate: FC<Props> = ({ onClose }) => {
                 AsyncSelectField.toFieldErrors<TFormValues>(formik.errors)
                   .customer
               }
+              isRequired={true}
             />
           </Spacings.Stack>
         </Spacings.Stack>

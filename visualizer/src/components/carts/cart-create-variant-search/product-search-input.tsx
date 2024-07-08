@@ -1,12 +1,15 @@
 import { FC } from 'react';
 import { useMcQuery } from '@commercetools-frontend/application-shell';
-import ProductSearch from './product-search.rest.graphql';
+import ProductSearch from './product-search.ctp.graphql';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import AsyncSelectInput from '@commercetools-uikit/async-select-input';
 import { useIntl } from 'react-intl';
 import Spacings from '@commercetools-uikit/spacings';
 import messages from './messages';
-import { formatLocalizedString } from '@commercetools-frontend/l10n';
+import {
+  formatLocalizedString,
+  transformLocalizedFieldToLocalizedString,
+} from '@commercetools-frontend/l10n';
 import {
   GRAPHQL_TARGETS,
   NO_VALUE_FALLBACK,
@@ -19,7 +22,12 @@ import ProductById from './product-by-id.graphql';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { PageNotFound } from '@commercetools-frontend/application-components';
-import { TQuery, TQuery_ProductArgs } from '../../../types/generated/ctp';
+import {
+  TProductProjection,
+  TProductSearchVariant,
+  TQuery,
+  TQuery_ProductArgs,
+} from '../../../types/generated/ctp';
 import { getErrorMessage } from '../../../helpers';
 import { TAsyncSelectInputProps } from '@commercetools-uikit/async-select-input/dist/declarations/src/async-select-input';
 
@@ -47,6 +55,7 @@ export const ProductSearchSingleValue: FC<SingleValueProps<ProductValue>> = (
       sku: props.data.sku,
       locale: dataLocale,
     },
+    skip: !props.data.id || !props.data.sku,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -128,32 +137,17 @@ ProductSearchOption.displayName = 'ProductSearchOption';
 interface ProductSearchInputProps {
   name: string;
   value?: ProductValue;
-  filter?: string;
+  filter?: Array<string>;
   placeholder?: string;
   hasError?: boolean;
   onBlur?(...args: unknown[]): unknown;
   onChange: TAsyncSelectInputProps['onChange'];
 }
 
-type Image = { url: string };
-
-type ProductVariantResponse = {
-  id: number;
-  sku: string;
-  isMatchingVariant: boolean;
-  images: Array<Image>;
-};
-type ProductResponse = {
-  id: string;
-  name: { [locale: string]: string };
-  masterVariant: ProductVariantResponse;
-  variants: Array<ProductVariantResponse>;
-};
-
 const ProductSearchInput: FC<ProductSearchInputProps> = ({
   name,
   value,
-  filter = '',
+  filter = [],
   placeholder,
   hasError,
   onBlur,
@@ -166,14 +160,9 @@ const ProductSearchInput: FC<ProductSearchInputProps> = ({
   const intl = useIntl();
 
   const { refetch } = useMcQuery<
-    {
-      products: {
-        results: Array<ProductResponse>;
-      };
-    },
-    { locale: string; text: string; filter: string }
+    TQuery,
+    { locale: string; text: string; filter: Array<string> }
   >(ProductSearch, {
-    fetchPolicy: 'cache-and-network',
     variables: {
       locale: dataLocale,
       text: '',
@@ -181,30 +170,37 @@ const ProductSearchInput: FC<ProductSearchInputProps> = ({
     },
     skip: true,
     context: {
-      target: 'ctp',
+      target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
   });
 
   const getMatchingVariants = (
     result: Array<ProductValue>,
-    product: ProductResponse
+    product: TProductProjection
   ) => {
     const base = {
       productId: product.id,
-      name: formatLocalizedString(product, {
-        key: 'name',
-        locale: dataLocale,
-        fallbackOrder: languages,
-        fallback: NO_VALUE_FALLBACK,
-      }),
+      name: formatLocalizedString(
+        {
+          name: transformLocalizedFieldToLocalizedString(
+            product.nameAllLocales ?? []
+          ),
+        },
+        {
+          key: 'name',
+          locale: dataLocale,
+          fallbackOrder: languages,
+          fallback: NO_VALUE_FALLBACK,
+        }
+      ),
     };
 
-    const addMatchingVariant = (variant: ProductVariantResponse) => {
+    const addMatchingVariant = (variant: TProductSearchVariant) => {
       if (variant.isMatchingVariant) {
         const item = {
           ...base,
           id: variant.id,
-          sku: variant.sku,
+          sku: variant.sku || '',
           image: variant.images?.[0]?.url,
         };
         result.push(item);
@@ -222,10 +218,9 @@ const ProductSearchInput: FC<ProductSearchInputProps> = ({
 
   const loadOptions = (text: string) => {
     return refetch({ text }).then((response) => {
-      return response.data.products.results.reduce<Array<ProductValue>>(
-        getMatchingVariants,
-        []
-      );
+      return response.data.productProjectionSearch.results.reduce<
+        Array<ProductValue>
+      >(getMatchingVariants, []);
     });
   };
 

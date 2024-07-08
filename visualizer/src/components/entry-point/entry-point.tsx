@@ -1,10 +1,7 @@
 import { lazy } from 'react';
-import { RestLink } from 'apollo-link-rest';
 import {
   ApplicationShell,
-  createApolloClient,
   setupGlobalErrorListener,
-  selectProjectKeyFromUrl,
 } from '@commercetools-frontend/application-shell';
 import type { ApplicationWindow } from '@commercetools-frontend/constants';
 import loadMessages from '../../load-messages';
@@ -22,32 +19,8 @@ const AsyncApplicationRoutes = lazy(
 // in order to catch possible errors on rendering/mounting.
 setupGlobalErrorListener();
 
-// TODO: Refactor this code in a better way to fetch mcApiUrl and projectKey.
-const { mcApiUrl } = window.app;
-const projectKey = selectProjectKeyFromUrl();
-
-const restLink = new RestLink({
-  uri: `${mcApiUrl}/proxy/ctp/${projectKey}`,
-  headers: {
-    Accept: 'application/json',
-  },
-  credentials: 'include',
-});
-
-const configureApollo = () =>
-  createApolloClient({
-    restLink: restLink,
-    cache: {
-      typePolicies: { ProductVariant: { keyFields: ['key', 'sku'] } },
-    },
-  });
-
 const EntryPoint = () => (
-  <ApplicationShell
-    environment={window.app}
-    applicationMessages={loadMessages}
-    apolloClient={configureApollo()}
-  >
+  <ApplicationShell environment={window.app} applicationMessages={loadMessages}>
     <AsyncApplicationRoutes />
   </ApplicationShell>
 );

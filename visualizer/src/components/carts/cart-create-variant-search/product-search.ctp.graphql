@@ -1,0 +1,29 @@
+query ProductSearch($text: String, $locale: Locale, $filter: [SearchFilterInput!]) {
+  productProjectionSearch(markMatchingVariants: true, text: $text, locale: $locale, filters: $filter) {
+    results {
+      id
+      nameAllLocales {
+        locale
+        value
+      }
+      variants {
+        id
+        sku
+        key
+        isMatchingVariant
+        images {
+          url
+        }
+      }
+      masterVariant {
+        id
+        sku
+        key
+        isMatchingVariant
+        images {
+          url
+        }
+      }
+    }
+  }
+}

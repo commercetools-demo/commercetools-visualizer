@@ -1,0 +1,7 @@
+#import './shopping-list-fragment.ctp.graphql'
+
+mutation UpdateShoppingList($id: String, $key: String, $version: Long!, $actions: [ShoppingListUpdateAction!]!) {
+    updateShoppingList(id: $id, key: $key, version: $version, actions: $actions) {
+        ...ShoppingListItem
+    }
+}

@@ -97,6 +97,13 @@ const Welcome = () => {
               }
               target={'carts'}
             />
+            <InfoCard
+              title={'Shopping Lists'}
+              content={
+                'A Shopping List can be used to implement a "save-for-later" feature for an individual Customer, a shareable wishlist, or a public collection of Products.'
+              }
+              target={'shopping-lists'}
+            />
           </Grid>
         </Spacings.Stack>
       </PageContentWide>

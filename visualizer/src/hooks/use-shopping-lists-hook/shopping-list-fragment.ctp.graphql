@@ -1,0 +1,41 @@
+fragment ShoppingListItem on ShoppingList {
+    id
+    version
+    key
+    nameAllLocales {
+        locale
+        value
+    }
+    descriptionAllLocales {
+        locale
+        value
+    }
+    customer {
+        id
+        firstName
+        lastName
+        email
+    }
+    anonymousId
+    lineItems {
+        id
+        productId
+        quantity
+        nameAllLocales {
+            locale
+            value
+        }
+        variant {
+            sku
+            key
+            images {
+                label
+                url
+                dimensions {
+                    width
+                    height
+                }
+            }
+        }
+    }
+}

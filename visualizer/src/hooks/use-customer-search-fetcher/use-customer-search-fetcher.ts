@@ -26,7 +26,7 @@ const useCustomerSearchFetcher = (handleError: Function) => {
       customerIdsSearch
         .then((res) => {
           setIdSearchTotal(res.total);
-          const customerIds = res.hits.map((hit) => hit.id);
+          const customerIds = res.results.map((hit) => hit.id);
           searchPoweredCustomerFetcher.handleSearch({
             limit: customerIds.length > 0 ? searchParams.perPage : 0,
             offset: (searchParams.page - 1) * searchParams.perPage,

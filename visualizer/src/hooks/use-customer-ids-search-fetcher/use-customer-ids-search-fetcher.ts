@@ -10,7 +10,7 @@ import { SearchParams } from '../use-customer-search-fetcher/use-customer-search
 const useCustomerIdsSearchFetcher = (projectKey: string) => {
   const dispatch = useDispatch<
     (payload: TSdkActionPayloadForUri & TSdkActionPayloadBody) => Promise<{
-      hits: Array<{ id: string; relevance: number }>;
+      results: Array<{ id: string; relevance: number }>;
       limit: number;
       offset: number;
       total: number;
@@ -27,11 +27,15 @@ const useCustomerIdsSearchFetcher = (projectKey: string) => {
           uri: `/${projectKey}`,
           payload: {
             query: {
-              field: 'all',
-              value: searchParams.searchQuery,
-              limit: searchParams.perPage,
-              offset: (searchParams.page - 1) * searchParams.perPage,
+              prefix: {
+                caseInsensitive: true,
+                field: 'all',
+                value: searchParams.searchQuery,
+              },
             },
+            limit: searchParams.perPage,
+            offset: (searchParams.page - 1) * searchParams.perPage,
+            sort: [],
           },
         })
       ),

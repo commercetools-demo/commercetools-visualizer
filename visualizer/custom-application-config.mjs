@@ -7,6 +7,7 @@ const config = {
   name: 'Visualizer',
   entryPointUriPath: '${env:ENTRY_POINT_URI_PATH}',
   cloudIdentifier: '${env:CLOUD_IDENTIFIER}',
+  mcApiUrl: '${env:MC_API_URL}',
   env: {
     development: {
       initialProjectKey: '${env:INITIAL_PROJECT_KEY}',

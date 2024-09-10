@@ -7,7 +7,7 @@ import {
 import { debounce } from 'lodash';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
+import { formatMoney, getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
@@ -35,6 +35,8 @@ import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CartDetails from '../cart-details/cart-details';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import Stamp, { TTone } from '@commercetools-uikit/stamp';
+import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -110,6 +112,30 @@ const CartsList = () => {
         return intl.formatDate(item.lastModifiedAt);
       case 'amountOfLineitems':
         return item.lineItems.length;
+      case 'cartState': {
+        let tone: TTone = 'primary';
+        switch (item.cartState) {
+          case 'Active':
+            tone = 'primary';
+            break;
+          case 'Merged':
+            tone = 'secondary';
+            break;
+          case 'Ordered':
+            tone = 'information';
+            break;
+          case 'Frozen':
+            tone = 'warning';
+            break;
+        }
+        return <Stamp tone={tone} label={item.cartState} isCondensed={true} />;
+      }
+      case 'shippingAddress':
+        return formatTitleAddress(item.shippingAddress) || '';
+      case 'billingAddress':
+        return formatTitleAddress(item.billingAddress) || '';
+      case 'totalPrice':
+        return formatMoney(item.totalPrice, intl);
       default:
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (item as any)[column.key] || '';
@@ -134,7 +160,10 @@ const CartsList = () => {
     hideableColumns: tableData.columns,
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
-  const onSettingChange = (action: string, nextValue: boolean | string[]) => {
+  const onSettingChange = (
+    action: string,
+    nextValue: boolean | string[] | Record<string, unknown>
+  ) => {
     const {
       COLUMNS_UPDATE,
       IS_TABLE_CONDENSED_UPDATE,

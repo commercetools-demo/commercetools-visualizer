@@ -14,6 +14,6 @@ export default defineMessages({
   allFieldsFilterPlaceholder: {
     id: 'CartListSearch.filterPlaceholder.allFields',
     description: 'Label for the searchbar placeholder for all fields option',
-    defaultMessage: 'Ignored for now',
+    defaultMessage: 'Select a field to search for',
   },
 });

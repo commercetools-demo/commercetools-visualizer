@@ -10,7 +10,7 @@ import { SHORT_ADDRESS_TYPE } from '../../../constants';
 import { FormikProps } from 'formik';
 import { Step3 } from '../cart-create/conversion';
 
-export function formatTitleAddress(address?: TAddress) {
+export function formatTitleAddress(address?: TAddress | null) {
   if (!address) {
     return undefined;
   }

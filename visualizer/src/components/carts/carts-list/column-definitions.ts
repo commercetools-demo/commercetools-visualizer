@@ -5,15 +5,20 @@ import messages from './messages';
 export const createVisibleColumnDefinitions = memoize(
   (): Array<TColumn> => [
     { key: 'customerEmail', label: 'Customer Email' },
-    { key: 'anonymousId', label: 'anonymousId' },
     { key: 'amountOfLineitems', label: 'Amount of Lineitems' },
     { key: 'cartState', label: 'Cart State' },
+    {
+      key: 'billingAddress',
+      label: 'Billing address',
+    },
+    { key: 'totalPrice', label: 'Total price' },
   ]
 );
 
 export const createHiddenColumnDefinitions = memoize(
   (formatMessage): Array<TColumn> => [
     { key: 'id', label: formatMessage(messages.columnId) },
+    { key: 'anonymousId', label: 'anonymousId' },
     { key: 'customerId', label: 'customerId' },
     {
       key: 'key',
@@ -35,6 +40,10 @@ export const createHiddenColumnDefinitions = memoize(
       key: 'shippingMode',
       label: 'shippingMode',
       isSortable: true,
+    },
+    {
+      key: 'shippingAddress',
+      label: 'Shipping address',
     },
   ]
 );

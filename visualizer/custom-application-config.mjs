@@ -28,26 +28,8 @@ const config = {
   },
   submenuLinks: [
     {
-      uriPath: 'subscriptions',
-      defaultLabel: 'Subscriptions',
-      labelAllLocales: [],
-      permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'states',
-      defaultLabel: 'States',
-      labelAllLocales: [],
-      permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'types',
-      defaultLabel: 'Types',
-      labelAllLocales: [],
-      permissions: [PERMISSIONS.View],
-    },
-    {
       uriPath: 'extensions',
-      defaultLabel: 'Extensions',
+      defaultLabel: 'API Extensions',
       labelAllLocales: [],
       permissions: [PERMISSIONS.View],
     },
@@ -60,6 +42,24 @@ const config = {
     {
       uriPath: 'shopping-lists',
       defaultLabel: 'Shopping lists',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'states',
+      defaultLabel: 'States',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'subscriptions',
+      defaultLabel: 'Subscriptions',
+      labelAllLocales: [],
+      permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'types',
+      defaultLabel: 'Types',
       labelAllLocales: [],
       permissions: [PERMISSIONS.View],
     },

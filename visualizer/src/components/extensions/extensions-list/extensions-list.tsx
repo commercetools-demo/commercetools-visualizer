@@ -28,6 +28,7 @@ import { Pagination } from '@commercetools-uikit/pagination';
 import ExtensionsCreate from '../extensions-create/extensions-create';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
+import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
 
 const ExtensionsList = () => {
   const intl = useIntl();
@@ -104,7 +105,10 @@ const ExtensionsList = () => {
     hideableColumns: tableData.columns,
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
-  const onSettingChange = (action: string, nextValue: boolean | string[]) => {
+  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
+    action,
+    nextValue
+  ) => {
     const {
       COLUMNS_UPDATE,
       IS_TABLE_CONDENSED_UPDATE,

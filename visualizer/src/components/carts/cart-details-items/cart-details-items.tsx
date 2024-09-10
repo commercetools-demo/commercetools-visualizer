@@ -35,6 +35,7 @@ import CartItemTableUnitPriceCell from './cart-item-table-unit-price-cell';
 import CartItemTableTaxRateCell from './cart-item-table-tax-rate-cell';
 import CartItemTableSubtotalPriceCell from './cart-item-table-subtotal-price-cell';
 import CartItemTableTotalPriceCell from './cart-item-table-total-price-cell';
+import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
 
 type Props = { cart: TCart };
 
@@ -149,7 +150,10 @@ const CartDetailsItems: FC<Props> = ({ cart }) => {
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
 
-  const onSettingChange = (action: string, nextValue: boolean | string[]) => {
+  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
+    action,
+    nextValue
+  ) => {
     const {
       COLUMNS_UPDATE,
       IS_TABLE_CONDENSED_UPDATE,

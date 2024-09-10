@@ -38,6 +38,7 @@ import formatCustomerName from '../../../utils/format-customer-name';
 import Tooltip from '@commercetools-uikit/tooltip';
 import IconButton from '@commercetools-uikit/icon-button';
 import { CloseBoldIcon } from '@commercetools-uikit/icons';
+import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
 
 type Props = StepProps & { cart: TCart };
 
@@ -117,7 +118,10 @@ export const CartCreateCustomerPick: FC<Props> = ({
     hideableColumns: tableData.columns,
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
-  const onSettingChange = (action: string, nextValue: boolean | string[]) => {
+  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
+    action,
+    nextValue
+  ) => {
     const {
       COLUMNS_UPDATE,
       IS_TABLE_CONDENSED_UPDATE,

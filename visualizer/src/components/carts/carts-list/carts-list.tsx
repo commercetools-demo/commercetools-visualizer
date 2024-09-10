@@ -37,6 +37,7 @@ import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import Stamp, { TTone } from '@commercetools-uikit/stamp';
 import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
+import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -160,9 +161,9 @@ const CartsList = () => {
     hideableColumns: tableData.columns,
     visibleColumnKeys: tableData.visibleColumnKeys,
   };
-  const onSettingChange = (
-    action: string,
-    nextValue: boolean | string[] | Record<string, unknown>
+  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
+    action,
+    nextValue
   ) => {
     const {
       COLUMNS_UPDATE,

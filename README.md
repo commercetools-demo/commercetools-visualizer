@@ -72,6 +72,27 @@ Detail View
 New View
 ![Types-New.jpg](./visualizer/docs/Types-New.jpg)
 
+## Local Development
+
+Create a file .env.local within the folder [visualizer](./visualizer) folder like:
+```dotenv    
+CLOUD_IDENTIFIER=gcp-eu
+CUSTOM_APPLICATION_ID=TODO
+APPLICATION_URL=https://your_app_hostname.com
+INITIAL_PROJECT_KEY=YOUR_PROJECT_KEY
+```
+Run the following commands
+
+```shell    
+cd ./visualizer
+yarn install
+yarn run start
+```
+
+The code has been built sucessfully using 
+* Node v18.12.0
+* Yarn 1.22.22
+
 ## Known issues
  - On Subscriptions:
    - only GCP is currently supported

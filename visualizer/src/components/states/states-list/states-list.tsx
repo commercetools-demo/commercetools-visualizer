@@ -11,7 +11,7 @@ import { useIntl } from 'react-intl';
 import {
   PageNotFound,
   TabHeader,
-  TabularDetailPage,
+  TabularMainPage,
 } from '@commercetools-frontend/application-components';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import { lazy, ReactNode } from 'react';
@@ -140,9 +140,7 @@ const StatesList = (props: Props) => {
   );
 
   return (
-    <TabularDetailPage
-      onPreviousPathClick={() => push(props.linkToWelcome)}
-      previousPathLabel={intl.formatMessage(messages.backToWelcome)}
+    <TabularMainPage
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
           <Text.Headline as="h2" intlMessage={messages.title} />
@@ -189,7 +187,7 @@ const StatesList = (props: Props) => {
           />
         </SuspendedRoute>
       </Switch>
-    </TabularDetailPage>
+    </TabularMainPage>
   );
 };
 

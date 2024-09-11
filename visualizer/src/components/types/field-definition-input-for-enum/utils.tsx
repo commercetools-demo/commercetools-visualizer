@@ -1,6 +1,6 @@
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 
 export function createColumnDefinitions(
   enumLanguages: Array<string>,
@@ -32,7 +32,7 @@ export function createColumnDefinitions(
             key: 'label',
             label: <FormattedMessage {...messages.tableHeaderLabelLabel} />,
             isSortable: false,
-            width: `minmax(${customProperties.constraint5}, auto)`,
+            width: `minmax(${designTokens.constraint5}, auto)`,
           },
         ]),
     // delete column

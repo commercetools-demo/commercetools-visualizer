@@ -2,7 +2,7 @@ import { FC, ReactElement } from 'react';
 import { useFormik, type FormikHelpers } from 'formik';
 import TextField from '@commercetools-uikit/text-field';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import Card from '@commercetools-uikit/card';
 import Spacings from '@commercetools-uikit/spacings';
@@ -127,7 +127,7 @@ const TypesForm: FC<Props> = ({
   }));
 
   const formElements = (
-    <PageContentWide columns="2/1" gapSize="20">
+    <PageContentWide>
       <Spacings.Stack scale="xxxl">
         <Spacings.Stack scale="m">
           <CollapsiblePanel
@@ -138,8 +138,8 @@ const TypesForm: FC<Props> = ({
             }
           >
             <Grid
-              gridTemplateColumns={`repeat(2, ${customProperties.constraint11})`}
-              gridGap={customProperties.spacingM}
+              gridTemplateColumns={`repeat(2, ${designTokens.constraint11})`}
+              gridGap={designTokens.spacingM}
             >
               <Grid.Item>
                 <Card type="flat" insetScale="s">

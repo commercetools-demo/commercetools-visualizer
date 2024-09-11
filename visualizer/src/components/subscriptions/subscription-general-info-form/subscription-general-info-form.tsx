@@ -4,7 +4,7 @@ import messages from './messages';
 import { FormattedMessage } from 'react-intl';
 import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 
 export const validateKeyInput = (key: string) => {
@@ -41,7 +41,7 @@ const SubscriptionGeneralInfoForm = () => {
   return (
     <Constraints.Horizontal max="scale">
       <Grid
-        gridGap={customProperties.spacing50}
+        gridGap={designTokens.spacing50}
         gridTemplateColumns={`repeat(auto-fill, '')`}
       >
         <Grid.Item>

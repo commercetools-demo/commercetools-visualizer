@@ -91,15 +91,17 @@ export const PaginatableDataTable = <Row extends TRow = TRow>({
       >
         <DataTable<Row> {...props} columns={tableData.visibleColumns} />
       </DataTableManager>
-      {paginationState && totalItems && (
-        <Pagination
-          page={paginationState.page.value}
-          onPageChange={paginationState.page.onChange}
-          perPage={paginationState.perPage.value}
-          onPerPageChange={paginationState.perPage.onChange}
-          totalItems={totalItems}
-        />
-      )}
+      {paginationState &&
+        totalItems &&
+        totalItems > paginationState.perPage.value && (
+          <Pagination
+            page={paginationState.page.value}
+            onPageChange={paginationState.page.onChange}
+            perPage={paginationState.perPage.value}
+            onPerPageChange={paginationState.perPage.onChange}
+            totalItems={totalItems}
+          />
+        )}
     </Spacings.Stack>
   );
 };

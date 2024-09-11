@@ -266,7 +266,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
         currentStep={currentStep}
         totalSteps={totalSteps}
         onNext={() => {
-          goToNextStep();
+          goToNextStep && goToNextStep();
         }}
         onBack={goToPreviousStep}
         onCancel={() => {

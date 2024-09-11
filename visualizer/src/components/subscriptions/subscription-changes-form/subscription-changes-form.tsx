@@ -1,5 +1,5 @@
 import Grid from '@commercetools-uikit/grid';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import Constraints from '@commercetools-uikit/constraints';
 import Card from '@commercetools-uikit/card';
 import CheckboxGroup from '../../checkbox/CheckboxGroup';
@@ -119,7 +119,7 @@ const SubscriptionChangesForm = () => {
   return (
     <Constraints.Horizontal max="scale">
       <Grid
-        gridGap={customProperties.spacing50}
+        gridGap={designTokens.spacing50}
         gridTemplateColumns={`repeat(auto-fill, '')`}
       >
         <Grid.Item>

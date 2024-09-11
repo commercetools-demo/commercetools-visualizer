@@ -142,6 +142,7 @@ const SubscriptionList = (props: Props) => {
             onRowClick={(row) =>
               push(`${props.linkToHome}/subscription/${row.id}`)
             }
+            paginationState={paginationState}
             totalItems={subscriptions.total}
           />
         </Spacings.Stack>

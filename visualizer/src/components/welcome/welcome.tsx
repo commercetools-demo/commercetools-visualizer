@@ -6,7 +6,7 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import messages from './messages';
 import { PageContentWide } from '@commercetools-frontend/application-components';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import FlatButton from '@commercetools-uikit/flat-button';
 import AccessibleButton from '@commercetools-uikit/accessible-button';
@@ -58,7 +58,7 @@ const Welcome = () => {
           <Text.Headline as="h1" intlMessage={messages.title} />
           <Grid
             gridTemplateColumns={`repeat(3,1fr)`}
-            gridGap={customProperties.spacingM}
+            gridGap={designTokens.spacingM}
             gridAutoColumns={'1fr'}
           >
             <InfoCard

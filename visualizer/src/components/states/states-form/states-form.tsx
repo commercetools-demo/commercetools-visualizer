@@ -16,7 +16,7 @@ import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import { FormattedMessage, useIntl } from 'react-intl';
 import messages from './messages';
 import Grid from '@commercetools-uikit/grid';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import LocalizedTextField from '@commercetools-uikit/localized-text-field';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
@@ -169,8 +169,8 @@ const StatesForm: FC<Props> = ({
             }
           >
             <Grid
-              gridTemplateColumns={`repeat(2, ${customProperties.constraint11})`}
-              gridGap={customProperties.spacingM}
+              gridTemplateColumns={`repeat(2, ${designTokens.constraint11})`}
+              gridGap={designTokens.spacingM}
             >
               <Grid.Item>
                 <Card type="flat" insetScale="s">

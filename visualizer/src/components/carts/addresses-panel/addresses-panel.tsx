@@ -20,7 +20,7 @@ import AddressContainer from '../address-container';
 import Address from '../address';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import Grid from '@commercetools-uikit/grid';
-import { customProperties } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 import Constraints from '@commercetools-uikit/constraints';
 import Text from '@commercetools-uikit/text';
 import FlatButton from '@commercetools-uikit/flat-button';
@@ -110,8 +110,8 @@ const AddressesPanel: FC<Props> = ({ cart }) => {
     >
       <Constraints.Horizontal>
         <Grid
-          gridColumnGap={customProperties.spacingXl}
-          gridRowGap={customProperties.spacingL}
+          gridColumnGap={designTokens.spacingXl}
+          gridRowGap={designTokens.spacingL}
           gridTemplateColumns="1fr 1fr"
         >
           <Grid.Item gridColumn="span 1">

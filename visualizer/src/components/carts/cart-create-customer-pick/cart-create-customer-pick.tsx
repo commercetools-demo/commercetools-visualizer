@@ -11,10 +11,6 @@ import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import SearchTextInput from '@commercetools-uikit/search-text-input';
 import { debounce } from 'lodash';
-import DataTable, { TColumn } from '@commercetools-uikit/data-table';
-import DataTableManager, {
-  UPDATE_ACTIONS,
-} from '@commercetools-uikit/data-table-manager';
 import {
   columnDefinitions,
   hiddenColumnsDefinition,
@@ -25,7 +21,6 @@ import {
   TCustomer,
 } from '../../../types/generated/ctp';
 import { usePaginationState } from '@commercetools-uikit/hooks';
-import { Pagination } from '@commercetools-uikit/pagination';
 import { StepProps } from '../cart-create/cart-create';
 import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { useHistory } from 'react-router';
@@ -38,7 +33,8 @@ import formatCustomerName from '../../../utils/format-customer-name';
 import Tooltip from '@commercetools-uikit/tooltip';
 import IconButton from '@commercetools-uikit/icon-button';
 import { CloseBoldIcon } from '@commercetools-uikit/icons';
-import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
+import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 
 type Props = StepProps & { cart: TCart };
 
@@ -55,7 +51,7 @@ export const CartCreateCustomerPick: FC<Props> = ({
   const showNotification = useShowNotification();
   const showApiErrorNotification = useShowApiErrorNotification();
   const [searchValue, setSearchValue] = useState('');
-  const { page, perPage } = usePaginationState();
+  const paginationState = usePaginationState();
 
   const { customer, loading } = useCustomerFetcher({
     id: cart.customerId || '',
@@ -104,55 +100,6 @@ export const CartCreateCustomerPick: FC<Props> = ({
     ]
   );
 
-  const [tableData, setTableData] = useState({
-    columns: [...columnDefinitions, ...hiddenColumnsDefinition],
-    visibleColumns: columnDefinitions,
-    visibleColumnKeys: columnDefinitions.map((column) => column.key),
-  });
-
-  const [isCondensed, setIsCondensed] = useState<boolean>(true);
-  const [isWrappingText, setIsWrappingText] = useState<boolean>(false);
-
-  const columnManager = {
-    disableColumnManager: false,
-    hideableColumns: tableData.columns,
-    visibleColumnKeys: tableData.visibleColumnKeys,
-  };
-  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
-    action,
-    nextValue
-  ) => {
-    const {
-      COLUMNS_UPDATE,
-      IS_TABLE_CONDENSED_UPDATE,
-      IS_TABLE_WRAPPING_TEXT_UPDATE,
-    } = UPDATE_ACTIONS;
-
-    switch (action) {
-      case IS_TABLE_CONDENSED_UPDATE: {
-        setIsCondensed(nextValue as boolean);
-        break;
-      }
-      case IS_TABLE_WRAPPING_TEXT_UPDATE: {
-        setIsWrappingText(nextValue as boolean);
-        break;
-      }
-      case COLUMNS_UPDATE: {
-        if (Array.isArray(nextValue)) {
-          Array.isArray(nextValue) &&
-            setTableData({
-              ...tableData,
-              visibleColumns: tableData.columns.filter((column) =>
-                nextValue.includes(column.key)
-              ),
-              visibleColumnKeys: nextValue,
-            });
-        }
-        break;
-      }
-    }
-  };
-
   const { customerData, fetchCustomers } =
     useCustomerSearchFetcher(handleErrors);
 
@@ -167,10 +114,10 @@ export const CartCreateCustomerPick: FC<Props> = ({
     fetchCustomers &&
       fetchCustomers({
         searchQuery: searchValue,
-        page: page.value,
-        perPage: perPage.value,
+        page: paginationState.page.value,
+        perPage: paginationState.perPage.value,
       });
-  }, [searchValue, page.value, perPage.value]);
+  }, [searchValue, paginationState.page.value, paginationState.perPage.value]);
   if (!customerData || customerData.isLoading) {
     return <LoadingSpinner />;
   }
@@ -231,7 +178,10 @@ export const CartCreateCustomerPick: FC<Props> = ({
     });
   };
 
-  const itemRenderer = (item: TCustomer, column: TColumn<TCustomer>) => {
+  const itemRenderer: TDataTableProps<TCustomer>['itemRenderer'] = (
+    item,
+    column
+  ) => {
     switch (column.key) {
       case 'customerGroup':
         return item[column.key] ? item[column.key]?.name : NO_VALUE_FALLBACK;
@@ -311,32 +261,14 @@ export const CartCreateCustomerPick: FC<Props> = ({
           />
           {customerData?.customers?.count &&
           customerData?.customers?.count > 0 ? (
-            <Spacings.Stack scale="m">
-              <DataTableManager
-                columns={tableData.visibleColumns}
-                columnManager={columnManager}
-                onSettingsChange={onSettingChange}
-                displaySettings={{
-                  isWrappingText,
-                  isCondensed,
-                  disableDisplaySettings: false,
-                }}
-              >
-                <DataTable<TCustomer>
-                  rows={customerData?.customers?.results || []}
-                  columns={tableData.visibleColumns}
-                  itemRenderer={itemRenderer}
-                  onRowClick={(customer) => handleRowClick(customer)}
-                />
-              </DataTableManager>
-              <Pagination
-                page={page.value}
-                onPageChange={page.onChange}
-                perPage={perPage.value}
-                onPerPageChange={perPage.onChange}
-                totalItems={customerData?.customers?.total}
-              />
-            </Spacings.Stack>
+            <PaginatableDataTable<TCustomer>
+              rows={customerData?.customers?.results || []}
+              columns={[...columnDefinitions, ...hiddenColumnsDefinition]}
+              visibleColumns={columnDefinitions}
+              itemRenderer={itemRenderer}
+              onRowClick={(customer) => handleRowClick(customer)}
+              totalItems={customerData?.customers?.total}
+            />
           ) : (
             <>No items</>
           )}

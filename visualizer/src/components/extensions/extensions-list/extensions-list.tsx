@@ -4,7 +4,6 @@ import {
   useDataTableSortingState,
   usePaginationState,
 } from '@commercetools-uikit/hooks';
-import { useState } from 'react';
 import createColumnDefinitions from './column-definitions';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
@@ -16,43 +15,28 @@ import {
   PageNotFound,
 } from '@commercetools-frontend/application-components';
 import { useExtensionsFetcher } from '../../../hooks/use-extensions-connector';
-import { TExtension, TQuery } from '../../../types/generated/ctp';
-import DataTable, { TColumn } from '@commercetools-uikit/data-table';
-import DataTableManager, {
-  UPDATE_ACTIONS,
-} from '@commercetools-uikit/data-table-manager';
+import { TExtension } from '../../../types/generated/ctp';
 import messages from './messages';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import { Pagination } from '@commercetools-uikit/pagination';
 import ExtensionsCreate from '../extensions-create/extensions-create';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
-import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 
 const ExtensionsList = () => {
   const intl = useIntl();
   const { push } = useHistory();
   const match = useRouteMatch();
-  const { page, perPage } = usePaginationState();
+  const paginationState = usePaginationState();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
 
   const { extensions, error, loading, refetch } = useExtensionsFetcher({
-    limit: perPage.value,
-    offset: (page.value - 1) * perPage.value,
+    limit: paginationState.perPage.value,
+    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
     sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
   });
-
-  const [tableData, setTableData] = useState({
-    columns: createColumnDefinitions(intl.formatMessage),
-    visibleColumns: createColumnDefinitions(intl.formatMessage),
-    visibleColumnKeys: createColumnDefinitions(intl.formatMessage).map(
-      (column) => column.key
-    ),
-  });
-
-  const [isCondensed, setIsCondensed] = useState<boolean>(true);
-  const [isWrappingText, setIsWrappingText] = useState<boolean>(false);
 
   if (error) {
     return (
@@ -76,7 +60,10 @@ const ExtensionsList = () => {
 
   const { results, total } = extensions;
 
-  const itemRenderer = (item: TExtension, column: TColumn<TExtension>) => {
+  const itemRenderer: TDataTableProps<TExtension>['itemRenderer'] = (
+    item,
+    column
+  ) => {
     switch (column.key) {
       case 'key':
         return item.key || '';
@@ -100,45 +87,6 @@ const ExtensionsList = () => {
     }
   };
 
-  const columnManager = {
-    disableColumnManager: false,
-    hideableColumns: tableData.columns,
-    visibleColumnKeys: tableData.visibleColumnKeys,
-  };
-  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
-    action,
-    nextValue
-  ) => {
-    const {
-      COLUMNS_UPDATE,
-      IS_TABLE_CONDENSED_UPDATE,
-      IS_TABLE_WRAPPING_TEXT_UPDATE,
-    } = UPDATE_ACTIONS;
-
-    switch (action) {
-      case IS_TABLE_CONDENSED_UPDATE: {
-        setIsCondensed(nextValue as boolean);
-        break;
-      }
-      case IS_TABLE_WRAPPING_TEXT_UPDATE: {
-        setIsWrappingText(nextValue as boolean);
-        break;
-      }
-      case COLUMNS_UPDATE: {
-        if (Array.isArray(nextValue)) {
-          Array.isArray(nextValue) &&
-            setTableData({
-              ...tableData,
-              visibleColumns: tableData.columns.filter((column) =>
-                nextValue.includes(column.key)
-              ),
-              visibleColumnKeys: nextValue,
-            });
-        }
-        break;
-      }
-    }
-  };
   return (
     <InfoMainPage
       customTitleRow={
@@ -156,36 +104,18 @@ const ExtensionsList = () => {
       {total === 0 && <div>{intl.formatMessage(messages.noResults)}</div>}
 
       {total > 0 ? (
-        <Spacings.Stack scale="l">
-          <DataTableManager
-            columns={tableData.visibleColumns}
-            columnManager={columnManager}
-            onSettingsChange={onSettingChange}
-            displaySettings={{
-              isWrappingText,
-              isCondensed,
-              disableDisplaySettings: false,
-            }}
-          >
-            <DataTable<NonNullable<TQuery['extensions']['results']>[0]>
-              isCondensed
-              columns={tableData.visibleColumns}
-              rows={results}
-              itemRenderer={itemRenderer}
-              sortedBy={tableSorting.value.key}
-              sortDirection={tableSorting.value.order}
-              onSortChange={tableSorting.onChange}
-              onRowClick={(row) => push(`${match.url}/${row.id}`)}
-            />
-          </DataTableManager>
-          <Pagination
-            page={page.value}
-            onPageChange={page.onChange}
-            perPage={perPage.value}
-            onPerPageChange={perPage.onChange}
-            totalItems={total}
-          />
-        </Spacings.Stack>
+        <PaginatableDataTable<TExtension>
+          columns={createColumnDefinitions(intl.formatMessage)}
+          visibleColumns={createColumnDefinitions(intl.formatMessage)}
+          rows={results}
+          itemRenderer={itemRenderer}
+          sortedBy={tableSorting.value.key}
+          sortDirection={tableSorting.value.order}
+          onSortChange={tableSorting.onChange}
+          onRowClick={(row) => push(`${match.url}/${row.id}`)}
+          totalItems={total}
+          paginationState={paginationState}
+        />
       ) : null}
       <Switch>
         <SuspendedRoute path={`${match.path}/new`}>

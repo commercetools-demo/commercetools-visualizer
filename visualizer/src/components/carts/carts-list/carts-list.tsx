@@ -15,18 +15,13 @@ import {
   PageContentFull,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import DataTable, { TColumn } from '@commercetools-uikit/data-table';
 import { TCart } from '../../../types/generated/ctp';
 import messages from './messages';
-import { Pagination } from '@commercetools-uikit/pagination';
 import { useCartsFetcher } from '../../../hooks/use-carts-hook';
 import { useCallback, useState } from 'react';
 import CartsSearchbar from './carts-searchbar/carts-searchbar';
 import { ALL_FIELDS } from './constants';
 import { TCustomEvent } from '@commercetools-uikit/selectable-search-input';
-import DataTableManager, {
-  UPDATE_ACTIONS,
-} from '@commercetools-uikit/data-table-manager';
 import {
   createHiddenColumnDefinitions,
   createVisibleColumnDefinitions,
@@ -37,7 +32,8 @@ import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import Stamp, { TTone } from '@commercetools-uikit/stamp';
 import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
-import { TDataTableManagerProps } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
+import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -48,7 +44,7 @@ const CartsList = () => {
     key: 'createdAt',
     order: 'desc',
   });
-  const { page, perPage } = usePaginationState();
+  const paginationState = usePaginationState();
 
   const [searchOption, setSearchOption] = useState(ALL_FIELDS);
   const [searchText, setSearchText] = useState('');
@@ -58,23 +54,9 @@ const CartsList = () => {
     []
   );
 
-  const [tableData, setTableData] = useState({
-    columns: [
-      ...createVisibleColumnDefinitions(),
-      ...createHiddenColumnDefinitions(intl.formatMessage),
-    ],
-    visibleColumns: createVisibleColumnDefinitions(),
-    visibleColumnKeys: createVisibleColumnDefinitions().map(
-      (column) => column.key
-    ),
-  });
-
-  const [isCondensed, setIsCondensed] = useState<boolean>(true);
-  const [isWrappingText, setIsWrappingText] = useState<boolean>(false);
-
   const { carts, error, loading, refetch } = useCartsFetcher({
-    limit: perPage.value,
-    offset: (page.value - 1) * perPage.value,
+    limit: paginationState.perPage.value,
+    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
     sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
     where:
       searchOption === ALL_FIELDS
@@ -105,7 +87,10 @@ const CartsList = () => {
 
   const { results } = carts;
 
-  const itemRenderer = (item: TCart, column: TColumn<TCart>) => {
+  const itemRenderer: TDataTableProps<TCart>['itemRenderer'] = (
+    item,
+    column
+  ) => {
     switch (column.key) {
       case 'createdAt':
         return intl.formatDate(item.createdAt);
@@ -156,46 +141,6 @@ const CartsList = () => {
     }
   };
 
-  const columnManager = {
-    disableColumnManager: false,
-    hideableColumns: tableData.columns,
-    visibleColumnKeys: tableData.visibleColumnKeys,
-  };
-  const onSettingChange: TDataTableManagerProps['onSettingsChange'] = (
-    action,
-    nextValue
-  ) => {
-    const {
-      COLUMNS_UPDATE,
-      IS_TABLE_CONDENSED_UPDATE,
-      IS_TABLE_WRAPPING_TEXT_UPDATE,
-    } = UPDATE_ACTIONS;
-
-    switch (action) {
-      case IS_TABLE_CONDENSED_UPDATE: {
-        setIsCondensed(nextValue as boolean);
-        break;
-      }
-      case IS_TABLE_WRAPPING_TEXT_UPDATE: {
-        setIsWrappingText(nextValue as boolean);
-        break;
-      }
-      case COLUMNS_UPDATE: {
-        if (Array.isArray(nextValue)) {
-          Array.isArray(nextValue) &&
-            setTableData({
-              ...tableData,
-              visibleColumns: tableData.columns.filter((column) =>
-                nextValue.includes(column.key)
-              ),
-              visibleColumnKeys: nextValue,
-            });
-        }
-        break;
-      }
-    }
-  };
-
   return (
     <InfoMainPage
       customTitleRow={
@@ -222,36 +167,21 @@ const CartsList = () => {
         )}
         {carts.total > 0 && (
           <PageContentFull>
-            <Spacings.Stack scale="m">
-              <DataTableManager
-                columns={tableData.visibleColumns}
-                columnManager={columnManager}
-                onSettingsChange={onSettingChange}
-                displaySettings={{
-                  isWrappingText,
-                  isCondensed,
-                  disableDisplaySettings: false,
-                }}
-              >
-                <DataTable
-                  isCondensed
-                  columns={tableData.visibleColumns}
-                  rows={results}
-                  itemRenderer={itemRenderer}
-                  sortedBy={tableSorting.value.key}
-                  sortDirection={tableSorting.value.order}
-                  onSortChange={tableSorting.onChange}
-                  onRowClick={(row) => push(`${match.url}/${row.id}`)}
-                />
-              </DataTableManager>
-              <Pagination
-                page={page.value}
-                onPageChange={page.onChange}
-                perPage={perPage.value}
-                onPerPageChange={perPage.onChange}
-                totalItems={carts.total}
-              />
-            </Spacings.Stack>
+            <PaginatableDataTable<TCart>
+              columns={[
+                ...createVisibleColumnDefinitions(),
+                ...createHiddenColumnDefinitions(intl.formatMessage),
+              ]}
+              visibleColumns={createVisibleColumnDefinitions()}
+              rows={results}
+              itemRenderer={itemRenderer}
+              onRowClick={(row) => push(`${match.url}/${row.id}`)}
+              sortedBy={tableSorting.value.key}
+              sortDirection={tableSorting.value.order}
+              onSortChange={tableSorting.onChange}
+              paginationState={paginationState}
+              totalItems={carts.total}
+            />
           </PageContentFull>
         )}
       </Spacings.Stack>

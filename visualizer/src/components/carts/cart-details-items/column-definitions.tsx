@@ -35,15 +35,14 @@ const createSelectedColumnsDefinition = memoize(
     }
     if (isTaxIncludedInPrice && isTaxRateSameInMultiMode) {
       result.push({
-        key: 'grossPrice',
-        label: intl?.formatMessage(messages.columnGrossUnitPrice, {
+        key: 'netPrice',
+        label: intl?.formatMessage(messages.columnNetUnitPrice, {
           currencySymbol,
         }),
         align: 'right',
       });
     }
-
-    if (!isTaxIncludedInPrice) {
+    if (isTaxIncludedInPrice === false) {
       result.push({
         key: 'price',
         label: intl?.formatMessage(messages.columnNetUnitPrice, {

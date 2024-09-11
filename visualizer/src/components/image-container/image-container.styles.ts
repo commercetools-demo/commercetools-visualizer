@@ -1,5 +1,5 @@
 import { css, keyframes } from '@emotion/react';
-import { customProperties as vars } from '@commercetools-uikit/design-system';
+import { designTokens } from '@commercetools-uikit/design-system';
 
 const IMAGE_DIMENSION = {
   DEFAULT: '50px',
@@ -31,7 +31,7 @@ export const tooltipBodyStyles = css`
   visibility: hidden;
   background: rgb(0 0 0 / 15%);
   & img {
-    box-shadow: ${vars.shadow1};
+    box-shadow: ${designTokens.shadow1};
     max-width: calc((100vw / 4));
   }
 `;
@@ -55,7 +55,7 @@ export const iconButtonStyles = css`
 
 export const containerStyles = css`
   width: fit-content;
-  border: 1px solid ${vars.colorNeutral};
+  border: 1px solid ${designTokens.colorNeutral};
   &.condensed {
     width: min-content;
 
@@ -68,10 +68,10 @@ export const containerStyles = css`
 
   &.clickable:hover,
   &.clickable:focus-within {
-    border-color: ${vars.colorPrimary};
+    border-color: ${designTokens.colorPrimary};
 
     &::after {
-      box-shadow: inset 0 0 0 1px ${vars.colorPrimary};
+      box-shadow: inset 0 0 0 1px ${designTokens.colorPrimary};
       content: '';
       display: block;
       position: relative;
@@ -86,7 +86,7 @@ export const containerRowStyles = css`
 `;
 
 export const imageContainerStyles = css`
-  background: ${vars.colorSurface};
+  background: ${designTokens.colorSurface};
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -9,7 +9,7 @@ declare const window: Window &
 export const entryPointUriPath =
   typeof window === 'undefined'
     ? process.env.ENTRY_POINT_URI_PATH || 'visualizer'
-    : window.app.entryPointUriPath;
+    : window.app.entryPointUriPath || 'visualizer';
 
 export const PERMISSIONS = entryPointUriPathToPermissionKeys(entryPointUriPath);
 

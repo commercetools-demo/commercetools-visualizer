@@ -38,6 +38,5 @@ export const formatLocalizedString = (
 };
 
 export const formatDateAndTime = (dateAndTime: string, intl: IntlShape) => {
-  console.log(dateAndTime);
   return `${intl.formatDate(dateAndTime)} ${intl.formatTime(dateAndTime)}`;
 };

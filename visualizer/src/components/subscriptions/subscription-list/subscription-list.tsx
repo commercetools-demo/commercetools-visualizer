@@ -22,6 +22,10 @@ import destinationMessages from '../subscription-destination-type-form/messages'
 import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
 
 type Props = {
   linkToHome: string;
@@ -84,24 +88,24 @@ const SubscriptionList = (props: Props) => {
             );
           });
         }
-        case 'key':
-          return item.key || '';
-        case 'version':
-          return item.version;
         case 'createdAt':
-          return intl.formatDate(item.createdAt);
+        case 'lastModifiedAt':
+          return formatDateAndTime(item[column.key], intl);
         case 'destinationType':
           try {
             return intl.formatMessage(
-              // @ts-ignore
-              destinationMessages['destination' + item.destination.type]
+              destinationMessages[
+                ('destination' +
+                  item.destination.type) as keyof typeof destinationMessages
+              ]
             );
           } catch (e) {
             return item.destination.type;
           }
         default:
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return (item as any)[column.key];
+          return renderDefault(
+            item[column.key as keyof TCommercetoolsSubscription]
+          );
       }
     };
   return (

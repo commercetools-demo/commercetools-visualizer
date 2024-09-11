@@ -1,7 +1,6 @@
 import { FC, lazy } from 'react';
 import { useIntl } from 'react-intl';
 import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
-import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import {
   usePaginationState,
   useDataTableSortingState,
@@ -14,10 +13,6 @@ import {
   InfoMainPage,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import {
-  formatLocalizedString,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
@@ -29,6 +24,11 @@ import { useTypesFetcher } from '../../../hooks/use-types-connector';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import {
+  formatDateAndTime,
+  formatLocalizedString,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
 const TypesCreate = lazy(() => import('../types-create/types-create'));
 
 const TypesEdit = lazy(() => import('../types-edit/types-edit'));
@@ -42,8 +42,8 @@ const TypesList: FC<Props> = () => {
   const paginationState = usePaginationState();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale,
-    projectLanguages: context.project?.languages,
+    dataLocale: context.dataLocale ?? '',
+    projectLanguages: context.project?.languages ?? [],
   }));
   const { typeDefinitions, error, loading, refetch } = useTypesFetcher({
     limit: paginationState.perPage.value,
@@ -80,47 +80,25 @@ const TypesList: FC<Props> = () => {
     switch (column.key) {
       case 'name':
         return formatLocalizedString(
-          {
-            name: transformLocalizedFieldToLocalizedString(
-              item.nameAllLocales ?? []
-            ),
-          },
-          {
-            key: 'name',
-            locale: dataLocale,
-            fallbackOrder: projectLanguages,
-            fallback: NO_VALUE_FALLBACK,
-          }
+          item.nameAllLocales,
+          dataLocale,
+          projectLanguages
         );
       case 'description':
         return formatLocalizedString(
-          {
-            name: transformLocalizedFieldToLocalizedString(
-              item.descriptionAllLocales ?? []
-            ),
-          },
-          {
-            key: 'name',
-            locale: dataLocale,
-            fallbackOrder: projectLanguages,
-            fallback: NO_VALUE_FALLBACK,
-          }
+          item.descriptionAllLocales,
+          dataLocale,
+          projectLanguages
         );
       case 'resourceTypeIds':
         return item.resourceTypeIds.join(', ');
       case 'fieldCount':
         return item.fieldDefinitions.length;
       case 'createdAt':
-        return `${intl.formatDate(item.createdAt)} ${intl.formatTime(
-          item.createdAt
-        )}`;
       case 'lastModifiedAt':
-        return `${intl.formatDate(item.lastModifiedAt)} ${intl.formatTime(
-          item.lastModifiedAt
-        )}`;
+        return formatDateAndTime(item[column.key], intl);
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (item as any)[column.key];
+        return renderDefault(item[column.key as keyof TTypeDefinition]);
     }
   };
 

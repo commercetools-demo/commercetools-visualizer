@@ -35,6 +35,10 @@ import IconButton from '@commercetools-uikit/icon-button';
 import { CloseBoldIcon } from '@commercetools-uikit/icons';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
 
 type Props = StepProps & { cart: TCart };
 
@@ -187,22 +191,9 @@ export const CartCreateCustomerPick: FC<Props> = ({
         return item[column.key] ? item[column.key]?.name : NO_VALUE_FALLBACK;
       case 'createdAt':
       case 'lastModifiedAt':
-        return `${intl.formatDate(item[column.key])} ${intl.formatTime(
-          item[column.key]
-        )}`;
-      case 'email':
-      case 'companyName':
-      case 'firstName':
-      case 'lastName':
-      case 'middleName':
-      case 'vatId':
-      case 'externalId':
-      case 'dateOfBirth':
-      case 'customerNumber':
-        return item[column.key] || NO_VALUE_FALLBACK;
+        return formatDateAndTime(item[column.key], intl);
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (item as any)[column.key];
+        return renderDefault(item[column.key as keyof TCustomer]);
     }
   };
   return (

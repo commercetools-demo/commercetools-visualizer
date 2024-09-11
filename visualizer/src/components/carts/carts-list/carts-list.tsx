@@ -34,6 +34,10 @@ import Stamp, { TTone } from '@commercetools-uikit/stamp';
 import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
 
 const CartsList = () => {
   const intl = useIntl();
@@ -93,9 +97,8 @@ const CartsList = () => {
   ) => {
     switch (column.key) {
       case 'createdAt':
-        return intl.formatDate(item.createdAt);
       case 'lastModifiedAt':
-        return intl.formatDate(item.lastModifiedAt);
+        return formatDateAndTime(item[column.key], intl);
       case 'amountOfLineitems':
         return item.lineItems.length;
       case 'cartState': {
@@ -123,8 +126,7 @@ const CartsList = () => {
       case 'totalPrice':
         return formatMoney(item.totalPrice, intl);
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (item as any)[column.key] || '';
+        return renderDefault(item[column.key as keyof TCart]);
     }
   };
 

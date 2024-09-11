@@ -24,6 +24,10 @@ import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
 
 const ExtensionsList = () => {
   const intl = useIntl();
@@ -65,25 +69,15 @@ const ExtensionsList = () => {
     column
   ) => {
     switch (column.key) {
-      case 'key':
-        return item.key || '';
       case 'destination':
         return item.destination.type;
-      case 'timeoutInMs':
-        return item.timeoutInMs || 0;
       case 'triggers':
         return item.triggers.map((value) => value.resourceTypeId).join(', ');
       case 'createdAt':
-        return `${intl.formatDate(item.createdAt)} ${intl.formatTime(
-          item.createdAt
-        )}`;
       case 'lastModifiedAt':
-        return `${intl.formatDate(item.lastModifiedAt)} ${intl.formatTime(
-          item.lastModifiedAt
-        )}`;
+        return formatDateAndTime(item[column.key], intl);
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (item as any)[column.key];
+        return renderDefault(item[column.key as keyof TExtension]);
     }
   };
 

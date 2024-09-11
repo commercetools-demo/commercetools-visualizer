@@ -33,6 +33,7 @@ import CartItemTableSubtotalPriceCell from './cart-item-table-subtotal-price-cel
 import CartItemTableTotalPriceCell from './cart-item-table-total-price-cell';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import { renderDefault } from '../../paginatable-data-table/helpers';
 
 type Props = { cart: TCart };
 
@@ -113,8 +114,9 @@ const CartDetailsItems: FC<Props> = ({ cart }) => {
           />
         );
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (item as any)[column.key] || '';
+        return renderDefault(
+          item[column.key as keyof (TLineItem | TCustomLineItem)]
+        );
     }
   };
 

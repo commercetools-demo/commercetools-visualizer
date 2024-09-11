@@ -178,7 +178,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
           <Spacings.Inline alignItems="center">
             <ImageContainer
               label={itemName}
-              url={item.variant?.images[0].url}
+              url={item.variant?.images[0]?.url}
             />
             <div>
               <span>{itemName}</span>

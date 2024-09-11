@@ -8,19 +8,17 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import ImageContainer from '../../../image-container';
+import { isCustomLineItem } from '../../../../helpers';
 
 const getImageUrl = ({
   lineItem,
 }: {
   lineItem: TLineItem | TCustomLineItem;
 }) => {
-  if ('money' in lineItem) return NoImageIconUri;
-  // We optionally select `Variant` from lineItem with the risk that
-  // `lineItem.variant` could have been deleted from the project
-  // through missync (multi project setup)
-  return lineItem?.variant?.images?.length
-    ? lineItem.variant.images[0].url
-    : undefined;
+  if (isCustomLineItem(lineItem)) {
+    return NoImageIconUri;
+  }
+  return lineItem.variant?.images[0]?.url;
 };
 type Props = {
   lineItem: TLineItem | TCustomLineItem;

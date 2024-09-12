@@ -6,6 +6,7 @@ import {
   waitFor,
   mapResourceAccessToAppliedPermissions,
   type TRenderAppWithReduxOptions,
+  within,
 } from '@commercetools-frontend/application-shell/test-utils';
 import { buildGraphqlList } from '@commercetools-test-data/core';
 import { renderApplicationWithRoutesAndRedux } from '../../../test-utils';
@@ -14,6 +15,7 @@ import {
   random,
   TSubscription,
 } from '../../../test-utils/models/subscriptions';
+import { act } from '@testing-library/react-hooks';
 
 const mockServer = setupServer();
 afterEach(() => mockServer.resetHandlers());
@@ -73,19 +75,19 @@ const fetchSubscriptionDetailsQueryHandlerWithNullData = graphql.query(
   }
 );
 
-// const fetchSubscriptionDetailsQueryHandlerWithError = graphql.query(
-//   'FetchSubscription',
-//   (_req, res, ctx) => {
-//     return res(
-//       ctx.data({ subscription: null }),
-//       ctx.errors([
-//         {
-//           message: "Field '$channelId' has wrong value: Invalid ID.",
-//         },
-//       ])
-//     );
-//   }
-// );
+const fetchSubscriptionDetailsQueryHandlerWithError = graphql.query(
+  'FetchSubscription',
+  (_req, res, ctx) => {
+    return res(
+      ctx.data({ subscription: null }),
+      ctx.errors([
+        {
+          message: "Field '$subscriptionId' has wrong value: Invalid ID.",
+        },
+      ])
+    );
+  }
+);
 
 const updateSubscriptionDetailsHandler = graphql.mutation(
   'UpdateSubscription',
@@ -115,20 +117,20 @@ const updateSubscriptionDetailsHandlerWithDuplicateFieldError =
     );
   });
 
-// const updateSubscriptionDetailsHandlerWithARandomError = graphql.mutation(
-//   'UpdateSubscription',
-//   (_req, res, ctx) => {
-//     return res(
-//       ctx.data({ updateSubscription: null }),
-//       ctx.errors([
-//         {
-//           message: 'Some fake error message.',
-//           code: 'SomeFakeErrorCode',
-//         },
-//       ])
-//     );
-//   }
-// );
+const updateSubscriptionDetailsHandlerWithARandomError = graphql.mutation(
+  'UpdateSubscription',
+  (_req, res, ctx) => {
+    return res(
+      ctx.data({ updateSubscription: null }),
+      ctx.errors([
+        {
+          message: 'Some fake error message.',
+          code: 'SomeFakeErrorCode',
+        },
+      ])
+    );
+  }
+);
 
 const useMockServerHandlers = (handlers: GraphQLHandler[]) => {
   mockServer.use(
@@ -241,71 +243,76 @@ describe('rendering', () => {
     fireEvent.click(saveButton);
 
     await screen.findByText(/a subscription with this key already exists/i);
-  });
+  }, 10000);
 });
-// describe('notifications', () => {
-//   it('should render a success notification after an update', async () => {
-//     useMockServerHandlers([
-//       fetchSubscriptionDetailsQueryHandler,
-//       updateSubscriptionDetailsHandler,
-//     ]);
-//     renderApp();
-//
-//     const keyInput: HTMLInputElement = await screen.findByLabelText(
-//       /subscription key/i
-//     );
-//     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-//
-//     fireEvent.change(keyInput, {
-//       target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-//     });
-//     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-//
-//     const rolesSelect = screen.getByRole('combobox', {
-//       name: /subscription roles/i,
-//     });
-//     fireEvent.focus(rolesSelect);
-//     fireEvent.keyDown(rolesSelect, { key: 'ArrowDown' });
-//     const inventorySupplyOption = await screen.findByText('InventorySupply');
-//
-//     inventorySupplyOption.click();
-//     expect(screen.getByDisplayValue(/InventorySupply/i)).toBeInTheDocument();
-//
-//     // updating subscription details
-//     const saveButton = screen.getByRole('button', { name: /save/i });
-//     fireEvent.click(saveButton);
-//     const notification = await screen.findByRole('alertdialog');
-//     within(notification).getByText(/subscription .+ updated/i);
-//   });
-//   it('should render an error notification if fetching subscription details resulted in an error', async () => {
-//     useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
-//     renderApp();
-//     await screen.findByText(
-//       /please check your connection, the provided subscription ID and try again/i
-//     );
-//   });
-//   it('should display an error notification if an update resulted in an unmapped error', async () => {
-//     // Mock error log
-//     jest.spyOn(console, 'error').mockImplementation();
-//
-//     useMockServerHandlers([
-//       fetchSubscriptionDetailsQueryHandler,
-//       updateSubscriptionDetailsHandlerWithARandomError,
-//     ]);
-//     renderApp();
-//
-//     const keyInput = await screen.findByLabelText(/subscription key/i);
-//
-//     // we're firing the input change to enable the save button, the value itself is not relevant
-//     fireEvent.change(keyInput, {
-//       target: { value: 'not relevant' },
-//     });
-//
-//     // updating subscription details
-//     const saveButton = screen.getByRole('button', { name: /save/i });
-//     fireEvent.click(saveButton);
-//
-//     const notification = await screen.findByRole('alertdialog');
-//     within(notification).getByText(/some fake error message/i);
-//   });
-// });
+describe('notifications', () => {
+  it('should render a success notification after an update', async () => {
+    useMockServerHandlers([
+      fetchSubscriptionDetailsQueryHandler,
+      updateSubscriptionDetailsHandler,
+    ]);
+    renderApp();
+
+    const keyInput: HTMLInputElement = await screen.findByLabelText(
+      /subscription key/i
+    );
+    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+
+    fireEvent.change(keyInput, {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+
+    const destinations = screen.getByRole('combobox', {
+      name: 'Destination *',
+    });
+    fireEvent.focus(destinations);
+    fireEvent.keyDown(destinations, { key: 'ArrowDown' });
+    const inventorySupplyOption = await screen.findByText('AWS SNS');
+
+    act(() => {
+      inventorySupplyOption.click();
+    });
+
+    expect(screen.getByText(/AWS SNS/i)).toBeInTheDocument();
+
+    // updating subscription details
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
+    const notification = await screen.findByRole('alertdialog');
+    within(notification).getByText(/subscription .+ updated/i);
+  }, 10000);
+
+  it('should render an error notification if fetching subscription details resulted in an error', async () => {
+    useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
+    renderApp();
+    await screen.findByText(
+      "Field '$subscriptionId' has wrong value: Invalid ID."
+    );
+  });
+
+  it('should display an error notification if an update resulted in an unmapped error', async () => {
+    // Mock error log
+    jest.spyOn(console, 'error').mockImplementation();
+
+    useMockServerHandlers([
+      fetchSubscriptionDetailsQueryHandler,
+      updateSubscriptionDetailsHandlerWithARandomError,
+    ]);
+    renderApp();
+
+    const keyInput = await screen.findByLabelText(/subscription key/i);
+
+    // we're firing the input change to enable the save button, the value itself is not relevant
+    fireEvent.change(keyInput, {
+      target: { value: 'not-relevant' },
+    });
+
+    // updating subscription details
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
+
+    const notification = await screen.findByRole('alertdialog');
+    within(notification).getByText(/some fake error message/i);
+  }, 8000);
+});

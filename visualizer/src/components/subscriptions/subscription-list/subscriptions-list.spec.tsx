@@ -14,9 +14,13 @@ import {
   random,
   TSubscription,
 } from '../../../test-utils/models/subscriptions';
+import { cleanup } from '@testing-library/react-hooks';
 
 const mockServer = setupServer();
-afterEach(() => mockServer.resetHandlers());
+afterEach(async () => {
+  mockServer.resetHandlers();
+  await cleanup();
+});
 
 beforeAll(() => {
   mockServer.listen({

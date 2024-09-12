@@ -15,10 +15,13 @@ import {
   random,
   TSubscription,
 } from '../../../test-utils/models/subscriptions';
-import { act } from '@testing-library/react-hooks';
+import { act, cleanup } from '@testing-library/react-hooks';
 
 const mockServer = setupServer();
-afterEach(() => mockServer.resetHandlers());
+afterEach(async () => {
+  mockServer.resetHandlers();
+  await cleanup();
+});
 beforeAll(() => {
   mockServer.listen({
     // for debugging reasons we force an error when the test fires a request with a query or mutation which is not mocked

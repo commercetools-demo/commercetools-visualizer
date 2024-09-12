@@ -8,13 +8,17 @@ import Spacings from '@commercetools-uikit/spacings';
 
 type Props = {
   destinationType: string;
+  isReadOnly?: boolean;
 };
 
-const SubscriptionDestinationForm: FC<Props> = ({ destinationType }) => {
+const SubscriptionDestinationForm: FC<Props> = ({
+  destinationType,
+  isReadOnly,
+}) => {
   let toRender = <div>No mapping defined so far for {destinationType}</div>;
   switch (destinationType) {
     case 'GoogleCloudPubSub':
-      toRender = <GoogleCloudPubSubDestination />;
+      toRender = <GoogleCloudPubSubDestination isReadOnly={isReadOnly} />;
       break;
   }
 

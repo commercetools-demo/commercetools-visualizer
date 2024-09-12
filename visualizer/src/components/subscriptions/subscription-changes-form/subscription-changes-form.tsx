@@ -6,6 +6,7 @@ import CheckboxGroup from '../../checkbox/CheckboxGroup';
 import { TChangeSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { IntlShape, useIntl } from 'react-intl';
+import { FC } from 'react';
 
 const possibilities = (intl: IntlShape) => {
   return [
@@ -79,7 +80,10 @@ const possibilities = (intl: IntlShape) => {
   ];
 };
 
-const SubscriptionChangesForm = () => {
+type Props = {
+  isReadOnly?: boolean;
+};
+const SubscriptionChangesForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
 
   const isChecked = (
@@ -138,6 +142,7 @@ const SubscriptionChangesForm = () => {
                       isChecked={isChecked}
                       addItem={addItem}
                       removeItem={removeItem}
+                      isReadOnly={isReadOnly}
                     />
                   );
                 })}

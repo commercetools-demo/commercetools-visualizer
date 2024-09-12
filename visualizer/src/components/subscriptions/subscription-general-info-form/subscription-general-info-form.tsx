@@ -6,6 +6,7 @@ import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
+import { FC } from 'react';
 
 export const validateKeyInput = (key: string) => {
   const hasKeyValue = Boolean(key);
@@ -33,7 +34,9 @@ const renderBusinessUnitKeyInputErrors = (key: string) => {
   }
 };
 
-const SubscriptionGeneralInfoForm = () => {
+type Props = { isReadOnly?: boolean };
+
+const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'key',
     validate: (key) => validateKeyInput(key),
@@ -61,6 +64,7 @@ const SubscriptionGeneralInfoForm = () => {
                 title={<FormattedMessage {...messages.subscriptionKeyLabel} />}
                 touched={keyMeta.touched}
                 value={keyMeta.value || ''}
+                isReadOnly={isReadOnly}
               />
             </Card>
           </Constraints.Horizontal>

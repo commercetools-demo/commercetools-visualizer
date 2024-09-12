@@ -8,6 +8,7 @@ type Props<T> = {
   isChecked: (values: Array<T> | undefined, value: string) => boolean;
   removeItem: (values: Array<T> | undefined, value: string) => Array<T>;
   addItem: (values: Array<T> | undefined, value: string) => Array<T>;
+  isReadOnly?: boolean;
 };
 
 export default function CheckboxGroupItem<T>({
@@ -16,6 +17,7 @@ export default function CheckboxGroupItem<T>({
   isChecked,
   removeItem,
   addItem,
+  isReadOnly,
 }: Props<T>) {
   const { field, helpers } = useCheckboxContext<T>();
   const checked = isChecked(field.value, value);
@@ -30,6 +32,7 @@ export default function CheckboxGroupItem<T>({
             helpers.setValue(addItem(field.value, value));
           }
         }}
+        isReadOnly={isReadOnly}
       >
         {label}
       </CheckboxInput>

@@ -22,6 +22,10 @@ jobs:
         working-directory: ./visualizer
         run: yarn install
 
+      - name: Run build
+        working-directory: ./visualizer
+        run: yarn run build
+
       - name: Run tests
         working-directory: ./visualizer
         run: yarn run test

@@ -9,6 +9,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      CLOUD_IDENTIFIER: gcp-eu
+      CUSTOM_APPLICATION_ID: TODO
+      APPLICATION_URL: https://your_app_hostname.com
+      INITIAL_PROJECT_KEY: todo
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

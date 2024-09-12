@@ -31,12 +31,16 @@ export const compareStringArrays = (
   } else if (!array1 || !array2) {
     return false;
   } else {
-    const sortedArray1 = array1.sort(sortStringArray);
-    const sortedArray2 = array2.sort(sortStringArray);
-    const areEqual: boolean =
-      sortedArray1.length === sortedArray2.length &&
-      sortedArray1.every((value, index) => value === sortedArray2[index]);
-    return areEqual;
+    try {
+      const sortedArray1 = [...array1].sort(sortStringArray);
+      const sortedArray2 = [...array2].sort(sortStringArray);
+      const areEqual: boolean =
+        sortedArray1.length === sortedArray2.length &&
+        sortedArray1.every((value, index) => value === sortedArray2[index]);
+      return areEqual;
+    } catch (e) {
+      throw new Error();
+    }
   }
 };
 export const getErrorMessage = (error: ApolloError) =>

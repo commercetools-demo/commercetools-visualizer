@@ -17,9 +17,16 @@ const transformers = {
 
   graphql: Transformer<TSubscription, TSubscriptionGraphql>('graphql', {
     buildFields,
-    addFields: () => ({
-      __typename: 'CommercetoolsSubscription',
-    }),
+    replaceFields: ({ fields }) => {
+      return {
+        ...fields,
+        __typename: 'CommercetoolsSubscription',
+        destination: {
+          ...fields.destination,
+          __typename: 'GoogleCloudPubSubDestination',
+        },
+      };
+    },
   }),
 };
 

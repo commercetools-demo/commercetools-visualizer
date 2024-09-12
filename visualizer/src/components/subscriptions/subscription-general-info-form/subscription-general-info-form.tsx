@@ -7,6 +7,7 @@ import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import { FC } from 'react';
+import { TFieldErrors } from '@commercetools-uikit/multiline-text-field/dist/declarations/src/multiline-text-field';
 
 export const validateKeyInput = (key: string) => {
   const hasKeyValue = Boolean(key);
@@ -41,6 +42,12 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
     name: 'key',
     validate: (key) => validateKeyInput(key),
   });
+  let parsedErrors: TFieldErrors | undefined;
+  if (keyMeta.error) {
+    if (typeof keyMeta.error === 'string') {
+      parsedErrors = JSON.parse(keyMeta.error || '{}');
+    } else parsedErrors = keyMeta.error;
+  }
   return (
     <Constraints.Horizontal max="scale">
       <Grid
@@ -51,7 +58,7 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
           <Constraints.Horizontal max="scale">
             <Card insetScale="s" type="flat">
               <TextField
-                errors={JSON.parse(keyMeta.error || '{}')}
+                errors={parsedErrors}
                 name={keyField.name}
                 isRequired={true}
                 onBlur={() => {

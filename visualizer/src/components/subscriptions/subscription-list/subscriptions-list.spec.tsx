@@ -10,8 +10,10 @@ import { buildGraphqlList } from '@commercetools-test-data/core';
 import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 import { renderApplicationWithRedux } from '../../../test-utils';
 import ApplicationRoutes from '../../../routes';
-import * as Subscription from '../../../test-utils/models/subscriptions';
-import { TSubscription } from '../../../test-utils/models/subscriptions';
+import {
+  random,
+  TSubscription,
+} from '../../../test-utils/models/subscriptions';
 
 const mockServer = setupServer();
 afterEach(() => mockServer.resetHandlers());
@@ -42,9 +44,7 @@ const renderApp = (options: Partial<TRenderAppWithReduxOptions> = {}) => {
   return { history };
 };
 
-console.log(Subscription.random().buildGraphql());
-
-it('should render channels and paginate to second page', async () => {
+it('should render subscriptions and paginate to second page', async () => {
   mockServer.use(
     graphql.query('FetchSubscriptions', (req, res, ctx) => {
       // Simulate a server side pagination.
@@ -56,7 +56,7 @@ it('should render channels and paginate to second page', async () => {
         ctx.data({
           subscriptions: buildGraphqlList<TSubscription>(
             Array.from({ length: itemsPerPage }).map((_, index) => {
-              return Subscription.random().key(
+              return random().key(
                 `subscription-key-${offset === 0 ? index : 20 + index}`
               );
             }),

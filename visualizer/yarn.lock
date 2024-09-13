@@ -2064,6 +2064,20 @@
     "@commercetools/platform-sdk" "^7.0.0"
     "@faker-js/faker" "^8.0.0"
 
+"@commercetools-test-data/commons@10.7.0":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@commercetools-test-data/commons/-/commons-10.7.0.tgz#3ede59819e754651427c91071ac21955559d2c86"
+  integrity sha512-QdNf1kDdDMSDZkUM9kVVXlvbXRevVQGv1rFUFWT6YBdFPo2K+Y2u5YKBG9bXymAGEXJuc2QNsBJooAL1kZS2xA==
+  dependencies:
+    "@babel/runtime" "^7.17.9"
+    "@babel/runtime-corejs3" "^7.17.9"
+    "@commercetools-test-data/core" "10.7.0"
+    "@commercetools-test-data/utils" "10.7.0"
+    "@commercetools/platform-sdk" "7.12.0"
+    "@faker-js/faker" "^8.0.0"
+    "@types/lodash" "^4.17.0"
+    lodash "^4.17.21"
+
 "@commercetools-test-data/commons@8.5.0":
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/@commercetools-test-data/commons/-/commons-8.5.0.tgz#f4ecca0279d106525458350dc22da601364c6a7a"
@@ -2078,6 +2092,17 @@
     "@types/lodash" "^4.17.0"
     lodash "^4.17.21"
 
+"@commercetools-test-data/core@10.7.0":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@commercetools-test-data/core/-/core-10.7.0.tgz#cd3d414f98a8331952f86127af30ec42b4a5cdd1"
+  integrity sha512-vdyVrhTT5DzZdFPPxmhlpzb1CBGjt1lUFj3z0gcbdMz9rpwUXRpHV6cdhVSmb7hPPpHNlLsBRQcN+7DAiQ7t/A==
+  dependencies:
+    "@babel/runtime" "^7.17.9"
+    "@babel/runtime-corejs3" "^7.17.9"
+    "@faker-js/faker" "^8.0.0"
+    "@types/lodash" "^4.17.0"
+    lodash "^4.17.21"
+
 "@commercetools-test-data/core@8.5.0":
   version "8.5.0"
   resolved "https://registry.yarnpkg.com/@commercetools-test-data/core/-/core-8.5.0.tgz#fa023f7cf84aebff927a80ab76d8a2f406fdbb8e"
@@ -2088,6 +2113,28 @@
     "@faker-js/faker" "^8.0.0"
     "@types/lodash" "^4.17.0"
     lodash "^4.17.21"
+
+"@commercetools-test-data/type@^10.7.0":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@commercetools-test-data/type/-/type-10.7.0.tgz#86e7c97080c840825f71a8e17ef1a50b0c8adf6f"
+  integrity sha512-q5ebiZIe1bJEmenHlT0tYvTyx3YfXPnUSYYcRaaiik2AERv1JPKI+BMAGDkkTopkwXl7Xj8dfY/yllDs7iH7xw==
+  dependencies:
+    "@babel/runtime" "^7.17.9"
+    "@babel/runtime-corejs3" "^7.17.9"
+    "@commercetools-test-data/commons" "10.7.0"
+    "@commercetools-test-data/core" "10.7.0"
+    "@commercetools-test-data/utils" "10.7.0"
+    "@commercetools/platform-sdk" "7.12.0"
+    "@faker-js/faker" "^8.0.0"
+
+"@commercetools-test-data/utils@10.7.0":
+  version "10.7.0"
+  resolved "https://registry.yarnpkg.com/@commercetools-test-data/utils/-/utils-10.7.0.tgz#2ee3b65f52612cb562a169bad7fc2fb93acaaeb2"
+  integrity sha512-S7j68VXdtyzhUY3UT/NQPh0m/KDS1pXc3McgbmcA9SXSe1Q+ByEfz5L+ipoRZm4XzVoIINpa9bz4gURsPB2ZZw==
+  dependencies:
+    "@babel/runtime" "^7.17.9"
+    "@babel/runtime-corejs3" "^7.17.9"
+    "@faker-js/faker" "^8.0.0"
 
 "@commercetools-test-data/utils@8.5.0":
   version "8.5.0"
@@ -3052,6 +3099,17 @@
   resolved "https://registry.yarnpkg.com/@commercetools/http-user-agent/-/http-user-agent-3.0.0.tgz#1bf8573f11f7a9e9688e3460425d9371c4b23c24"
   integrity sha512-kHlVST/Ax8GFpG9vpcUR5wKBGBoY2tZDA87kSC3nxhgk2+szZfv7MMMaAt0EIz2thpyO7oJv9NyPY/3XrrNIXQ==
 
+"@commercetools/platform-sdk@7.12.0":
+  version "7.12.0"
+  resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-7.12.0.tgz#c22ee5984aec890db12c49edde62aa3888ce4446"
+  integrity sha512-fhO8kZgV1c1VuWe6pQ423dxat5E4y7uSyTjm5pO+yCO7EXdWT7IYkoP0xmnLay5kUuXxuD9GcTXobGxqkupESw==
+  dependencies:
+    "@commercetools/sdk-client-v2" "^2.5.0"
+    "@commercetools/sdk-middleware-auth" "^7.0.0"
+    "@commercetools/sdk-middleware-http" "^7.0.0"
+    "@commercetools/sdk-middleware-logger" "^3.0.0"
+    "@commercetools/ts-client" "^2.0.2"
+
 "@commercetools/platform-sdk@^7.0.0":
   version "7.13.0"
   resolved "https://registry.yarnpkg.com/@commercetools/platform-sdk/-/platform-sdk-7.13.0.tgz#308fafe4e574f839db357279bad62e219ca83bd1"
@@ -3133,7 +3191,7 @@
     lodash.uniqwith "^4.5.0"
     lodash.without "^4.4.0"
 
-"@commercetools/ts-client@^2.0.4":
+"@commercetools/ts-client@^2.0.2", "@commercetools/ts-client@^2.0.4":
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/@commercetools/ts-client/-/ts-client-2.0.4.tgz#fa660a85da3361ec190532428dcc338e63badb82"
   integrity sha512-uMfpQshh0CuzIdE0e5d9PctELJ1YTeFc/0MYdXSPqOdlzy3f8dW9Bgze8bGAoDKbkC6GK85JRAVs9ADlU48ugg==

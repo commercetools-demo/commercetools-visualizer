@@ -129,5 +129,7 @@
     "headers-polyfill": "3.2.5",
     "nwsapi": "2.2.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@commercetools-test-data/type": "^10.7.0"
+  }
 }

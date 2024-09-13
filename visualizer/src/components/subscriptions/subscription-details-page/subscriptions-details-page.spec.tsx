@@ -225,28 +225,28 @@ describe('rendering', () => {
       name: /we could not find what you are looking for/i,
     });
   });
-  // it('should display a key field validation message if the submitted key value is duplicated', async () => {
-  //   useMockServerHandlers([
-  //     fetchSubscriptionDetailsQueryHandler,
-  //     updateSubscriptionDetailsHandlerWithDuplicateFieldError,
-  //   ]);
-  //   renderApp();
-  //
-  //   const keyInput: HTMLInputElement = await screen.findByLabelText(
-  //     /subscription key/i
-  //   );
-  //
-  //   fireEvent.change(keyInput, {
-  //     target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-  //   });
-  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-  //
-  //   // updating subscription details
-  //   const saveButton = screen.getByRole('button', { name: /save/i });
-  //   fireEvent.click(saveButton);
-  //
-  //   await screen.findByText(/a subscription with this key already exists/i);
-  // }, 10000);
+  it('should display a key field validation message if the submitted key value is duplicated', async () => {
+    useMockServerHandlers([
+      fetchSubscriptionDetailsQueryHandler,
+      updateSubscriptionDetailsHandlerWithDuplicateFieldError,
+    ]);
+    renderApp();
+
+    const keyInput: HTMLInputElement = await screen.findByLabelText(
+      /subscription key/i
+    );
+
+    fireEvent.change(keyInput, {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+
+    // updating subscription details
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
+
+    await screen.findByText(/a subscription with this key already exists/i);
+  }, 10000);
 });
 // describe('notifications', () => {
 //   it('should render a success notification after an update', async () => {

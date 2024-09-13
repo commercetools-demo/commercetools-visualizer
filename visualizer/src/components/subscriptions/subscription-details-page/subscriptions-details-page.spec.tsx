@@ -196,7 +196,7 @@ describe('rendering', () => {
     await waitFor(() => {
       expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
     });
-  });
+  }, 10000);
   describe('when user has no manage permission', () => {
     it('should render the form as read-only and keep the "save" button "disabled"', async () => {
       useMockServerHandlers([

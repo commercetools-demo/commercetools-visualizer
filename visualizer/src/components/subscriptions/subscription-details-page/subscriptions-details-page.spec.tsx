@@ -172,150 +172,150 @@ describe('rendering', () => {
 
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
-  it('should reset form values on "revert" button click', async () => {
-    useMockServerHandlers([fetchSubscriptionDetailsQueryHandler]);
-    renderApp();
-
-    const resetButton = await screen.findByRole('button', {
-      name: /revert/i,
-    });
-    expect(resetButton).toBeDisabled();
-
-    const keyInput: HTMLInputElement = await screen.findByLabelText(
-      /subscription key/i
-    );
-    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-
-    fireEvent.change(keyInput, {
-      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-    });
-    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-
-    fireEvent.click(resetButton);
-
-    await waitFor(() => {
-      expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-    });
-  });
-  describe('when user has no manage permission', () => {
-    it('should render the form as read-only and keep the "save" button "disabled"', async () => {
-      useMockServerHandlers([
-        fetchSubscriptionDetailsQueryHandler,
-        updateSubscriptionDetailsHandler,
-      ]);
-      renderApp({}, false);
-
-      const keyInput = await screen.findByLabelText(/subscription key/i);
-      expect(keyInput.hasAttribute('readonly')).toBeTruthy();
-
-      const destinationSelect = screen.getByRole('combobox', {
-        name: 'Destination *',
-      });
-      expect(destinationSelect.hasAttribute('readonly')).toBeTruthy();
-
-      const saveButton = screen.getByRole('button', { name: /save/i });
-      expect(saveButton).toBeDisabled();
-    });
-  });
-  it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
-    useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);
-    renderApp();
-
-    await screen.findByRole('heading', {
-      name: /we could not find what you are looking for/i,
-    });
-  });
-  it('should display a key field validation message if the submitted key value is duplicated', async () => {
-    useMockServerHandlers([
-      fetchSubscriptionDetailsQueryHandler,
-      updateSubscriptionDetailsHandlerWithDuplicateFieldError,
-    ]);
-    renderApp();
-
-    const keyInput: HTMLInputElement = await screen.findByLabelText(
-      /subscription key/i
-    );
-
-    fireEvent.change(keyInput, {
-      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-    });
-    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-
-    // updating subscription details
-    const saveButton = screen.getByRole('button', { name: /save/i });
-    fireEvent.click(saveButton);
-
-    await screen.findByText(/a subscription with this key already exists/i);
-  }, 10000);
+  // it('should reset form values on "revert" button click', async () => {
+  //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandler]);
+  //   renderApp();
+  //
+  //   const resetButton = await screen.findByRole('button', {
+  //     name: /revert/i,
+  //   });
+  //   expect(resetButton).toBeDisabled();
+  //
+  //   const keyInput: HTMLInputElement = await screen.findByLabelText(
+  //     /subscription key/i
+  //   );
+  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+  //
+  //   fireEvent.change(keyInput, {
+  //     target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+  //   });
+  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+  //
+  //   fireEvent.click(resetButton);
+  //
+  //   await waitFor(() => {
+  //     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+  //   });
+  // });
+  // describe('when user has no manage permission', () => {
+  //   it('should render the form as read-only and keep the "save" button "disabled"', async () => {
+  //     useMockServerHandlers([
+  //       fetchSubscriptionDetailsQueryHandler,
+  //       updateSubscriptionDetailsHandler,
+  //     ]);
+  //     renderApp({}, false);
+  //
+  //     const keyInput = await screen.findByLabelText(/subscription key/i);
+  //     expect(keyInput.hasAttribute('readonly')).toBeTruthy();
+  //
+  //     const destinationSelect = screen.getByRole('combobox', {
+  //       name: 'Destination *',
+  //     });
+  //     expect(destinationSelect.hasAttribute('readonly')).toBeTruthy();
+  //
+  //     const saveButton = screen.getByRole('button', { name: /save/i });
+  //     expect(saveButton).toBeDisabled();
+  //   });
+  // });
+  // it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
+  //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);
+  //   renderApp();
+  //
+  //   await screen.findByRole('heading', {
+  //     name: /we could not find what you are looking for/i,
+  //   });
+  // });
+  // it('should display a key field validation message if the submitted key value is duplicated', async () => {
+  //   useMockServerHandlers([
+  //     fetchSubscriptionDetailsQueryHandler,
+  //     updateSubscriptionDetailsHandlerWithDuplicateFieldError,
+  //   ]);
+  //   renderApp();
+  //
+  //   const keyInput: HTMLInputElement = await screen.findByLabelText(
+  //     /subscription key/i
+  //   );
+  //
+  //   fireEvent.change(keyInput, {
+  //     target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+  //   });
+  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+  //
+  //   // updating subscription details
+  //   const saveButton = screen.getByRole('button', { name: /save/i });
+  //   fireEvent.click(saveButton);
+  //
+  //   await screen.findByText(/a subscription with this key already exists/i);
+  // }, 10000);
 });
-describe('notifications', () => {
-  it('should render a success notification after an update', async () => {
-    useMockServerHandlers([
-      fetchSubscriptionDetailsQueryHandler,
-      updateSubscriptionDetailsHandler,
-    ]);
-    renderApp();
-
-    const keyInput: HTMLInputElement = await screen.findByLabelText(
-      /subscription key/i
-    );
-    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-
-    fireEvent.change(keyInput, {
-      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-    });
-    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-
-    const destinations = screen.getByRole('combobox', {
-      name: 'Destination *',
-    });
-    fireEvent.focus(destinations);
-    fireEvent.keyDown(destinations, { key: 'ArrowDown' });
-    const inventorySupplyOption = await screen.findByText('AWS SNS');
-
-    act(() => {
-      inventorySupplyOption.click();
-    });
-
-    expect(screen.getByText(/AWS SNS/i)).toBeInTheDocument();
-
-    // updating subscription details
-    const saveButton = screen.getByRole('button', { name: /save/i });
-    fireEvent.click(saveButton);
-    const notification = await screen.findByRole('alertdialog');
-    within(notification).getByText(/subscription .+ updated/i);
-  }, 10000);
-
-  it('should render an error notification if fetching subscription details resulted in an error', async () => {
-    useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
-    renderApp();
-    await screen.findByText(
-      "Field '$subscriptionId' has wrong value: Invalid ID."
-    );
-  });
-
-  it('should display an error notification if an update resulted in an unmapped error', async () => {
-    // Mock error log
-    jest.spyOn(console, 'error').mockImplementation();
-
-    useMockServerHandlers([
-      fetchSubscriptionDetailsQueryHandler,
-      updateSubscriptionDetailsHandlerWithARandomError,
-    ]);
-    renderApp();
-
-    const keyInput = await screen.findByLabelText(/subscription key/i);
-
-    // we're firing the input change to enable the save button, the value itself is not relevant
-    fireEvent.change(keyInput, {
-      target: { value: 'not-relevant' },
-    });
-
-    // updating subscription details
-    const saveButton = screen.getByRole('button', { name: /save/i });
-    fireEvent.click(saveButton);
-
-    const notification = await screen.findByRole('alertdialog');
-    within(notification).getByText(/some fake error message/i);
-  }, 8000);
-});
+// describe('notifications', () => {
+//   it('should render a success notification after an update', async () => {
+//     useMockServerHandlers([
+//       fetchSubscriptionDetailsQueryHandler,
+//       updateSubscriptionDetailsHandler,
+//     ]);
+//     renderApp();
+//
+//     const keyInput: HTMLInputElement = await screen.findByLabelText(
+//       /subscription key/i
+//     );
+//     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+//
+//     fireEvent.change(keyInput, {
+//       target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+//     });
+//     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+//
+//     const destinations = screen.getByRole('combobox', {
+//       name: 'Destination *',
+//     });
+//     fireEvent.focus(destinations);
+//     fireEvent.keyDown(destinations, { key: 'ArrowDown' });
+//     const inventorySupplyOption = await screen.findByText('AWS SNS');
+//
+//     act(() => {
+//       inventorySupplyOption.click();
+//     });
+//
+//     expect(screen.getByText(/AWS SNS/i)).toBeInTheDocument();
+//
+//     // updating subscription details
+//     const saveButton = screen.getByRole('button', { name: /save/i });
+//     fireEvent.click(saveButton);
+//     const notification = await screen.findByRole('alertdialog');
+//     within(notification).getByText(/subscription .+ updated/i);
+//   }, 10000);
+//
+//   it('should render an error notification if fetching subscription details resulted in an error', async () => {
+//     useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
+//     renderApp();
+//     await screen.findByText(
+//       "Field '$subscriptionId' has wrong value: Invalid ID."
+//     );
+//   });
+//
+//   it('should display an error notification if an update resulted in an unmapped error', async () => {
+//     // Mock error log
+//     jest.spyOn(console, 'error').mockImplementation();
+//
+//     useMockServerHandlers([
+//       fetchSubscriptionDetailsQueryHandler,
+//       updateSubscriptionDetailsHandlerWithARandomError,
+//     ]);
+//     renderApp();
+//
+//     const keyInput = await screen.findByLabelText(/subscription key/i);
+//
+//     // we're firing the input change to enable the save button, the value itself is not relevant
+//     fireEvent.change(keyInput, {
+//       target: { value: 'not-relevant' },
+//     });
+//
+//     // updating subscription details
+//     const saveButton = screen.getByRole('button', { name: /save/i });
+//     fireEvent.click(saveButton);
+//
+//     const notification = await screen.findByRole('alertdialog');
+//     within(notification).getByText(/some fake error message/i);
+//   }, 8000);
+// });

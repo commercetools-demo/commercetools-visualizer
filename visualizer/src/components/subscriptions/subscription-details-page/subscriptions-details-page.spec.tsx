@@ -286,14 +286,14 @@ describe('notifications', () => {
     within(notification).getByText(/subscription .+ updated/i);
   }, 10000);
 
-  //   it('should render an error notification if fetching subscription details resulted in an error', async () => {
-  //     useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
-  //     renderApp();
-  //     await screen.findByText(
-  //       "Field '$subscriptionId' has wrong value: Invalid ID."
-  //     );
-  //   });
-  //
+  it('should render an error notification if fetching subscription details resulted in an error', async () => {
+    useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithError]);
+    renderApp();
+    await screen.findByText(
+      "Field '$subscriptionId' has wrong value: Invalid ID."
+    );
+  });
+
   //   it('should display an error notification if an update resulted in an unmapped error', async () => {
   //     // Mock error log
   //     jest.spyOn(console, 'error').mockImplementation();

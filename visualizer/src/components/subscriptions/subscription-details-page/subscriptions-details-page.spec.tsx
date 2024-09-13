@@ -294,28 +294,28 @@ describe('notifications', () => {
     );
   });
 
-  //   it('should display an error notification if an update resulted in an unmapped error', async () => {
-  //     // Mock error log
-  //     jest.spyOn(console, 'error').mockImplementation();
-  //
-  //     useMockServerHandlers([
-  //       fetchSubscriptionDetailsQueryHandler,
-  //       updateSubscriptionDetailsHandlerWithARandomError,
-  //     ]);
-  //     renderApp();
-  //
-  //     const keyInput = await screen.findByLabelText(/subscription key/i);
-  //
-  //     // we're firing the input change to enable the save button, the value itself is not relevant
-  //     fireEvent.change(keyInput, {
-  //       target: { value: 'not-relevant' },
-  //     });
-  //
-  //     // updating subscription details
-  //     const saveButton = screen.getByRole('button', { name: /save/i });
-  //     fireEvent.click(saveButton);
-  //
-  //     const notification = await screen.findByRole('alertdialog');
-  //     within(notification).getByText(/some fake error message/i);
-  //   }, 8000);
+  it('should display an error notification if an update resulted in an unmapped error', async () => {
+    // Mock error log
+    jest.spyOn(console, 'error').mockImplementation();
+
+    useMockServerHandlers([
+      fetchSubscriptionDetailsQueryHandler,
+      updateSubscriptionDetailsHandlerWithARandomError,
+    ]);
+    renderApp();
+
+    const keyInput = await screen.findByLabelText(/subscription key/i);
+
+    // we're firing the input change to enable the save button, the value itself is not relevant
+    fireEvent.change(keyInput, {
+      target: { value: 'not-relevant' },
+    });
+
+    // updating subscription details
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
+
+    const notification = await screen.findByRole('alertdialog');
+    within(notification).getByText(/some fake error message/i);
+  }, 8000);
 });

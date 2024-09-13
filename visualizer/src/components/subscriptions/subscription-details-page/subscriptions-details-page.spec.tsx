@@ -217,14 +217,14 @@ describe('rendering', () => {
       expect(saveButton).toBeDisabled();
     }, 10000);
   });
-  // it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
-  //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);
-  //   renderApp();
-  //
-  //   await screen.findByRole('heading', {
-  //     name: /we could not find what you are looking for/i,
-  //   });
-  // });
+  it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
+    useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);
+    renderApp();
+
+    await screen.findByRole('heading', {
+      name: /we could not find what you are looking for/i,
+    });
+  });
   // it('should display a key field validation message if the submitted key value is duplicated', async () => {
   //   useMockServerHandlers([
   //     fetchSubscriptionDetailsQueryHandler,

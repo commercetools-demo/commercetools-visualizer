@@ -310,10 +310,10 @@ describe('notifications', () => {
     fireEvent.change(keyInput, {
       target: { value: 'not-relevant' },
     });
-    //
-    // // updating subscription details
-    // const saveButton = screen.getByRole('button', { name: /save/i });
-    // fireEvent.click(saveButton);
+
+    // updating subscription details
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    fireEvent.click(saveButton);
     //
     // const notification = await screen.findByRole('alertdialog');
     // within(notification).getByText(/some fake error message/i);

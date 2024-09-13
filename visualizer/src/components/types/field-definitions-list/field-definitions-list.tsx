@@ -1,12 +1,8 @@
 import { FC, lazy } from 'react';
 import { useIntl } from 'react-intl';
-import DataTable, { TColumn } from '@commercetools-uikit/data-table';
+import { TColumn } from '@commercetools-uikit/data-table';
 import IconButton from '@commercetools-uikit/icon-button';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
-import {
-  formatLocalizedString,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
 import {
   CheckActiveIcon,
   CheckInactiveIcon,
@@ -15,7 +11,7 @@ import {
 } from '@commercetools-uikit/icons';
 import Spacings from '@commercetools-uikit/spacings';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
+import { DOMAINS } from '@commercetools-frontend/constants';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { ApolloQueryResult } from '@apollo/client';
@@ -30,6 +26,12 @@ import createColumnDefinitions from './field-definitions-list-column-definitions
 import messages from './messages';
 import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
 import { renderAttributeTypeName } from './render-attribute-type-name';
+import {
+  formatLocalizedString,
+  renderDefault,
+} from '../../paginatable-data-table/helpers';
+import { PageContentFull } from '@commercetools-frontend/application-components';
+import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')
@@ -63,8 +65,8 @@ const FieldDefinitionsList: FC<Props> = ({
   const typeDefinitionCreator = useTypeDefinitionEntryCreator();
   const showNotification = useShowNotification();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale,
-    projectLanguages: context.project?.languages,
+    dataLocale: context.dataLocale ?? '',
+    projectLanguages: context.project?.languages ?? [],
   }));
   const fields: Array<TFieldDefinitionWithId> = value.map((item, index) => {
     return { ...item, id: index + '' };
@@ -108,17 +110,9 @@ const FieldDefinitionsList: FC<Props> = ({
         return item.name;
       case 'label':
         return formatLocalizedString(
-          {
-            name: transformLocalizedFieldToLocalizedString(
-              item.labelAllLocales ?? []
-            ),
-          },
-          {
-            key: 'name',
-            locale: dataLocale,
-            fallbackOrder: projectLanguages,
-            fallback: NO_VALUE_FALLBACK,
-          }
+          item.labelAllLocales,
+          dataLocale,
+          projectLanguages
         );
       case 'required':
         if (item.required) {
@@ -140,13 +134,12 @@ const FieldDefinitionsList: FC<Props> = ({
       case 'delete':
         return <IconButton label="" size={'medium'} icon={<BinFilledIcon />} />;
       default:
-        return (item as any)[column.key] || '';
+        return renderDefault(item[column.key as keyof TFieldDefinitionWithId]);
     }
   };
   return (
-    <>
-      <div style={{ display: 'block', width: '100%' }}>
-        {/* <FieldDefinitionInput
+    <PageContentFull>
+      {/* <FieldDefinitionInput
           isOpen={FieldDefinitionInputOpen}
           onClose={() => {
             setFieldDefinitionInputOpen(false);
@@ -154,44 +147,44 @@ const FieldDefinitionsList: FC<Props> = ({
           onSubmit={updateFieldDefinition}
           existingFieldDefinition={FieldDefinitionInputData}
         /> */}
-        <Spacings.Stack scale="m">
-          <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-            <SecondaryButton
-              onClick={() => {
-                push(`${linkToHome}/${id}/${version}/new`);
-              }}
-              iconLeft={<PlusBoldIcon />}
-              label={intl.formatMessage(messages.addField)}
-            />
-          </div>
-          <DataTable<TFieldDefinitionWithId>
-            columns={createColumnDefinitions(intl.formatMessage)}
-            isCondensed={true}
-            rows={fields}
-            itemRenderer={itemRendered}
-            onRowClick={rowClick}
+      <Spacings.Stack scale="m">
+        <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
+          <SecondaryButton
+            onClick={() => {
+              push(`${linkToHome}/${id}/${version}/new`);
+            }}
+            iconLeft={<PlusBoldIcon />}
+            label={intl.formatMessage(messages.addField)}
           />
-          <Switch>
-            <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
-              <NewFieldDefinitionInput
-                onClose={() => {
-                  refetch && refetch();
-                  push(`${match.url}`);
-                }}
-              />
-            </SuspendedRoute>
-            <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
-              <FieldDefinitionInput
-                onClose={() => {
-                  refetch && refetch();
-                  push(`${match.url}`);
-                }}
-              />
-            </SuspendedRoute>
-          </Switch>
-        </Spacings.Stack>
-      </div>
-    </>
+        </div>
+        <PaginatableDataTable<TFieldDefinitionWithId>
+          visibleColumns={createColumnDefinitions(intl.formatMessage)}
+          columns={createColumnDefinitions(intl.formatMessage)}
+          isCondensed={true}
+          rows={fields}
+          itemRenderer={itemRendered}
+          onRowClick={rowClick}
+        />
+        <Switch>
+          <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
+            <NewFieldDefinitionInput
+              onClose={() => {
+                refetch && refetch();
+                push(`${match.url}`);
+              }}
+            />
+          </SuspendedRoute>
+          <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
+            <FieldDefinitionInput
+              onClose={() => {
+                refetch && refetch();
+                push(`${match.url}`);
+              }}
+            />
+          </SuspendedRoute>
+        </Switch>
+      </Spacings.Stack>
+    </PageContentFull>
   );
 };
 

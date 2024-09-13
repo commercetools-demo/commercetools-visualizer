@@ -41,8 +41,7 @@ type Props = {
 
 const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   const intl = useIntl();
-  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale ?? '',
+  const { projectLanguages } = useApplicationContext((context) => ({
     projectLanguages: context.project?.languages ?? [],
   }));
   const { id } = useParams<{ id: string }>();
@@ -144,7 +143,6 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
         fieldDefinitions: typeDefinition.fieldDefinitions,
       }}
       onSubmit={handleSubmit}
-      dataLocale={dataLocale}
       linkToHome={linkToHome}
       version={typeDefinition.version}
       refetch={refetch}

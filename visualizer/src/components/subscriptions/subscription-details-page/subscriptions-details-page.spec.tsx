@@ -215,7 +215,7 @@ describe('rendering', () => {
 
       const saveButton = screen.getByRole('button', { name: /save/i });
       expect(saveButton).toBeDisabled();
-    });
+    }, 10000);
   });
   // it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
   //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);

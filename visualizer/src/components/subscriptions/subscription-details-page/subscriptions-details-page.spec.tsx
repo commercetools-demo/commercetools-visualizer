@@ -172,51 +172,51 @@ describe('rendering', () => {
 
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
-  // it('should reset form values on "revert" button click', async () => {
-  //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandler]);
-  //   renderApp();
-  //
-  //   const resetButton = await screen.findByRole('button', {
-  //     name: /revert/i,
-  //   });
-  //   expect(resetButton).toBeDisabled();
-  //
-  //   const keyInput: HTMLInputElement = await screen.findByLabelText(
-  //     /subscription key/i
-  //   );
-  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-  //
-  //   fireEvent.change(keyInput, {
-  //     target: { value: TEST_SUBSCRIPTION_NEW_KEY },
-  //   });
-  //   expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
-  //
-  //   fireEvent.click(resetButton);
-  //
-  //   await waitFor(() => {
-  //     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
-  //   });
-  // });
-  // describe('when user has no manage permission', () => {
-  //   it('should render the form as read-only and keep the "save" button "disabled"', async () => {
-  //     useMockServerHandlers([
-  //       fetchSubscriptionDetailsQueryHandler,
-  //       updateSubscriptionDetailsHandler,
-  //     ]);
-  //     renderApp({}, false);
-  //
-  //     const keyInput = await screen.findByLabelText(/subscription key/i);
-  //     expect(keyInput.hasAttribute('readonly')).toBeTruthy();
-  //
-  //     const destinationSelect = screen.getByRole('combobox', {
-  //       name: 'Destination *',
-  //     });
-  //     expect(destinationSelect.hasAttribute('readonly')).toBeTruthy();
-  //
-  //     const saveButton = screen.getByRole('button', { name: /save/i });
-  //     expect(saveButton).toBeDisabled();
-  //   });
-  // });
+  it('should reset form values on "revert" button click', async () => {
+    useMockServerHandlers([fetchSubscriptionDetailsQueryHandler]);
+    renderApp();
+
+    const resetButton = await screen.findByRole('button', {
+      name: /revert/i,
+    });
+    expect(resetButton).toBeDisabled();
+
+    const keyInput: HTMLInputElement = await screen.findByLabelText(
+      /subscription key/i
+    );
+    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+
+    fireEvent.change(keyInput, {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
+
+    fireEvent.click(resetButton);
+
+    await waitFor(() => {
+      expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
+    });
+  });
+  describe('when user has no manage permission', () => {
+    it('should render the form as read-only and keep the "save" button "disabled"', async () => {
+      useMockServerHandlers([
+        fetchSubscriptionDetailsQueryHandler,
+        updateSubscriptionDetailsHandler,
+      ]);
+      renderApp({}, false);
+
+      const keyInput = await screen.findByLabelText(/subscription key/i);
+      expect(keyInput.hasAttribute('readonly')).toBeTruthy();
+
+      const destinationSelect = screen.getByRole('combobox', {
+        name: 'Destination *',
+      });
+      expect(destinationSelect.hasAttribute('readonly')).toBeTruthy();
+
+      const saveButton = screen.getByRole('button', { name: /save/i });
+      expect(saveButton).toBeDisabled();
+    });
+  });
   // it('should display a "page not found" information if the fetched subscription details data is null (without an error)', async () => {
   //   useMockServerHandlers([fetchSubscriptionDetailsQueryHandlerWithNullData]);
   //   renderApp();

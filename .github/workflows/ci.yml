@@ -1,0 +1,51 @@
+name: Run Tests on PR
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_lint_and_test:
+    runs-on: ubuntu-latest
+
+    env:
+      CLOUD_IDENTIFIER: gcp-eu
+      CUSTOM_APPLICATION_ID: TODO
+      APPLICATION_URL: https://your_app_hostname.com
+      INITIAL_PROJECT_KEY: todo
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node (uses version in .nvmrc)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: './visualizer/.nvmrc'
+
+      - name: Get yarn cache
+        id: yarn-cache
+        working-directory: ./visualizer
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Install dependencies
+        working-directory: ./visualizer
+        run: yarn install
+
+      - name: Building packages
+        working-directory: ./visualizer
+        run: yarn build
+
+      - name: Run tests
+        working-directory: ./visualizer
+        run: yarn run test
+        env:
+          CI: true

@@ -60,7 +60,7 @@ type Props = {
     formikHelpers: FormikHelpers<TFormValues>
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
-  isReadOnly: boolean;
+  isReadOnly?: boolean;
   dataLocale: string;
   children: (formProps: FormProps) => JSX.Element;
 };
@@ -69,6 +69,7 @@ const SubscriptionDetailsForm: FC<Props> = ({
   children,
   initialValues,
   onSubmit,
+  isReadOnly,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -81,28 +82,33 @@ const SubscriptionDetailsForm: FC<Props> = ({
       <CollapsiblePanel
         header={<CollapsiblePanel.Header>Key</CollapsiblePanel.Header>}
       >
-        <SubscriptionGeneralInfoForm />
+        <SubscriptionGeneralInfoForm isReadOnly={isReadOnly} />
       </CollapsiblePanel>
       <CollapsiblePanel
-        header={<CollapsiblePanel.Header>Destination</CollapsiblePanel.Header>}
-        isDefaultClosed={true}
+        header={
+          <CollapsiblePanel.Header>
+            Subscription Destination
+          </CollapsiblePanel.Header>
+        }
+        isDefaultClosed={false}
       >
-        <SubscriptionDestinationTypeForm />
+        <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
         <SubscriptionDestinationForm
           destinationType={formik.values.destinationType}
+          isReadOnly={isReadOnly}
         />
       </CollapsiblePanel>
       <CollapsiblePanel
         header={<CollapsiblePanel.Header>Changes</CollapsiblePanel.Header>}
         isDefaultClosed={true}
       >
-        <SubscriptionChangesForm />
+        <SubscriptionChangesForm isReadOnly={isReadOnly} />
       </CollapsiblePanel>
       <CollapsiblePanel
         header={<CollapsiblePanel.Header>Messages</CollapsiblePanel.Header>}
         isDefaultClosed={true}
       >
-        <SubscriptionMessagesForm />
+        <SubscriptionMessagesForm isReadOnly={isReadOnly} />
       </CollapsiblePanel>
     </FormikProvider>
   );

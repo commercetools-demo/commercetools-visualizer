@@ -6,6 +6,7 @@ import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import SelectField from '@commercetools-uikit/select-field';
 import { useField } from 'formik';
+import { FC } from 'react';
 
 export const validateKeyInput = (key: string) => {
   const hasKeyValue = Boolean(key);
@@ -14,7 +15,10 @@ export const validateKeyInput = (key: string) => {
   }
   return undefined;
 };
-const SubscriptionDestinationTypeForm = () => {
+
+type Props = { isReadOnly?: boolean };
+
+const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'destinationType',
     validate: (key) => validateKeyInput(key),
@@ -90,6 +94,7 @@ const SubscriptionDestinationTypeForm = () => {
                   keyHelpers.setValue(event.target.value as string);
                 }}
                 touched={keyMeta.touched}
+                isReadOnly={isReadOnly}
                 // renderError={renderError}
               />
             </Card>

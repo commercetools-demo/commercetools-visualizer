@@ -13,7 +13,11 @@ export const validateInput = (key: string) => {
   return undefined;
 };
 
-const GoogleCloudPubSubDestination: FC = () => {
+type Props = {
+  isReadOnly?: boolean;
+};
+
+const GoogleCloudPubSubDestination: FC<Props> = ({ isReadOnly }) => {
   const [topicField, topicMeta, topicHelpers] = useField<string>({
     name: 'destination.GoogleCloudPubSub.topic',
     validate: validateInput,
@@ -41,6 +45,7 @@ const GoogleCloudPubSubDestination: FC = () => {
         }
         touched={topicMeta.touched}
         value={topicMeta.value || ''}
+        isReadOnly={isReadOnly}
       />
       <TextField
         errors={JSON.parse(projectIdMeta.error || '{}')}
@@ -60,6 +65,7 @@ const GoogleCloudPubSubDestination: FC = () => {
         }
         touched={projectIdMeta.touched}
         value={projectIdMeta.value || ''}
+        isReadOnly={isReadOnly}
       />
     </>
   );

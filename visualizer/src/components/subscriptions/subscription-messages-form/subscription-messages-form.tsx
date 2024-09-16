@@ -8,6 +8,7 @@ import messages from './messages';
 import { IntlShape, useIntl } from 'react-intl';
 import Text from '@commercetools-uikit/text';
 import Spacings from '@commercetools-uikit/spacings';
+import { FC } from 'react';
 
 const entries = (intl: IntlShape) => {
   return [
@@ -654,7 +655,11 @@ const entries = (intl: IntlShape) => {
     },
   ];
 };
-const SubscriptionMessagesForm = () => {
+
+type Props = {
+  isReadOnly?: boolean;
+};
+const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
 
   const isChecked = (
@@ -785,6 +790,7 @@ const SubscriptionMessagesForm = () => {
                             isChecked={isChecked}
                             addItem={addItem}
                             removeItem={removeItem}
+                            isReadOnly={isReadOnly}
                           />
                         );
                       })}

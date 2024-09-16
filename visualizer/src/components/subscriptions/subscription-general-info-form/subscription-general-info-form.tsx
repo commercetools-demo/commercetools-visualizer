@@ -6,6 +6,8 @@ import Constraints from '@commercetools-uikit/constraints';
 import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
+import { FC } from 'react';
+import { TFieldErrors } from '@commercetools-uikit/multiline-text-field/dist/declarations/src/multiline-text-field';
 
 export const validateKeyInput = (key: string) => {
   const hasKeyValue = Boolean(key);
@@ -33,11 +35,19 @@ const renderBusinessUnitKeyInputErrors = (key: string) => {
   }
 };
 
-const SubscriptionGeneralInfoForm = () => {
+type Props = { isReadOnly?: boolean };
+
+const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'key',
     validate: (key) => validateKeyInput(key),
   });
+  let parsedErrors: TFieldErrors | undefined;
+  if (keyMeta.error) {
+    if (typeof keyMeta.error === 'string') {
+      parsedErrors = JSON.parse(keyMeta.error || '{}');
+    } else parsedErrors = keyMeta.error;
+  }
   return (
     <Constraints.Horizontal max="scale">
       <Grid
@@ -48,7 +58,7 @@ const SubscriptionGeneralInfoForm = () => {
           <Constraints.Horizontal max="scale">
             <Card insetScale="s" type="flat">
               <TextField
-                errors={JSON.parse(keyMeta.error || '{}')}
+                errors={parsedErrors}
                 name={keyField.name}
                 isRequired={true}
                 onBlur={() => {
@@ -61,6 +71,7 @@ const SubscriptionGeneralInfoForm = () => {
                 title={<FormattedMessage {...messages.subscriptionKeyLabel} />}
                 touched={keyMeta.touched}
                 value={keyMeta.value || ''}
+                isReadOnly={isReadOnly}
               />
             </Card>
           </Constraints.Horizontal>

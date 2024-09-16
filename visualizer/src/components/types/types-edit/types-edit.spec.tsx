@@ -12,8 +12,8 @@ import { renderApplicationWithRoutesAndRedux } from '../../../test-utils';
 import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 import { cleanup } from '@testing-library/react-hooks';
 import { TType, Type } from '@commercetools-test-data/type';
-import { TTypeDefinition } from '../../../types/generated/ctp';
 import { TTypeGraphql } from '@commercetools-test-data/type/dist/declarations/src/type/types';
+import { LocalizedString } from '@commercetools-test-data/commons';
 
 const mockServer = setupServer();
 afterEach(async () => {
@@ -33,9 +33,14 @@ afterAll(() => {
 
 const TEST_TYPE_ID = 'b8a40b99-0c11-43bc-8680-fc570d624747';
 const TEST_TYPE_KEY = 'test-key';
+const TEST_TYPE_NAME = 'test-key';
 const TEST_TYPE_NEW_KEY = 'new-test-key';
 
-const type = Type.random().key(TEST_TYPE_KEY).buildGraphql<TTypeGraphql>();
+const type = Type.random()
+  .key(TEST_TYPE_KEY)
+  // @ts-ignore
+  .name(LocalizedString.random().en(TEST_TYPE_NAME))
+  .buildGraphql<TTypeGraphql>();
 
 const renderApp = (
   options: Partial<TRenderAppWithReduxOptions> = {},
@@ -137,9 +142,7 @@ describe('rendering', () => {
       'types-edit-name-en'
     );
 
-    const moep: TTypeDefinition = type as any as TTypeDefinition;
-    let find = moep.nameAllLocales.find((item) => item.locale === 'en');
-    expect(name.value).toBe(find?.value);
+    expect(name.value).toBe(TEST_TYPE_KEY);
     fireEvent.change(name, {
       target: { value: TEST_TYPE_NEW_KEY },
     });
@@ -148,7 +151,7 @@ describe('rendering', () => {
     fireEvent.click(resetButton);
 
     await waitFor(() => {
-      expect(name.value).toBe(find?.value);
+      expect(name.value).toBe(TEST_TYPE_KEY);
     });
   }, 10000);
   describe('when user has no manage permission', () => {

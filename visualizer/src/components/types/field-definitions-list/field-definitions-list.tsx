@@ -86,7 +86,7 @@ const FieldDefinitionsList: FC<Props> = ({
       domain: DOMAINS.SIDE,
       text: intl.formatMessage(messages.removeFieldDefinitionButtonSuccess),
     });
-    refetch && refetch();
+    refetch && (await refetch());
   };
 
   const rowClick = async (
@@ -132,7 +132,7 @@ const FieldDefinitionsList: FC<Props> = ({
         return <CheckInactiveIcon color={'neutral60'} />;
       }
       case 'delete':
-        return <IconButton label="" size={'medium'} icon={<BinFilledIcon />} />;
+        return <IconButton label="" size={'30'} icon={<BinFilledIcon />} />;
       default:
         return renderDefault(item[column.key as keyof TFieldDefinitionWithId]);
     }

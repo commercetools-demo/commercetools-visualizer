@@ -144,6 +144,7 @@ const TypesForm: FC<Props> = ({
               <Grid.Item>
                 <Card type="flat" insetScale="s">
                   <LocalizedTextField
+                    data-testid={'types-edit-name'}
                     name="name"
                     selectedLanguage={dataLocale}
                     value={formik.values.name}
@@ -192,7 +193,7 @@ const TypesForm: FC<Props> = ({
                     touched={!!formik.touched.key}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    isDisabled={!createNewMode}
+                    isReadOnly={!createNewMode}
                     renderError={renderKeyInputErrors}
                   />
                 </Card>
@@ -217,7 +218,7 @@ const TypesForm: FC<Props> = ({
                     }
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
-                    isDisabled={!createNewMode}
+                    isReadOnly={!createNewMode}
                   />
                 </Card>
               </Grid.Item>

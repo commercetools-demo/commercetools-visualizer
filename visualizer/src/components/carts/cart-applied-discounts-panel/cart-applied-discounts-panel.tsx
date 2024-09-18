@@ -18,6 +18,7 @@ import {
   selectDiscountsOnTotalPrice,
   selectShippingDiscounts,
 } from '../../../utils/cart-selectors';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 
 export const MISSING_DISCOUNT_CODE = 'missingDiscountCode';
 export const OUTDATED_DISCOUNT_CODE = 'outdatedDiscountCode';
@@ -85,6 +86,9 @@ const CartAppliedDiscountsPanel: FC<Props> = ({
   resetErrors,
 }) => {
   const intl = useIntl();
+  const { dataLocale } = useApplicationContext((context) => ({
+    dataLocale: context.dataLocale ?? '',
+  }));
 
   const discounts = [
     ...selectDiscounts(cart),
@@ -98,7 +102,7 @@ const CartAppliedDiscountsPanel: FC<Props> = ({
   ) => {
     switch (column.key) {
       case 'name':
-        return discount.name;
+        return discount.name[dataLocale] || NO_VALUE_FALLBACK;
       case 'amount':
         return formatMoney(discount.amount, intl, {
           minimumFractionDigits: undefined,

@@ -13,6 +13,7 @@ import {
   TChangeSubscriptionInput,
   TGoogleCloudPubSubDestination,
   TMessageSubscriptionInput,
+  TSqsDestination,
 } from '../../../types/generated/ctp';
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
@@ -25,7 +26,7 @@ export type TFormValues = {
   id: string;
   key: string;
   destinationType: string;
-  destination: { GoogleCloudPubSub: TGoogleCloudPubSubDestination } | undefined;
+  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestination, SQS?: TSqsDestination } | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;
   messages?: Array<TMessageSubscriptionInput> | null;
 };

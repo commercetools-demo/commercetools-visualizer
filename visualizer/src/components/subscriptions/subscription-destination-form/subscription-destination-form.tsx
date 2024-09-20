@@ -5,6 +5,7 @@ import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import Spacings from '@commercetools-uikit/spacings';
+import SQSDestination from './subscription-destination-form-sqs';
 
 type Props = {
   destinationType: string;
@@ -19,6 +20,9 @@ const SubscriptionDestinationForm: FC<Props> = ({
   switch (destinationType) {
     case 'GoogleCloudPubSub':
       toRender = <GoogleCloudPubSubDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'SQS':
+      toRender = <SQSDestination isReadOnly={isReadOnly} />
       break;
   }
 

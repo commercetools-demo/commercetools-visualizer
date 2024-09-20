@@ -4,14 +4,7 @@ import { useField } from 'formik';
 import Text from '@commercetools-uikit/text';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
-
-export const validateInput = (key: string) => {
-  const hasKeyValue = Boolean(key);
-  if (!hasKeyValue) {
-    return JSON.stringify({ missing: true });
-  }
-  return undefined;
-};
+import { validateInput } from './validate';
 
 type Props = {
   isReadOnly?: boolean;

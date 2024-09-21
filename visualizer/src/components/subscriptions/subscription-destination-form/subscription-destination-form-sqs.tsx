@@ -5,6 +5,7 @@ import Text from '@commercetools-uikit/text';
 import { FormattedMessage } from 'react-intl';
 import messages from './messages';
 import { validateInput } from './validate';
+import SelectField from '@commercetools-uikit/select-field';
 
 type Props = {
     isReadOnly?: boolean;
@@ -13,12 +14,10 @@ type Props = {
 const SQSDestination: FC<Props> = ({ isReadOnly }) => {
     const [accessKeyField, accessKeyMeta, accessKeyHelpers] = useField<string>({
         name: 'destination.SQS.accessKey',
-        validate: validateInput,
     });
 
     const [accessSecretField, accessSecretMeta, accessSecretHelpers] = useField<string>({
         name: 'destination.SQS.accessSecret',
-        validate: validateInput,
     });
 
     const [queueUrlField, queueUrlMeta, queueUrlHelpers] = useField<string>({
@@ -33,47 +32,82 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
 
     const [authenticationModeField, authenticationModeMeta, authenticationModeHelpers] = useField<string>({
         name: 'destination.SQS.authenticationMode',
+        validate: validateInput,
     });
 
     return (
         <>
             <Text.Headline as="h3">Configure AWS SQS Destination</Text.Headline>
-            <TextField
-                errors={JSON.parse(accessKeyMeta.error || '{}')}
-                name={accessKeyField.name}
+            <SelectField
+                errors={JSON.parse(authenticationModeMeta.error || '{}')}
+                name={authenticationModeField.name}
+                options={[
+                    {
+                        value: "IAM", label: "IAM",
+                    },
+                    {
+                        value: "Credentials", label: "Credentials"
+                    }
+                ]}
                 isRequired={true}
                 onBlur={() => {
-                    accessKeyHelpers.setTouched(true);
+                    authenticationModeHelpers.setTouched(true);
                 }}
                 onChange={(event) => {
-                    accessKeyHelpers.setValue(event.target.value);
-                }}
-                title={
-                    <FormattedMessage {...messages.destinationSQSAccessKey} />
-                }
-                touched={accessKeyMeta.touched}
-                value={accessKeyMeta.value || ''}
-                isReadOnly={isReadOnly}
-            />
-            <TextField
-                errors={JSON.parse(accessSecretMeta.error || '{}')}
-                name={accessSecretField.name}
-                isRequired={true}
-                onBlur={() => {
-                    accessSecretHelpers.setTouched(true);
-                }}
-                onChange={(event) => {
-                    accessSecretHelpers.setValue(event.target.value);
+                    authenticationModeHelpers.setValue(event.target.value as string);
                 }}
                 title={
                     <FormattedMessage
-                        {...messages.destinationSQSAccessSecret}
+                        {...messages.destinationSQSAuthenticationMode}
                     />
                 }
-                touched={accessSecretMeta.touched}
-                value={accessSecretMeta.value || ''}
+                touched={authenticationModeMeta.touched}
+                value={authenticationModeMeta.value || ''}
                 isReadOnly={isReadOnly}
             />
+            {authenticationModeField.value &&
+                authenticationModeField.value === "Credentials" &&
+                (
+                    <>
+                        <TextField
+                            errors={JSON.parse(accessKeyMeta.error || '{}')}
+                            name={accessKeyField.name}
+                            isRequired={true}
+                            onBlur={() => {
+                                accessKeyHelpers.setTouched(true);
+                            }}
+                            onChange={(event) => {
+                                accessKeyHelpers.setValue(event.target.value);
+                            }}
+                            title={
+                                <FormattedMessage {...messages.destinationSQSAccessKey} />
+                            }
+                            touched={accessKeyMeta.touched}
+                            value={accessKeyMeta.value || ''}
+                            isReadOnly={isReadOnly}
+                        />
+                        <TextField
+                            errors={JSON.parse(accessSecretMeta.error || '{}')}
+                            name={accessSecretField.name}
+                            isRequired={true}
+                            onBlur={() => {
+                                accessSecretHelpers.setTouched(true);
+                            }}
+                            onChange={(event) => {
+                                accessSecretHelpers.setValue(event.target.value);
+                            }}
+                            title={
+                                <FormattedMessage
+                                    {...messages.destinationSQSAccessSecret}
+                                />
+                            }
+                            touched={accessSecretMeta.touched}
+                            value={accessSecretMeta.value || ''}
+                            isReadOnly={isReadOnly}
+                        />
+                    </>
+                )}
+
             <TextField
                 errors={JSON.parse(queueUrlMeta.error || '{}')}
                 name={queueUrlField.name}
@@ -112,28 +146,6 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
                 value={regionMeta.value || ''}
                 isReadOnly={isReadOnly}
             />
-            <TextField
-                errors={JSON.parse(authenticationModeMeta.error || '{}')}
-                name={authenticationModeField.name}
-                isRequired={true}
-                onBlur={() => {
-                    authenticationModeHelpers.setTouched(true);
-                }}
-                onChange={(event) => {
-                    authenticationModeHelpers.setValue(event.target.value);
-                }}
-                title={
-                    <FormattedMessage
-                        {...messages.destinationSQSAuthenticationMode}
-                    />
-                }
-                touched={authenticationModeMeta.touched}
-                value={authenticationModeMeta.value || 'Credentials'}
-                isReadOnly={isReadOnly}
-                isDisabled= {true}
-                
-            />
-            
         </>
     );
 

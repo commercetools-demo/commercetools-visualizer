@@ -35,6 +35,6 @@ export default defineMessages({
   destinationSQSAuthenticationMode: {
     id: 'Subscription.Destination.destinationSQSAuthenticationMode',
     description: 'destinationSQSAuthenticationMode',
-    defaultMessage: 'Defines the method of authentication for the SQS queue. Default: Credentials',
+    defaultMessage: 'Defines the method of authentication for the SQS queue.',
   },
 });

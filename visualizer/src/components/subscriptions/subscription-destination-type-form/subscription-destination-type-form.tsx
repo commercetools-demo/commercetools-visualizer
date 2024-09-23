@@ -58,7 +58,7 @@ const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
                     label: <FormattedMessage {...messages.destinationSNS} />,
                   },
                   {
-                    value: 'Sqs',
+                    value: 'SQS',
                     label: <FormattedMessage {...messages.destinationSQS} />,
                   },
                   {

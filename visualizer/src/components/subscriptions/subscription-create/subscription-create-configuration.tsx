@@ -2,13 +2,14 @@ import { useFormik } from 'formik';
 import {
   TChangeSubscriptionInput,
   TGoogleCloudPubSubDestinationInput,
+  TSqsDestinationInput,
   TMessageSubscriptionInput,
 } from '../../../types/generated/ctp';
 
 export type Step1 = { key: string | undefined | null };
 export type Step2 = { destinationType: string | undefined | null };
 export type Step3 = {
-  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput };
+  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput, Sqs?: TSqsDestinationInput };
 };
 export type Step4 = {
   changes?: Array<TChangeSubscriptionInput> | null;

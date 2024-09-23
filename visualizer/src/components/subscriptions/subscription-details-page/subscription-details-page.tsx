@@ -31,7 +31,7 @@ import {
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
 } from '../../../hooks/use-subscription-connector';
-import { TGoogleCloudPubSubDestination } from '../../../types/generated/ctp';
+import { TGoogleCloudPubSubDestination, TSqsDestination } from '../../../types/generated/ctp';
 
 type Props = {
   linkToWelcome: string;
@@ -125,14 +125,21 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     });
     history.replace({
       pathname: linkToWelcome + '/subscriptions',
+      state: { refetch: true }
     });
   };
-  let dest: { GoogleCloudPubSub: TGoogleCloudPubSubDestination } | undefined;
+  let dest: { GoogleCloudPubSub?: TGoogleCloudPubSubDestination, SQS?: TSqsDestination } | undefined;
 
   if (subscription.destination.type === 'GoogleCloudPubSub') {
     dest = {
       GoogleCloudPubSub:
         subscription.destination as TGoogleCloudPubSubDestination,
+    };
+  }
+  if (subscription.destination.type === 'SQS') {
+    dest = {
+      SQS:
+        subscription.destination as TSqsDestination,
     };
   }
 

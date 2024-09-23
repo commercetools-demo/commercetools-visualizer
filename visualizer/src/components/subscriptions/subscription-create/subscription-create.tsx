@@ -49,18 +49,18 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
         const subscriptionDraft: TSubscriptionDraft = {
           key:
             formikValues.subscriptionStepsDraft[1].key &&
-            formikValues.subscriptionStepsDraft[1].key !== ''
+              formikValues.subscriptionStepsDraft[1].key !== ''
               ? formikValues.subscriptionStepsDraft[1].key
               : undefined,
           ...formikValues.subscriptionStepsDraft[3],
           changes:
             formikValues.subscriptionStepsDraft[4].changes &&
-            formikValues.subscriptionStepsDraft[4].changes.length > 0
+              formikValues.subscriptionStepsDraft[4].changes.length > 0
               ? formikValues.subscriptionStepsDraft[4].changes
               : undefined,
           messages:
             formikValues.subscriptionStepsDraft[5].messages &&
-            formikValues.subscriptionStepsDraft[5].messages.length > 0
+              formikValues.subscriptionStepsDraft[5].messages.length > 0
               ? formikValues.subscriptionStepsDraft[5].messages
               : undefined,
         };
@@ -74,6 +74,12 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
             subscriptionKey:
               createdSubscription.data?.createSubscription?.id || '',
           }),
+        });
+        history.push({
+          pathname:
+            linkToWelcome +
+            '/subscriptions/',
+          state: { refetch: true }
         });
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
@@ -96,9 +102,7 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
         1: { key: null },
         2: { destinationType: null },
         3: {
-          destination: {
-            GoogleCloudPubSub: { topic: '', projectId: '' },
-          },
+          destination: {},
         },
         4: { changes: [] },
         5: { messages: [] },

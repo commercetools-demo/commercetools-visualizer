@@ -26,21 +26,36 @@ import {
   formatDateAndTime,
   renderDefault,
 } from '../../paginatable-data-table/helpers';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 type Props = {
   linkToHome: string;
 };
 
+interface LocationState {
+  refetch?: boolean;
+}
+
 const SubscriptionList = (props: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
+
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
   const paginationState = usePaginationState();
-  const { subscriptions, error, loading } = useSubscriptionsFetcher({
+  const { subscriptions, error, loading, refetch } = useSubscriptionsFetcher({
     limit: paginationState.perPage.value,
     offset: (paginationState.page.value - 1) * paginationState.perPage.value,
     sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
   });
+
+  const location = useLocation<LocationState>();
+
+  useEffect(() => {
+    if (location.state?.refetch) {
+      refetch();
+    }
+  }, [location]);
 
   if (error) {
     return (
@@ -95,8 +110,8 @@ const SubscriptionList = (props: Props) => {
           try {
             return intl.formatMessage(
               destinationMessages[
-                ('destination' +
-                  item.destination.type) as keyof typeof destinationMessages
+              ('destination' +
+                item.destination.type) as keyof typeof destinationMessages
               ]
             );
           } catch (e) {

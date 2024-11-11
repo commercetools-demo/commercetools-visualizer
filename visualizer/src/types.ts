@@ -26,6 +26,11 @@ export type TSetDescriptionActionPayload = {
   description: LocalizedString;
 };
 
+export type TChangeLabelActionPayload = {
+  fieldName: string;
+  label: LocalizedString;
+};
+
 export type TChangeLocalizedEnumValueLabelActionPayload = {
   fieldName: string;
   value: { key: string; label: LocalizedString };

@@ -17,6 +17,7 @@ import {
   TSetDescriptionActionPayload,
   TChangeLocalizedEnumValueLabelActionPayload,
   TSetNameActionPayload,
+  TChangeLabelActionPayload,
 } from './types';
 import { PRECISION_TYPES } from './constants';
 import { IntlShape } from 'react-intl';
@@ -77,6 +78,10 @@ const getNameFromPayload = (payload: TChangeNameActionPayload) => ({
 const getDescriptionFromPayload = (payload: TSetDescriptionActionPayload) => ({
   description: transformLocalizedStringToLocalizedField(payload.description),
 });
+const getLabelFromPayload = (payload: TChangeLabelActionPayload) => ({
+  fieldName: payload.fieldName,
+  label: transformLocalizedStringToLocalizedField(payload.label),
+});
 const getChangeLocalizedEnumValueFromPayload = (
   payload: TChangeLocalizedEnumValueLabelActionPayload
 ) => {
@@ -105,6 +110,11 @@ const isSetDescriptionActionPayload = (
   return (
     (actionPayload as TSetDescriptionActionPayload)?.description !== undefined
   );
+};
+const isChangeLabelActionPayload = (
+  actionPayload: Record<string, unknown>
+): actionPayload is TChangeLabelActionPayload => {
+  return (actionPayload as TChangeLabelActionPayload)?.label !== undefined;
 };
 const isUpdateLocalizedEnumValueLabel = (
   actionPayload: Record<string, unknown>
@@ -148,6 +158,13 @@ const convertAction = (action: TSyncAction): TGraphqlUpdateAction => {
       if (isUpdateLocalizedEnumValueLabel(actionPayload)) {
         actionPL = getChangeLocalizedEnumValueFromPayload(actionPayload);
       }
+      break;
+    }
+    case 'changeLabel': {
+      if (isChangeLabelActionPayload(actionPayload)) {
+        actionPL = getLabelFromPayload(actionPayload);
+      }
+      break;
     }
   }
   return {

@@ -6,6 +6,11 @@ export default defineMessages({
     description: 'messageLabel',
     defaultMessage: 'Choose Changes you want to listen to.',
   },
+  label: {
+    id: 'label',
+    description: 'label',
+    defaultMessage: 'Changes related to {type}.',
+  },
   'approval-flow': {
     id: 'approval-flow',
     description: 'approval-flow',

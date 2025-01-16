@@ -56,12 +56,13 @@ const getEnumLanguages = memoize((values) => (languages: Array<string>) => {
     ? sortEnumLanguagesByResourceLanguages(getLangsFromEnums(values), languages)
     : languages;
 });
-const createEmptyLocalizedEnum = (enumLanguages: Array<any>) => ({
+const createEmptyLocalizedEnum = (enumLanguages: Array<string>) => ({
   key: '',
-  ...enumLanguages.reduce(
-    (acc, lang) => ({ ...acc, label: { ...acc.label, [lang]: '' } }),
-    {}
-  ),
+  ...enumLanguages.reduce<{
+    label: Record<string, string>;
+  }>((acc, lang) => ({ ...acc, label: { ...acc.label, [lang]: '' } }), {
+    label: {},
+  }),
 });
 
 const createEmptyPlainEnum = () => ({

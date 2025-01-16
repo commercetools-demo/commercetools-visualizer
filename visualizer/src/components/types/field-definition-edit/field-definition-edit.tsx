@@ -60,33 +60,35 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const fieldDefinitionInput =
-          fromFormValuesToTFieldDefinitionInput(formikValues);
-        if (fieldDefinitions) {
-          await typeDefinitionUpdater.execute({
+      const fieldDefinitionInput =
+        fromFormValuesToTFieldDefinitionInput(formikValues);
+      if (fieldDefinitions) {
+        await typeDefinitionUpdater
+          .execute({
             originalDraft: fieldDefinitions[0],
             nextDraft: fieldDefinitionInput,
             id: id,
             version: version || 1,
-          });
-        }
-        await refetch();
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
-        });
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
+          })
+          .then(async () => {
+            await refetch();
+            showNotification({
+              kind: 'success',
+              domain: DOMAINS.SIDE,
+              text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
+            });
+          })
+          .catch((graphQLErrors) => {
+            const transformedErrors = transformErrors(graphQLErrors);
+            if (transformedErrors.unmappedErrors.length > 0) {
+              showApiErrorNotification({
+                errors:
+                  transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+              });
+            }
 
-        formikHelpers.setErrors(transformedErrors.formErrors);
+            formikHelpers.setErrors(transformedErrors.formErrors);
+          });
       }
     },
     [fieldDefinitions, id, intl, refetch, typeDefinitionUpdater, version]

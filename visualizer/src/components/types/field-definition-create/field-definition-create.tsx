@@ -23,7 +23,7 @@ import {
 import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
 
 type Props = {
-  onClose: () => void;
+  onClose: () => Promise<void>;
 };
 
 const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
@@ -49,33 +49,33 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const actionDraft = fromFormValuesToTFieldDefinitionInput(formikValues);
-        await typeDefinitionCreator.execute({
+      const actionDraft = fromFormValuesToTFieldDefinitionInput(formikValues);
+      await typeDefinitionCreator
+        .execute({
           id: id,
           version: Number(version),
           actions: [{ addFieldDefinition: { fieldDefinition: actionDraft } }],
-        });
-
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
-        });
-        onClose();
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+        })
+        .then(async () => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
           });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
-      }
+          return onClose();
+        })
+        .catch((graphQLErrors) => {
+          const transformedErrors = transformErrors(graphQLErrors);
+          if (transformedErrors.unmappedErrors.length > 0) {
+            showApiErrorNotification({
+              errors:
+                transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+            });
+          }
+          formikHelpers.setErrors(transformedErrors.formErrors);
+        });
     },
-    [id, intl, onClose, showNotification, typeDefinitionCreator, version]
+    [id, typeDefinitionCreator, version]
   );
 
   return (

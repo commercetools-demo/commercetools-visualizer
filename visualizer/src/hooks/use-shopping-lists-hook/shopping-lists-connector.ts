@@ -1,5 +1,4 @@
 import {
-  Maybe,
   TMutation,
   TMutation_CreateShoppingListArgs,
   TMutation_DeleteShoppingListArgs,
@@ -7,11 +6,8 @@ import {
   TQuery,
   TQuery_ShoppingListArgs,
   TQuery_ShoppingListsArgs,
-  TShoppingList,
-  TShoppingListDraft,
-  TShoppingListUpdateAction,
 } from '../../types/generated/ctp';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import {
   useMcMutation,
@@ -30,15 +26,13 @@ export const useShoppingListCreator = () => {
     TMutation_CreateShoppingListArgs
   >(CreateShoppingListMutation);
 
-  const execute = async ({ draft }: { draft: TShoppingListDraft }) => {
+  const execute = async (variables: TMutation_CreateShoppingListArgs) => {
     try {
       return await createShoppingList({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          draft: draft,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -51,14 +45,8 @@ export const useShoppingListCreator = () => {
   };
 };
 
-type TUseShoppingListsFetcher = (variables: TQuery_ShoppingListsArgs) => {
-  shoppingLists?: TQuery['shoppingLists'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useShoppingListsFetcher: TUseShoppingListsFetcher = (
-  variables
+export const useShoppingListsFetcher = (
+  variables: TQuery_ShoppingListsArgs
 ) => {
   const { data, error, loading, refetch } = useQuery<
     TQuery,
@@ -77,23 +65,12 @@ export const useShoppingListsFetcher: TUseShoppingListsFetcher = (
   };
 };
 
-type TUseShoppingListFetcher = (props: { id: string }) => {
-  shoppingList?: Maybe<TShoppingList>;
-  error?: ApolloError;
-  loading: boolean;
-  refetch: (
-    variables?: Partial<TQuery_ShoppingListArgs> | undefined
-  ) => Promise<ApolloQueryResult<TQuery>>;
-};
-
-export const useShoppingListFetcher: TUseShoppingListFetcher = ({ id }) => {
+export const useShoppingListFetcher = (variables: TQuery_ShoppingListArgs) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_ShoppingListArgs
   >(FetchQuery, {
-    variables: {
-      id: id,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -112,26 +89,14 @@ export const useShoppingListUpdater = () => {
     TMutation_UpdateShoppingListArgs
   >(UpdateShoppingListIdMutation);
 
-  const execute = async ({
-    actions,
-    id,
-    version,
-  }: {
-    actions: Array<TShoppingListUpdateAction>;
-    id: string;
-    version: number;
-  }) => {
+  const execute = async (variables: TMutation_UpdateShoppingListArgs) => {
     try {
-      if (actions.length > 0) {
+      if (variables.actions.length > 0) {
         await updateShoppingListId({
           context: {
             target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
           },
-          variables: {
-            id: id,
-            version: version || 1,
-            actions: actions,
-          },
+          variables: variables,
         });
       }
     } catch (graphQlResponse) {
@@ -152,21 +117,13 @@ export const useShoppingListDeleter = () => {
     TMutation_DeleteShoppingListArgs
   >(DeleteQuery);
 
-  const execute = async ({
-    id,
-    key,
-    version,
-  }: TMutation_DeleteShoppingListArgs) => {
+  const execute = async (variables: TMutation_DeleteShoppingListArgs) => {
     try {
       return await deleteShoppingListById({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          key: key,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       console.log(graphQlResponse);

@@ -56,8 +56,8 @@ fragment CustomerDetailsAddressesFragment on Customer {
     }
 }
 
-query CustomerDetailsAddressesQuery($id: String!) {
-    customer(id: $id) {
+query CustomerDetailsAddressesQuery($id: String, $emailToken: String, $passwordToken: String, $key: String) {
+    customer(id: $id, key: $key, emailToken: $emailToken, passwordToken: $passwordToken) {
         ...CustomerDetailsAddressesFragment
     }
 }

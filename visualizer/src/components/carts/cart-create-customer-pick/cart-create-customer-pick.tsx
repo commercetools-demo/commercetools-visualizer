@@ -145,7 +145,7 @@ export const CartCreateCustomerPick: FC<Props> = ({
     });
 
     await cartUpdater.execute({
-      updateActions: updateActions,
+      actions: updateActions,
       id: cart.id,
       version: cart.version,
       locale: dataLocale,
@@ -170,7 +170,7 @@ export const CartCreateCustomerPick: FC<Props> = ({
     }
 
     await cartUpdater.execute({
-      updateActions: updateActions,
+      actions: updateActions,
       id: cart.id,
       version: cart.version,
       locale: dataLocale,

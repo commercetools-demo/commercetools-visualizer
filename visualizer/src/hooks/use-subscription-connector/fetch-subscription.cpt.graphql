@@ -1,5 +1,5 @@
-query FetchSubscription($id: String) {
-  subscription(id: $id) {
+query FetchSubscription($id: String, $key: String) {
+  subscription(id: $id, key: $key) {
     id
     key
     version

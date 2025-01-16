@@ -3,7 +3,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import {
   compareStringArrays,
   extractErrorFromGraphQlResponse,
@@ -15,10 +15,8 @@ import {
   TSubscriptionUpdateAction,
   TQuery,
   TQuery_SubscriptionArgs,
-  Maybe,
   TMutation_DeleteSubscriptionArgs,
   TMutation_CreateSubscriptionArgs,
-  TSubscriptionDraft,
   TQuery_SubscriptionsArgs,
 } from '../../types/generated/ctp';
 import UpdateSubscriptionKeyMutation from './update-subscription-key.ctp.graphql';
@@ -35,15 +33,13 @@ export const useSubscriptionCreator = () => {
     TMutation_CreateSubscriptionArgs
   >(CreateQuery);
 
-  const execute = async ({ draft }: { draft: TSubscriptionDraft }) => {
+  const execute = async (variables: TMutation_CreateSubscriptionArgs) => {
     try {
       return await createSubscription({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          draft: draft,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -142,21 +138,12 @@ export const useSubscriptionKeyUpdater = () => {
   };
 };
 
-type TUseSubscriptionFetcher = (props: { id: string }) => {
-  subscription?: Maybe<TCommercetoolsSubscription>;
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-
-export const useSubscriptionFetcher: TUseSubscriptionFetcher = ({ id }) => {
+export const useSubscriptionFetcher = (variables: TQuery_SubscriptionArgs) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_SubscriptionArgs
   >(FetchQuery, {
-    variables: {
-      id: id,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -175,16 +162,13 @@ export const useSubscriptionDeleter = () => {
     TMutation_DeleteSubscriptionArgs
   >(DeleteSubscriptionIdMutation);
 
-  const execute = async ({ id, version }: { id: string; version: number }) => {
+  const execute = async (variables: TMutation_DeleteSubscriptionArgs) => {
     try {
       return await deleteSubscriptionById({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -197,13 +181,7 @@ export const useSubscriptionDeleter = () => {
   };
 };
 
-type TUseSubscriptionsFetcher = (variables: TQuery_SubscriptionsArgs) => {
-  subscriptions?: TQuery['subscriptions'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useSubscriptionsFetcher: TUseSubscriptionsFetcher = (
+export const useSubscriptionsFetcher = (
   variables: TQuery_SubscriptionsArgs
 ) => {
   const { data, error, loading, refetch } = useQuery<

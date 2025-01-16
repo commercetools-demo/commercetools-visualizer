@@ -56,7 +56,10 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
   const typeDefinitionUpdater = useTypeDefinitionUpdater();
 
   const { fieldDefinitions, error, loading, version, refetch } =
-    useTypeWithDefinitionByNameFetcher(id, [fieldDefinitionName]);
+    useTypeWithDefinitionByNameFetcher({
+      id: id,
+      includeNames: [fieldDefinitionName],
+    });
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {

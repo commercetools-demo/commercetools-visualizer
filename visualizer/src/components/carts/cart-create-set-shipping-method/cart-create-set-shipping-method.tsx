@@ -61,7 +61,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
   const setShippingMethodToCart = (shippingMethod: TShippingMethod) => {
     cartUpdater
       .execute({
-        updateActions: [
+        actions: [
           {
             setShippingMethod: {
               shippingMethod: {

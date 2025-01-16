@@ -42,7 +42,7 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
   const handleUpdateCart = (actions: Array<TCartUpdateAction>) =>
     cartUpdater
       .execute({
-        updateActions: actions,
+        actions: actions,
         id: cart.id,
         version: cart.version,
         locale: dataLocale,
@@ -102,7 +102,7 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
   const handleAddVariantToCart = async (variant: ProductValue) => {
     await cartUpdater
       .execute({
-        updateActions: [{ addLineItem: { sku: variant.sku, quantity: 1 } }],
+        actions: [{ addLineItem: { sku: variant.sku, quantity: 1 } }],
         id: cart.id,
         version: cart.version,
         locale: dataLocale,
@@ -137,7 +137,7 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
       ? { removeCustomLineItem: { customLineItemId: id } }
       : { removeLineItem: { lineItemId: id } };
     await cartUpdater.execute({
-      updateActions: [action],
+      actions: [action],
       id: cart.id,
       version: cart.version,
       locale: dataLocale,
@@ -167,7 +167,7 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
         }
       : { changeLineItemQuantity: { lineItemId: id, quantity } };
     await cartUpdater.execute({
-      updateActions: [action],
+      actions: [action],
       id: cart.id,
       version: cart.version,
       locale: dataLocale,

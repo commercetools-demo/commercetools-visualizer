@@ -1,5 +1,4 @@
 import {
-  Maybe,
   TMutation,
   TMutation_CreateStateArgs,
   TMutation_DeleteStateArgs,
@@ -11,7 +10,7 @@ import {
   TStateDraft,
   TStateType,
 } from '../../types/generated/ctp';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import {
   useMcMutation,
@@ -41,15 +40,13 @@ export const useStateCreator = () => {
     TMutation_CreateStateArgs
   >(CreateStateMutation);
 
-  const execute = async ({ draft }: { draft: TStateDraft }) => {
+  const execute = async (variables: TMutation_CreateStateArgs) => {
     try {
       return await createState({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          draft: draft,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -62,13 +59,7 @@ export const useStateCreator = () => {
   };
 };
 
-type TUseStatesFetcher = (variables: TQuery_StatesArgs) => {
-  states?: TQuery['states'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useStatesFetcher: TUseStatesFetcher = (variables) => {
+export const useStatesFetcher = (variables: TQuery_StatesArgs) => {
   const { data, error, loading, refetch } = useQuery<TQuery, TQuery_StatesArgs>(
     FetchAllQuery,
     {
@@ -86,23 +77,12 @@ export const useStatesFetcher: TUseStatesFetcher = (variables) => {
   };
 };
 
-type TUseStateFetcher = (props: { id: string }) => {
-  state?: Maybe<TState>;
-  error?: ApolloError;
-  loading: boolean;
-  refetch: (
-    variables?: Partial<TQuery_StateArgs> | undefined
-  ) => Promise<ApolloQueryResult<TQuery>>;
-};
-
-export const useStateFetcher: TUseStateFetcher = ({ id }) => {
+export const useStateFetcher = (variables: TQuery_StateArgs) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_StateArgs
   >(FetchQuery, {
-    variables: {
-      id: id,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -208,17 +188,13 @@ export const useStateDeleter = () => {
     TMutation_DeleteStateArgs
   >(DeleteQuery);
 
-  const execute = async ({ id, key, version }: TMutation_DeleteStateArgs) => {
+  const execute = async (variables: TMutation_DeleteStateArgs) => {
     try {
       return await deleteStateById({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          key: key,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       console.log(graphQlResponse);

@@ -1,5 +1,4 @@
 import {
-  Maybe,
   TExtension,
   TExtensionDraft,
   TExtensionUpdateAction,
@@ -12,7 +11,7 @@ import {
   TQuery_ExtensionsArgs,
   TTriggerInput,
 } from '../../types/generated/ctp';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import FetchExtensionsQuery from './fetch-extensions.cpt.graphql';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import {
@@ -34,15 +33,13 @@ export const useExtensionCreator = () => {
     TMutation_CreateExtensionArgs
   >(CreateQuery);
 
-  const execute = async ({ draft }: { draft: TExtensionDraft }) => {
+  const execute = async (variables: TMutation_CreateExtensionArgs) => {
     try {
       return await createSubscription({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          draft: draft,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -55,13 +52,7 @@ export const useExtensionCreator = () => {
   };
 };
 
-type TUseExtensionsFetcher = (variables: TQuery_ExtensionsArgs) => {
-  extensions?: TQuery['extensions'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useExtensionsFetcher: TUseExtensionsFetcher = (variables) => {
+export const useExtensionsFetcher = (variables: TQuery_ExtensionsArgs) => {
   const { data, error, loading, refetch } = useQuery<
     TQuery,
     TQuery_ExtensionsArgs
@@ -79,23 +70,12 @@ export const useExtensionsFetcher: TUseExtensionsFetcher = (variables) => {
   };
 };
 
-type TUseExtensionFetcher = (props: { id: string }) => {
-  extension?: Maybe<TExtension>;
-  error?: ApolloError;
-  loading: boolean;
-  refetch: (
-    variables?: Partial<TQuery_ExtensionArgs> | undefined
-  ) => Promise<ApolloQueryResult<TQuery>>;
-};
-
-export const useExtensionFetcher: TUseExtensionFetcher = ({ id }) => {
+export const useExtensionFetcher = (variables: TQuery_ExtensionArgs) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_ExtensionArgs
   >(FetchQuery, {
-    variables: {
-      id: id,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -193,7 +173,6 @@ export const useExtensionUpdater = () => {
         },
       });
     } catch (graphQlResponse) {
-      console.log(graphQlResponse);
       throw extractErrorFromGraphQlResponse(graphQlResponse);
     }
   };
@@ -210,21 +189,13 @@ export const useExtensionDeleter = () => {
     TMutation_DeleteExtensionArgs
   >(DeleteQuery);
 
-  const execute = async ({
-    id,
-    key,
-    version,
-  }: TMutation_DeleteExtensionArgs) => {
+  const execute = async (variables: TMutation_DeleteExtensionArgs) => {
     try {
       return await deleteExtension({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          key: key,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);

@@ -2,7 +2,6 @@ import {
   Maybe,
   TCart,
   TCartDraft,
-  TCartUpdateAction,
   TMutation,
   TMutation_CreateCartArgs,
   TMutation_DeleteCartArgs,
@@ -24,13 +23,7 @@ import DeleteQuery from './delete-cart.ctp.graphql';
 import CreateQuery from './create-cart.ctp.graphql';
 import UpdateQuery from './update-cart.ctp.graphql';
 
-type TUseCartsFetcher = (variables: TQuery_CartsArgs) => {
-  carts?: TQuery['carts'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useCartsFetcher: TUseCartsFetcher = (variables) => {
+export const useCartsFetcher = (variables: TQuery_CartsArgs) => {
   const { data, error, loading, refetch } = useQuery<TQuery, TQuery_CartsArgs>(
     FetchAllQuery,
     {
@@ -57,15 +50,14 @@ type TUseCartFetcher = (props: { id: string; locale: string }) => {
   ) => Promise<ApolloQueryResult<TQuery>>;
 };
 
-export const useCartFetcher: TUseCartFetcher = ({ id, locale }) => {
+export const useCartFetcher: TUseCartFetcher = (
+  variables: TQuery_CartArgs & { locale: string }
+) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_CartArgs & { locale: string }
   >(FetchQuery, {
-    variables: {
-      id: id,
-      locale: locale,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -84,17 +76,13 @@ export const useCartDeleter = () => {
     TMutation_DeleteCartArgs
   >(DeleteQuery);
 
-  const execute = async ({ id, key, version }: TMutation_DeleteCartArgs) => {
+  const execute = async (variables: TMutation_DeleteCartArgs) => {
     try {
       return await deleteCartById({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          key: key,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       console.log(graphQlResponse);
@@ -148,29 +136,18 @@ export const useCartUpdater = () => {
     TMutation_UpdateCartArgs & { locale: string }
   >(UpdateQuery);
 
-  const execute = async ({
-    updateActions,
-    id,
-    version,
-    locale,
-  }: {
-    updateActions: Array<TCartUpdateAction>;
-    id: string;
-    version: number;
-    locale: string;
-  }) => {
+  const execute = async (
+    variables: TMutation_UpdateCartArgs & {
+      locale: string;
+    }
+  ) => {
     try {
-      if (updateActions.length > 0) {
+      if (variables.actions.length > 0) {
         return await updateCartId({
           context: {
             target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
           },
-          variables: {
-            id: id,
-            version: version || 1,
-            actions: updateActions,
-            locale: locale,
-          },
+          variables: variables,
         });
       }
       return Promise.resolve(undefined);

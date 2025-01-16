@@ -75,7 +75,7 @@ export const CartCreateSelectCurrency: FC<Props> = ({
           }
         } else {
           const updated = await cartUpdater.execute({
-            updateActions: [{ setCountry: { country: formikValues.country } }],
+            actions: [{ setCountry: { country: formikValues.country } }],
             locale: dataLocale,
             id: cart.id,
             version: cart.version,

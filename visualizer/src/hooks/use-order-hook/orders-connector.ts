@@ -1,15 +1,9 @@
 import { TQuery, TQuery_OrdersArgs } from '../../types/generated/ctp';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import FetchAllQuery from './fetch-orders.ctp.graphql';
 
-type TUseOrdersFetcher = (variables: TQuery_OrdersArgs) => {
-  orders?: TQuery['orders'];
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useOrdersFetcher: TUseOrdersFetcher = (variables) => {
+export const useOrdersFetcher = (variables: TQuery_OrdersArgs) => {
   const { data, error, loading, refetch } = useQuery<TQuery, TQuery_OrdersArgs>(
     FetchAllQuery,
     {

@@ -1,5 +1,4 @@
 import {
-  Maybe,
   TFieldDefinition,
   TFieldDefinitionInput,
   TMutation,
@@ -10,11 +9,8 @@ import {
   TQuery_TypeDefinitionArgs,
   TQuery_TypeDefinitionsArgs,
   TTypeDefinition,
-  TTypeDefinitionDraft,
-  TTypeDefinitionQueryResult,
-  TTypeUpdateAction,
 } from '../../types/generated/ctp';
-import { ApolloError, ApolloQueryResult, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import FetchTypeDefinitionsQuery from './fetch-types.ctp.graphql';
 import { GRAPHQL_TARGETS } from '@commercetools-frontend/constants';
 import {
@@ -44,15 +40,13 @@ export const useTypeDefinitionCreator = () => {
     TMutation_CreateTypeDefinitionArgs
   >(CreateTypeDefinitionMutation);
 
-  const execute = async ({ draft }: { draft: TTypeDefinitionDraft }) => {
+  const execute = async (variables: TMutation_CreateTypeDefinitionArgs) => {
     try {
       return await createTypeDefinition({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          draft: draft,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -157,13 +151,7 @@ export const useTypeDefinitionUpdater = () => {
   };
 };
 
-type TUseTypesFetcher = (variables: TQuery_TypeDefinitionsArgs) => {
-  typeDefinitions?: TTypeDefinitionQueryResult;
-  error?: ApolloError;
-  loading: boolean;
-  refetch(): Promise<ApolloQueryResult<TQuery>>;
-};
-export const useTypesFetcher: TUseTypesFetcher = (variables) => {
+export const useTypesFetcher = (variables: TQuery_TypeDefinitionsArgs) => {
   const { data, error, loading, refetch } = useQuery<
     TQuery,
     TQuery_TypeDefinitionsArgs
@@ -181,23 +169,14 @@ export const useTypesFetcher: TUseTypesFetcher = (variables) => {
   };
 };
 
-type TUseTypeDefinitionFetcher = (props: { id: string }) => {
-  typeDefinition?: Maybe<TTypeDefinition>;
-  error?: ApolloError;
-  loading: boolean;
-  refetch: (
-    variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
-  ) => Promise<ApolloQueryResult<TQuery>>;
-};
-
-export const useTypeDefinitionFetcher: TUseTypeDefinitionFetcher = ({ id }) => {
+export const useTypeDefinitionFetcher = (
+  variables: TQuery_TypeDefinitionArgs
+) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_TypeDefinitionArgs
   >(FetchQuery, {
-    variables: {
-      id: id,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },
@@ -216,21 +195,13 @@ export const useTypeDefinitionDeleter = () => {
     TMutation_DeleteTypeDefinitionArgs
   >(DeleteQuery);
 
-  const execute = async ({
-    id,
-    key,
-    version,
-  }: TMutation_DeleteTypeDefinitionArgs) => {
+  const execute = async (variables: TMutation_DeleteTypeDefinitionArgs) => {
     try {
       return await deleteTypeDefinitionById({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          key: key,
-          version: version,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -248,25 +219,13 @@ export const useTypeDefinitionEntryCreator = () => {
     TMutation_UpdateTypeDefinitionArgs
   >(UpdateTypeDefinitionIdMutation);
 
-  const execute = async ({
-    actions,
-    id,
-    version,
-  }: {
-    id: string;
-    version: number;
-    actions: Array<TTypeUpdateAction>;
-  }) => {
+  const execute = async (variables: TMutation_UpdateTypeDefinitionArgs) => {
     try {
       return await createTypeDefinitionEntry({
         context: {
           target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
         },
-        variables: {
-          id: id,
-          version: version || 1,
-          actions: actions,
-        },
+        variables: variables,
       });
     } catch (graphQlResponse) {
       throw extractErrorFromGraphQlResponse(graphQlResponse);
@@ -283,17 +242,13 @@ export type TQuery_TypeDefinitionWithDefinitionByNameArgs = {
   includeNames: Array<string>;
 };
 export const useTypeWithDefinitionByNameFetcher = (
-  id: string,
-  includeNames: Array<string>
+  variables: TQuery_TypeDefinitionWithDefinitionByNameArgs
 ) => {
   const { data, error, loading, refetch } = useMcQuery<
     TQuery,
     TQuery_TypeDefinitionWithDefinitionByNameArgs
   >(TypeWithDefinitionByName, {
-    variables: {
-      id: id,
-      includeNames: includeNames,
-    },
+    variables: variables,
     context: {
       target: GRAPHQL_TARGETS.COMMERCETOOLS_PLATFORM,
     },

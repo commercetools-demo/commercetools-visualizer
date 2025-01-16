@@ -96,7 +96,7 @@ const CartCreateCustomerAddresses: FC<Props> = ({
           });
         }
         await cartUpdater.execute({
-          updateActions: updateActions,
+          actions: updateActions,
           id: cart.id,
           version: cart.version,
           locale: dataLocale,

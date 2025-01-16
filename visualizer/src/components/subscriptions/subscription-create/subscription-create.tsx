@@ -3,17 +3,12 @@ import { useIntl } from 'react-intl';
 import { Route, Switch, useHistory, useParams } from 'react-router';
 import { useFormik } from 'formik';
 
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import Steps from '../../steps';
 import messages from './messages';
 
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
-import { transformErrors } from '../transform-errors';
 import { useSubscriptionCreator } from '../../../hooks/use-subscription-connector';
 import { InfoDetailPage } from '@commercetools-frontend/application-components';
 import { ContextData } from './subscription-create-configuration';
@@ -22,6 +17,7 @@ import SubscriptionCreateDestination from './subscription-create-destination/sub
 import SubscriptionCreateDestinationConfigure from './subscription-create-destination-configure/subscription-create-destination-configure';
 import SubscriptionCreateChanges from './subscription-create-changes/subscription-create-changes';
 import SubscriptionCreateMessages from './subscription-create-messages/subscription-create-messages';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToWelcome: string;
@@ -41,59 +37,47 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
   const subscriptionCreator = useSubscriptionCreator();
 
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
 
   const handleSubmit = useCallback(
     async (formikValues: ContextData, formikHelpers) => {
-      try {
-        const subscriptionDraft: TSubscriptionDraft = {
-          key:
-            formikValues.subscriptionStepsDraft[1].key &&
-              formikValues.subscriptionStepsDraft[1].key !== ''
-              ? formikValues.subscriptionStepsDraft[1].key
-              : undefined,
-          ...formikValues.subscriptionStepsDraft[3],
-          changes:
-            formikValues.subscriptionStepsDraft[4].changes &&
-              formikValues.subscriptionStepsDraft[4].changes.length > 0
-              ? formikValues.subscriptionStepsDraft[4].changes
-              : undefined,
-          messages:
-            formikValues.subscriptionStepsDraft[5].messages &&
-              formikValues.subscriptionStepsDraft[5].messages.length > 0
-              ? formikValues.subscriptionStepsDraft[5].messages
-              : undefined,
-        };
-        const createdSubscription = await subscriptionCreator.execute({
+      const subscriptionDraft: TSubscriptionDraft = {
+        key:
+          formikValues.subscriptionStepsDraft[1].key &&
+          formikValues.subscriptionStepsDraft[1].key !== ''
+            ? formikValues.subscriptionStepsDraft[1].key
+            : undefined,
+        ...formikValues.subscriptionStepsDraft[3],
+        changes:
+          formikValues.subscriptionStepsDraft[4].changes &&
+          formikValues.subscriptionStepsDraft[4].changes.length > 0
+            ? formikValues.subscriptionStepsDraft[4].changes
+            : undefined,
+        messages:
+          formikValues.subscriptionStepsDraft[5].messages &&
+          formikValues.subscriptionStepsDraft[5].messages.length > 0
+            ? formikValues.subscriptionStepsDraft[5].messages
+            : undefined,
+      };
+      await subscriptionCreator
+        .execute({
           draft: subscriptionDraft,
-        });
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.subscriptionCreated, {
-            subscriptionKey:
-              createdSubscription.data?.createSubscription?.id || '',
-          }),
-        });
-        history.push({
-          pathname:
-            linkToWelcome +
-            '/subscriptions/',
-          state: { refetch: true }
-        });
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+        })
+        .then(({ data }) => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.subscriptionCreated, {
+              subscriptionKey: data?.createSubscription?.id || '',
+            }),
           });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
-      }
+          history.push({
+            pathname: linkToWelcome + '/subscriptions/',
+            state: { refetch: true },
+          });
+        })
+        .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
-    [intl, subscriptionCreator]
+    [subscriptionCreator]
   );
 
   const formik = useFormik<ContextData>({

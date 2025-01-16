@@ -18,12 +18,7 @@ import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import StatesForm, { TFormValues } from '../states-form/states-form';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import {
   useStateDeleter,
   useStateFetcher,
@@ -33,6 +28,7 @@ import {
   formValuesToState,
   stateToFormValues,
 } from '../states-form/conversion';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;
@@ -44,7 +40,6 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const { id } = useParams<{ id: string }>();
   const stateUpdater = useStateUpdater();
   const stateDeleter = useStateDeleter();
@@ -58,35 +53,27 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const data = formValuesToState(formikValues);
-        if (state && data) {
-          await stateUpdater.execute({
+      const data = formValuesToState(formikValues);
+      if (state && data) {
+        await stateUpdater
+          .execute({
             originalDraft: state,
             nextDraft: data,
             id: state.id,
             version: state.version,
-          });
-        }
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.updateSuccess),
-        });
-        await refetch();
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
+          })
+          .then(() => {
+            showNotification({
+              kind: 'success',
+              domain: DOMAINS.SIDE,
+              text: intl.formatMessage(messages.updateSuccess),
+            });
+            return refetch();
+          })
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
       }
     },
-    [intl, refetch, showNotification, state]
+    [refetch, state]
   );
 
   const handleDelete = async () => {

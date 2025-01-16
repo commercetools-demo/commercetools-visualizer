@@ -29,17 +29,14 @@ import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import IconButton from '@commercetools-uikit/icon-button';
 import { BinFilledIcon } from '@commercetools-uikit/icons';
-import {
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import NumberInput from '@commercetools-uikit/number-input';
 import { ProductSearchInput } from '../../carts/cart-create-variant-search';
 import { ProductValue } from '../../carts/cart-create-variant-search/product-search-input';
 import Constraints from '@commercetools-uikit/constraints';
-import transformErrors from '../../carts/cart-create-add-line-items/transform-errors';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import ImageContainer from '../../image-container';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;
@@ -48,7 +45,6 @@ type Props = {
 export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -133,7 +129,6 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
     });
   };
   const handleAddVariantToCart = async (variant: ProductValue) => {
-    console.log(variant);
     await shoppingListUpdater
       .execute({
         actions: [{ addLineItem: { sku: variant.sku, quantity: 1 } }],
@@ -147,14 +142,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
           text: 'Added item',
         });
       })
-      .catch((e) => {
-        const transformedErrors = transformErrors(e);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors: transformedErrors.unmappedErrors,
-          });
-        }
-      });
+      .catch(graphQLErrorHandler(showNotification));
   };
   const itemRenderer = (
     item: TShoppingListLineItem,

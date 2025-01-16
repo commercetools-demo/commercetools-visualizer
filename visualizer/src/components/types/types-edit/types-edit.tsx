@@ -1,11 +1,7 @@
 import { FC, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import Text from '@commercetools-uikit/text';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import Spacings from '@commercetools-uikit/spacings';
@@ -24,7 +20,6 @@ import { DOMAINS } from '@commercetools-frontend/constants';
 import { formValuesToDoc } from '../type-definition-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import TypesForm, { TFormValues } from '../types-form/types-form';
 
 import messages from './messages';
@@ -33,6 +28,7 @@ import {
   useTypeDefinitionFetcher,
   useTypeUpdater,
 } from '../../../hooks/use-types-connector';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToHome: string;
@@ -46,7 +42,6 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const typeUpdater = useTypeUpdater();
   const typeDefinitionDeleter = useTypeDefinitionDeleter();
   const canManage = useIsAuthorized({
@@ -59,32 +54,24 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const data = formValuesToDoc(formikValues);
-        if (typeDefinition) {
-          await typeUpdater.execute({
+      const data = formValuesToDoc(formikValues);
+      if (typeDefinition) {
+        await typeUpdater
+          .execute({
             originalDraft: typeDefinition,
             nextDraft: data,
             id: typeDefinition.id,
             version: typeDefinition.version,
-          });
-        }
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.updateSuccess),
-        });
-        await refetch();
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
+          })
+          .then(() => {
+            showNotification({
+              kind: 'success',
+              domain: DOMAINS.SIDE,
+              text: intl.formatMessage(messages.updateSuccess),
+            });
+            return refetch();
+          })
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
       }
     },
     [intl, refetch, showNotification, typeDefinition, typeUpdater]

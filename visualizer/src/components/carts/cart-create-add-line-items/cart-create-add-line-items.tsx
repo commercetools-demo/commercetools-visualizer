@@ -18,6 +18,7 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { DOMAINS } from '@commercetools-frontend/constants';
 import CartAppliedDiscountsPanel from '../cart-applied-discounts-panel';
 import transformErrors from './transform-errors';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 interface Props
   extends PropsWithChildren<{
@@ -119,14 +120,7 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
           }),
         });
       })
-      .catch((e) => {
-        const transformedErrors = transformErrors(e);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors: transformedErrors.unmappedErrors,
-          });
-        }
-      });
+      .catch(graphQLErrorHandler(showNotification));
   };
 
   const handleRemoveLineItem = async (

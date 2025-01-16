@@ -22,7 +22,7 @@ const SubscriptionDestinationForm: FC<Props> = ({
       toRender = <GoogleCloudPubSubDestination isReadOnly={isReadOnly} />;
       break;
     case 'SQS':
-      toRender = <SQSDestination isReadOnly={isReadOnly} />
+      toRender = <SQSDestination isReadOnly={isReadOnly} />;
       break;
   }
 

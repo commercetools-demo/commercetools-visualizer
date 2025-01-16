@@ -6,13 +6,8 @@ import ExtensionsForm, {
 } from '../extensions-form/extensions-form';
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { useExtensionCreator } from '../../../hooks/use-extensions-connector';
@@ -20,6 +15,7 @@ import {
   formValuesToTExtension,
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;
@@ -34,33 +30,24 @@ const ExtensionsCreate: FC<Props> = ({ onClose }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
   const extensionCreator = useExtensionCreator();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const showNotification = useShowNotification();
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const draft = formValuesToTExtension(formikValues);
-        await extensionCreator.execute({
+      const draft = formValuesToTExtension(formikValues);
+      await extensionCreator
+        .execute({
           draft: draft,
-        });
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.createSuccess),
-        });
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+        })
+        .then(() => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.createSuccess),
           });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
-      }
+        })
+        .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
-    [intl]
+    [extensionCreator]
   );
   return (
     <ExtensionsForm

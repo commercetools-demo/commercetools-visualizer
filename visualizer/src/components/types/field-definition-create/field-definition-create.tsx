@@ -5,14 +5,9 @@ import { RevertIcon } from '@commercetools-uikit/icons';
 import { useParams } from 'react-router-dom';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 import {
@@ -21,6 +16,7 @@ import {
   TFormValues,
 } from '../field-definition-input/helpers';
 import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -37,7 +33,6 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   });
 
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
 
   const typeDefinitionCreator = useTypeDefinitionEntryCreator();
 
@@ -64,16 +59,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
           });
           return onClose();
         })
-        .catch((graphQLErrors) => {
-          const transformedErrors = transformErrors(graphQLErrors);
-          if (transformedErrors.unmappedErrors.length > 0) {
-            showApiErrorNotification({
-              errors:
-                transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-            });
-          }
-          formikHelpers.setErrors(transformedErrors.formErrors);
-        });
+        .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
     [id, typeDefinitionCreator, version]
   );

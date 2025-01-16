@@ -13,11 +13,7 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useIntl } from 'react-intl';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import {
-  useShowNotification,
-  useShowApiErrorNotification,
-  type TApiErrorNotificationOptions,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
@@ -25,13 +21,16 @@ import SubscriptionDetailsForm, {
   TFormValues,
 } from '../subscription-details-form/subscription-details-form';
 import messages from './messages';
-import { transformErrors } from '../transform-errors';
 import {
   useSubscriptionDeleter,
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
 } from '../../../hooks/use-subscription-connector';
-import { TGoogleCloudPubSubDestination, TSqsDestination } from '../../../types/generated/ctp';
+import {
+  TGoogleCloudPubSubDestination,
+  TSqsDestination,
+} from '../../../types/generated/ctp';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToWelcome: string;
@@ -43,7 +42,6 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   const intl = useIntl();
   const history = useHistory();
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -58,39 +56,25 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        subscription &&
-          (await subscriptionKeyUpdater.execute({
+      subscription &&
+        (await subscriptionKeyUpdater
+          .execute({
             originalDraft: subscription,
             nextDraft: formikValues,
-          }));
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.subscriptionUpdated, {
-            subscriptionKey: subscription?.key,
-          }),
-        });
-        refetch();
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
-      }
+          })
+          .then(() => {
+            showNotification({
+              kind: 'success',
+              domain: DOMAINS.SIDE,
+              text: intl.formatMessage(messages.subscriptionUpdated, {
+                subscriptionKey: subscription?.key,
+              }),
+            });
+            return refetch();
+          })
+          .then(graphQLErrorHandler(showNotification, formikHelpers)));
     },
-    [
-      subscription,
-      intl,
-      showApiErrorNotification,
-      showNotification,
-      subscriptionKeyUpdater,
-    ]
+    [subscription, subscriptionKeyUpdater]
   );
 
   if (error) {
@@ -125,10 +109,15 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     });
     history.replace({
       pathname: linkToWelcome + '/subscriptions',
-      state: { refetch: true }
+      state: { refetch: true },
     });
   };
-  let dest: { GoogleCloudPubSub?: TGoogleCloudPubSubDestination, SQS?: TSqsDestination } | undefined;
+  let dest:
+    | {
+        GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
+        SQS?: TSqsDestination;
+      }
+    | undefined;
 
   if (subscription.destination.type === 'GoogleCloudPubSub') {
     dest = {
@@ -138,8 +127,7 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   }
   if (subscription.destination.type === 'SQS') {
     dest = {
-      SQS:
-        subscription.destination as TSqsDestination,
+      SQS: subscription.destination as TSqsDestination,
     };
   }
 

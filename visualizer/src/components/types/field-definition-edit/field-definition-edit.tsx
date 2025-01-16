@@ -12,15 +12,10 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import {
-  TApiErrorNotificationOptions,
-  useShowNotification,
-  useShowApiErrorNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
 import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
@@ -30,6 +25,7 @@ import {
   TFormValues,
 } from '../field-definition-input/helpers';
 import { useTypeWithDefinitionByNameFetcher } from '../../../hooks/use-types-connector/types-connector';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: (event: SyntheticEvent) => void;
@@ -41,7 +37,6 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
     fieldDefinitionName: string;
   }>();
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
 
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -81,17 +76,7 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
               text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
             });
           })
-          .catch((graphQLErrors) => {
-            const transformedErrors = transformErrors(graphQLErrors);
-            if (transformedErrors.unmappedErrors.length > 0) {
-              showApiErrorNotification({
-                errors:
-                  transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-              });
-            }
-
-            formikHelpers.setErrors(transformedErrors.formErrors);
-          });
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
       }
     },
     [fieldDefinitions, id, intl, refetch, typeDefinitionUpdater, version]

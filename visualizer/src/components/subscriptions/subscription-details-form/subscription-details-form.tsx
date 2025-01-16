@@ -26,7 +26,12 @@ export type TFormValues = {
   id: string;
   key: string;
   destinationType: string;
-  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestination, SQS?: TSqsDestination } | undefined;
+  destination:
+    | {
+        GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
+        SQS?: TSqsDestination;
+      }
+    | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;
   messages?: Array<TMessageSubscriptionInput> | null;
 };

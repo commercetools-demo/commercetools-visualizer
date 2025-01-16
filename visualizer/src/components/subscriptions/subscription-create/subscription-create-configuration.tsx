@@ -9,7 +9,10 @@ import {
 export type Step1 = { key: string | undefined | null };
 export type Step2 = { destinationType: string | undefined | null };
 export type Step3 = {
-  destination: { GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput, Sqs?: TSqsDestinationInput };
+  destination: {
+    GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput;
+    Sqs?: TSqsDestinationInput;
+  };
 };
 export type Step4 = {
   changes?: Array<TChangeSubscriptionInput> | null;

@@ -4,14 +4,9 @@ import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIntl } from 'react-intl';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import messages from './messages';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';
@@ -35,6 +30,7 @@ import {
   useExtensionFetcher,
   useExtensionUpdater,
 } from '../../../hooks/use-extensions-connector';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;
@@ -47,7 +43,6 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const extensionsUpdater = useExtensionUpdater();
   const extensionDeleter = useExtensionDeleter();
   const canManage = useIsAuthorized({
@@ -60,35 +55,27 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      try {
-        const data = formValuesToTExtension(formikValues);
-        if (extension) {
-          await extensionsUpdater.execute({
+      const data = formValuesToTExtension(formikValues);
+      if (extension) {
+        await extensionsUpdater
+          .execute({
             originalDraft: extension,
             nextDraft: data,
             id: extension.id,
             version: extension.version,
-          });
-        }
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.updateSuccess),
-        });
-        await refetch();
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
+          })
+          .then(() => {
+            showNotification({
+              kind: 'success',
+              domain: DOMAINS.SIDE,
+              text: intl.formatMessage(messages.updateSuccess),
+            });
+            return refetch();
+          })
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
       }
     },
-    [intl, refetch, showNotification, extension, extensionsUpdater]
+    [refetch, extension, extensionsUpdater]
   );
 
   const handleDelete = async () => {

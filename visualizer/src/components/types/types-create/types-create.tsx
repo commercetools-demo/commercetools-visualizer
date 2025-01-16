@@ -1,10 +1,6 @@
 import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { FormModalPage } from '@commercetools-frontend/application-components';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
@@ -15,12 +11,12 @@ import {
 } from '@commercetools-frontend/l10n';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
 import TypesForm from '../types-form/types-form';
 
 import { TTypeDefinitionDraft } from '../../../types/generated/ctp';
 import messages from './messages';
 import { useTypeDefinitionCreator } from '../../../hooks/use-types-connector';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToHome: string;
@@ -34,7 +30,6 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const typeDefinitionCreator = useTypeDefinitionCreator();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -42,39 +37,31 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
 
   const handleSubmit = useCallback(
     async (formikValues, formikHelpers) => {
-      try {
-        const draft: TTypeDefinitionDraft = {
-          key: formikValues.key,
-          name: transformLocalizedStringToLocalizedField(
-            LocalizedTextInput.omitEmptyTranslations(formikValues.name)
-          ),
-          description: transformLocalizedStringToLocalizedField(
-            LocalizedTextInput.omitEmptyTranslations(formikValues.description)
-          ),
+      const draft: TTypeDefinitionDraft = {
+        key: formikValues.key,
+        name: transformLocalizedStringToLocalizedField(
+          LocalizedTextInput.omitEmptyTranslations(formikValues.name)
+        ),
+        description: transformLocalizedStringToLocalizedField(
+          LocalizedTextInput.omitEmptyTranslations(formikValues.description)
+        ),
 
-          resourceTypeIds: formikValues.resourceTypeIds,
-        };
-        const result = await typeDefinitionCreator.execute({
+        resourceTypeIds: formikValues.resourceTypeIds,
+      };
+      await typeDefinitionCreator
+        .execute({
           draft: draft,
-        });
-        showNotification({
-          kind: 'success',
-          domain: DOMAINS.SIDE,
-          text: intl.formatMessage(messages.createSuccess),
-        });
-        result.data?.createTypeDefinition?.id &&
-          onCreate(result.data?.createTypeDefinition?.id);
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
+        })
+        .then(({ data }) => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.createSuccess),
           });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
-      }
+          data?.createTypeDefinition?.id &&
+            onCreate(data?.createTypeDefinition?.id);
+        })
+        .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
     [intl, typeDefinitionCreator]
   );

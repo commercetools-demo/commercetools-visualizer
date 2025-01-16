@@ -9,14 +9,10 @@ import { useHistory } from 'react-router';
 import { StepProps } from '../cart-create/cart-create';
 import { useCartCreator, useCartUpdater } from '../../../hooks/use-carts-hook';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { transformErrors } from '../../subscriptions/transform-errors';
-import {
-  TApiErrorNotificationOptions,
-  useShowApiErrorNotification,
-  useShowNotification,
-} from '@commercetools-frontend/actions-global';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { TCart, TCartDraft } from '../../../types/generated/ctp';
 import Spacings from '@commercetools-uikit/spacings';
+import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = StepProps & {
   cart?: TCart;
@@ -44,7 +40,6 @@ export const CartCreateSelectCurrency: FC<Props> = ({
     })
   );
   const showNotification = useShowNotification();
-  const showApiErrorNotification = useShowApiErrorNotification();
   const cartCreator = useCartCreator();
   const cartUpdater = useCartUpdater();
   const formik = useFormik<Step1>({
@@ -54,50 +49,45 @@ export const CartCreateSelectCurrency: FC<Props> = ({
       country: cart?.country || undefined,
     },
     onSubmit: async (formikValues, formikHelpers) => {
-      try {
-        if (!cart) {
-          const draft: TCartDraft = {
-            currency: formikValues.currency || 'EUR',
-            country: formikValues.country || undefined,
-          };
-          const { data } = await cartCreator.execute({
+      if (!cart) {
+        const draft: TCartDraft = {
+          currency: formikValues.currency || 'EUR',
+          country: formikValues.country || undefined,
+        };
+        await cartCreator
+          .execute({
             draft: draft,
             locale: dataLocale,
-          });
-
-          if (data && data.createCart && data.createCart.id) {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.createSuccess),
-            });
-            goToNextStep && goToNextStep(data.createCart.id);
-          }
-        } else {
-          const updated = await cartUpdater.execute({
+          })
+          .then(({ data }) => {
+            if (data && data.createCart && data.createCart.id) {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.createSuccess),
+              });
+              goToNextStep && goToNextStep(data.createCart.id);
+            }
+          })
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
+      } else {
+        await cartUpdater
+          .execute({
             actions: [{ setCountry: { country: formikValues.country } }],
             locale: dataLocale,
             id: cart.id,
             version: cart.version,
-          });
-          if (updated && updated.data && updated.data.updateCart) {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.updateSuccess),
-            });
-          }
-        }
-      } catch (graphQLErrors) {
-        const transformedErrors = transformErrors(graphQLErrors);
-        if (transformedErrors.unmappedErrors.length > 0) {
-          showApiErrorNotification({
-            errors:
-              transformedErrors.unmappedErrors as TApiErrorNotificationOptions['errors'],
-          });
-        }
-
-        formikHelpers.setErrors(transformedErrors.formErrors);
+          })
+          .then((updated) => {
+            if (updated && updated.data && updated.data.updateCart) {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.updateSuccess),
+              });
+            }
+          })
+          .catch(graphQLErrorHandler(showNotification, formikHelpers));
       }
     },
   });

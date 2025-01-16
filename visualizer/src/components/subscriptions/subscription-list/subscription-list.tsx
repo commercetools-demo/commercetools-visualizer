@@ -110,8 +110,8 @@ const SubscriptionList = (props: Props) => {
           try {
             return intl.formatMessage(
               destinationMessages[
-              ('destination' +
-                item.destination.type) as keyof typeof destinationMessages
+                ('destination' +
+                  item.destination.type) as keyof typeof destinationMessages
               ]
             );
           } catch (e) {
@@ -127,7 +127,7 @@ const SubscriptionList = (props: Props) => {
     <InfoMainPage
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h2">
+          <Text.Headline as="h1">
             {intl.formatMessage(messages.title)}
           </Text.Headline>
 

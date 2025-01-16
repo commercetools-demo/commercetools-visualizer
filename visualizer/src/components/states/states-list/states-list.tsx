@@ -143,7 +143,7 @@ const StatesList = (props: Props) => {
     <TabularMainPage
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h2" intlMessage={messages.title} />
+          <Text.Headline as="h1" intlMessage={messages.title} />
           <SecondaryButton
             as={Link}
             to={`${match.url}/new`}

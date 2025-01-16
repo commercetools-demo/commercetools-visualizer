@@ -107,7 +107,7 @@ export const ShoppingListsList = () => {
     <InfoMainPage
       customTitleRow={
         <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h2">Shopping Lists</Text.Headline>
+          <Text.Headline as="h1">Shopping Lists</Text.Headline>
 
           <SecondaryButton
             iconLeft={<PlusBoldIcon />}

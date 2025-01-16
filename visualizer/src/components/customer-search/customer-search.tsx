@@ -1,5 +1,7 @@
 import { FC } from 'react';
 import AsyncSelectField from '@commercetools-uikit/async-select-field';
+import Text from '@commercetools-uikit/text';
+import { AdditionalInfoMessage } from '@commercetools-uikit/messages';
 import formatCustomerName from '../../utils/format-customer-name';
 import useCustomerSearchFetcher from '../../hooks/use-customer-search-fetcher';
 import { TAsyncSelectInputProps } from '@commercetools-uikit/async-select-input/dist/declarations/src/async-select-input';
@@ -52,9 +54,17 @@ export const CustomerSearch: FC<Props> = ({
         });
         return (
           customerData.customers.results?.map((customer) => {
+            const label = (
+              <Text.Body>
+                {formatCustomerName(customer)}
+                <AdditionalInfoMessage
+                  message={`(${customer.email})`}
+                ></AdditionalInfoMessage>
+              </Text.Body>
+            );
             return {
               value: customer.id,
-              label: formatCustomerName(customer),
+              label: label,
             };
           }) || []
         );

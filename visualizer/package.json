@@ -6,6 +6,8 @@
   "scripts": {
     "build": "mc-scripts build",
     "start": "mc-scripts start",
+    "login": "mc-scripts login",
+    "sync": "mc-scripts config:sync",
     "compile-html": "mc-scripts compile-html",
     "compile-html:local": "MC_APP_ENV=development mc-scripts compile-html --transformer @commercetools-frontend/mc-dev-authentication/transformer-local.js",
     "start:prod:local": "npm run compile-html:local && mc-scripts serve",

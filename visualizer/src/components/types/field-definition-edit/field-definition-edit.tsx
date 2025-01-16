@@ -69,7 +69,7 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
             version: version || 1,
           });
         }
-        refetch();
+        await refetch();
         showNotification({
           kind: 'success',
           domain: DOMAINS.SIDE,

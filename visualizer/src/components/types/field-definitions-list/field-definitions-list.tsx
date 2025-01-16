@@ -168,16 +168,16 @@ const FieldDefinitionsList: FC<Props> = ({
         <Switch>
           <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
             <NewFieldDefinitionInput
-              onClose={() => {
-                refetch && refetch();
+              onClose={async () => {
+                refetch && (await refetch());
                 push(`${match.url}`);
               }}
             />
           </SuspendedRoute>
           <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
             <FieldDefinitionInput
-              onClose={() => {
-                refetch && refetch();
+              onClose={async () => {
+                refetch && (await refetch());
                 push(`${match.url}`);
               }}
             />

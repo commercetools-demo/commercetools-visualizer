@@ -73,7 +73,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
           domain: DOMAINS.SIDE,
           text: intl.formatMessage(messages.updateSuccess),
         });
-        refetch();
+        await refetch();
       } catch (graphQLErrors) {
         const transformedErrors = transformErrors(graphQLErrors);
         if (transformedErrors.unmappedErrors.length > 0) {

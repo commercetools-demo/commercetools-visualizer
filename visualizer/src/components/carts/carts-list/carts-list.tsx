@@ -202,8 +202,8 @@ const CartsList = () => {
         {/*</SuspendedRoute>*/}
         <SuspendedRoute path={`${match.path}/:id`}>
           <CartDetails
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(`${match.url}`);
             }}
             linkToHome={match.url}

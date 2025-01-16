@@ -114,16 +114,16 @@ const ExtensionsList = () => {
       <Switch>
         <SuspendedRoute path={`${match.path}/new`}>
           <ExtensionsCreate
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(`${match.url}`);
             }}
           />
         </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <ExtensionsEdit
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(`${match.url}`);
             }}
           />

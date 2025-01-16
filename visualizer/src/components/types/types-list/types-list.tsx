@@ -137,20 +137,20 @@ const TypesList: FC<Props> = () => {
         <SuspendedRoute path={`${match.path}/new`}>
           <TypesCreate
             linkToHome={match.url}
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(`${match.url}`);
             }}
-            onCreate={(id: string) => {
-              refetch();
+            onCreate={async (id: string) => {
+              await refetch();
               push(`${match.url}/${id}`);
             }}
           />
         </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <TypesEdit
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(`${match.url}`);
             }}
             linkToHome={match.url}

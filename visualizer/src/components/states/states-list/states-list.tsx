@@ -171,17 +171,16 @@ const StatesList = (props: Props) => {
             onClose={() => {
               push(match.url);
             }}
-            onCreate={(id: string) => {
-              refetch();
-              console.log(`${match.url}/${id}`);
+            onCreate={async (id: string) => {
+              await refetch();
               push(`${match.url}/${id}`);
             }}
           />
         </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <StatesEdit
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(match.url);
             }}
           />

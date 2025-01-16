@@ -8,7 +8,7 @@ import {
   InfoMainPage,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import DataTable, { TColumn } from '@commercetools-uikit/data-table';
+import { TColumn } from '@commercetools-uikit/data-table';
 import { TShoppingList } from '../../../types/generated/ctp';
 import {
   formatLocalizedString,
@@ -17,7 +17,6 @@ import {
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { usePaginationState } from '@commercetools-uikit/hooks';
-import { Pagination } from '@commercetools-uikit/pagination';
 import { useState } from 'react';
 import CheckboxInput from '@commercetools-uikit/checkbox-input';
 import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
@@ -27,9 +26,10 @@ import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import ShoppingListsCreate from '../shopping-lists-create/shopping-lists-create';
 import CustomerSearch from '../../customer-search/customer-search';
+import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 
 export const ShoppingListsList = () => {
-  const { page, perPage } = usePaginationState();
+  const paginationState = usePaginationState();
   const { push } = useHistory();
   const match = useRouteMatch();
   const [userId, setUserId] = useState<
@@ -38,8 +38,8 @@ export const ShoppingListsList = () => {
   const [onlyItemsWithCustomer, setOnlyItemsWithCustomer] =
     useState<boolean>(false);
   const { shoppingLists, loading, error, refetch } = useShoppingListsFetcher({
-    limit: perPage.value,
-    offset: (page.value - 1) * perPage.value,
+    limit: paginationState.perPage.value,
+    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
     where: userId
       ? `customer(id="${userId.value}")`
       : onlyItemsWithCustomer
@@ -137,19 +137,15 @@ export const ShoppingListsList = () => {
             Only display items with customers
           </CheckboxInput>
         </Spacings.Inline>
-        <DataTable
+        <PaginatableDataTable
           rows={shoppingLists.results}
           columns={columns}
+          visibleColumns={columns}
           itemRenderer={itemRenderer}
           onRowClick={(row) => {
             push(`${match.url}/${row.id}`);
           }}
-        />
-        <Pagination
-          page={page.value}
-          onPageChange={page.onChange}
-          perPage={perPage.value}
-          onPerPageChange={perPage.onChange}
+          paginationState={paginationState}
           totalItems={shoppingLists.total}
         />
       </Spacings.Stack>

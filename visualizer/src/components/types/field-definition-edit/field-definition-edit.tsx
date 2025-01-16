@@ -13,9 +13,9 @@ import Text from '@commercetools-uikit/text';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import {
-  showNotification,
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowNotification,
+  useShowApiErrorNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { getErrorMessage } from '../../../helpers';
@@ -40,6 +40,8 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
     id: string;
     fieldDefinitionName: string;
   }>();
+  const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
 
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],

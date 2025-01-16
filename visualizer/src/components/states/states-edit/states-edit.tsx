@@ -20,8 +20,8 @@ import StatesForm, { TFormValues } from '../states-form/states-form';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import {
@@ -44,6 +44,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const { id } = useParams<{ id: string }>();
   const stateUpdater = useStateUpdater();
   const stateDeleter = useStateDeleter();

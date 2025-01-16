@@ -1,8 +1,8 @@
 import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { FormModalPage } from '@commercetools-frontend/application-components';
@@ -34,6 +34,7 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const typeDefinitionCreator = useTypeDefinitionCreator();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],

@@ -2,8 +2,8 @@ import { FC, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import Text from '@commercetools-uikit/text';
@@ -46,6 +46,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const typeUpdater = useTypeUpdater();
   const typeDefinitionDeleter = useTypeDefinitionDeleter();
   const canManage = useIsAuthorized({

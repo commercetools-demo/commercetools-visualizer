@@ -5,8 +5,8 @@ import { PERMISSIONS } from '../../../constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIntl } from 'react-intl';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
@@ -47,6 +47,7 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const extensionsUpdater = useExtensionUpdater();
   const extensionDeleter = useExtensionDeleter();
   const canManage = useIsAuthorized({

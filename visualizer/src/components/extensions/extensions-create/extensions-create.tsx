@@ -7,8 +7,8 @@ import ExtensionsForm, {
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
@@ -34,6 +34,7 @@ const ExtensionsCreate: FC<Props> = ({ onClose }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
   const extensionCreator = useExtensionCreator();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const showNotification = useShowNotification();
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {

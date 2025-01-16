@@ -30,7 +30,7 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import IconButton from '@commercetools-uikit/icon-button';
 import { BinFilledIcon } from '@commercetools-uikit/icons';
 import {
-  showApiErrorNotification,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import NumberInput from '@commercetools-uikit/number-input';
@@ -48,6 +48,7 @@ type Props = {
 export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],

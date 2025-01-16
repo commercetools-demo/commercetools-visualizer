@@ -6,8 +6,8 @@ import { useParams } from 'react-router-dom';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
@@ -37,6 +37,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   });
 
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
 
   const typeDefinitionCreator = useTypeDefinitionEntryCreator();
 

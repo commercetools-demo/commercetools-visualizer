@@ -11,8 +11,8 @@ import { useCartCreator, useCartUpdater } from '../../../hooks/use-carts-hook';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { transformErrors } from '../../subscriptions/transform-errors';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { TCart, TCartDraft } from '../../../types/generated/ctp';
@@ -44,6 +44,7 @@ export const CartCreateSelectCurrency: FC<Props> = ({
     })
   );
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const cartCreator = useCartCreator();
   const cartUpdater = useCartUpdater();
   const formik = useFormik<Step1>({

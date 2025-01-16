@@ -2,8 +2,8 @@ import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import {
-  showApiErrorNotification,
   TApiErrorNotificationOptions,
+  useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
@@ -32,6 +32,7 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
   }));
   const { type } = useParams<{ type: string }>();
   const showNotification = useShowNotification();
+  const showApiErrorNotification = useShowApiErrorNotification();
   const stateCreator = useStateCreator();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],

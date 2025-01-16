@@ -1,5 +1,6 @@
 import DataTable, { TRow } from '@commercetools-uikit/data-table';
 import Spacings from '@commercetools-uikit/spacings';
+import Text from '@commercetools-uikit/text';
 import {
   TColumn,
   TDataTableProps,
@@ -14,6 +15,7 @@ import {
   TColumnManagerProps,
   TDataTableManagerProps,
 } from '@commercetools-uikit/data-table-manager/dist/declarations/src/types';
+import messages from './messages';
 
 type Props<Row extends TRow = TRow> = {
   paginationState?: TPaginationState;
@@ -79,29 +81,50 @@ export const PaginatableDataTable = <Row extends TRow = TRow>({
   };
   return (
     <Spacings.Stack scale="l">
-      <DataTableManager
-        columns={tableData.visibleColumns}
-        columnManager={columnManager}
-        onSettingsChange={onSettingChange}
-        displaySettings={{
-          isWrappingText,
-          isCondensed,
-          disableDisplaySettings: false,
-        }}
-      >
-        <DataTable<Row> {...props} columns={tableData.visibleColumns} />
-      </DataTableManager>
-      {paginationState &&
-        totalItems &&
-        totalItems > paginationState.perPage.value && (
-          <Pagination
-            page={paginationState.page.value}
-            onPageChange={paginationState.page.onChange}
-            perPage={paginationState.perPage.value}
-            onPerPageChange={paginationState.perPage.onChange}
-            totalItems={totalItems}
-          />
-        )}
+      {!props.rows ||
+        (props.rows.length === 0 && (
+          <>
+            <Text.Body
+              fontWeight={'bold'}
+              intlMessage={messages.nothingFoundOnSearch}
+            />
+            <Text.Body intlMessage={messages.searchTypesAndGuidelines} />
+            <ul>
+              <li>
+                <Text.Body
+                  intlMessage={messages.searchTypesAndGuidelinesBulletPoint1}
+                />
+              </li>
+            </ul>
+          </>
+        ))}
+      {props.rows && props.rows.length > 0 && (
+        <>
+          <DataTableManager
+            columns={tableData.visibleColumns}
+            columnManager={columnManager}
+            onSettingsChange={onSettingChange}
+            displaySettings={{
+              isWrappingText,
+              isCondensed,
+              disableDisplaySettings: false,
+            }}
+          >
+            <DataTable<Row> {...props} columns={tableData.visibleColumns} />
+          </DataTableManager>
+          {paginationState &&
+            totalItems &&
+            totalItems > paginationState.perPage.value && (
+              <Pagination
+                page={paginationState.page.value}
+                onPageChange={paginationState.page.onChange}
+                perPage={paginationState.perPage.value}
+                onPerPageChange={paginationState.perPage.onChange}
+                totalItems={totalItems}
+              />
+            )}
+        </>
+      )}
     </Spacings.Stack>
   );
 };

@@ -163,8 +163,8 @@ export const ShoppingListsList = () => {
         </SuspendedRoute>
         <SuspendedRoute path={`${match.path}/:id`}>
           <ShoppingListsEdit
-            onClose={() => {
-              refetch();
+            onClose={async () => {
+              await refetch();
               push(match.url);
             }}
           />

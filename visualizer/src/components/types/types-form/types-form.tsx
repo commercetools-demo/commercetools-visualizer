@@ -23,6 +23,8 @@ import { RESOURCE_TYPES } from './constants';
 import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { PageContentWide } from '@commercetools-frontend/application-components';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 const resourceTypes = RESOURCE_TYPES.map((t) => ({ label: t, value: t }));
 type Formik = ReturnType<typeof useFormik>;
@@ -126,6 +128,10 @@ const TypesForm: FC<Props> = ({
     dataLocale: context.dataLocale ?? '',
   }));
 
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const formElements = (
     <PageContentWide>
       <Spacings.Stack scale="xxxl">
@@ -158,6 +164,7 @@ const TypesForm: FC<Props> = ({
                     touched={!!formik.touched.name}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>
@@ -176,6 +183,7 @@ const TypesForm: FC<Props> = ({
                     touched={!!formik.touched.description}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>

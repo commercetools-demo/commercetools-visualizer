@@ -3,7 +3,7 @@ import {
   PageNotFound,
 } from '@commercetools-frontend/application-components';
 import { useIntl } from 'react-intl';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory, Link, useLocation } from 'react-router-dom';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Spacings from '@commercetools-uikit/spacings';
@@ -26,7 +26,6 @@ import {
   formatDateAndTime,
   renderDefault,
 } from '../../paginatable-data-table/helpers';
-import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
 type Props = {

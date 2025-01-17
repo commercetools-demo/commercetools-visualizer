@@ -31,6 +31,8 @@ import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import CheckboxInput from '@commercetools-uikit/checkbox-input';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 type Formik = ReturnType<typeof useFormik>;
 
 export const resourceTypes = [
@@ -127,6 +129,10 @@ const StatesForm: FC<Props> = ({
     projectLanguages: context.project?.languages ?? [],
   }));
 
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   let where = `type="${formik.values.stateType}"`;
   if (formik.values.id) {
     where = `${where} and id != "${formik.values.id}"`;
@@ -188,6 +194,7 @@ const StatesForm: FC<Props> = ({
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     renderError={renderKeyInputErrors}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>
@@ -211,11 +218,13 @@ const StatesForm: FC<Props> = ({
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
                     isDisabled={!createNewMode}
+                    isReadOnly={!canManage}
                   />
                   <CheckboxInput
                     name="initial"
                     isChecked={formik.values.initial}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   >
                     <FormattedMessage {...messages.initialTitle} />
                   </CheckboxInput>
@@ -236,6 +245,7 @@ const StatesForm: FC<Props> = ({
                     touched={!!formik.touched.name}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>
@@ -254,6 +264,7 @@ const StatesForm: FC<Props> = ({
                     touched={!!formik.touched.description}
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>
@@ -288,6 +299,7 @@ const StatesForm: FC<Props> = ({
                     }
                     onBlur={formik.handleBlur}
                     onChange={formik.handleChange}
+                    isReadOnly={!canManage}
                   />
                 </Card>
               </Grid.Item>

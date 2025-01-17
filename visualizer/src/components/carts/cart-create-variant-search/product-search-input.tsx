@@ -142,6 +142,8 @@ interface ProductSearchInputProps {
   hasError?: boolean;
   onBlur?(...args: unknown[]): unknown;
   onChange: TAsyncSelectInputProps['onChange'];
+  isDisabled?: TAsyncSelectInputProps['isDisabled'];
+  isReadOnly?: TAsyncSelectInputProps['isReadOnly'];
 }
 
 const ProductSearchInput: FC<ProductSearchInputProps> = ({
@@ -152,6 +154,8 @@ const ProductSearchInput: FC<ProductSearchInputProps> = ({
   hasError,
   onBlur,
   onChange,
+  isDisabled,
+  isReadOnly,
 }) => {
   const { dataLocale, languages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
@@ -243,6 +247,8 @@ const ProductSearchInput: FC<ProductSearchInputProps> = ({
       onBlur={onBlur}
       onChange={onChange}
       noOptionsMessage={() => intl.formatMessage(messages.noProductsFound)}
+      isReadOnly={isReadOnly}
+      isDisabled={isDisabled}
     />
   );
 };

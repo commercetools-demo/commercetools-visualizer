@@ -38,11 +38,17 @@ import {
   formatDateAndTime,
   renderDefault,
 } from '../../paginatable-data-table/helpers';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 const CartsList = () => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
+
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
 
   const tableSorting = useDataTableSortingState({
     key: 'createdAt',
@@ -153,6 +159,7 @@ const CartsList = () => {
             to={`${match.url}/new`}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addCart)}
+            isDisabled={!canManage}
           />
         </Spacings.Inline>
       }

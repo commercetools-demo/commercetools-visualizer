@@ -22,6 +22,8 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import CartDetailsItems from '../cart-details-items/cart-details-items';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 type Props = {
   onClose: () => void;
@@ -39,6 +41,10 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
   const { cart, error, loading } = useCartFetcher({
     id: id,
     locale: dataLocale,
+  });
+
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
   });
 
   const cartDeleter = useCartDeleter();
@@ -86,9 +92,11 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
           <CustomFormModalPage.FormPrimaryButton
             label={intl.formatMessage(messages.edit)}
             onClick={() => push(`${linkToHome}/edit/${id}`)}
+            isDisabled={!canManage}
           />
           <CustomFormModalPage.FormDeleteButton
             onClick={() => handleDelete()}
+            isDisabled={!canManage}
           />
         </>
       }

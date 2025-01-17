@@ -205,6 +205,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
               );
             }}
             value={item.quantity}
+            isReadOnly={!canManage}
           />
         );
       default:
@@ -228,6 +229,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
         <>
           <CustomFormModalPage.FormDeleteButton
             onClick={() => handleDelete()}
+            isDisabled={!canManage}
           />
         </>
       }
@@ -251,6 +253,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
                 const product = event.target.value as ProductValue;
                 await handleAddVariantToCart(product);
               }}
+              isReadOnly={!canManage}
             />
           </Constraints.Horizontal>
         </Spacings.Stack>

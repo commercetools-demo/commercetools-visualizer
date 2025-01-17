@@ -32,6 +32,8 @@ import {
 } from '../../paginatable-data-table/helpers';
 import { PageContentFull } from '@commercetools-frontend/application-components';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')
@@ -64,6 +66,10 @@ const FieldDefinitionsList: FC<Props> = ({
   const { push } = useHistory();
   const typeDefinitionCreator = useTypeDefinitionEntryCreator();
   const showNotification = useShowNotification();
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -132,7 +138,14 @@ const FieldDefinitionsList: FC<Props> = ({
         return <CheckInactiveIcon color={'neutral60'} />;
       }
       case 'delete':
-        return <IconButton label="" size={'30'} icon={<BinFilledIcon />} />;
+        return (
+          <IconButton
+            label=""
+            size={'30'}
+            icon={<BinFilledIcon />}
+            isDisabled={!canManage}
+          />
+        );
       default:
         return renderDefault(item[column.key as keyof TFieldDefinitionWithId]);
     }
@@ -155,6 +168,7 @@ const FieldDefinitionsList: FC<Props> = ({
             }}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addField)}
+            isDisabled={!canManage}
           />
         </div>
         <PaginatableDataTable<TFieldDefinitionWithId>

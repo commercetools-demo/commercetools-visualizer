@@ -29,6 +29,8 @@ import {
   formatLocalizedString,
   renderDefault,
 } from '../../paginatable-data-table/helpers';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 const TypesCreate = lazy(() => import('../types-create/types-create'));
 
 const TypesEdit = lazy(() => import('../types-edit/types-edit'));
@@ -41,6 +43,11 @@ const TypesList: FC<Props> = () => {
   const match = useRouteMatch();
   const paginationState = usePaginationState();
   const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
+
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -112,6 +119,7 @@ const TypesList: FC<Props> = () => {
             to={`${match.url}/new`}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addType)}
+            isDisabled={!canManage}
           />
         </Spacings.Inline>
       }

@@ -27,6 +27,8 @@ import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import ShoppingListsCreate from '../shopping-lists-create/shopping-lists-create';
 import CustomerSearch from '../../customer-search/customer-search';
 import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 export const ShoppingListsList = () => {
   const paginationState = usePaginationState();
@@ -46,6 +48,11 @@ export const ShoppingListsList = () => {
       ? 'customer is defined'
       : undefined,
   });
+
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -114,6 +121,7 @@ export const ShoppingListsList = () => {
             as={Link}
             to={`${match.url}/new`}
             label={'New Shopping List'}
+            isDisabled={!canManage}
           />
         </Spacings.Inline>
       }

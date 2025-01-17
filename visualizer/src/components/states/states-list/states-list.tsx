@@ -25,6 +25,8 @@ import { useStatesFetcher } from '../../../hooks/use-states-hook';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 const StateCreate = lazy(() => import('../states-create/states-create'));
 
@@ -57,6 +59,10 @@ const StatesList = (props: Props) => {
   const match = useRouteMatch();
   const { type } = useParams<{ type: string }>();
   const baseUrl = props.linkToWelcome + '/states';
+
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
 
   const { states, error, loading, refetch } = useStatesFetcher({
     limit: 100,
@@ -149,6 +155,7 @@ const StatesList = (props: Props) => {
             to={`${match.url}/new`}
             iconLeft={<PlusBoldIcon />}
             label={intl.formatMessage(messages.addState)}
+            isDisabled={!canManage}
           />
         </Spacings.Inline>
       }

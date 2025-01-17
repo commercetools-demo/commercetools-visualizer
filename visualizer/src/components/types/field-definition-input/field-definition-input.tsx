@@ -20,6 +20,8 @@ import RadioInput from '@commercetools-uikit/radio-input';
 import { TFormValues } from './helpers';
 import FieldDefinitionInputForEnum from '../field-definition-input-for-enum/field-definition-input-for-enum';
 import { Item } from '../field-definition-input-for-enum/constants';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -143,6 +145,10 @@ const FieldDefinitionInput: FC<Props> = ({
   }));
   const intl = useIntl();
 
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const handleAddEnumValue = (enumTemplate: Item) => {
     const enumDraftItemIndexes = formik.values.enumValues?.length || 0;
     formik.setFieldValue(`enumValues.${enumDraftItemIndexes}`, enumTemplate);
@@ -197,6 +203,7 @@ const FieldDefinitionInput: FC<Props> = ({
             isDisabled={!createNewMode}
             errors={TextField.toFieldErrors<TFormValues>(formik.errors).name}
             renderError={renderKeyInputErrors}
+            isReadOnly={!canManage}
           />
           <LocalizedTextField
             name="label"
@@ -210,6 +217,7 @@ const FieldDefinitionInput: FC<Props> = ({
             errors={
               LocalizedTextField.toFieldErrors<TFormValues>(formik.errors).label
             }
+            isReadOnly={!canManage}
           />
           <Spacings.Inline alignItems="flex-end">
             <SelectField
@@ -225,6 +233,7 @@ const FieldDefinitionInput: FC<Props> = ({
               errors={
                 SelectField.toFieldErrors<TFormValues>(formik.errors).typeName
               }
+              isReadOnly={!canManage}
             />
             {(formik.values.typeName === 'String' ||
               formik.values.typeName === 'Enum') && (

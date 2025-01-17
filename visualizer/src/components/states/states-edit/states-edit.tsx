@@ -134,6 +134,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
                 />
                 <CustomFormModalPage.FormDeleteButton
                   onClick={() => handleDelete()}
+                  isDisabled={!canManage}
                 />
               </>
             }

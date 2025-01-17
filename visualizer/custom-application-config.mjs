@@ -45,7 +45,7 @@ const config = {
       uriPath: 'extensions',
       defaultLabel: 'API Extensions',
       labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
+      permissions: [PERMISSIONS.Manage],
     },
     {
       uriPath: 'carts',
@@ -69,7 +69,7 @@ const config = {
       uriPath: 'subscriptions',
       defaultLabel: 'Subscriptions',
       labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
+      permissions: [PERMISSIONS.Manage],
     },
     {
       uriPath: 'types',

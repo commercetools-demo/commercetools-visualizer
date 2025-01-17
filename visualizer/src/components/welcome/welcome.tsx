@@ -104,6 +104,13 @@ const Welcome = () => {
               }
               target={'shopping-lists'}
             />
+            <InfoCard
+              title={'Custom Objects'}
+              content={
+                'Custom Objects store arbitrary JSON-formatted data on commercetools Composable Commerce.'
+              }
+              target={'custom-objects'}
+            />
           </Grid>
         </Spacings.Stack>
       </PageContentWide>

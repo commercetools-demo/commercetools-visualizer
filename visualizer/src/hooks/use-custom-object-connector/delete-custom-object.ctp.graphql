@@ -1,0 +1,13 @@
+#import './custom-object-fragment.ctp.graphql'
+
+mutation DeleteCustomObject($container: String, $id: String, $key: String, $personalDataErasure: Boolean = false, $version: Long) {
+    deleteCustomObject(
+        id: $id
+        key: $key
+        version: $version
+        container: $container
+        personalDataErasure: $personalDataErasure
+    ) {
+        ...CustomObject
+    }
+}

@@ -119,7 +119,8 @@
     "react-router-dom": "5.3.4",
     "reactflow": "^11.10.1",
     "redux": "4.2.1",
-    "typescript": "5.0.4"
+    "typescript": "5.0.4",
+    "vanilla-jsoneditor": "^2.3.3"
   },
   "resolutions": {
     "@emotion/react": "^11.11.1",

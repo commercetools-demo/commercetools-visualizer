@@ -24,6 +24,7 @@ const config = {
       'view_customers',
       'view_products',
       'view_shopping_lists',
+      'view_key_value_documents',
     ],
     manage: [
       'manage_states',
@@ -32,6 +33,7 @@ const config = {
       'manage_extensions',
       'manage_orders',
       'manage_shopping_lists',
+      'manage_key_value_documents',
     ],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
@@ -74,6 +76,12 @@ const config = {
     {
       uriPath: 'types',
       defaultLabel: 'Types',
+      labelAllLocales: [],
+      // permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'custom-objects',
+      defaultLabel: 'Custom Objects',
       labelAllLocales: [],
       // permissions: [PERMISSIONS.View],
     },

@@ -11,6 +11,7 @@ import CartsList from './components/carts/carts-list';
 import CartCreate from './components/carts/cart-create/cart-create';
 import CartEdit from './components/carts/cart-edit/cart-edit';
 import ShoppingListsList from './components/shopping-lists/shopping-lists-list/shopping-lists-list';
+import CustomObjectsList from './components/custom-objects/custom-objects-list';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -65,6 +66,9 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/shopping-lists`}>
         <ShoppingListsList />
+      </Route>
+      <Route path={`${match.path}/custom-objects`}>
+        <CustomObjectsList linkToHome={match.url} />
       </Route>
       <Route>
         <Welcome />

@@ -1,0 +1,9 @@
+fragment CustomObject on CustomObject {
+    id
+    container
+    createdAt
+    key
+    lastModifiedAt
+    value
+    version
+}

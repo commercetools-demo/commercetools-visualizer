@@ -1,0 +1,7 @@
+#import './custom-object-fragment.ctp.graphql'
+
+query GetCustomObject($container: String, $id: String, $key: String) {
+  customObject(id: $id, container: $container, key: $key) {
+    ...CustomObject
+  }
+}

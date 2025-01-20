@@ -139,12 +139,13 @@ const CustomObjectForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
           <FieldLabel title={intl.formatMessage(messages.containerValue)} />
           <ValueEditor
             content={{
-              json: JSON.parse(formik.values.value),
-              text: undefined,
+              text: formik.values.value,
             }}
             onChange={(content) => {
               if ('json' in content) {
                 formik.setFieldValue('value', JSON.stringify(content.json));
+              } else {
+                formik.setFieldValue('value', content.text);
               }
             }}
           />

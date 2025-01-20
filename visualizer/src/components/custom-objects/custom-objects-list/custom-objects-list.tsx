@@ -35,6 +35,7 @@ import { debounce } from 'lodash';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CustomObjectEdit from '../custom-object-edit/custom-object-edit';
 import CustomObjectCreate from '../custom-object-create/custom-object-create';
+import FieldLabel from '@commercetools-uikit/field-label';
 
 type Props = {
   linkToHome: string;
@@ -135,26 +136,29 @@ const CustomObjectsList: FC<Props> = ({ linkToHome }) => {
       }
     >
       <Spacings.Stack scale={'l'}>
-        <SearchTextInput
-          onChange={(event) => debouncedContainerName(event.target.value)}
-          onReset={() => setContainer('')}
-          onSubmit={debouncedContainerName}
-          placeholder="Container Name"
-          value={container}
-        />
-        <PaginatableDataTable<TCustomObject>
-          isCondensed
-          columns={columns}
-          visibleColumns={visibleColumns}
-          rows={results}
-          itemRenderer={itemRenderer}
-          sortedBy={tableSorting.value.key}
-          sortDirection={tableSorting.value.order}
-          onSortChange={tableSorting.onChange}
-          onRowClick={(row) => push(`${linkToHome}/custom-objects/${row.id}`)}
-          paginationState={paginationState}
-          totalItems={customObjects.total}
-        />
+        <Spacings.Stack scale={'s'}>
+          <FieldLabel title={'Container Name'} />
+          <SearchTextInput
+            onChange={(event) => debouncedContainerName(event.target.value)}
+            onReset={() => setContainer('')}
+            onSubmit={debouncedContainerName}
+            placeholder="Container Name"
+            value={container}
+          />
+          <PaginatableDataTable<TCustomObject>
+            isCondensed
+            columns={columns}
+            visibleColumns={visibleColumns}
+            rows={results}
+            itemRenderer={itemRenderer}
+            sortedBy={tableSorting.value.key}
+            sortDirection={tableSorting.value.order}
+            onSortChange={tableSorting.onChange}
+            onRowClick={(row) => push(`${linkToHome}/custom-objects/${row.id}`)}
+            paginationState={paginationState}
+            totalItems={customObjects.total}
+          />
+        </Spacings.Stack>
       </Spacings.Stack>
       <Switch>
         <SuspendedRoute path={`${match.path}/new`}>

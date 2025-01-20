@@ -10,6 +10,7 @@ This repository contains components rendering non out-of-the-box types as a cust
  * [States](https://docs.commercetools.com/api/projects/states)
  * [Subscriptions](https://docs.commercetools.com/api/projects/subscriptions)
  * [Types](https://docs.commercetools.com/api/projects/types)
+ * [Custom Objects](https://docs.commercetools.com/api/projects/custom-objects)
 
 ## Installation
 The commercetools Visualizer is pre-packaged to run as a connect application. Follow the public documentation on how to run a custom merchant center application in connect and how to configure it in Merchant Center.
@@ -71,6 +72,13 @@ Detail View
 ![Types-Details.jpg](./visualizer/docs/Types-Details.jpg)
 New View
 ![Types-New.jpg](./visualizer/docs/Types-New.jpg)
+
+### Custom Objects
+
+List View
+![Custom-Objects-List.png](./visualizer/docs/Custom-Objects-List.png)
+Detail View
+![Custom-Objects-Edit.png](./visualizer/docs/Custom-Objects-Edit.png)
 
 ## Local Development
 

@@ -98,6 +98,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/testing-library__jest-dom": "^5.14.9",
     "apollo-link-rest": "^0.9.0",
+    "commercetools-demo-shared-paginatable-data-table": "^0.0.1",
     "dagre": "^0.8.5",
     "eslint": "8.57.0",
     "eslint-formatter-pretty": "4.1.0",

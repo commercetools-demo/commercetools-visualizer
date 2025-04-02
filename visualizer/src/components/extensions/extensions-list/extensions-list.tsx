@@ -23,11 +23,11 @@ import ExtensionsCreate from '../extensions-create/extensions-create';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import {
+  PaginatableDataTable,
   formatDateAndTime,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+} from 'commercetools-demo-shared-paginatable-data-table';
 
 const ExtensionsList = () => {
   const intl = useIntl();

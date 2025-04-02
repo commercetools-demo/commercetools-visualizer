@@ -33,12 +33,12 @@ import formatCustomerName from '../../../utils/format-customer-name';
 import Tooltip from '@commercetools-uikit/tooltip';
 import IconButton from '@commercetools-uikit/icon-button';
 import { CloseBoldIcon } from '@commercetools-uikit/icons';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import {
   formatDateAndTime,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+  PaginatableDataTable,
+} from 'commercetools-demo-shared-paginatable-data-table';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 
 type Props = StepProps & { cart: TCart };
 

@@ -26,12 +26,12 @@ import createColumnDefinitions from './field-definitions-list-column-definitions
 import messages from './messages';
 import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
 import { renderAttributeTypeName } from './render-attribute-type-name';
-import {
-  formatLocalizedString,
-  renderDefault,
-} from '../../paginatable-data-table/helpers';
 import { PageContentFull } from '@commercetools-frontend/application-components';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import {
+  PaginatableDataTable,
+  renderDefault,
+  formatLocalizedString,
+} from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 

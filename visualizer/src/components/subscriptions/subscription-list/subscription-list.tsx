@@ -20,12 +20,12 @@ import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import messages from './messages';
 import destinationMessages from '../subscription-destination-type-form/messages';
 import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import {
+  PaginatableDataTable,
   formatDateAndTime,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+} from 'commercetools-demo-shared-paginatable-data-table';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useEffect } from 'react';
 
 type Props = {

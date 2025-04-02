@@ -26,7 +26,7 @@ import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import ShoppingListsCreate from '../shopping-lists-create/shopping-lists-create';
 import CustomerSearch from '../../customer-search/customer-search';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 

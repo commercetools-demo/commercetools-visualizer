@@ -32,12 +32,12 @@ import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import Stamp, { TTone } from '@commercetools-uikit/stamp';
 import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import {
+  PaginatableDataTable,
   formatDateAndTime,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+} from 'commercetools-demo-shared-paginatable-data-table';
+import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 

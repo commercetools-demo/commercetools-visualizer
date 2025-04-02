@@ -22,13 +22,13 @@ import messages from './messages';
 import createColumnDefinitions from './column-definitions';
 import { useTypesFetcher } from '../../../hooks/use-types-connector';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import {
-  formatDateAndTime,
-  formatLocalizedString,
+  PaginatableDataTable,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+  formatLocalizedString,
+  formatDateAndTime,
+} from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 const TypesCreate = lazy(() => import('../types-create/types-create'));

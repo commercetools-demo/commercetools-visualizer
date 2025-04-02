@@ -18,9 +18,10 @@ import { TColumn } from '@commercetools-uikit/data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { TCustomObject } from '../../../types/generated/ctp';
 import {
+  PaginatableDataTable,
   formatDateAndTime,
   renderDefault,
-} from '../../paginatable-data-table/helpers';
+} from 'commercetools-demo-shared-paginatable-data-table';
 import messages from './messages';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import {
@@ -28,7 +29,6 @@ import {
   CheckInactiveIcon,
   PlusBoldIcon,
 } from '@commercetools-uikit/icons';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
 import { useCustomObjectsFetcher } from '../../../hooks/use-custom-object-connector';
 import SearchTextInput from '@commercetools-uikit/search-text-input';
 import { debounce } from 'lodash';

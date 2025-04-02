@@ -31,9 +31,11 @@ import CartItemTableUnitPriceCell from './cart-item-table-unit-price-cell';
 import CartItemTableTaxRateCell from './cart-item-table-tax-rate-cell';
 import CartItemTableSubtotalPriceCell from './cart-item-table-subtotal-price-cell';
 import CartItemTableTotalPriceCell from './cart-item-table-total-price-cell';
-import PaginatableDataTable from '../../paginatable-data-table/paginatable-data-table';
+import {
+  PaginatableDataTable,
+  renderDefault,
+} from 'commercetools-demo-shared-paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import { renderDefault } from '../../paginatable-data-table/helpers';
 
 type Props = { cart: TCart };
 

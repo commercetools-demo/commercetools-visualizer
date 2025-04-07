@@ -6,9 +6,10 @@ import {
 import { Formik } from 'formik';
 import Spacings from '@commercetools-uikit/spacings';
 import { PageContentWide } from '@commercetools-frontend/application-components';
-import StepperToolbar from '../../../save-toolbar/StepperToolbar';
+
 import { useHistory } from 'react-router';
 import SubscriptionDestinationForm from '../../subscription-destination-form/subscription-destination-form';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 const SubscriptionCreateDestinationConfigure: FC<SubscriptionStepProps> = ({
   currentStep,
   goToNextStep,
@@ -41,7 +42,7 @@ const SubscriptionCreateDestinationConfigure: FC<SubscriptionStepProps> = ({
               <SubscriptionDestinationForm destinationType={destinationType} />
             </Spacings.Stack>
           </PageContentWide>
-          <StepperToolbar
+          <SaveToolbar
             isVisible={formikProps.dirty || formik?.dirty}
             buttonProps={{ next: { isDisabled: !formikProps.isValid } }}
             currentStep={currentStep}

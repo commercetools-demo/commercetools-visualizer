@@ -22,7 +22,6 @@ import {
 } from '../../../types/generated/ctp';
 import { usePaginationState } from '@commercetools-uikit/hooks';
 import { StepProps } from '../cart-create/cart-create';
-import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { useHistory } from 'react-router';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useCartUpdater } from '../../../hooks/use-carts-hook';
@@ -39,6 +38,7 @@ import {
   PaginatableDataTable,
 } from 'commercetools-demo-shared-paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 type Props = StepProps & { cart: TCart };
 
@@ -228,7 +228,7 @@ export const CartCreateCustomerPick: FC<Props> = ({
               </Spacings.Inline>
             </Constraints.Horizontal>
           </Spacings.Stack>
-          <StepperToolbar
+          <SaveToolbar
             isVisible={true}
             currentStep={currentStep}
             totalSteps={totalSteps}

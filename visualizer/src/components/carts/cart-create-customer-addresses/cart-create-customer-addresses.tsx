@@ -12,7 +12,6 @@ import {
 import { Formik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { Step3 } from '../cart-create/conversion';
-import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { StepProps } from '../cart-create/cart-create';
 import { useHistory } from 'react-router';
 import Constraints from '@commercetools-uikit/constraints';
@@ -26,6 +25,7 @@ import { useCartUpdater } from '../../../hooks/use-carts-hook';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import omit from 'lodash/omit';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 type Props = StepProps & { cart: TCart };
 
@@ -160,7 +160,7 @@ const CartCreateCustomerAddresses: FC<Props> = ({
                 </Spacings.Stack>
               </Spacings.Stack>
             </PageContentNarrow>
-            <StepperToolbar
+            <SaveToolbar
               isVisible={true}
               buttonProps={{
                 next: {

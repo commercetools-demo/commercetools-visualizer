@@ -29,8 +29,8 @@ import { ContentNotification } from '@commercetools-uikit/notifications';
 import { PageNotFound } from '@commercetools-frontend/application-components';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { StepProps } from '../cart-create/cart-create';
-import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { useHistory } from 'react-router';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 type Props = {
   cart: TCart;
@@ -261,7 +261,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
           </CollapsiblePanel>
         </Spacings.Stack>
       </Spacings.Stack>
-      <StepperToolbar
+      <SaveToolbar
         isVisible={true}
         currentStep={currentStep}
         totalSteps={totalSteps}

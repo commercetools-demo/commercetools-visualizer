@@ -4,7 +4,6 @@ import SelectField from '@commercetools-uikit/select-field';
 import messages from './messages';
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { useHistory } from 'react-router';
 import { StepProps } from '../cart-create/cart-create';
 import { useCartCreator, useCartUpdater } from '../../../hooks/use-carts-hook';
@@ -13,6 +12,7 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { TCart, TCartDraft } from '../../../types/generated/ctp';
 import Spacings from '@commercetools-uikit/spacings';
 import { graphQLErrorHandler } from '../../../utils/error-handling';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 type Props = StepProps & {
   cart?: TCart;
@@ -120,7 +120,7 @@ export const CartCreateSelectCurrency: FC<Props> = ({
         onBlur={formik.handleBlur}
         onChange={formik.handleChange}
       />
-      <StepperToolbar
+      <SaveToolbar
         isVisible={formik.dirty}
         buttonProps={{ next: { isDisabled: !formik.isValid } }}
         currentStep={currentStep}

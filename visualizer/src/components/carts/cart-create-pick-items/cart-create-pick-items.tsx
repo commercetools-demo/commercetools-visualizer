@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { StepProps } from '../cart-create/cart-create';
 import CartCreateAddLineItems from '../cart-create-add-line-items';
 import { useHistory } from 'react-router';
-import StepperToolbar from '../../save-toolbar/StepperToolbar';
 import { TCart } from '../../../types/generated/ctp';
+import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 type Props = StepProps & { cart: TCart };
 
@@ -19,7 +19,7 @@ export const CartCreatePickItems: FC<Props> = ({
   return (
     <>
       <CartCreateAddLineItems cart={cart} />
-      <StepperToolbar
+      <SaveToolbar
         isVisible={true}
         currentStep={currentStep}
         totalSteps={totalSteps}

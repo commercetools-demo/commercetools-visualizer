@@ -2037,7 +2037,7 @@
     prop-types "15.8.1"
     react-is "17.0.2"
 
-"@commercetools-uikit/accessible-button@19.22.7":
+"@commercetools-uikit/accessible-button@19.22.7", "@commercetools-uikit/accessible-button@^19.22.7":
   version "19.22.7"
   resolved "https://registry.yarnpkg.com/@commercetools-uikit/accessible-button/-/accessible-button-19.22.7.tgz#1fa793b3f680d3f158627f7380d7ff6952ef96e3"
   integrity sha512-8uQIxUbKCD2nvBSdI4lyuOQiE+ZcGXxaQnV2RYyFv0ZezSpdwCp1nYwbbHgw433cQpmj7/gaSA5NWk4PltDNaA==
@@ -2681,7 +2681,7 @@
     prop-types "15.8.1"
     react-from-dom "0.6.2"
 
-"@commercetools-uikit/icons@19.22.7":
+"@commercetools-uikit/icons@19.22.7", "@commercetools-uikit/icons@^19.22.7":
   version "19.22.7"
   resolved "https://registry.yarnpkg.com/@commercetools-uikit/icons/-/icons-19.22.7.tgz#a1fd802c84706276071bc32993c508225a7b84da"
   integrity sha512-bsNTB8xUB8vTX//YRFKftYhkpkJn9gjf2K9iMbPuvwnsaYd2fv4YuZLU2AW9qg3s8r1yyKtMJv2Zz1z0nt3v/A==
@@ -3785,7 +3785,7 @@
   resolved "https://registry.yarnpkg.com/@emotion/sheet/-/sheet-1.4.0.tgz#c9299c34d248bc26e82563735f78953d2efca83c"
   integrity sha512-fTBW9/8r2w3dXWYM4HCB1Rdp8NLibOw2+XELH5m5+AkWiL/KqYX6dc0kKYlaYyKjrQ6ds33MCdMPEwgs2z1rqg==
 
-"@emotion/styled@^11.10.5", "@emotion/styled@^11.11.0":
+"@emotion/styled@^11.10.5", "@emotion/styled@^11.11.0", "@emotion/styled@^11.14.0":
   version "11.13.0"
   resolved "https://registry.yarnpkg.com/@emotion/styled/-/styled-11.13.0.tgz#633fd700db701472c7a5dbef54d6f9834e9fb190"
   integrity sha512-tkzkY7nQhW/zC4hztlwucpT8QEZ6eUzpXDRhww/Eej4tFfO0FxQYWRyg/c5CCXa4d/f174kqeXYjuQRnhzf6dA==
@@ -8247,6 +8247,27 @@ commercetools-demo-shared-paginatable-data-table@^0.0.1:
     "@commercetools-uikit/text" "^19.22.7"
     "@commercetools-uikit/utils" "19.22.7"
     "@emotion/react" "^11.10.5"
+    react-intl "^6.3.2"
+
+commercetools-demo-shared-stepper@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-stepper/-/commercetools-demo-shared-stepper-0.0.1.tgz#80af464256b7a8c951cd5554e205d48935a529cf"
+  integrity sha512-EvAe7+7F25G9Hpencc8w5yPp6PZLmtmACjrEfp777jmJExLuIyE/q43ewfSRqcPD/CvgCQcWURvEDgKHBqrdWQ==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/constants" "^23.2.2"
+    "@commercetools-frontend/l10n" "^23.2.2"
+    "@commercetools-uikit/accessible-button" "^19.22.7"
+    "@commercetools-uikit/data-table" "^19.22.7"
+    "@commercetools-uikit/data-table-manager" "^19.22.7"
+    "@commercetools-uikit/icons" "^19.22.7"
+    "@commercetools-uikit/pagination" "^19.22.7"
+    "@commercetools-uikit/spacings" "^19.22.7"
+    "@commercetools-uikit/text" "^19.22.7"
+    "@commercetools-uikit/utils" "19.22.7"
+    "@emotion/react" "^11.14.0"
+    "@emotion/styled" "^11.14.0"
     react-intl "^6.3.2"
 
 common-tags@1.8.2:

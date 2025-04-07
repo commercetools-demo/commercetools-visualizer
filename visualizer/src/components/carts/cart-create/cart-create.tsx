@@ -3,7 +3,6 @@ import { useIntl } from 'react-intl';
 import messages from './messages';
 import { InfoDetailPage } from '@commercetools-frontend/application-components';
 import { Route, useHistory, useParams } from 'react-router';
-import Steps from '../../steps';
 import { Switch } from 'react-router-dom';
 import CartCreateSelectCurrency from '../cart-create-select-currency/cart-create-select-currency';
 import CartCreateCustomerPick from '../cart-create-customer-pick/cart-create-customer-pick';
@@ -13,6 +12,7 @@ import CartConnector from '../cart-connector';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import CartCreateSetShippingMethod from '../cart-create-set-shipping-method';
 import memoize from 'memoize-one';
+import Steps from 'commercetools-demo-shared-stepper';
 
 export type StepProps = {
   currentStep: number;

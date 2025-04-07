@@ -5,7 +5,7 @@ import { useFormik } from 'formik';
 
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import Steps from '../../steps';
+import Steps from 'commercetools-demo-shared-stepper';
 import messages from './messages';
 
 import { TSubscriptionDraft } from '../../../types/generated/ctp';

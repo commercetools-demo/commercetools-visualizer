@@ -31,12 +31,14 @@ import IconButton from '@commercetools-uikit/icon-button';
 import { BinFilledIcon } from '@commercetools-uikit/icons';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import NumberInput from '@commercetools-uikit/number-input';
-import { ProductSearchInput } from '../../carts/cart-create-variant-search';
-import { ProductValue } from '../../carts/cart-create-variant-search/product-search-input';
 import Constraints from '@commercetools-uikit/constraints';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import ImageContainer from '../../image-container';
 import { graphQLErrorHandler } from '../../../utils/error-handling';
+import {
+  AsyncVariantSelector,
+  VariantValue,
+} from 'commercetools-demo-shared-async-variant-selector';
 
 type Props = {
   onClose: () => void;
@@ -128,7 +130,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
       text: 'The Shopping List has been updated.',
     });
   };
-  const handleAddVariantToCart = async (variant: ProductValue) => {
+  const handleAddVariantToCart = async (variant: VariantValue) => {
     await shoppingListUpdater
       .execute({
         actions: [{ addLineItem: { sku: variant.sku, quantity: 1 } }],
@@ -247,10 +249,9 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
             </Constraints.Horizontal>
           </Spacings.Inline>
           <Constraints.Horizontal max={13}>
-            <ProductSearchInput
+            <AsyncVariantSelector
               name={'variantSearch'}
-              onChange={async (event) => {
-                const product = event.target.value as ProductValue;
+              onChange={async (product) => {
                 await handleAddVariantToCart(product);
               }}
               isReadOnly={!canManage}

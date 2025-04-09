@@ -17,13 +17,13 @@ import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import AddressesPanel from '../addresses-panel';
 import CartDetailsGeneralInfoHeader from '../cart-details-general-info-header';
 import Card from '@commercetools-uikit/card';
-import CartSummaryPricingBreakdown from '../cart-summary-pricing-breakdown';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import CartDetailsItems from '../cart-details-items/cart-details-items';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import { CartSummaryPricingBreakdown } from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 
 type Props = {
   onClose: () => void;

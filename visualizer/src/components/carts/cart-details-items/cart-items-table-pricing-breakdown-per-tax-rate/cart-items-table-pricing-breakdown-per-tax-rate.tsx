@@ -12,7 +12,7 @@ import Text from '@commercetools-uikit/text';
 import {
   filterPerMethodTaxRateByTarget,
   isTaxIncludedInPrice,
-} from '../../cart-summary-pricing-breakdown/order-prices';
+} from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 import CartItemTableUnitPriceCell from '../cart-item-table-unit-price-cell';
 import CartItemTableUnitNetPriceCell from '../cart-item-table-unit-net-price-cell';
 import DataTable from '@commercetools-uikit/data-table';

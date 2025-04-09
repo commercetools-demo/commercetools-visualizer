@@ -1,7 +1,7 @@
 import { FormattedMessage, useIntl } from 'react-intl';
 import messages from './messages';
 import styles from './cart-item-table-cart-discount.module.css';
-import { getTotalCartDiscount } from '../../cart-summary-pricing-breakdown/order-prices';
+import { getTotalCartDiscount } from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 import { formatMoney } from '../../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import { FC } from 'react';

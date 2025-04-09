@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { isTaxIncludedInPrice } from '../../cart-summary-pricing-breakdown/order-prices';
+import { isTaxIncludedInPrice } from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 import { formatMoney } from '../../../../helpers';
 import Text from '@commercetools-uikit/text';
 import messages from '../cart-item-table-product-discount/messages';

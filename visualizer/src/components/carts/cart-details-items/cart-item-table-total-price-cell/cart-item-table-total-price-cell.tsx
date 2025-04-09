@@ -7,7 +7,7 @@ import { FC } from 'react';
 import {
   getTotalCartDiscount,
   isTaxIncludedInPrice,
-} from '../../cart-summary-pricing-breakdown/order-prices';
+} from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 import { formatMoney, isCustomLineItem, isLineItem } from '../../../../helpers';
 import { getSelectedPrice } from '../../../../prices';
 import {

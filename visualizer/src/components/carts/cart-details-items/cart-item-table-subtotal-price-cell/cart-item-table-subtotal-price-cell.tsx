@@ -12,7 +12,7 @@ import {
   getTotalCartDiscount,
   isTaxIncludedInPrice,
   isTaxRateSameInMultiMode,
-} from '../../cart-summary-pricing-breakdown/order-prices';
+} from 'commercetools-demo-shared-cart-summary-pricing-breakdown';
 import { formatMoney, isCustomLineItem, isLineItem } from '../../../../helpers';
 import Text from '@commercetools-uikit/text';
 import { useIntl } from 'react-intl';

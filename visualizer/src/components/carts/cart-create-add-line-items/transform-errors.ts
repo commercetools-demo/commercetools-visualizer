@@ -1,8 +1,7 @@
-import {
-  MISSING_DISCOUNT_CODE,
-  OUTDATED_DISCOUNT_CODE,
-} from '../cart-applied-discounts-panel/cart-applied-discounts-panel';
 import omitEmpty from 'omit-empty-es';
+
+export const MISSING_DISCOUNT_CODE = 'missingDiscountCode';
+export const OUTDATED_DISCOUNT_CODE = 'outdatedDiscountCode';
 
 const transformErrors = (apiErrors: Array<any>) => {
   const formErrors: Array<any> = [];

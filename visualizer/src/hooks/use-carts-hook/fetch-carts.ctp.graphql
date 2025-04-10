@@ -1,34 +1,12 @@
-#import './fragments/address-fragment.ctp.graphql'
-#import './fragments/money-fragment.ctp.graphql'
+#import './fragments/cart-fragment.ctp.graphql'
 
-query FetchCarts($limit: Int!, $offset: Int!, $sort: [String!], $where: String) {
+query FetchCarts($limit: Int!, $offset: Int!, $sort: [String!], $where: String, $locale: Locale!) {
   carts(limit: $limit, offset: $offset, sort: $sort, where: $where) {
     total
     count
     offset
     results {
-      id
-      key
-      version
-      customerId
-      customerEmail
-      anonymousId
-      createdAt
-      shippingMode
-      lastModifiedAt
-      totalPrice {
-        ...MoneyFragment
-      }
-      lineItems {
-        id
-      }
-      cartState
-      billingAddress {
-        ...Address
-      }
-      shippingAddress {
-        ...Address
-      }
+      ...CartFragment
     }
   }
 }

@@ -17,6 +17,23 @@ fragment CartFragment on Cart {
     lastModifiedAt
     shippingMode
     cartState
+    directDiscounts {
+        id
+        target {
+            type
+        }
+        value {
+            type
+            ... on RelativeDiscountValue{
+                permyriad
+            }
+            ... on AbsoluteDiscountValue{
+                money {
+                    ...MoneyFragment
+                }
+            }
+        }
+    }
     store {
         id
         key
@@ -495,15 +512,15 @@ fragment CartFragment on Cart {
             locale
             value
         }
-        custom {
-            type {
-                ...CustomFieldsTypeFragment
-            }
-            customFieldsRaw {
-                name
-                value
-            }
-        }
+        #        custom {
+        #            type {
+        #                ...CustomFieldsTypeFragment
+        #            }
+        #            customFieldsRaw {
+        #                name
+        #                value
+        #            }
+        #        }
         discountedPricePerQuantity {
             ...DiscountedPricePerQuantityFragment
         }

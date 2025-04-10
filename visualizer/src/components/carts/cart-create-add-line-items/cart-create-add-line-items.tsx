@@ -11,16 +11,22 @@ import {
 } from '@commercetools-frontend/actions-global';
 import CartCreateItemsTable from '../cart-create-items-table';
 import { useCartUpdater } from '../../../hooks/use-carts-hook';
-import { TCart, TCartUpdateAction } from '../../../types/generated/ctp';
+import {
+  TCart,
+  TCartUpdateAction,
+  TDirectDiscountDraft,
+} from '../../../types/generated/ctp';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import CartAppliedDiscountsPanel from '../cart-applied-discounts-panel';
 import transformErrors from './transform-errors';
 import { graphQLErrorHandler } from '../../../utils/error-handling';
 import {
   AsyncVariantSelector,
   VariantValue,
 } from 'commercetools-demo-shared-async-variant-selector';
+import { CartAppliedDiscountsPanel } from 'commercetools-demo-shared-cart-handling';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 
 interface Props
   extends PropsWithChildren<{
@@ -40,6 +46,10 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
     ...(cart.customLineItems || []),
   ];
 
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+
   const [shoppingCartPanelClosed, setShoppingCartPanelClosed] = useState(false);
 
   const handleUpdateCart = (actions: Array<TCartUpdateAction>) =>
@@ -57,7 +67,6 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.cartUpdated),
           });
-          return true;
         },
         (graphQLErrors) => {
           const transformedErrors = transformErrors(graphQLErrors);
@@ -73,7 +82,6 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
           //   };
           // });
           // used by subchild component to prevent the text field from clearing if errors returned from server
-          return false;
         }
       );
   //
@@ -102,6 +110,18 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
       },
     ]);
   };
+
+  const handleApplyDirectDiscount = async (
+    directDiscounts: Array<TDirectDiscountDraft>
+  ) =>
+    await handleUpdateCart([
+      {
+        setDirectDiscounts: {
+          discounts: directDiscounts,
+        },
+      },
+    ]);
+
   const handleAddVariantToCart = async (variant: VariantValue) => {
     await cartUpdater
       .execute({
@@ -177,69 +197,71 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
 
   const hasLineItems = allLineItems.length > 0;
   return (
-    <Spacings.Stack scale="xxl">
-      <Spacings.Stack scale="s">
-        <Spacings.Inline justifyContent="space-between" scale="l">
-          <Constraints.Horizontal max={11}>
-            <Spacings.Stack scale="m">
-              <Text.Headline as="h2" intlMessage={messages.title} />
-              <Text.Subheadline as="h5" intlMessage={messages.subTitle} />
-            </Spacings.Stack>
-          </Constraints.Horizontal>
-          {/*<SecondaryButton*/}
-          {/*  iconLeft={<PlusBoldIcon />}*/}
-          {/*  label={intl.formatMessage(messages.addCustomLineItemLabel)}*/}
-          {/*  onClick={goToCustomLineItemAddition}*/}
-          {/*/>*/}
-        </Spacings.Inline>
-        <Constraints.Horizontal max={13}>
-          <AsyncVariantSelector
-            name={'variantSearch'}
-            onChange={async (product) => {
-              await handleAddVariantToCart(product);
-            }}
-          />
-        </Constraints.Horizontal>
-      </Spacings.Stack>
-      <CollapsiblePanel
-        header={
-          <CollapsiblePanel.Header>
-            <FormattedMessage
-              {...(!hasLineItems
-                ? messages.emptyShoppingCartLabel
-                : messages.shoppingCartLabel)}
+    <div css={{ paddingBottom: '32px' }}>
+      <Spacings.Stack scale="xxl">
+        <Spacings.Stack scale="s">
+          <Spacings.Inline justifyContent="space-between" scale="l">
+            <Constraints.Horizontal max={11}>
+              <Spacings.Stack scale="m">
+                <Text.Headline as="h2" intlMessage={messages.title} />
+                <Text.Subheadline as="h5" intlMessage={messages.subTitle} />
+              </Spacings.Stack>
+            </Constraints.Horizontal>
+            {/*<SecondaryButton*/}
+            {/*  iconLeft={<PlusBoldIcon />}*/}
+            {/*  label={intl.formatMessage(messages.addCustomLineItemLabel)}*/}
+            {/*  onClick={goToCustomLineItemAddition}*/}
+            {/*/>*/}
+          </Spacings.Inline>
+          <Constraints.Horizontal max={13}>
+            <AsyncVariantSelector
+              name={'variantSearch'}
+              onChange={async (product) => {
+                await handleAddVariantToCart(product);
+              }}
             />
-          </CollapsiblePanel.Header>
-        }
-        isClosed={shoppingCartPanelClosed}
-        onToggle={() => setShoppingCartPanelClosed(!shoppingCartPanelClosed)}
-      >
-        {hasLineItems ? (
-          <Constraints.Horizontal>
-            <Spacings.Stack scale="xl">
-              <CartCreateItemsTable
-                isEditable={true}
-                onChangeQuantity={handleChangeQuantity}
-                onRemoveItem={handleRemoveLineItem}
-                cart={cart}
-              />
-              <CartAppliedDiscountsPanel
-                cart={cart}
-                //errors={state.errors}
-                onApplyDiscountCode={handleApplyDiscountCode}
-                onRemoveDiscountCode={handleRemoveDiscountCode}
-                //resetErrors={handleErrorsReset}
-              />
-            </Spacings.Stack>
           </Constraints.Horizontal>
-        ) : (
-          <Text.Body>
-            <FormattedMessage {...messages.emptyCart} />
-          </Text.Body>
-        )}
-      </CollapsiblePanel>
-      {children}
-    </Spacings.Stack>
+        </Spacings.Stack>
+        <CollapsiblePanel
+          header={
+            <CollapsiblePanel.Header>
+              <FormattedMessage
+                {...(!hasLineItems
+                  ? messages.emptyShoppingCartLabel
+                  : messages.shoppingCartLabel)}
+              />
+            </CollapsiblePanel.Header>
+          }
+          isClosed={shoppingCartPanelClosed}
+          onToggle={() => setShoppingCartPanelClosed(!shoppingCartPanelClosed)}
+        >
+          {hasLineItems ? (
+            <Constraints.Horizontal>
+              <Spacings.Stack scale="xl">
+                <CartCreateItemsTable
+                  isEditable={true}
+                  onChangeQuantity={handleChangeQuantity}
+                  onRemoveItem={handleRemoveLineItem}
+                  cart={cart}
+                />
+                <CartAppliedDiscountsPanel
+                  cart={cart}
+                  onApplyDiscountCode={handleApplyDiscountCode}
+                  onRemoveDiscountCode={handleRemoveDiscountCode}
+                  onApplyDirectDiscount={handleApplyDirectDiscount}
+                  canManage={canManage}
+                />
+              </Spacings.Stack>
+            </Constraints.Horizontal>
+          ) : (
+            <Text.Body>
+              <FormattedMessage {...messages.emptyCart} />
+            </Text.Body>
+          )}
+        </CollapsiblePanel>
+        {children}
+      </Spacings.Stack>
+    </div>
   );
 };
 

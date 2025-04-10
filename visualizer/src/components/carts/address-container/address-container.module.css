@@ -1,8 +1,0 @@
-:root {
-  --address-width: 650px;
-}
-
-.address-container {
-  max-width: var(--address-width);
-  overflow-x: auto;
-}

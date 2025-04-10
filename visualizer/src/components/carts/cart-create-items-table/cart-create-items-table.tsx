@@ -17,19 +17,22 @@ import { INVENTORY_MODES } from '../../../constants';
 import IconButton from '@commercetools-uikit/icon-button';
 import { BinFilledIcon } from '@commercetools-uikit/icons';
 import { isCustomLineItem } from '../../../helpers';
-import { CartItemTableProductCell } from '../cart-details-items/cart-item-table-product-cell/cart-item-table-product-cell';
-import CartItemTableInventoryCell from '../cart-details-items/cart-item-table-inventory-cell';
-import CartItemTableUnitPriceCell from '../cart-details-items/cart-item-table-unit-price-cell';
-import CartItemTableUnitGrossPriceCell from '../cart-details-items/cart-item-table-unit-gross-price-cell';
-import CartItemTableUnitNetPriceCell from '../cart-details-items/cart-item-table-unit-net-price-cell';
-import CartItemTableTaxRateCell from '../cart-details-items/cart-item-table-tax-rate-cell';
+
 import {
   getSymbolFromCurrency,
   useCurrencies,
 } from '@commercetools-frontend/l10n';
-import CartItemTableSubtotalPriceCell from '../cart-details-items/cart-item-table-subtotal-price-cell';
-import CartItemTableTotalPriceCell from '../cart-details-items/cart-item-table-total-price-cell';
-import QuantitySelector from '../quantity-selector';
+import {
+  CartItemTableProductCell,
+  CartItemTableSubtotalPriceCell,
+  CartItemTableTaxRateCell,
+  CartItemTableTotalPriceCell,
+  CartItemTableUnitGrossPriceCell,
+  CartItemTableUnitNetPriceCell,
+  CartItemTableUnitPriceCell,
+  CartItemTableInventoryCell,
+  QuantitySelector,
+} from 'commercetools-demo-shared-cart-handling';
 
 export const checkIfTaxIsIncludedInPrice = (
   allLineItems: Array<TLineItem | TCustomLineItem>

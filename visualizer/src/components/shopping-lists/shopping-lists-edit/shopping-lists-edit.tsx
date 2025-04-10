@@ -33,12 +33,12 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import NumberInput from '@commercetools-uikit/number-input';
 import Constraints from '@commercetools-uikit/constraints';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
-import ImageContainer from '../../image-container';
 import { graphQLErrorHandler } from '../../../utils/error-handling';
 import {
   AsyncVariantSelector,
   VariantValue,
 } from 'commercetools-demo-shared-async-variant-selector';
+import { ImageContainer } from 'commercetools-demo-shared-cart-handling';
 
 type Props = {
   onClose: () => void;

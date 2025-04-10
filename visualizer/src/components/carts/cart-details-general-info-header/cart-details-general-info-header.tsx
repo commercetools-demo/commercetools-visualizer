@@ -23,7 +23,6 @@ const CartDetailsGeneralInfoHeader: FC<Props> = ({ cart }) => {
     limit: 10,
     where: `cart(id="${cart.id}")`,
   });
-  useApplicationContext();
   if (error) {
     return (
       <ContentNotification type="error">

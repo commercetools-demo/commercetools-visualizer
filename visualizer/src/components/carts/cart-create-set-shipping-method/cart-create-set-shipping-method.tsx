@@ -22,8 +22,6 @@ import {
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import { useCartUpdater } from '../../../hooks/use-carts-hook';
-import AddressContainer from '../address-container';
-import Address from '../address';
 import { useFetchShippingMethodsByCartFetcher } from '../../../hooks/use-shipping-method-hook';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import { PageNotFound } from '@commercetools-frontend/application-components';
@@ -31,6 +29,10 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { StepProps } from '../cart-create/cart-create';
 import { useHistory } from 'react-router';
 import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
+import {
+  Address,
+  AddressContainer,
+} from 'commercetools-demo-shared-cart-handling';
 
 type Props = {
   cart: TCart;

@@ -1,5 +1,0 @@
-mutation CreateExtension($draft: ExtensionDraft!) {
-    createExtension(draft: $draft) {
-        id
-    }
-}

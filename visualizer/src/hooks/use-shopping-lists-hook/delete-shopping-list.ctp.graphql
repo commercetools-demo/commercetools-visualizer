@@ -1,5 +1,0 @@
-mutation DeleteShoppingList($id: String, $version: Long!) {
-    deleteShoppingList(version: $version, id: $id) {
-        id
-    }
-}

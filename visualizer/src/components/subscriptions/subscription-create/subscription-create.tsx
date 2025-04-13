@@ -9,7 +9,10 @@ import Steps from 'commercetools-demo-shared-stepper';
 import messages from './messages';
 
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
-import { useSubscriptionCreator } from '../../../hooks/use-subscription-connector';
+import {
+  useSubscriptionCreator,
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { InfoDetailPage } from '@commercetools-frontend/application-components';
 import { ContextData } from './subscription-create-configuration';
 import SubscriptionCreateDetailsStep from './subscription-create-details-step/subscription-create-details-step';
@@ -17,7 +20,6 @@ import SubscriptionCreateDestination from './subscription-create-destination/sub
 import SubscriptionCreateDestinationConfigure from './subscription-create-destination-configure/subscription-create-destination-configure';
 import SubscriptionCreateChanges from './subscription-create-changes/subscription-create-changes';
 import SubscriptionCreateMessages from './subscription-create-messages/subscription-create-messages';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToWelcome: string;

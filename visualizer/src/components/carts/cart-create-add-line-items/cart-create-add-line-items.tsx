@@ -10,7 +10,10 @@ import {
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import CartCreateItemsTable from '../cart-create-items-table';
-import { useCartUpdater } from '../../../hooks/use-carts-hook';
+import {
+  graphQLErrorHandler,
+  useCartUpdater,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   TCart,
   TCartUpdateAction,
@@ -19,7 +22,6 @@ import {
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import transformErrors from './transform-errors';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 import {
   AsyncVariantSelector,
   VariantValue,
@@ -83,7 +85,8 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
           // });
           // used by subchild component to prevent the text field from clearing if errors returned from server
         }
-      );
+      )
+      .catch(graphQLErrorHandler(showNotification));
   //
   // const handleErrorsReset = () => {
   //   // setState(() => ({

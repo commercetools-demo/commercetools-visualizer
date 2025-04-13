@@ -24,7 +24,7 @@ import {
 } from '../../../types/generated/ctp';
 import createColumnDefinitions from './field-definitions-list-column-definitions';
 import messages from './messages';
-import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
+import { useTypeDefinitionEntryCreator } from 'commercetools-demo-shared-data-fetching-hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
 import { PageContentFull } from '@commercetools-frontend/application-components';
 import {

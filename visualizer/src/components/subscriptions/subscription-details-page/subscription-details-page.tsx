@@ -25,12 +25,12 @@ import {
   useSubscriptionDeleter,
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
-} from '../../../hooks/use-subscription-connector';
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   TGoogleCloudPubSubDestination,
   TSqsDestination,
 } from '../../../types/generated/ctp';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   linkToWelcome: string;

@@ -1,5 +1,0 @@
-mutation CreateShoppingList($draft: ShoppingListDraft!) {
-    createShoppingList(draft: $draft) {
-        id
-    }
-}

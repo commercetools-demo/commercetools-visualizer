@@ -21,7 +21,7 @@ import CustomerSearch, {
 import omitEmpty from 'omit-empty-es';
 import AsyncSelectField from '@commercetools-uikit/async-select-field';
 import { TShoppingListDraft } from '../../../types/generated/ctp';
-import { useShoppingListCreator } from '../../../hooks/use-shopping-lists-hook';
+import { useShoppingListCreator } from 'commercetools-demo-shared-data-fetching-hooks';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import messages from '../../types/types-create/messages';
 import { useShowNotification } from '@commercetools-frontend/actions-global';

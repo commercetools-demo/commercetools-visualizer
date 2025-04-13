@@ -15,8 +15,10 @@ import {
   initialValuesFromFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
-import { useTypeDefinitionEntryCreator } from '../../../hooks/use-types-connector/types-connector';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
+import {
+  useTypeDefinitionEntryCreator,
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   onClose: () => Promise<void>;

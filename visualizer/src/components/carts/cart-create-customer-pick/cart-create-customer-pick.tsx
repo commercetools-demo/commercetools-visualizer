@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useState } from 'react';
 import messages from './messages';
 import { useIntl } from 'react-intl';
-import useCustomerSearchFetcher from '../../../hooks/use-customer-search-fetcher';
 import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import {
   useShowApiErrorNotification,
@@ -24,8 +23,11 @@ import { usePaginationState } from '@commercetools-uikit/hooks';
 import { StepProps } from '../cart-create/cart-create';
 import { useHistory } from 'react-router';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { useCartUpdater } from '../../../hooks/use-carts-hook';
-import { useCustomerFetcher } from '../../../hooks/use-customers-hook';
+import {
+  useCartUpdater,
+  useCustomerFetcher,
+  useCustomerSearchFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import Constraints from '@commercetools-uikit/constraints';
 import TextInput from '@commercetools-uikit/text-input';
 import formatCustomerName from '../../../utils/format-customer-name';

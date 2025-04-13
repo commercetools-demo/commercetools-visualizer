@@ -21,8 +21,10 @@ import {
   useShowApiErrorNotification,
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
-import { useCartUpdater } from '../../../hooks/use-carts-hook';
-import { useFetchShippingMethodsByCartFetcher } from '../../../hooks/use-shipping-method-hook';
+import {
+  useCartUpdater,
+  useFetchShippingMethodsByCartFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import { PageNotFound } from '@commercetools-frontend/application-components';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';

@@ -7,7 +7,10 @@ import {
 import { useHistory, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import messages from './messages';
-import { useCartDeleter, useCartFetcher } from '../../../hooks/use-carts-hook';
+import {
+  useCartDeleter,
+  useCartFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';

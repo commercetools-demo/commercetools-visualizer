@@ -26,11 +26,11 @@ import {
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
 import {
+  graphQLErrorHandler,
   useExtensionDeleter,
   useExtensionFetcher,
   useExtensionUpdater,
-} from '../../../hooks/use-extensions-connector';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   onClose: () => void;

@@ -24,11 +24,11 @@ import TypesForm, { TFormValues } from '../types-form/types-form';
 
 import messages from './messages';
 import {
+  graphQLErrorHandler,
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
   useTypeUpdater,
-} from '../../../hooks/use-types-connector';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   linkToHome: string;

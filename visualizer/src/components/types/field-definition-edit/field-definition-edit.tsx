@@ -18,14 +18,16 @@ import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
-import { useTypeDefinitionUpdater } from '../../../hooks/use-types-connector';
 import {
   fromFormValuesToTFieldDefinitionInput,
   initialValuesFromFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
-import { useTypeWithDefinitionByNameFetcher } from '../../../hooks/use-types-connector/types-connector';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
+import {
+  useTypeWithDefinitionByNameFetcher,
+  graphQLErrorHandler,
+  useTypeDefinitionUpdater,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   onClose: (event: SyntheticEvent) => void;

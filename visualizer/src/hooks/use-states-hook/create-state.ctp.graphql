@@ -1,5 +1,0 @@
-mutation CreateState($draft: StateDraft!) {
-    createState(draft: $draft) {
-        id
-    }
-}

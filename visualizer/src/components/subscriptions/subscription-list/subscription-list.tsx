@@ -19,7 +19,7 @@ import { getErrorMessage } from '../../../helpers';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import messages from './messages';
 import destinationMessages from '../subscription-destination-type-form/messages';
-import { useSubscriptionsFetcher } from '../../../hooks/use-subscription-connector/subscription-connectors';
+import { useSubscriptionsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   PaginatableDataTable,
   formatDateAndTime,

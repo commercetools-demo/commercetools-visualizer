@@ -1,5 +1,0 @@
-mutation DeleteExtension($id: String, $version: Long!) {
-    deleteExtension(version: $version, id: $id) {
-        id
-    }
-}

@@ -23,12 +23,12 @@ import {
   useStateDeleter,
   useStateFetcher,
   useStateUpdater,
-} from '../../../hooks/use-states-hook';
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   formValuesToState,
   stateToFormValues,
 } from '../states-form/conversion';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;

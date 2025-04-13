@@ -1,4 +1,4 @@
-import { useShoppingListsFetcher } from '../../../hooks/use-shopping-lists-hook';
+import { useShoppingListsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';

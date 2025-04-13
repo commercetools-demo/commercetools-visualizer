@@ -1,6 +1,0 @@
-#import './shopping-list-fragment.ctp.graphql'
-query FetchShoppingList($id: String, $key: String) {
-    shoppingList(id: $id, key: $key) {
-        ...ShoppingListItem
-    }
-}

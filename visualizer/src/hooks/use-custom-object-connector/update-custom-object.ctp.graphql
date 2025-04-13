@@ -1,7 +1,0 @@
-#import './custom-object-fragment.ctp.graphql'
-
-mutation CreateOrUpdateCustomObject($draft: CustomObjectDraft!) {
-  createOrUpdateCustomObject(draft: $draft) {
-    ...CustomObject
-  }
-}

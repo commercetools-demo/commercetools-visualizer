@@ -7,10 +7,11 @@ import { useParams } from 'react-router-dom';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import {
+  graphQLErrorHandler,
   useShoppingListDeleter,
   useShoppingListFetcher,
   useShoppingListUpdater,
-} from '../../../hooks/use-shopping-lists-hook';
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';
@@ -33,7 +34,6 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import NumberInput from '@commercetools-uikit/number-input';
 import Constraints from '@commercetools-uikit/constraints';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 import {
   AsyncVariantSelector,
   VariantValue,

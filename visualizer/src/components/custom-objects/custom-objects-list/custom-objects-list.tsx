@@ -29,7 +29,7 @@ import {
   CheckInactiveIcon,
   PlusBoldIcon,
 } from '@commercetools-uikit/icons';
-import { useCustomObjectsFetcher } from '../../../hooks/use-custom-object-connector';
+import { useCustomObjectsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import SearchTextInput from '@commercetools-uikit/search-text-input';
 import { debounce } from 'lodash';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';

@@ -23,7 +23,7 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import TextField from '@commercetools-uikit/text-field';
 import omitEmpty from 'omit-empty-es';
 import SelectField, { TOption } from '@commercetools-uikit/select-field';
-import { useStatesFetcher } from '../../../hooks/use-states-hook';
+import { useStatesFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';

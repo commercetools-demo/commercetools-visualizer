@@ -1,5 +1,0 @@
-mutation DeleteState($id: String, $version: Long!) {
-    deleteState(version: $version, id: $id) {
-        id
-    }
-}

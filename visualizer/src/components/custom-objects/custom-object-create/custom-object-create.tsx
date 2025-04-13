@@ -14,8 +14,10 @@ import {
   formValuesToTCustomObject,
   customObjectToFormValues,
 } from '../custom-object-form/conversion';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
-import { useCustomObjectUpdater } from '../../../hooks/use-custom-object-connector';
+import {
+  graphQLErrorHandler,
+  useCustomObjectUpdater,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   onClose: () => Promise<void>;

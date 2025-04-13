@@ -1,7 +1,0 @@
-#import './fragments/cart-fragment.ctp.graphql'
-
-query FetchCart($id: String!, $locale: Locale!) {
-    cart(id: $id) {
-      ...CartFragment
-    }
-}

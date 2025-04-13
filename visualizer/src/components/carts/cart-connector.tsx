@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import { useCartFetcher } from '../../hooks/use-carts-hook';
+import { useCartFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { TCart } from '../../types/generated/ctp';
 

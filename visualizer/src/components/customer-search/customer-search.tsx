@@ -3,9 +3,9 @@ import AsyncSelectField from '@commercetools-uikit/async-select-field';
 import Text from '@commercetools-uikit/text';
 import { AdditionalInfoMessage } from '@commercetools-uikit/messages';
 import formatCustomerName from '../../utils/format-customer-name';
-import useCustomerSearchFetcher from '../../hooks/use-customer-search-fetcher';
 import { TAsyncSelectInputProps } from '@commercetools-uikit/async-select-input/dist/declarations/src/async-select-input';
 import { TAsyncSelectFieldProps } from '@commercetools-uikit/async-select-field/dist/declarations/src/async-select-field';
+import { useCustomerSearchFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 
 export interface CustomerValue {
   value: string;

@@ -1,5 +1,0 @@
-mutation UpdateExtension($id: String, $key: String, $version: Long!, $actions: [ExtensionUpdateAction!]!) {
-    updateExtension(id: $id, key: $key, version: $version, actions: $actions) {
-        id
-    }
-}

@@ -17,7 +17,7 @@ import {
 } from '@commercetools-frontend/application-components';
 import { TCart } from '../../../types/generated/ctp';
 import messages from './messages';
-import { useCartsFetcher } from '../../../hooks/use-carts-hook';
+import { useCartsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { useCallback, useState } from 'react';
 import CartsSearchbar from './carts-searchbar/carts-searchbar';
 import { ALL_FIELDS } from './constants';
@@ -40,8 +40,12 @@ import {
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 
 const CartsList = () => {
+  const { dataLocale } = useApplicationContext((context) => ({
+    dataLocale: context.dataLocale ?? '',
+  }));
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
@@ -68,6 +72,7 @@ const CartsList = () => {
     limit: paginationState.perPage.value,
     offset: (paginationState.page.value - 1) * paginationState.perPage.value,
     sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+    locale: dataLocale,
     where:
       searchOption === ALL_FIELDS
         ? undefined

@@ -1976,7 +1976,7 @@
     prop-types "15.8.1"
     reselect "4.1.8"
 
-"@commercetools-frontend/sdk@23.2.2":
+"@commercetools-frontend/sdk@23.2.2", "@commercetools-frontend/sdk@^23.2.2":
   version "23.2.2"
   resolved "https://registry.yarnpkg.com/@commercetools-frontend/sdk/-/sdk-23.2.2.tgz#baf5216bea504e9bbe781d6def6730d5a29dfed4"
   integrity sha512-HYss1d0I5aDBaHyvAXyRWRbSEIsgQHlITbEBO/dIjhYN8FezPvzlnGzM8CItpmrVMEaXrdf3MobSRyGThdcwSA==
@@ -8323,6 +8323,23 @@ commercetools-demo-shared-cart-handling@^0.0.7:
     omit-empty-es "^1.2.0"
     react-intl "^6.3.2"
     reselect "4.1.8"
+
+commercetools-demo-shared-data-fetching-hooks@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.0.4.tgz#07869f2849869f782ef1a60b62f37402caf7d313"
+  integrity sha512-bDwMYgUPjhj8alK2yDAfgMVD8fDXL8w0aX9CtuAh4RKoepwF+rjBybjr9iuaFPNg95IAJ2R9pEY9zuNAn/4CgA==
+  dependencies:
+    "@apollo/client" "3.7.14"
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/application-shell-connectors" "^23.2.2"
+    "@commercetools-frontend/constants" "23.2.2"
+    "@commercetools-frontend/l10n" "23.2.2"
+    "@commercetools-frontend/sdk" "^23.2.2"
+    "@commercetools/sync-actions" "^5.14.0"
+    omit-empty-es "^1.2.0"
+    react-intl "^6.4.7"
+    react-redux "7.2.9"
 
 commercetools-demo-shared-paginatable-data-table@^0.0.1:
   version "0.0.1"

@@ -10,12 +10,14 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
-import { useExtensionCreator } from '../../../hooks/use-extensions-connector';
+import {
+  useExtensionCreator,
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   formValuesToTExtension,
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;

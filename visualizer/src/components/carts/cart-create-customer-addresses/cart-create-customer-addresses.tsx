@@ -1,5 +1,8 @@
 import { FC } from 'react';
-import { useCustomerFetcher } from '../../../hooks/use-customers-hook';
+import {
+  useCustomerFetcher,
+  useCartUpdater,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
 import { getErrorMessage } from '../../../helpers';
@@ -21,7 +24,6 @@ import CartCreateCustomerAddressesList from '../cart-create-customer-addresses-l
 import { SHORT_ADDRESS_TYPE } from '../../../constants';
 import { TCart, TCartUpdateAction } from '../../../types/generated/ctp';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { useCartUpdater } from '../../../hooks/use-carts-hook';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import omit from 'lodash/omit';

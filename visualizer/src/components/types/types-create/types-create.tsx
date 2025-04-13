@@ -15,8 +15,10 @@ import TypesForm from '../types-form/types-form';
 
 import { TTypeDefinitionDraft } from '../../../types/generated/ctp';
 import messages from './messages';
-import { useTypeDefinitionCreator } from '../../../hooks/use-types-connector';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
+import {
+  graphQLErrorHandler,
+  useTypeDefinitionCreator,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
   linkToHome: string;

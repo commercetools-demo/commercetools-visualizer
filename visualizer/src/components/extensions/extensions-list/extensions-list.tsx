@@ -14,7 +14,7 @@ import {
   InfoMainPage,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import { useExtensionsFetcher } from '../../../hooks/use-extensions-connector';
+import { useExtensionsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { TExtension } from '../../../types/generated/ctp';
 import messages from './messages';
 import SecondaryButton from '@commercetools-uikit/secondary-button';

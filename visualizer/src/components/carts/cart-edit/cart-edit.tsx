@@ -15,7 +15,7 @@ import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { useParams } from 'react-router';
 import CartCreateCustomerPick from '../cart-create-customer-pick/cart-create-customer-pick';
 import CartCreateCustomerAddresses from '../cart-create-customer-addresses/cart-create-customer-addresses';
-import { useCartFetcher } from '../../../hooks/use-carts-hook';
+import { useCartFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';

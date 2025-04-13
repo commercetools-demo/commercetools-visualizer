@@ -12,10 +12,12 @@ import {
   formValuesToState,
   stateToFormValues,
 } from '../states-form/conversion';
-import { useStateCreator } from '../../../hooks/use-states-hook';
+import {
+  useStateCreator,
+  graphQLErrorHandler,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { useParams } from 'react-router-dom';
 import { TStateType } from '../../../types/generated/ctp';
-import { graphQLErrorHandler } from '../../../utils/error-handling';
 
 type Props = {
   onClose: () => void;

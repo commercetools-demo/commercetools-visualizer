@@ -32,7 +32,6 @@ export const CART_CREATE_TAB_NAMES = {
   ADDRESS: 'address',
   ITEMS: 'items',
   SHIPPING: 'shipping',
-  REVIEW: 'review',
 };
 
 export const createStepsDefinition = memoize((intl) => [
@@ -55,10 +54,6 @@ export const createStepsDefinition = memoize((intl) => [
   {
     key: CART_CREATE_TAB_NAMES.SHIPPING,
     label: intl.formatMessage(messages.stepShipping),
-  },
-  {
-    key: CART_CREATE_TAB_NAMES.REVIEW,
-    label: intl.formatMessage(messages.stepReview),
   },
 ]);
 
@@ -254,9 +249,7 @@ const CartCreate: FC<Props> = ({ linkToWelcome }) => {
                       currentStep={current + 1}
                       goToNextStep={() => {
                         history.replace({
-                          pathname: `${linkToWelcome}/carts/new/${id}/${
-                            stepsDefinition[current + 1].key
-                          }`,
+                          pathname: `${linkToWelcome}/carts/${id}`,
                         });
                       }}
                       goToPreviousStep={() => {

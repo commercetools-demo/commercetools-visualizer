@@ -269,7 +269,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
         isVisible={true}
         currentStep={currentStep}
         totalSteps={totalSteps}
-        onNext={() => {
+        onSave={() => {
           goToNextStep && goToNextStep();
         }}
         onBack={goToPreviousStep}

@@ -41,8 +41,4 @@ export default defineMessages({
     id: 'CreateCart.message.create.step.shipping',
     defaultMessage: 'Shipping',
   },
-  stepReview: {
-    id: 'CreateCart.message.create.step.review',
-    defaultMessage: 'Review',
-  },
 });

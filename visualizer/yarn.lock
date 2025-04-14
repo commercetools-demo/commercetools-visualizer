@@ -8279,10 +8279,10 @@ commercetools-demo-shared-async-variant-selector@^0.0.1:
     "@emotion/react" "^11.10.5"
     react-intl "^6.3.2"
 
-commercetools-demo-shared-cart-handling@^0.0.10:
-  version "0.0.10"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.10.tgz#8f6516f002d44dbb1c5083eac6d48df718eceafe"
-  integrity sha512-jI9TeSGS5GI1Uq8Z4VtN5kGAjJaSXXf5Vscw9flhdt5IXXPfkKebjmtkLIRp3vABfscu2n4ZBYHBFHGAVnCylQ==
+commercetools-demo-shared-cart-handling@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.11.tgz#1ca8a9de4c60a7c2323ffa2d3c0df0ebf73de412"
+  integrity sha512-sGFbxnt0xppw5zaF1RD2kEZ7lH1aWa2G2foQPIU/3QE6dSru8jtTac51KOxnJMSe2ocfc7krDkTDGtzsZzj14Q==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@babel/runtime-corejs3" "^7.20.13"

@@ -24,26 +24,20 @@ import { useCallback, useState } from 'react';
 import CartsSearchbar from './carts-searchbar/carts-searchbar';
 import { ALL_FIELDS } from './constants';
 import { TCustomEvent } from '@commercetools-uikit/selectable-search-input';
-import {
-  createHiddenColumnDefinitions,
-  createVisibleColumnDefinitions,
-} from './column-definitions';
+import { createVisibleColumnDefinitions } from './column-definitions';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CartDetails from '../cart-details/cart-details';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import Stamp, { TTone } from '@commercetools-uikit/stamp';
 import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+
 import {
-  formatAddress,
-  formatMoney,
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-helpers';
+  defaultCartsColumnsDefinition,
+  defaultCartsItemRenderer,
+} from 'commercetools-demo-shared-cart-handling';
 
 const CartsList = () => {
   const { dataLocale } = useApplicationContext((context) => ({
@@ -105,45 +99,6 @@ const CartsList = () => {
 
   const { results } = carts;
 
-  const itemRenderer: TDataTableProps<TCart>['itemRenderer'] = (
-    item,
-    column
-  ) => {
-    switch (column.key) {
-      case 'createdAt':
-      case 'lastModifiedAt':
-        return formatDateAndTime(item[column.key], intl);
-      case 'amountOfLineitems':
-        return item.lineItems.length;
-      case 'cartState': {
-        let tone: TTone = 'primary';
-        switch (item.cartState) {
-          case 'Active':
-            tone = 'primary';
-            break;
-          case 'Merged':
-            tone = 'secondary';
-            break;
-          case 'Ordered':
-            tone = 'information';
-            break;
-          case 'Frozen':
-            tone = 'warning';
-            break;
-        }
-        return <Stamp tone={tone} label={item.cartState} isCondensed={true} />;
-      }
-      case 'shippingAddress':
-        return formatAddress(item.shippingAddress) || '';
-      case 'billingAddress':
-        return formatAddress(item.billingAddress) || '';
-      case 'totalPrice':
-        return formatMoney(item.totalPrice, intl);
-      default:
-        return renderDefault(item[column.key as keyof TCart]);
-    }
-  };
-
   const onReset = () => {
     setSearchOption(ALL_FIELDS);
     setSearchText('');
@@ -185,13 +140,10 @@ const CartsList = () => {
         {carts.total > 0 && (
           <PageContentFull>
             <PaginatableDataTable<TCart>
-              columns={[
-                ...createVisibleColumnDefinitions(),
-                ...createHiddenColumnDefinitions(intl.formatMessage),
-              ]}
+              columns={defaultCartsColumnsDefinition({ intl })}
               visibleColumns={createVisibleColumnDefinitions()}
               rows={results}
-              itemRenderer={itemRenderer}
+              itemRenderer={defaultCartsItemRenderer(intl)}
               onRowClick={(row) => push(`${match.url}/${row.id}`)}
               sortedBy={tableSorting.value.key}
               sortDirection={tableSorting.value.order}

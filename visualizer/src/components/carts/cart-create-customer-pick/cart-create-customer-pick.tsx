@@ -34,13 +34,13 @@ import formatCustomerName from '../../../utils/format-customer-name';
 import Tooltip from '@commercetools-uikit/tooltip';
 import IconButton from '@commercetools-uikit/icon-button';
 import { CloseBoldIcon } from '@commercetools-uikit/icons';
-import {
-  formatDateAndTime,
-  renderDefault,
-  PaginatableDataTable,
-} from 'commercetools-demo-shared-paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
+import {
+  renderDefault,
+  formatDateAndTime,
+} from 'commercetools-demo-shared-helpers';
 
 type Props = StepProps & { cart: TCart };
 

@@ -4,9 +4,11 @@ import Spacings from '@commercetools-uikit/spacings';
 import Text from '@commercetools-uikit/text';
 import { FormattedMessage, useIntl } from 'react-intl';
 import messages from './messages';
-import { useOrdersFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useOrdersFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
-import { getErrorMessage } from '../../../helpers';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { PageNotFound } from '@commercetools-frontend/application-components';
 import { Link } from 'react-router-dom';

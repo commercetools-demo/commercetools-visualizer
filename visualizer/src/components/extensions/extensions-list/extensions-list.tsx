@@ -7,14 +7,16 @@ import {
 import createColumnDefinitions from './column-definitions';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
   InfoMainPage,
   PageNotFound,
 } from '@commercetools-frontend/application-components';
-import { useExtensionsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useExtensionsFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { TExtension } from '../../../types/generated/ctp';
 import messages from './messages';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
@@ -23,11 +25,11 @@ import ExtensionsCreate from '../extensions-create/extensions-create';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import {
-  PaginatableDataTable,
   formatDateAndTime,
   renderDefault,
-} from 'commercetools-demo-shared-paginatable-data-table';
+} from 'commercetools-demo-shared-helpers';
 
 const ExtensionsList = () => {
   const intl = useIntl();

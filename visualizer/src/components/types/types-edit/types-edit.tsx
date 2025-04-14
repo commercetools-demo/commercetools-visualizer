@@ -18,12 +18,12 @@ import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { formValuesToDoc } from '../type-definition-connectors';
-import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import TypesForm, { TFormValues } from '../types-form/types-form';
 
 import messages from './messages';
 import {
+  getErrorMessage,
   graphQLErrorHandler,
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,

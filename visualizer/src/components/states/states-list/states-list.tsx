@@ -18,10 +18,12 @@ import { lazy, ReactNode } from 'react';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { TState } from '../../../types/generated/ctp';
-import { getErrorMessage } from '../../../helpers';
 import messages from './messages';
 import StateFlow from './states-flow';
-import { useStatesFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useStatesFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';

@@ -15,11 +15,13 @@ import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { useParams } from 'react-router';
 import CartCreateCustomerPick from '../cart-create-customer-pick/cart-create-customer-pick';
 import CartCreateCustomerAddresses from '../cart-create-customer-addresses/cart-create-customer-addresses';
-import { useCartFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useCartFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import CartCreatePickItems from '../cart-create-pick-items/cart-create-pick-items';
 import CartCreateSetShippingMethod from '../cart-create-set-shipping-method';
@@ -126,7 +128,6 @@ export const CartEdit: FC<Props> = ({ linkToWelcome }) => {
             cart={cart}
           />
         </Route>
-        <Route path={`${match.path}/${CART_CREATE_TAB_NAMES.REVIEW}`}>6</Route>
       </Switch>
     </TabularMainPage>
   );

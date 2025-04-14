@@ -9,7 +9,6 @@ import { DOMAINS } from '@commercetools-frontend/constants';
 import messages from './messages';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
@@ -26,6 +25,7 @@ import {
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
 import {
+  getErrorMessage,
   graphQLErrorHandler,
   useExtensionDeleter,
   useExtensionFetcher,

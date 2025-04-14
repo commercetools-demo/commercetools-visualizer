@@ -7,7 +7,6 @@ import {
 } from '@commercetools-uikit/hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
@@ -17,11 +16,7 @@ import {
 import { TColumn } from '@commercetools-uikit/data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { TCustomObject } from '../../../types/generated/ctp';
-import {
-  PaginatableDataTable,
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import messages from './messages';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import {
@@ -29,13 +24,20 @@ import {
   CheckInactiveIcon,
   PlusBoldIcon,
 } from '@commercetools-uikit/icons';
-import { useCustomObjectsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useCustomObjectsFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import SearchTextInput from '@commercetools-uikit/search-text-input';
 import { debounce } from 'lodash';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import CustomObjectEdit from '../custom-object-edit/custom-object-edit';
 import CustomObjectCreate from '../custom-object-create/custom-object-create';
 import FieldLabel from '@commercetools-uikit/field-label';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 type Props = {
   linkToHome: string;

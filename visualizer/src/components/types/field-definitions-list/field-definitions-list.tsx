@@ -27,13 +27,13 @@ import messages from './messages';
 import { useTypeDefinitionEntryCreator } from 'commercetools-demo-shared-data-fetching-hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
 import { PageContentFull } from '@commercetools-frontend/application-components';
-import {
-  PaginatableDataTable,
-  renderDefault,
-  formatLocalizedString,
-} from 'commercetools-demo-shared-paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import {
+  formatLocalizedString,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')

@@ -7,7 +7,6 @@ import {
 import { debounce } from 'lodash';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { formatMoney, getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
@@ -17,7 +16,10 @@ import {
 } from '@commercetools-frontend/application-components';
 import { TCart } from '../../../types/generated/ctp';
 import messages from './messages';
-import { useCartsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useCartsFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { useCallback, useState } from 'react';
 import CartsSearchbar from './carts-searchbar/carts-searchbar';
 import { ALL_FIELDS } from './constants';
@@ -31,16 +33,17 @@ import CartDetails from '../cart-details/cart-details';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import Stamp, { TTone } from '@commercetools-uikit/stamp';
-import { formatTitleAddress } from '../cart-create-customer-address-title/cart-create-customer-address-title';
-import {
-  PaginatableDataTable,
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import {
+  formatAddress,
+  formatMoney,
+  formatDateAndTime,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 const CartsList = () => {
   const { dataLocale } = useApplicationContext((context) => ({
@@ -131,9 +134,9 @@ const CartsList = () => {
         return <Stamp tone={tone} label={item.cartState} isCondensed={true} />;
       }
       case 'shippingAddress':
-        return formatTitleAddress(item.shippingAddress) || '';
+        return formatAddress(item.shippingAddress) || '';
       case 'billingAddress':
-        return formatTitleAddress(item.billingAddress) || '';
+        return formatAddress(item.billingAddress) || '';
       case 'totalPrice':
         return formatMoney(item.totalPrice, intl);
       default:

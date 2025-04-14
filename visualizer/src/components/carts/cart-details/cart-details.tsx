@@ -8,12 +8,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import messages from './messages';
 import {
+  getErrorMessage,
   useCartDeleter,
   useCartFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 

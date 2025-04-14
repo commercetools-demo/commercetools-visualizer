@@ -1,9 +1,6 @@
 import PrimaryButton from '@commercetools-uikit/primary-button';
 import dagre from 'dagre';
-import {
-  formatLocalizedString,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
+
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 
 import { FC, useCallback, useState } from 'react';
@@ -21,6 +18,7 @@ import ReactFlow, {
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { TState } from '../../../types/generated/ctp';
 import 'reactflow/dist/style.css';
+import { formatLocalizedString } from 'commercetools-demo-shared-helpers';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -89,17 +87,10 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
       data: {
         label:
           formatLocalizedString(
-            {
-              name: transformLocalizedFieldToLocalizedString(
-                item.nameAllLocales ?? []
-              ),
-            },
-            {
-              key: 'name',
-              locale: dataLocale,
-              fallbackOrder: projectLanguages,
-              fallback: NO_VALUE_FALLBACK,
-            }
+            item.nameAllLocales ?? [],
+            dataLocale,
+            projectLanguages,
+            NO_VALUE_FALLBACK
           ) || item.key,
         // description: formatLocalizedString(
         //   {

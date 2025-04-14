@@ -1,7 +1,9 @@
-import { useShoppingListsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useShoppingListsFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {
@@ -10,10 +12,6 @@ import {
 } from '@commercetools-frontend/application-components';
 import { TColumn } from '@commercetools-uikit/data-table';
 import { TShoppingList } from '../../../types/generated/ctp';
-import {
-  formatLocalizedString,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { usePaginationState } from '@commercetools-uikit/hooks';
@@ -29,6 +27,10 @@ import CustomerSearch from '../../customer-search/customer-search';
 import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import {
+  formatLocalizedString,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 export const ShoppingListsList = () => {
   const paginationState = usePaginationState();
@@ -93,21 +95,14 @@ export const ShoppingListsList = () => {
       }
       case 'name': {
         return formatLocalizedString(
-          {
-            name: transformLocalizedFieldToLocalizedString(
-              item.nameAllLocales ?? []
-            ),
-          },
-          {
-            key: 'name',
-            locale: dataLocale,
-            fallbackOrder: projectLanguages,
-            fallback: NO_VALUE_FALLBACK,
-          }
+          item.nameAllLocales ?? [],
+          dataLocale,
+          projectLanguages,
+          NO_VALUE_FALLBACK
         );
       }
       default:
-        return item[column.key as keyof TShoppingList];
+        return renderDefault(item[column.key as keyof TShoppingList]);
     }
   };
   return (

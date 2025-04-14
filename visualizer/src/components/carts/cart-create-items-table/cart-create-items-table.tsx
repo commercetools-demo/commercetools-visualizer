@@ -13,10 +13,8 @@ import {
 } from '../../../types/generated/ctp';
 import Constraints from '@commercetools-uikit/constraints';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
-import { INVENTORY_MODES } from '../../../constants';
 import IconButton from '@commercetools-uikit/icon-button';
 import { BinFilledIcon } from '@commercetools-uikit/icons';
-import { isCustomLineItem } from '../../../helpers';
 
 import {
   getSymbolFromCurrency,
@@ -32,7 +30,10 @@ import {
   CartItemTableUnitPriceCell,
   CartItemTableInventoryCell,
   QuantitySelector,
+  isCustomLineItem,
 } from 'commercetools-demo-shared-cart-handling';
+import { INVENTORY_MODES } from '../../../constants';
+import { renderDefault } from 'commercetools-demo-shared-helpers';
 
 export const checkIfTaxIsIncludedInPrice = (
   allLineItems: Array<TLineItem | TCustomLineItem>
@@ -240,8 +241,9 @@ export const CartCreateItemsTable: FC<Props> = ({
           />
         );
       default:
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (lineItem as any)[column.key] || '';
+        return renderDefault(
+          lineItem[column.key as keyof (TLineItem | TCustomLineItem)]
+        );
     }
   };
 

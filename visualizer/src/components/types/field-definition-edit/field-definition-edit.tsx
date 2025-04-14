@@ -14,7 +14,6 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
@@ -27,6 +26,7 @@ import {
   useTypeWithDefinitionByNameFetcher,
   graphQLErrorHandler,
   useTypeDefinitionUpdater,
+  getErrorMessage,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {

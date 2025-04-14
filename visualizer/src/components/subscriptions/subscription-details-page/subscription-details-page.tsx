@@ -15,7 +15,6 @@ import { useIntl } from 'react-intl';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { getErrorMessage } from '../../../helpers';
 import { PERMISSIONS } from '../../../constants';
 import SubscriptionDetailsForm, {
   TFormValues,
@@ -26,6 +25,7 @@ import {
   useSubscriptionFetcher,
   useSubscriptionKeyUpdater,
   graphQLErrorHandler,
+  getErrorMessage,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   TGoogleCloudPubSubDestination,

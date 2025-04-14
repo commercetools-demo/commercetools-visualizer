@@ -15,18 +15,20 @@ import {
 } from '@commercetools-uikit/hooks';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
-import { getErrorMessage } from '../../../helpers';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import messages from './messages';
 import destinationMessages from '../subscription-destination-type-form/messages';
-import { useSubscriptionsFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
-  PaginatableDataTable,
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-paginatable-data-table';
+  getErrorMessage,
+  useSubscriptionsFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
 import { useEffect } from 'react';
+import {
+  formatDateAndTime,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 type Props = {
   linkToHome: string;

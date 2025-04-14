@@ -2,10 +2,10 @@ import { FC } from 'react';
 import {
   useCustomerFetcher,
   useCartUpdater,
+  getErrorMessage,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import {

@@ -8279,10 +8279,10 @@ commercetools-demo-shared-async-variant-selector@^0.0.1:
     "@emotion/react" "^11.10.5"
     react-intl "^6.3.2"
 
-commercetools-demo-shared-cart-handling@^0.0.7:
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.7.tgz#13a2e7732912a44aeb0a56e093488bab3dd8a984"
-  integrity sha512-kW6wjmcHvzUOXc47smCoWHRi9CMYrd0vHbmvWx84u1emNyMgzp1Hfh7tWC0335uSV1hVBEhXIMuLd3pD2S6SpQ==
+commercetools-demo-shared-cart-handling@^0.0.10:
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.10.tgz#8f6516f002d44dbb1c5083eac6d48df718eceafe"
+  integrity sha512-jI9TeSGS5GI1Uq8Z4VtN5kGAjJaSXXf5Vscw9flhdt5IXXPfkKebjmtkLIRp3vABfscu2n4ZBYHBFHGAVnCylQ==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@babel/runtime-corejs3" "^7.20.13"
@@ -8316,12 +8316,13 @@ commercetools-demo-shared-cart-handling@^0.0.7:
     "@commercetools-uikit/tooltip" "^19.22.7"
     "@emotion/react" "^11.14.0"
     "@emotion/styled" "^11.14.0"
-    commercetools-demo-shared-paginatable-data-table "^0.0.1"
+    commercetools-demo-shared-helpers "^0.0.1"
+    commercetools-demo-shared-paginatable-data-table "^0.0.2"
     formik "^2.4.6"
     lodash "^4.17.21"
     memoize-one "^6.0.0"
     omit-empty-es "^1.2.0"
-    react-intl "^6.3.2"
+    react-intl "^6.4.7"
     reselect "4.1.8"
 
 commercetools-demo-shared-data-fetching-hooks@^0.0.4:
@@ -8341,10 +8342,21 @@ commercetools-demo-shared-data-fetching-hooks@^0.0.4:
     react-intl "^6.4.7"
     react-redux "7.2.9"
 
-commercetools-demo-shared-paginatable-data-table@^0.0.1:
+commercetools-demo-shared-helpers@^0.0.1:
   version "0.0.1"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-paginatable-data-table/-/commercetools-demo-shared-paginatable-data-table-0.0.1.tgz#686f888bf693d2dfaef381480cdd1864aaf91878"
-  integrity sha512-PeiTv7FJzxVnMIdg9zpVCyarjRaxPPAA7sw+HivSB/rhH6oGg7YaMr7Gx3aHma4yX7oefUgpL5hUG9YvhDg0FA==
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-helpers/-/commercetools-demo-shared-helpers-0.0.1.tgz#21bc7271311fb1f8ddb0a714073592cfeac561d8"
+  integrity sha512-RMQqQ/KYKVo9ovUMrT0XpIUSlhNQPLTyildlvz3fBRhuWF2K5UxoZjrVDMcqp6rFo4U6k6/6aE8Ub1+FjVQ+JQ==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/constants" "^23.2.2"
+    "@commercetools-frontend/l10n" "^23.2.2"
+    react-intl "^6.4.7"
+
+commercetools-demo-shared-paginatable-data-table@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-paginatable-data-table/-/commercetools-demo-shared-paginatable-data-table-0.0.2.tgz#fd9524b62534fdd0f8b8b3406d34c98a21e225d8"
+  integrity sha512-IDpMMnQT+qoqDEsyPnlG3trTbF6eN94LeGIYPj0+jCyyuvmVyQxPIri3JQnDoCGnV+FVbHE8QqDYhMa7oY6agA==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@babel/runtime-corejs3" "^7.20.13"
@@ -8357,7 +8369,7 @@ commercetools-demo-shared-paginatable-data-table@^0.0.1:
     "@commercetools-uikit/text" "^19.22.7"
     "@commercetools-uikit/utils" "19.22.7"
     "@emotion/react" "^11.10.5"
-    react-intl "^6.3.2"
+    react-intl "^6.4.7"
 
 commercetools-demo-shared-save-toolbar@^0.0.1:
   version "0.0.1"

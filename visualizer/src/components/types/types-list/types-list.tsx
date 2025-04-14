@@ -16,21 +16,23 @@ import {
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { PlusBoldIcon } from '@commercetools-uikit/icons';
 import SecondaryButton from '@commercetools-uikit/secondary-button';
-import { getErrorMessage } from '../../../helpers';
 import { TTypeDefinition } from '../../../types/generated/ctp';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import {
-  PaginatableDataTable,
-  renderDefault,
-  formatLocalizedString,
-  formatDateAndTime,
-} from 'commercetools-demo-shared-paginatable-data-table';
+import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
-import { useTypesFetcher } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  getErrorMessage,
+  useTypesFetcher,
+} from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  formatDateAndTime,
+  formatLocalizedString,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 const TypesCreate = lazy(() => import('../types-create/types-create'));
 
 const TypesEdit = lazy(() => import('../types-edit/types-edit'));

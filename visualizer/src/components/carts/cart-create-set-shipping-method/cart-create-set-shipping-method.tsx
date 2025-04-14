@@ -3,7 +3,6 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import createColumnsDefinitions from './column-definitions';
 import messages from './messages';
-import { formatMoney, getErrorMessage } from '../../../helpers';
 import RadioInput from '@commercetools-uikit/radio-input';
 import Text from '@commercetools-uikit/text';
 import Spacings from '@commercetools-uikit/spacings';
@@ -22,6 +21,7 @@ import {
   useShowNotification,
 } from '@commercetools-frontend/actions-global';
 import {
+  getErrorMessage,
   useCartUpdater,
   useFetchShippingMethodsByCartFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
@@ -35,6 +35,7 @@ import {
   Address,
   AddressContainer,
 } from 'commercetools-demo-shared-cart-handling';
+import { formatMoney, renderDefault } from 'commercetools-demo-shared-helpers';
 
 type Props = {
   cart: TCart;
@@ -116,7 +117,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
     shippingMethodsByCart,
   ]);
 
-  const renderItem = (
+  const itemRenderer = (
     shippingMethod: TShippingMethod,
     column: TColumn<TShippingMethod>
   ) => {
@@ -167,7 +168,9 @@ const CartCreateSetShippingMethod: FC<Props> = ({
           ? formatMoney(findBestMatchingRate?.freeAbove, intl)
           : '-';
       default:
-        return undefined;
+        return renderDefault(
+          shippingMethod[column.key as keyof TShippingMethod]
+        );
     }
   };
 
@@ -255,7 +258,7 @@ const CartCreateSetShippingMethod: FC<Props> = ({
                 <Constraints.Horizontal max="scale">
                   <DataTable
                     columns={createColumnsDefinitions(intl)}
-                    itemRenderer={renderItem}
+                    itemRenderer={itemRenderer}
                     onRowClick={handleSetShippingMethod}
                     rows={shippingMethodsByCart}
                   />

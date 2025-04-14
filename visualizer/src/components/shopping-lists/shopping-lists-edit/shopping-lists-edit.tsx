@@ -7,6 +7,7 @@ import { useParams } from 'react-router-dom';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import {
+  getErrorMessage,
   graphQLErrorHandler,
   useShoppingListDeleter,
   useShoppingListFetcher,
@@ -14,7 +15,6 @@ import {
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import { ContentNotification } from '@commercetools-uikit/notifications';
 import Text from '@commercetools-uikit/text';
-import { getErrorMessage } from '../../../helpers';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import DataTable, { TColumn } from '@commercetools-uikit/data-table';
@@ -22,10 +22,6 @@ import {
   TShoppingListLineItem,
   TShoppingListUpdateAction,
 } from '../../../types/generated/ctp';
-import {
-  formatLocalizedString,
-  transformLocalizedFieldToLocalizedString,
-} from '@commercetools-frontend/l10n';
 import { DOMAINS, NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import IconButton from '@commercetools-uikit/icon-button';
@@ -39,6 +35,10 @@ import {
   VariantValue,
 } from 'commercetools-demo-shared-async-variant-selector';
 import { ImageContainer } from 'commercetools-demo-shared-cart-handling';
+import {
+  formatLocalizedString,
+  renderDefault,
+} from 'commercetools-demo-shared-helpers';
 
 type Props = {
   onClose: () => void;
@@ -151,17 +151,10 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
     column: TColumn<TShoppingListLineItem>
   ) => {
     const itemName = formatLocalizedString(
-      {
-        name: transformLocalizedFieldToLocalizedString(
-          item.nameAllLocales ?? []
-        ),
-      },
-      {
-        key: 'name',
-        locale: dataLocale,
-        fallbackOrder: projectLanguages,
-        fallback: NO_VALUE_FALLBACK,
-      }
+      item.nameAllLocales ?? [],
+      dataLocale,
+      projectLanguages,
+      NO_VALUE_FALLBACK
     );
     switch (column.key) {
       case 'name': {
@@ -211,7 +204,7 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
           />
         );
       default:
-        return item[column.key as keyof TShoppingListLineItem];
+        return renderDefault(item[column.key as keyof TShoppingListLineItem]);
     }
   };
   const columns: Array<TColumn<TShoppingListLineItem>> = [

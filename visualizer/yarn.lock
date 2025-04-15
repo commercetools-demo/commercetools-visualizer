@@ -8325,6 +8325,21 @@ commercetools-demo-shared-cart-handling@^0.0.11:
     react-intl "^6.4.7"
     reselect "4.1.8"
 
+commercetools-demo-shared-checkbox-group@^0.0.1:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-checkbox-group/-/commercetools-demo-shared-checkbox-group-0.0.2.tgz#d125aa86955f17ed38735af642f31c7aa196b2dd"
+  integrity sha512-0ztSYDcibGMBYAe918CxCNmWDIs1xDK1kedk+DEvnh7bFPASetjgfeBTTwFCRo03i5OKbIQPfhMHv7m7wDN86Q==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-uikit/checkbox-input" "^19.22.7"
+    "@commercetools-uikit/collapsible-panel" "^19.22.7"
+    "@commercetools-uikit/constraints" "^19.22.7"
+    "@commercetools-uikit/grid" "^19.22.7"
+    "@emotion/react" "^11.10.5"
+    formik "^2.4.6"
+    react-intl "^6.4.7"
+
 commercetools-demo-shared-data-fetching-hooks@^0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.0.4.tgz#07869f2849869f782ef1a60b62f37402caf7d313"

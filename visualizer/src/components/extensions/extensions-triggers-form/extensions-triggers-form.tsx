@@ -2,12 +2,15 @@ import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Constraints from '@commercetools-uikit/constraints';
 import Card from '@commercetools-uikit/card';
-import CheckboxGroup from '../../checkbox/CheckboxGroup';
 import { TActionType, TTriggerInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { IntlShape, useIntl } from 'react-intl';
 import Text from '@commercetools-uikit/text';
 import Spacings from '@commercetools-uikit/spacings';
+import {
+  CheckboxGroup,
+  CheckboxGroupItem,
+} from 'commercetools-demo-shared-checkbox-group';
 
 const actions = (intl: IntlShape) => {
   return [
@@ -183,7 +186,7 @@ const ExtensionsTriggersForm = () => {
                     >
                       {actions(intl).map((entry, index) => {
                         return (
-                          <CheckboxGroup.Item<TTriggerInput>
+                          <CheckboxGroupItem<TTriggerInput>
                             key={index}
                             label={entry.value}
                             value={item.triggerId + '#' + entry.key}

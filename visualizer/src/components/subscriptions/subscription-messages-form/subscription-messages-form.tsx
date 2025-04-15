@@ -2,7 +2,10 @@ import Grid from '@commercetools-uikit/grid';
 import { designTokens } from '@commercetools-uikit/design-system';
 import Constraints from '@commercetools-uikit/constraints';
 import Card from '@commercetools-uikit/card';
-import CheckboxGroup from '../../checkbox/CheckboxGroup';
+import {
+  CheckboxGroup,
+  CheckboxGroupItem,
+} from 'commercetools-demo-shared-checkbox-group';
 import { TMessageSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { useIntl } from 'react-intl';
@@ -267,7 +270,7 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
                     >
                       {item.types.map((entry, index) => {
                         return (
-                          <CheckboxGroup.Item
+                          <CheckboxGroupItem
                             key={index}
                             label={entry.value}
                             value={item.resourceTypeId + '#' + entry.key}

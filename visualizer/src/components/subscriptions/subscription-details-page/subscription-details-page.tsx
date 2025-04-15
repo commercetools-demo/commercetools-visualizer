@@ -72,7 +72,7 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
             });
             return refetch();
           })
-          .then(graphQLErrorHandler(showNotification, formikHelpers)));
+          .catch(graphQLErrorHandler(showNotification, formikHelpers)));
     },
     [subscription, subscriptionKeyUpdater]
   );

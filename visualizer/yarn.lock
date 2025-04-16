@@ -34,25 +34,6 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
-"@apollo/client@^3.13.6":
-  version "3.13.6"
-  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.13.6.tgz#64db62d74b1aa78bfff50d995b3473e9a8c70ab7"
-  integrity sha512-G6A8uNb13V/Tv4TJQOs5PnxuE5Rf5D2dMnBQcg9mng1Eo4YBecwFEJ0L022mraq/dLB0jD5tiAESOD2bTyJ6gg==
-  dependencies:
-    "@graphql-typed-document-node/core" "^3.1.1"
-    "@wry/caches" "^1.0.0"
-    "@wry/equality" "^0.5.6"
-    "@wry/trie" "^0.5.0"
-    graphql-tag "^2.12.6"
-    hoist-non-react-statics "^3.3.2"
-    optimism "^0.18.0"
-    prop-types "^15.7.2"
-    rehackt "^0.1.0"
-    symbol-observable "^4.0.0"
-    ts-invariant "^0.10.3"
-    tslib "^2.3.0"
-    zen-observable-ts "^1.2.5"
-
 "@ardatan/aggregate-error@0.0.6":
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/@ardatan/aggregate-error/-/aggregate-error-0.0.6.tgz#fe6924771ea40fc98dc7a7045c2e872dc8527609"
@@ -7028,13 +7009,6 @@
     fast-querystring "^1.1.1"
     tslib "^2.6.3"
 
-"@wry/caches@^1.0.0":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@wry/caches/-/caches-1.0.1.tgz#8641fd3b6e09230b86ce8b93558d44cf1ece7e52"
-  integrity sha512-bXuaUNLVVkD20wcGBWRyo7j9N3TxePEWFZj2Y+r9OoUzfqmavM84+mFykRicNsBqatba5JLay1t48wxaXaWnlA==
-  dependencies:
-    tslib "^2.3.0"
-
 "@wry/context@^0.7.0":
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/@wry/context/-/context-0.7.4.tgz#e32d750fa075955c4ab2cfb8c48095e1d42d5990"
@@ -7042,7 +7016,7 @@
   dependencies:
     tslib "^2.3.0"
 
-"@wry/equality@^0.5.0", "@wry/equality@^0.5.6":
+"@wry/equality@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@wry/equality/-/equality-0.5.7.tgz#72ec1a73760943d439d56b7b1e9985aec5d497bb"
   integrity sha512-BRFORjsTuQv5gxcXsuDXx6oGRhuVsEGwZy6LOzRRfgu+eSfxbhUQ9L9YtSEIuIjY/o7g3iWFjrc5eSY1GXP2Dw==
@@ -7053,13 +7027,6 @@
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@wry/trie/-/trie-0.3.2.tgz#a06f235dc184bd26396ba456711f69f8c35097e6"
   integrity sha512-yRTyhWSls2OY/pYLfwff867r8ekooZ4UI+/gxot5Wj8EFwSf2rG+n+Mo/6LoLQm1TKA4GRj2+LCpbfS937dClQ==
-  dependencies:
-    tslib "^2.3.0"
-
-"@wry/trie@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@wry/trie/-/trie-0.5.0.tgz#11e783f3a53f6e4cd1d42d2d1323f5bc3fa99c94"
-  integrity sha512-FNoYzHawTMk/6KMQoEG5O4PuioX19UbwdQKF44yw0nLfOypfQdjtfZzo/UIJWAJ23sNIFbD1Ug9lbaDGMwbqQA==
   dependencies:
     tslib "^2.3.0"
 
@@ -8256,29 +8223,6 @@ commander@^7.2.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
   integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
-commercetools-demo-shared-async-variant-selector@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-async-variant-selector/-/commercetools-demo-shared-async-variant-selector-0.0.1.tgz#3e8e36ad11a34e084dd1449626fae86bf5b3a9a9"
-  integrity sha512-OPqQAqnMZfEpZPHGL9tqJMAjehbZ1CZ4nY28AsgAhmR8t5A+cYXGWR/RksWLk9nrevmYEzlPMi3QfA3iZzLQFg==
-  dependencies:
-    "@apollo/client" "^3.13.6"
-    "@babel/runtime" "^7.20.13"
-    "@babel/runtime-corejs3" "^7.20.13"
-    "@commercetools-frontend/constants" "^23.2.2"
-    "@commercetools-frontend/l10n" "^23.2.2"
-    "@commercetools-uikit/async-select-input" "^19.22.7"
-    "@commercetools-uikit/data-table" "^19.22.7"
-    "@commercetools-uikit/data-table-manager" "^19.22.7"
-    "@commercetools-uikit/icons" "^19.22.7"
-    "@commercetools-uikit/loading-spinner" "^19.22.7"
-    "@commercetools-uikit/notifications" "^19.22.7"
-    "@commercetools-uikit/pagination" "^19.22.7"
-    "@commercetools-uikit/spacings" "^19.22.7"
-    "@commercetools-uikit/text" "^19.22.7"
-    "@commercetools-uikit/utils" "19.22.7"
-    "@emotion/react" "^11.10.5"
-    react-intl "^6.3.2"
-
 commercetools-demo-shared-cart-handling@^0.0.11:
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.11.tgz#1ca8a9de4c60a7c2323ffa2d3c0df0ebf73de412"
@@ -8325,7 +8269,7 @@ commercetools-demo-shared-cart-handling@^0.0.11:
     react-intl "^6.4.7"
     reselect "4.1.8"
 
-commercetools-demo-shared-checkbox-group@^0.0.1:
+commercetools-demo-shared-checkbox-group@^0.0.2:
   version "0.0.2"
   resolved "https://registry.yarnpkg.com/commercetools-demo-shared-checkbox-group/-/commercetools-demo-shared-checkbox-group-0.0.2.tgz#d125aa86955f17ed38735af642f31c7aa196b2dd"
   integrity sha512-0ztSYDcibGMBYAe918CxCNmWDIs1xDK1kedk+DEvnh7bFPASetjgfeBTTwFCRo03i5OKbIQPfhMHv7m7wDN86Q==
@@ -8356,6 +8300,48 @@ commercetools-demo-shared-data-fetching-hooks@^0.0.4:
     omit-empty-es "^1.2.0"
     react-intl "^6.4.7"
     react-redux "7.2.9"
+
+commercetools-demo-shared-data-fetching-hooks@^0.0.8:
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.0.8.tgz#7920376582f6a907b7cc70cb9be9e7a88f807393"
+  integrity sha512-ETrNnFHkDBzqOH5XXA/+WDiRwepOih7/nvPhjqPuEITWkjya8WfGClGn15v6Lbz1+TL10XwrXIq36VLjugX3hA==
+  dependencies:
+    "@apollo/client" "3.7.14"
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/application-shell-connectors" "^23.2.2"
+    "@commercetools-frontend/constants" "23.2.2"
+    "@commercetools-frontend/l10n" "23.2.2"
+    "@commercetools-frontend/sdk" "^23.2.2"
+    "@commercetools/sync-actions" "^5.14.0"
+    omit-empty-es "^1.2.0"
+    react-intl "^6.4.7"
+    react-redux "7.2.9"
+
+commercetools-demo-shared-entity-selectors@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-entity-selectors/-/commercetools-demo-shared-entity-selectors-0.0.2.tgz#8eb3cf9deb055fda818a33ad43c8ec1fee54c1d3"
+  integrity sha512-gbakMzcPzHcgLVLe7oVhd/0Qtmd+nsMo5/42MrrNV1MiGP8MpAho9up14L1YmuTUDvKjfIFaCqvQBmAeGIsvIg==
+  dependencies:
+    "@apollo/client" "3.7.14"
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/constants" "^23.2.2"
+    "@commercetools-frontend/l10n" "^23.2.2"
+    "@commercetools-uikit/async-select-input" "^19.22.7"
+    "@commercetools-uikit/data-table" "^19.22.7"
+    "@commercetools-uikit/data-table-manager" "^19.22.7"
+    "@commercetools-uikit/icons" "^19.22.7"
+    "@commercetools-uikit/loading-spinner" "^19.22.7"
+    "@commercetools-uikit/notifications" "^19.22.7"
+    "@commercetools-uikit/pagination" "^19.22.7"
+    "@commercetools-uikit/spacings" "^19.22.7"
+    "@commercetools-uikit/text" "^19.22.7"
+    "@commercetools-uikit/utils" "19.22.7"
+    "@emotion/react" "^11.10.5"
+    commercetools-demo-shared-data-fetching-hooks "^0.0.8"
+    commercetools-demo-shared-helpers "^0.0.1"
+    react-intl "^6.4.7"
 
 commercetools-demo-shared-helpers@^0.0.1:
   version "0.0.1"
@@ -13224,16 +13210,6 @@ optimism@^0.16.2:
     "@wry/context" "^0.7.0"
     "@wry/trie" "^0.3.0"
 
-optimism@^0.18.0:
-  version "0.18.1"
-  resolved "https://registry.yarnpkg.com/optimism/-/optimism-0.18.1.tgz#5cf16847921413dbb0ac809907370388b9c6335f"
-  integrity sha512-mLXNwWPa9dgFyDqkNi54sjDyNJ9/fTI6WGBLgnXku1vdKY/jovHfZT5r+aiVeFFLOz+foPNOm5YJ4mqgld2GBQ==
-  dependencies:
-    "@wry/caches" "^1.0.0"
-    "@wry/context" "^0.7.0"
-    "@wry/trie" "^0.5.0"
-    tslib "^2.3.0"
-
 optionator@^0.9.3:
   version "0.9.4"
   resolved "https://registry.yarnpkg.com/optionator/-/optionator-0.9.4.tgz#7ea1c1a5d91d764fb282139c88fe11e182a3a734"
@@ -14494,11 +14470,6 @@ regjsparser@^0.9.1:
   integrity sha512-dQUtn90WanSNl+7mQKcXAgZxvUe7Z0SqXlgzv0za4LwiUhyzBC58yQO3liFoUgu8GiJVInAhJjkj1N0EtQ5nkQ==
   dependencies:
     jsesc "~0.5.0"
-
-rehackt@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/rehackt/-/rehackt-0.1.0.tgz#a7c5e289c87345f70da8728a7eb878e5d03c696b"
-  integrity sha512-7kRDOuLHB87D/JESKxQoRwv4DzbIdwkAGQ7p6QKGdVlY1IZheUnVhlk/4UZlNUVxdAXpyxikE3URsG067ybVzw==
 
 relateurl@^0.2.7:
   version "0.2.7"

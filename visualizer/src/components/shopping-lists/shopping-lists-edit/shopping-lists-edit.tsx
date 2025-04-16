@@ -24,9 +24,9 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import Constraints from '@commercetools-uikit/constraints';
 import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import {
-  AsyncVariantSelector,
+  CategorySelector,
   VariantValue,
-} from 'commercetools-demo-shared-async-variant-selector';
+} from 'commercetools-demo-shared-entity-selectors';
 import {
   defaultShoppingListColumnsDefinition,
   defaultShoppingListItemRenderer,
@@ -169,10 +169,12 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
             </Constraints.Horizontal>
           </Spacings.Inline>
           <Constraints.Horizontal max={13}>
-            <AsyncVariantSelector
+            <CategorySelector
               name={'variantSearch'}
-              onChange={async (product) => {
-                await handleAddVariantToCart(product);
+              onChange={async (event) => {
+                await handleAddVariantToCart(
+                  event.target.value as VariantValue
+                );
               }}
               isReadOnly={!canManage}
             />

@@ -23,9 +23,9 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { DOMAINS } from '@commercetools-frontend/constants';
 import transformErrors from './transform-errors';
 import {
-  AsyncVariantSelector,
+  CategorySelector,
   VariantValue,
-} from 'commercetools-demo-shared-async-variant-selector';
+} from 'commercetools-demo-shared-entity-selectors';
 import { CartAppliedDiscountsPanel } from 'commercetools-demo-shared-cart-handling';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
@@ -217,10 +217,12 @@ const CartCreateAddLineItems: FC<Props> = ({ children, cart }) => {
             {/*/>*/}
           </Spacings.Inline>
           <Constraints.Horizontal max={13}>
-            <AsyncVariantSelector
+            <CategorySelector
               name={'variantSearch'}
-              onChange={async (product) => {
-                await handleAddVariantToCart(product);
+              onChange={async (event) => {
+                await handleAddVariantToCart(
+                  event.target.value as VariantValue
+                );
               }}
             />
           </Constraints.Horizontal>

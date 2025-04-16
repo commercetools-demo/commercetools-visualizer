@@ -16,8 +16,8 @@ import {
   TFormValues,
 } from '../field-definition-input/helpers';
 import {
-  useTypeDefinitionEntryCreator,
   graphQLErrorHandler,
+  useTypeDefinitionUpdater,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
@@ -36,7 +36,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
 
   const showNotification = useShowNotification();
 
-  const typeDefinitionCreator = useTypeDefinitionEntryCreator();
+  const typeDefinitionUpdater = useTypeDefinitionUpdater();
 
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
@@ -47,7 +47,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
       const actionDraft = fromFormValuesToTFieldDefinitionInput(formikValues);
-      await typeDefinitionCreator
+      await typeDefinitionUpdater
         .execute({
           id: id,
           version: Number(version),
@@ -63,7 +63,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
-    [id, typeDefinitionCreator, version]
+    [id, typeDefinitionUpdater, version]
   );
 
   return (

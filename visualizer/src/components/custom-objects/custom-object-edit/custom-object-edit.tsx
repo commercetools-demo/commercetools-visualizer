@@ -29,7 +29,7 @@ import {
   graphQLErrorHandler,
   useCustomObjectDeleter,
   useCustomObjectFetcher,
-  useCustomObjectUpdater,
+  useCustomObjectCreatorOrUpdater,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
@@ -44,7 +44,7 @@ const CustomObjectEdit: FC<Props> = ({ onClose, onIdChange }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const customObjectUpdater = useCustomObjectUpdater();
+  const customObjectUpdater = useCustomObjectCreatorOrUpdater();
   const customObjectDeleter = useCustomObjectDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -62,16 +62,16 @@ const CustomObjectEdit: FC<Props> = ({ onClose, onIdChange }) => {
           .execute({
             draft: data,
           })
-          .then(async ({ data }) => {
+          .then(async ({ createOrUpdateCustomObject }) => {
             showNotification({
               kind: 'success',
               domain: DOMAINS.SIDE,
               text: intl.formatMessage(messages.updateSuccess),
             });
-            if (data?.createOrUpdateCustomObject?.id === customObject.id) {
+            if (createOrUpdateCustomObject?.id === customObject.id) {
               await refetch();
             } else {
-              await onIdChange(data?.createOrUpdateCustomObject?.id || '');
+              await onIdChange(createOrUpdateCustomObject?.id || '');
             }
           })
           .catch(graphQLErrorHandler(showNotification, formikHelpers));

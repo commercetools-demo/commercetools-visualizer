@@ -8284,10 +8284,10 @@ commercetools-demo-shared-checkbox-group@^0.0.2:
     formik "^2.4.6"
     react-intl "^6.4.7"
 
-commercetools-demo-shared-data-fetching-hooks@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.0.4.tgz#07869f2849869f782ef1a60b62f37402caf7d313"
-  integrity sha512-bDwMYgUPjhj8alK2yDAfgMVD8fDXL8w0aX9CtuAh4RKoepwF+rjBybjr9iuaFPNg95IAJ2R9pEY9zuNAn/4CgA==
+commercetools-demo-shared-data-fetching-hooks@^0.0.11:
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.0.11.tgz#5c106eb1356dbb4e969ede55672b13df1a81004e"
+  integrity sha512-Zw5FGWqqCkwnrzR4TZewtSFNObyu63Phu7xGaAanBKnLhrZBW2gr5oCTeU+5z3ZyCwtCxhSl+7EdNe8CkvADkQ==
   dependencies:
     "@apollo/client" "3.7.14"
     "@babel/runtime" "^7.20.13"

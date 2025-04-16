@@ -62,14 +62,14 @@ export const CartCreateSelectCurrency: FC<Props> = ({
             draft: draft,
             locale: dataLocale,
           })
-          .then(({ data }) => {
-            if (data && data.createCart && data.createCart.id) {
+          .then(({ createCart }) => {
+            if (createCart && createCart.id) {
               showNotification({
                 kind: 'success',
                 domain: DOMAINS.SIDE,
                 text: intl.formatMessage(messages.createSuccess),
               });
-              goToNextStep && goToNextStep(data.createCart.id);
+              goToNextStep && goToNextStep(createCart.id);
             }
           })
           .catch(graphQLErrorHandler(showNotification, formikHelpers));
@@ -81,8 +81,8 @@ export const CartCreateSelectCurrency: FC<Props> = ({
             id: cart.id,
             version: cart.version,
           })
-          .then((updated) => {
-            if (updated && updated.data && updated.data.updateCart) {
+          .then(({ updateCart }) => {
+            if (updateCart) {
               showNotification({
                 kind: 'success',
                 domain: DOMAINS.SIDE,

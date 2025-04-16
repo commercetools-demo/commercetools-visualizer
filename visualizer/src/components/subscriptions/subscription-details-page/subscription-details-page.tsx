@@ -23,9 +23,10 @@ import messages from './messages';
 import {
   useSubscriptionDeleter,
   useSubscriptionFetcher,
-  useSubscriptionKeyUpdater,
+  useSubscriptionUpdater,
   graphQLErrorHandler,
   getErrorMessage,
+  calculateSubscriptionUpdateActions,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   TGoogleCloudPubSubDestination,
@@ -37,7 +38,7 @@ type Props = {
 };
 
 const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
-  const subscriptionKeyUpdater = useSubscriptionKeyUpdater();
+  const subscriptionKeyUpdater = useSubscriptionUpdater();
   const subscriptionDeleter = useSubscriptionDeleter();
   const intl = useIntl();
   const history = useHistory();
@@ -56,23 +57,31 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      subscription &&
-        (await subscriptionKeyUpdater
-          .execute({
-            originalDraft: subscription,
-            nextDraft: formikValues,
-          })
-          .then(() => {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.subscriptionUpdated, {
-                subscriptionKey: subscription?.key,
-              }),
-            });
-            return refetch();
-          })
-          .catch(graphQLErrorHandler(showNotification, formikHelpers)));
+      if (subscription) {
+        const updateActions = calculateSubscriptionUpdateActions(
+          subscription,
+          formikValues
+        );
+        if (updateActions.length > 0) {
+          await subscriptionKeyUpdater
+            .execute({
+              actions: updateActions,
+              version: subscription.version,
+              id: subscription.id,
+            })
+            .then(() => {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.subscriptionUpdated, {
+                  subscriptionKey: subscription?.key,
+                }),
+              });
+              return refetch();
+            })
+            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        }
+      }
     },
     [subscription, subscriptionKeyUpdater]
   );

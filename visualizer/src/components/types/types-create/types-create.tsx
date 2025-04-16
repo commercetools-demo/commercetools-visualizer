@@ -54,14 +54,13 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
         .execute({
           draft: draft,
         })
-        .then(({ data }) => {
+        .then(({ createTypeDefinition }) => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.createSuccess),
           });
-          data?.createTypeDefinition?.id &&
-            onCreate(data?.createTypeDefinition?.id);
+          createTypeDefinition?.id && onCreate(createTypeDefinition?.id);
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },

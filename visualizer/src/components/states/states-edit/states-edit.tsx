@@ -24,6 +24,7 @@ import {
   useStateUpdater,
   graphQLErrorHandler,
   getErrorMessage,
+  calculateStateUpdateActions,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   formValuesToState,
@@ -55,22 +56,24 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     async (formikValues: TFormValues, formikHelpers) => {
       const data = formValuesToState(formikValues);
       if (state && data) {
-        await stateUpdater
-          .execute({
-            originalDraft: state,
-            nextDraft: data,
-            id: state.id,
-            version: state.version,
-          })
-          .then(() => {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.updateSuccess),
-            });
-            return refetch();
-          })
-          .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        const updateActions = calculateStateUpdateActions(state, data);
+        if (updateActions.length > 0) {
+          await stateUpdater
+            .execute({
+              id: state.id,
+              version: state.version,
+              actions: updateActions,
+            })
+            .then(() => {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.updateSuccess),
+              });
+              return refetch();
+            })
+            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        }
       }
     },
     [refetch, state]

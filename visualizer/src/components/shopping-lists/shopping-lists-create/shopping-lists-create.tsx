@@ -21,7 +21,10 @@ import CustomerSearch, {
 import omitEmpty from 'omit-empty-es';
 import AsyncSelectField from '@commercetools-uikit/async-select-field';
 import { TShoppingListDraft } from '../../../types/generated/ctp';
-import { useShoppingListCreator } from 'commercetools-demo-shared-data-fetching-hooks';
+import {
+  graphQLErrorHandler,
+  useShoppingListCreator,
+} from 'commercetools-demo-shared-data-fetching-hooks';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import messages from '../../types/types-create/messages';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
@@ -73,14 +76,17 @@ export const ShoppingListsCreate: FC<Props> = ({ onClose, onCreate }) => {
     if (values.customer) {
       draft.customer = { id: values.customer?.value, typeId: 'customer' };
     }
-    const result = await shoppingListCreator.execute({ draft: draft });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: intl.formatMessage(messages.createSuccess),
-    });
-    result.data?.createShoppingList?.id &&
-      onCreate(result.data?.createShoppingList?.id);
+    await shoppingListCreator
+      .execute({ draft: draft })
+      .then(({ createShoppingList }) => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.createSuccess),
+        });
+        createShoppingList?.id && onCreate(createShoppingList?.id);
+      })
+      .catch(graphQLErrorHandler);
   };
   const formik = useFormik<TFormValues>({
     initialValues: {

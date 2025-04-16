@@ -24,7 +24,7 @@ import {
 } from '../../../types/generated/ctp';
 import createColumnDefinitions from './field-definitions-list-column-definitions';
 import messages from './messages';
-import { useTypeDefinitionEntryCreator } from 'commercetools-demo-shared-data-fetching-hooks';
+import { useTypeDefinitionUpdater } from 'commercetools-demo-shared-data-fetching-hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
 import { PageContentFull } from '@commercetools-frontend/application-components';
 import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
@@ -64,7 +64,7 @@ const FieldDefinitionsList: FC<Props> = ({
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
-  const typeDefinitionCreator = useTypeDefinitionEntryCreator();
+  const typeDefinitionUpdater = useTypeDefinitionUpdater();
   const showNotification = useShowNotification();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -82,7 +82,7 @@ const FieldDefinitionsList: FC<Props> = ({
     const deleteAction: TTypeUpdateAction = {
       removeFieldDefinition: { fieldName: name },
     };
-    await typeDefinitionCreator.execute({
+    await typeDefinitionUpdater.execute({
       actions: [deleteAction],
       id: id,
       version: version,

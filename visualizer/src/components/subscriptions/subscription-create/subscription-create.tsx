@@ -64,12 +64,12 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
         .execute({
           draft: subscriptionDraft,
         })
-        .then(({ data }) => {
+        .then(({ createSubscription }) => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.subscriptionCreated, {
-              subscriptionKey: data?.createSubscription?.id || '',
+              subscriptionKey: createSubscription?.id || '',
             }),
           });
           history.push({

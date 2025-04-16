@@ -27,6 +27,7 @@ import {
   graphQLErrorHandler,
   useTypeDefinitionUpdater,
   getErrorMessage,
+  calculateFieldDefinitionUpdateActions,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
@@ -63,22 +64,27 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
       const fieldDefinitionInput =
         fromFormValuesToTFieldDefinitionInput(formikValues);
       if (fieldDefinitions) {
-        await typeDefinitionUpdater
-          .execute({
-            originalDraft: fieldDefinitions[0],
-            nextDraft: fieldDefinitionInput,
-            id: id,
-            version: version || 1,
-          })
-          .then(async () => {
-            await refetch();
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
-            });
-          })
-          .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        const actions = calculateFieldDefinitionUpdateActions(
+          fieldDefinitions[0],
+          fieldDefinitionInput
+        );
+        if (actions.length > 0) {
+          await typeDefinitionUpdater
+            .execute({
+              id: id,
+              version: version || 1,
+              actions: actions,
+            })
+            .then(async () => {
+              await refetch();
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.fieldDefinitionUpdated, {}),
+              });
+            })
+            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        }
       }
     },
     [fieldDefinitions, id, intl, refetch, typeDefinitionUpdater, version]

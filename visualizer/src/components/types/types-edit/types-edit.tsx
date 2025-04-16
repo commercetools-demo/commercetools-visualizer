@@ -23,11 +23,12 @@ import TypesForm, { TFormValues } from '../types-form/types-form';
 
 import messages from './messages';
 import {
+  calculateTypeDefinitionUpdateActions,
   getErrorMessage,
   graphQLErrorHandler,
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
-  useTypeUpdater,
+  useTypeDefinitionUpdater,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
@@ -42,7 +43,7 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   }));
   const { id } = useParams<{ id: string }>();
   const showNotification = useShowNotification();
-  const typeUpdater = useTypeUpdater();
+  const typeDefinitionUpdater = useTypeDefinitionUpdater();
   const typeDefinitionDeleter = useTypeDefinitionDeleter();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -56,25 +57,30 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
     async (formikValues: TFormValues, formikHelpers) => {
       const data = formValuesToDoc(formikValues);
       if (typeDefinition) {
-        await typeUpdater
-          .execute({
-            originalDraft: typeDefinition,
-            nextDraft: data,
-            id: typeDefinition.id,
-            version: typeDefinition.version,
-          })
-          .then(() => {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.updateSuccess),
-            });
-            return refetch();
-          })
-          .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        const updateActions = calculateTypeDefinitionUpdateActions(
+          typeDefinition,
+          data
+        );
+        if (updateActions.length > 0) {
+          await typeDefinitionUpdater
+            .execute({
+              id: typeDefinition.id,
+              version: typeDefinition.version,
+              actions: updateActions,
+            })
+            .then(() => {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.updateSuccess),
+              });
+              return refetch();
+            })
+            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        }
       }
     },
-    [intl, refetch, showNotification, typeDefinition, typeUpdater]
+    [intl, refetch, showNotification, typeDefinition, typeDefinitionUpdater]
   );
 
   const handleDelete = async () => {

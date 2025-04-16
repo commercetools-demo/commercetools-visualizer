@@ -98,32 +98,38 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
     const action: TShoppingListUpdateAction = {
       removeLineItem: { lineItemId: id },
     };
-    await shoppingListUpdater.execute({
-      actions: [action],
-      id: shoppingList.id,
-      version: shoppingList.version,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: 'The Shopping List has been updated.',
-    });
+    await shoppingListUpdater
+      .execute({
+        actions: [action],
+        id: shoppingList.id,
+        version: shoppingList.version,
+      })
+      .then(() => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: 'The Shopping List has been updated.',
+        });
+      });
   };
 
   const handleChangeQuantity = async (lineItemId: string, quantity: number) => {
     const action: TShoppingListUpdateAction = {
       changeLineItemQuantity: { lineItemId: lineItemId, quantity },
     };
-    await shoppingListUpdater.execute({
-      actions: [action],
-      id: shoppingList.id,
-      version: shoppingList.version,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: 'The Shopping List has been updated.',
-    });
+    await shoppingListUpdater
+      .execute({
+        actions: [action],
+        id: shoppingList.id,
+        version: shoppingList.version,
+      })
+      .then(() => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: 'The Shopping List has been updated.',
+        });
+      });
   };
   const handleAddVariantToCart = async (variant: VariantValue) => {
     await shoppingListUpdater

@@ -42,13 +42,13 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
         .execute({
           draft: draft,
         })
-        .then(({ data }) => {
+        .then(({ createState }) => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.createSuccess),
           });
-          data?.createState?.id && onCreate(data?.createState?.id);
+          createState?.id && onCreate(createState?.id);
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },

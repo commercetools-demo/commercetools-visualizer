@@ -26,7 +26,7 @@ import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import {
   getErrorMessage,
-  useTypesFetcher,
+  useTypeDefinitionsFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   formatDateAndTime,
@@ -54,11 +54,12 @@ const TypesList: FC<Props> = () => {
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
-  const { typeDefinitions, error, loading, refetch } = useTypesFetcher({
-    limit: paginationState.perPage.value,
-    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
-    sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
-  });
+  const { typeDefinitions, error, loading, refetch } =
+    useTypeDefinitionsFetcher({
+      limit: paginationState.perPage.value,
+      offset: (paginationState.page.value - 1) * paginationState.perPage.value,
+      sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+    });
 
   if (error) {
     return (

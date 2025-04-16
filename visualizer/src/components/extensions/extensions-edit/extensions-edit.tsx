@@ -25,6 +25,7 @@ import {
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
 import {
+  calculateExtensionsUpdateActions,
   getErrorMessage,
   graphQLErrorHandler,
   useExtensionDeleter,
@@ -57,22 +58,24 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
     async (formikValues: TFormValues, formikHelpers) => {
       const data = formValuesToTExtension(formikValues);
       if (extension) {
-        await extensionsUpdater
-          .execute({
-            originalDraft: extension,
-            nextDraft: data,
-            id: extension.id,
-            version: extension.version,
-          })
-          .then(() => {
-            showNotification({
-              kind: 'success',
-              domain: DOMAINS.SIDE,
-              text: intl.formatMessage(messages.updateSuccess),
-            });
-            return refetch();
-          })
-          .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        const updateActions = calculateExtensionsUpdateActions(extension, data);
+        if (updateActions.length > 0) {
+          await extensionsUpdater
+            .execute({
+              id: extension.id,
+              version: extension.version,
+              actions: updateActions,
+            })
+            .then(() => {
+              showNotification({
+                kind: 'success',
+                domain: DOMAINS.SIDE,
+                text: intl.formatMessage(messages.updateSuccess),
+              });
+              return refetch();
+            })
+            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+        }
       }
     },
     [refetch, extension, extensionsUpdater]

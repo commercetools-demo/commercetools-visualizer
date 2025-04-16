@@ -16,7 +16,7 @@ import {
 } from '../custom-object-form/conversion';
 import {
   graphQLErrorHandler,
-  useCustomObjectUpdater,
+  useCustomObjectCreatorOrUpdater,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 
 type Props = {
@@ -32,7 +32,7 @@ const CustomObjectCreate: FC<Props> = ({ onClose, onSuccess }) => {
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
-  const extensionCreator = useCustomObjectUpdater();
+  const extensionCreator = useCustomObjectCreatorOrUpdater();
   const showNotification = useShowNotification();
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
@@ -41,13 +41,13 @@ const CustomObjectCreate: FC<Props> = ({ onClose, onSuccess }) => {
         .execute({
           draft: draft,
         })
-        .then(({ data }) => {
+        .then(({ createOrUpdateCustomObject }) => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.createSuccess),
           });
-          return onSuccess(data?.createOrUpdateCustomObject?.id || '');
+          return onSuccess(createOrUpdateCustomObject?.id || '');
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },

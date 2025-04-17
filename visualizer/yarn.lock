@@ -8223,10 +8223,10 @@ commander@^7.2.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-7.2.0.tgz#a36cb57d0b501ce108e4d20559a150a391d97ab7"
   integrity sha512-QrWXB+ZQSVPmIWIhtEO9H+gwHaMGYiF5ChvoJ+K9ZGHG/sVsa6yiesAD1GC/x46sET00Xlwo1u49RVVVzvcSkw==
 
-commercetools-demo-shared-cart-handling@^0.0.11:
-  version "0.0.11"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.11.tgz#1ca8a9de4c60a7c2323ffa2d3c0df0ebf73de412"
-  integrity sha512-sGFbxnt0xppw5zaF1RD2kEZ7lH1aWa2G2foQPIU/3QE6dSru8jtTac51KOxnJMSe2ocfc7krDkTDGtzsZzj14Q==
+commercetools-demo-shared-cart-handling@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-cart-handling/-/commercetools-demo-shared-cart-handling-0.0.12.tgz#f3e71a56de34ed7e8b38a1db756a2e3e36c2d575"
+  integrity sha512-sgQKpUYIxmaEudCj7+sLLluMN+Jz114TFG0t7+USOfNHLY/zwjtE7qF6RlIB8/vo6HFW3Y5qD7OlHaTIMq8Mug==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@babel/runtime-corejs3" "^7.20.13"
@@ -8260,7 +8260,7 @@ commercetools-demo-shared-cart-handling@^0.0.11:
     "@commercetools-uikit/tooltip" "^19.22.7"
     "@emotion/react" "^11.14.0"
     "@emotion/styled" "^11.14.0"
-    commercetools-demo-shared-helpers "^0.0.1"
+    commercetools-demo-shared-helpers "^0.0.2"
     commercetools-demo-shared-paginatable-data-table "^0.0.2"
     formik "^2.4.6"
     lodash "^4.17.21"
@@ -8347,6 +8347,17 @@ commercetools-demo-shared-helpers@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/commercetools-demo-shared-helpers/-/commercetools-demo-shared-helpers-0.0.1.tgz#21bc7271311fb1f8ddb0a714073592cfeac561d8"
   integrity sha512-RMQqQ/KYKVo9ovUMrT0XpIUSlhNQPLTyildlvz3fBRhuWF2K5UxoZjrVDMcqp6rFo4U6k6/6aE8Ub1+FjVQ+JQ==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-frontend/constants" "^23.2.2"
+    "@commercetools-frontend/l10n" "^23.2.2"
+    react-intl "^6.4.7"
+
+commercetools-demo-shared-helpers@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-helpers/-/commercetools-demo-shared-helpers-0.0.2.tgz#bd402efa5b3a1ef348781ce5e88eb5090153e596"
+  integrity sha512-AkfD5kwmB/2heVL/5VdPsqWWSBrYZrbdGzVdtbZP8tLkzEpFCi65KgjfpTKZuRzL3W9jzgISj6HvfqkokwFlyQ==
   dependencies:
     "@babel/runtime" "^7.20.13"
     "@babel/runtime-corejs3" "^7.20.13"

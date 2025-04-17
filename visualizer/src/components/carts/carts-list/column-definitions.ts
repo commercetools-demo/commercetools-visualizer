@@ -4,7 +4,7 @@ import memoize from 'memoize-one';
 export const createVisibleColumnDefinitions = memoize(
   (): Array<TColumn> => [
     { key: 'customerEmail', label: 'Customer Email' },
-    { key: 'amountOfLineitems', label: 'Amount of Lineitems' },
+    { key: 'count', label: 'Amount of Lineitems' },
     { key: 'cartState', label: 'Cart State' },
     {
       key: 'billingAddress',

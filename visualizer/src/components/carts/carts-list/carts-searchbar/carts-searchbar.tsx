@@ -5,15 +5,29 @@ import { useIntl } from 'react-intl';
 import { FC } from 'react';
 import { ALL_FIELDS, SEARCH_FIELDS } from '../constants';
 import messages from './messages';
+import SecondaryButton from '@commercetools-uikit/secondary-button';
+import { FilterIcon } from '@commercetools-uikit/icons';
+import Spacings from '@commercetools-uikit/spacings';
 
 type Props = {
   onReset: () => void;
   onChange: (event: TCustomEvent) => void;
   text: string;
   option: string;
+  isSidebarOpen: boolean;
+  hideSidebar: () => void;
+  showSidebar: () => void;
 };
 
-const CartsSearchbar: FC<Props> = ({ onReset, onChange, text, option }) => {
+const CartsSearchbar: FC<Props> = ({
+  onReset,
+  onChange,
+  text,
+  option,
+  isSidebarOpen,
+  hideSidebar,
+  showSidebar,
+}) => {
   const intl = useIntl();
 
   let searchOptions = Object.values(SEARCH_FIELDS).map((item) => ({
@@ -39,7 +53,7 @@ const CartsSearchbar: FC<Props> = ({ onReset, onChange, text, option }) => {
   );
 
   return (
-    <>
+    <Spacings.Inline scale="s">
       <SelectableSearchInput
         horizontalConstraint={15}
         value={{ text: text, option: option }}
@@ -49,7 +63,14 @@ const CartsSearchbar: FC<Props> = ({ onReset, onChange, text, option }) => {
         options={searchOptions}
         placeholder={seachPlaceholderMessages[option]}
       />
-    </>
+      <SecondaryButton
+        iconLeft={<FilterIcon />}
+        label={intl.formatMessage(messages.showFilters)}
+        isToggleButton={true}
+        isToggled={isSidebarOpen}
+        onClick={() => (isSidebarOpen ? hideSidebar() : showSidebar())}
+      />
+    </Spacings.Inline>
   );
 };
 export default CartsSearchbar;

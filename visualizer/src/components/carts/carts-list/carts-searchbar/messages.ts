@@ -16,4 +16,9 @@ export default defineMessages({
     description: 'Label for the searchbar placeholder for all fields option',
     defaultMessage: 'Select a field to search for',
   },
+  showFilters: {
+    id: 'Products.PimSearchList.SidebarLayout.showFilters',
+    description: 'Caption of the button which opens Filters sidebar',
+    defaultMessage: 'Filters',
+  },
 });

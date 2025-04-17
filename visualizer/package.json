@@ -52,6 +52,7 @@
     "@commercetools-uikit/constraints": "^19.22.7",
     "@commercetools-uikit/data-table": "^19.22.7",
     "@commercetools-uikit/data-table-manager": "^19.22.7",
+    "@commercetools-uikit/date-time-input": "^19.22.7",
     "@commercetools-uikit/design-system": "^19.22.7",
     "@commercetools-uikit/field-label": "^19.22.7",
     "@commercetools-uikit/flat-button": "^19.22.7",

@@ -1,0 +1,102 @@
+:root {
+  --edit-sidebar-height: 74px;
+  --edit-sidebar-width: 384px;
+  --duration: 310ms;
+  --sidebar-width: 340px;
+  --sidebar-height: 88px;
+}
+
+.container {
+  background: var(--color-surface);
+  box-shadow: var(--shadow-17), 0 1px 2px rgba(0, 0, 0, 0.24);
+  border: 1px solid var(--color-neutral-90);
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 336px;
+}
+
+.headerContainer {
+  align-items: stretch;
+  background-color: var(--color-neutral-98);
+  box-shadow: 0 2px 5px -3px var(--color-neutral-60);
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  width: var(--sidebar-width);
+  z-index: 2;
+  animation: shrink var(--duration);
+}
+
+
+.bodyContainer {
+  overflow-y: scroll;
+  width: var(--sidebar-width);
+  height: calc(100% - var(--sidebar-height));
+  margin-top: var(--sidebar-height);
+  animation: shrink var(--duration);
+}
+
+.enterAnimation {
+  right: 0;
+  position: absolute;
+}
+
+.enterActiveAnimation {
+  animation-name: enter;
+  animation-duration: var(--duration);
+}
+
+.exitAnimation {
+  right: 0;
+  position: absolute;
+}
+
+.exitActiveAnimation {
+  transform: translateX(var(--sidebar-width));
+  animation-name: exit;
+  animation-duration: var(--duration);
+}
+
+@keyframes exit {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(var(--sidebar-width));
+  }
+}
+
+@keyframes enter {
+  0% {
+    transform: translateX(var(--sidebar-width));
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes expand {
+  0% {
+    width: var(--sidebar-width);
+  }
+
+  100% {
+    width: var(--edit-sidebar-width);
+  }
+}
+
+@keyframes shrink {
+  0% {
+    width: var(--edit-sidebar-width);
+  }
+
+  100% {
+    width: var(--sidebar-width);
+  }
+}

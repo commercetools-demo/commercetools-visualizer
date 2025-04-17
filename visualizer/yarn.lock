@@ -2199,6 +2199,38 @@
     lodash "4.17.21"
     prop-types "15.8.1"
 
+"@commercetools-uikit/calendar-time-utils@19.22.7":
+  version "19.22.7"
+  resolved "https://registry.yarnpkg.com/@commercetools-uikit/calendar-time-utils/-/calendar-time-utils-19.22.7.tgz#4763dde722ef13a81f8113d22f973ef3c194794a"
+  integrity sha512-SeujIcdGhQwwLRQn0VDrYU3xN1yJYjmnUxJn3S2kt7mohMKn3+JcLjwV9MfZB5nyuAqWpMzUyzzIpxrhflJH4g==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-uikit/utils" "19.22.7"
+
+"@commercetools-uikit/calendar-utils@19.22.7":
+  version "19.22.7"
+  resolved "https://registry.yarnpkg.com/@commercetools-uikit/calendar-utils/-/calendar-utils-19.22.7.tgz#d2998f601b31705e62f9c0ce6a494fcba00a4305"
+  integrity sha512-ClQTPxtxJ30rzEBJmbPO/OkEqcm9V2dlIrawt2ixAGcurRY37pD8AOogGoXxON2H0iZowlF437PKpFTsLeRulA==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-uikit/accessible-button" "19.22.7"
+    "@commercetools-uikit/design-system" "19.22.7"
+    "@commercetools-uikit/hooks" "19.22.7"
+    "@commercetools-uikit/icons" "19.22.7"
+    "@commercetools-uikit/input-utils" "19.22.7"
+    "@commercetools-uikit/secondary-icon-button" "19.22.7"
+    "@commercetools-uikit/spacings-inline" "19.22.7"
+    "@commercetools-uikit/text" "19.22.7"
+    "@commercetools-uikit/tooltip" "19.22.7"
+    "@commercetools-uikit/utils" "19.22.7"
+    "@emotion/react" "^11.10.5"
+    "@emotion/styled" "^11.10.5"
+    lodash "4.17.21"
+    prop-types "15.8.1"
+    react-select "5.9.0"
+
 "@commercetools-uikit/card@19.22.7", "@commercetools-uikit/card@^19.22.3", "@commercetools-uikit/card@^19.22.7":
   version "19.22.7"
   resolved "https://registry.yarnpkg.com/@commercetools-uikit/card/-/card-19.22.7.tgz#1a0c9bea55845c5de70f29197d5bc326b61b33e2"
@@ -2337,6 +2369,33 @@
     lodash "4.17.21"
     prop-types "15.8.1"
     react-intl "^6.3.2"
+
+"@commercetools-uikit/date-time-input@^19.22.7":
+  version "19.22.7"
+  resolved "https://registry.yarnpkg.com/@commercetools-uikit/date-time-input/-/date-time-input-19.22.7.tgz#f9cf4cac336f8d0e71f316e83b28bde76b8bbeaa"
+  integrity sha512-t7M7fhjIETwKJMNgw6b7ZHCUZ0yyoMfP/4rHoVZnVJ2KY1rA3LYHqB3YdJxs68qwp2gLC3+I26cokhoaIKmmFA==
+  dependencies:
+    "@babel/runtime" "^7.20.13"
+    "@babel/runtime-corejs3" "^7.20.13"
+    "@commercetools-uikit/accessible-button" "19.22.7"
+    "@commercetools-uikit/calendar-time-utils" "19.22.7"
+    "@commercetools-uikit/calendar-utils" "19.22.7"
+    "@commercetools-uikit/constraints" "19.22.7"
+    "@commercetools-uikit/design-system" "19.22.7"
+    "@commercetools-uikit/hooks" "19.22.7"
+    "@commercetools-uikit/icons" "19.22.7"
+    "@commercetools-uikit/secondary-icon-button" "19.22.7"
+    "@commercetools-uikit/select-utils" "19.22.7"
+    "@commercetools-uikit/spacings-inline" "19.22.7"
+    "@commercetools-uikit/text" "19.22.7"
+    "@commercetools-uikit/tooltip" "19.22.7"
+    "@commercetools-uikit/utils" "19.22.7"
+    "@emotion/react" "^11.10.5"
+    "@emotion/styled" "^11.10.5"
+    downshift "6.1.12"
+    prop-types "15.8.1"
+    react-is "17.0.2"
+    warning "4.0.3"
 
 "@commercetools-uikit/design-system@19.22.7", "@commercetools-uikit/design-system@^19.22.3", "@commercetools-uikit/design-system@^19.22.7":
   version "19.22.7"

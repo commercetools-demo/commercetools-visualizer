@@ -34,4 +34,9 @@ export default defineMessages<string>({
     description: 'add cart button label',
     defaultMessage: 'Add New Cart',
   },
+  hideFilters: {
+    id: 'Products.PimSearchList.SidebarLayout.hideFilters',
+    description: 'Caption of the button which closes Filters sidebar',
+    defaultMessage: 'Hide filters',
+  },
 });

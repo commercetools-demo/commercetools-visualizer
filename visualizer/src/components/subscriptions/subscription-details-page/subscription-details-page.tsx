@@ -105,21 +105,25 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   }
 
   const handleDelete = async () => {
-    await subscriptionDeleter.execute({
-      id: subscription.id,
-      version: subscription.version,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: intl.formatMessage(messages.subscriptionUpdated, {
-        subscriptionKey: subscription?.key,
-      }),
-    });
-    history.replace({
-      pathname: linkToWelcome + '/subscriptions',
-      state: { refetch: true },
-    });
+    await subscriptionDeleter
+      .execute({
+        id: subscription.id,
+        version: subscription.version,
+      })
+      .then(() => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.subscriptionUpdated, {
+            subscriptionKey: subscription?.key,
+          }),
+        });
+        history.replace({
+          pathname: linkToWelcome + '/subscriptions',
+          state: { refetch: true },
+        });
+      })
+      .catch(graphQLErrorHandler);
   };
   let dest:
     | {

@@ -85,16 +85,20 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
 
   const handleDelete = async () => {
     if (typeDefinition) {
-      await typeDefinitionDeleter.execute({
-        id: typeDefinition.id,
-        version: typeDefinition.version,
-      });
-      showNotification({
-        kind: 'success',
-        domain: DOMAINS.SIDE,
-        text: intl.formatMessage(messages.updateSuccess),
-      });
-      onClose();
+      await typeDefinitionDeleter
+        .execute({
+          id: typeDefinition.id,
+          version: typeDefinition.version,
+        })
+        .then(() => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.updateSuccess),
+          });
+          onClose();
+        })
+        .catch(graphQLErrorHandler(showNotification));
     }
   };
 

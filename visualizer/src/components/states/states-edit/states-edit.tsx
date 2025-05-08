@@ -80,16 +80,20 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
   );
 
   const handleDelete = async () => {
-    await stateDeleter.execute({
-      id: state?.id,
-      version: state?.version || 1,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: intl.formatMessage(messages.stateDeleted),
-    });
-    onClose();
+    await stateDeleter
+      .execute({
+        id: state?.id,
+        version: state?.version || 1,
+      })
+      .then(() => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: intl.formatMessage(messages.stateDeleted),
+        });
+        onClose();
+      })
+      .catch(graphQLErrorHandler(showNotification));
   };
 
   if (error) {

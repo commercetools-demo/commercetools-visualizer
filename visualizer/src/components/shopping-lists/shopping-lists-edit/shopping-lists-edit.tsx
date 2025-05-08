@@ -82,16 +82,20 @@ export const ShoppingListsEdit: FC<Props> = ({ onClose }) => {
   }
 
   const handleDelete = async () => {
-    await shoppingListDeleter.execute({
-      id: shoppingList.id,
-      version: shoppingList.version,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: 'The Shopping list has been deleted.',
-    });
-    onClose();
+    await shoppingListDeleter
+      .execute({
+        id: shoppingList.id,
+        version: shoppingList.version,
+      })
+      .then(() => {
+        showNotification({
+          kind: 'success',
+          domain: DOMAINS.SIDE,
+          text: 'The Shopping list has been deleted.',
+        });
+        onClose();
+      })
+      .catch(graphQLErrorHandler(showNotification));
   };
 
   const handleRemoveLineItem = async (id: string) => {

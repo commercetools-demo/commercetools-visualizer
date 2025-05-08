@@ -9,6 +9,7 @@ import { useIntl } from 'react-intl';
 import messages from './messages';
 import {
   getErrorMessage,
+  graphQLErrorHandler,
   useCartDeleter,
   useCartFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
@@ -56,16 +57,20 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
 
   const handleDelete = async () => {
     if (cart) {
-      await cartDeleter.execute({
-        id: cart.id,
-        version: cart.version,
-      });
-      showNotification({
-        kind: 'success',
-        domain: DOMAINS.SIDE,
-        text: intl.formatMessage(messages.deleteSuccess),
-      });
-      onClose();
+      await cartDeleter
+        .execute({
+          id: cart.id,
+          version: cart.version,
+        })
+        .then(() => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.deleteSuccess),
+          });
+          onClose();
+        })
+        .catch(graphQLErrorHandler(showNotification));
     }
   };
 

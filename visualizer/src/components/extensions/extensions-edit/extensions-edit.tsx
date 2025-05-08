@@ -83,16 +83,20 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
 
   const handleDelete = async () => {
     if (extension) {
-      await extensionDeleter.execute({
-        id: extension.id,
-        version: extension.version,
-      });
-      showNotification({
-        kind: 'success',
-        domain: DOMAINS.SIDE,
-        text: intl.formatMessage(messages.updateSuccess),
-      });
-      onClose();
+      await extensionDeleter
+        .execute({
+          id: extension.id,
+          version: extension.version,
+        })
+        .then(() => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.updateSuccess),
+          });
+          onClose();
+        })
+        .catch(graphQLErrorHandler(showNotification));
     }
   };
 

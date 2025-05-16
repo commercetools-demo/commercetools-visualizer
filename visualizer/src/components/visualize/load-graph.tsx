@@ -125,6 +125,21 @@ const LoadGraph: FC<Props> = ({
           graph
         );
       });
+      store.productSelections.forEach((productSelection) => {
+        productSelection.productSelection &&
+          addNodeWithEdge(
+            productSelection.productSelection.id,
+            formatLocalizedString(
+              productSelection.productSelection.nameAllLocales,
+              dataLocale,
+              projectLanguages
+            ),
+            store.id,
+            'productSelection',
+            '#FFC806',
+            graph
+          );
+      });
     });
     products.forEach((product) => {
       graph.addNode(product.id, {

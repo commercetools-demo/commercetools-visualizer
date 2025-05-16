@@ -152,6 +152,15 @@ const Visualize: FC<Props> = ({}) => {
             >
               Channel
             </div>
+            <div
+              style={{
+                backgroundColor: '#FFC806',
+                padding: '10px',
+                color: designTokens.colorPrimary10,
+              }}
+            >
+              Product Selection
+            </div>
           </Spacings.Stack>
         </Spacings.Stack>
       </Constraints.Horizontal>

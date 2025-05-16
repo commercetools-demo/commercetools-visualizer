@@ -16,6 +16,13 @@ const config = {
       url: '${env:APPLICATION_URL}',
     },
   },
+  // headers: {
+  //   csp: {
+  //     'script-src': ['self', 'blob:'],
+  //
+  //     'connect-src': [],
+  //   },
+  // },
   oAuthScopes: {
     view: [
       'view_states',
@@ -25,6 +32,8 @@ const config = {
       'view_products',
       'view_shopping_lists',
       'view_key_value_documents',
+      'view_stores',
+      'view_product_selections',
     ],
     manage: [
       'manage_states',

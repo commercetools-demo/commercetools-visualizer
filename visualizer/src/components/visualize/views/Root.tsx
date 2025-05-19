@@ -47,11 +47,9 @@ const addOrUpdateEdge = (
   }
 };
 
-const addNodeWithEdge = (
+const addOrUpdateNode = (
   id: string | number,
   label: string | undefined | null,
-  parentId: string,
-  edgeName: string | undefined,
   cluster: string,
   color: string,
   graph: Graph
@@ -66,28 +64,18 @@ const addNodeWithEdge = (
       color: color,
     });
   }
-
-  addOrUpdateEdge(id, parentId, edgeName, graph);
 };
 
-export const addChannelWithEdge = (
+const addNodeWithEdge = (
   id: string | number,
   label: string | undefined | null,
   parentId: string,
   edgeName: string | undefined,
+  cluster: string,
   color: string,
   graph: Graph
 ) => {
-  if (!graph.hasNode(id)) {
-    graph.addNode(id, {
-      size: 5,
-      label: label || id,
-      x: randomInteger(0, 100),
-      y: randomInteger(0, 100),
-      cluster: 'channel',
-      color: color,
-    });
-  }
+  addOrUpdateNode(id, label || String(id), cluster, color, graph);
   addOrUpdateEdge(id, parentId, edgeName, graph);
 };
 
@@ -139,30 +127,32 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
   // Load data on mount:
   useEffect(() => {
     products.forEach((product) => {
-      graph.addNode(product.id, {
-        label: formatLocalizedString(
-          product.masterData.current?.nameAllLocales,
-          dataLocale,
-          projectLanguages
-        ),
-        key: product.key,
-        x: randomInteger(0, 100),
-        y: randomInteger(0, 100),
-        cluster: 'product',
-        //clusterName will be displayed on hover
-        ...omit(
-          clusters.find((cluster) => cluster.key === 'product'),
-          'key'
-        ),
-        //image being used for overlay
-        image:
-          tags.find((tag) => tag.key === product.productType?.name)?.image ||
-          'none.svg',
+      if (!graph.hasNode(product.id)) {
+        graph.addNode(product.id, {
+          label: formatLocalizedString(
+            product.masterData.current?.nameAllLocales,
+            dataLocale,
+            projectLanguages
+          ),
+          key: product.key,
+          x: randomInteger(0, 100),
+          y: randomInteger(0, 100),
+          cluster: 'product',
+          //clusterName will be displayed on hover
+          ...omit(
+            clusters.find((cluster) => cluster.key === 'product'),
+            'key'
+          ),
+          //image being used for overlay
+          image:
+            tags.find((tag) => tag.key === product.productType?.name)?.image ||
+            'none.svg',
 
-        color: clusters.find((cluster) => cluster.key === 'product')?.color,
-        score: product.masterData.current?.variants.length,
-        tag: product.productType?.name,
-      });
+          color: clusters.find((cluster) => cluster.key === 'product')?.color,
+          score: product.masterData.current?.variants.length,
+          tag: product.productType?.name,
+        });
+      }
       product.masterData.current?.masterVariant &&
         addNodeWithEdge(
           product.masterData.current?.masterVariant.id + product.id,
@@ -185,76 +175,81 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
         );
       });
     });
+
     stores.forEach((store) => {
-      graph.addNode(store.id, {
-        size: 5,
-        label: formatLocalizedString(
-          store.nameAllLocales,
-          dataLocale,
-          projectLanguages
-        ),
-        x: randomInteger(0, 100),
-        y: randomInteger(0, 100),
-        cluster: 'store',
-        color: clusters.find((cluster) => cluster.key === 'store')?.color,
-      });
-      store.supplyChannels.forEach((channel) => {
-        addChannelWithEdge(
-          channel.id,
-          formatLocalizedString(
-            channel.nameAllLocales,
+      if (!graph.hasNode(store.id)) {
+        graph.addNode(store.id, {
+          size: 5,
+          label: formatLocalizedString(
+            store.nameAllLocales,
             dataLocale,
             projectLanguages
           ),
-          store.id,
-          'supplyChannel',
-          '#9FF7EE',
-          graph
-        );
-      });
-      store.distributionChannels.forEach((channel) => {
-        addChannelWithEdge(
-          channel.id,
-          formatLocalizedString(
-            channel.nameAllLocales,
-            dataLocale,
-            projectLanguages
-          ),
-          store.id,
-          'distributionChannel',
-          '#9FF7EE',
-          graph
-        );
-      });
-      store.productSelections.forEach((productSelection) => {
-        productSelection.productSelection &&
+          x: randomInteger(0, 100),
+          y: randomInteger(0, 100),
+          cluster: 'store',
+          color: clusters.find((cluster) => cluster.key === 'store')?.color,
+        });
+        store.supplyChannels.forEach((channel) => {
           addNodeWithEdge(
-            productSelection.productSelection.id,
+            channel.id,
             formatLocalizedString(
-              productSelection.productSelection.nameAllLocales,
+              channel.nameAllLocales,
               dataLocale,
               projectLanguages
             ),
             store.id,
-            'productSelection',
-            'productSelection',
-            '#FFC806',
+            'supplyChannel',
+            'channel',
+            '#9FF7EE',
             graph
           );
-        productSelection.productSelection?.productRefs.results.forEach(
-          (product) => {
-            productSelection.productSelection &&
-              graph.hasNode(product.productRef.id) &&
-              graph.hasNode(productSelection.productSelection.id) &&
-              addOrUpdateEdge(
-                product.productRef.id,
-                productSelection.productSelection.id,
-                'productSelection',
-                graph
-              );
-          }
-        );
-      });
+        });
+        store.distributionChannels.forEach((channel) => {
+          addNodeWithEdge(
+            channel.id,
+            formatLocalizedString(
+              channel.nameAllLocales,
+              dataLocale,
+              projectLanguages
+            ),
+            store.id,
+            'distributionChannel',
+            'channel',
+            '#9FF7EE',
+            graph
+          );
+        });
+        store.productSelections.forEach((productSelection) => {
+          productSelection.productSelection &&
+            addNodeWithEdge(
+              productSelection.productSelection.id,
+              formatLocalizedString(
+                productSelection.productSelection.nameAllLocales,
+                dataLocale,
+                projectLanguages
+              ),
+              store.id,
+              'productSelection',
+              'productSelection',
+              '#FFC806',
+              graph
+            );
+          productSelection.productSelection?.productRefs.results.forEach(
+            (product) => {
+              productSelection.productSelection &&
+                graph.hasNode(product.productRef.id) &&
+                graph.hasNode(productSelection.productSelection.id) &&
+                addOrUpdateEdge(
+                  product.productRef.id,
+                  productSelection.productSelection.id,
+                  'productSelection',
+                  graph
+                );
+            }
+          );
+        });
+      }
     });
 
     // Use degrees as node sizes:
@@ -288,7 +283,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
         scalingRatio: 2,
       },
     });
-  }, []);
+  }, [products, stores]);
 
   // graph.forEachNode((node) => console.log(graph.getNodeAttributes(node)));
 

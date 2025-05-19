@@ -45,6 +45,12 @@ const config = {
       'manage_key_value_documents',
     ],
   },
+  headers: {
+    csp: {
+      'connect-src': ['sigmajs.org'],
+      'frame-src': ['sigmajs.org'],
+    },
+  },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
   mainMenuLink: {
     defaultLabel: 'Visualizer',

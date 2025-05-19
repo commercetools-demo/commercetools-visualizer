@@ -111,6 +111,11 @@ const Welcome = () => {
               }
               target={'custom-objects'}
             />
+            <InfoCard
+              title={'Visualize'}
+              content={'A UI showing how your object interact with each other.'}
+              target={'visualize'}
+            />
           </Grid>
         </Spacings.Stack>
       </PageContentWide>

@@ -1,5 +1,4 @@
-import { FC, useState } from 'react';
-import { SigmaContainer } from '@react-sigma/core';
+import { FC } from 'react';
 import '@react-sigma/core/lib/style.css';
 import {
   getErrorMessage,
@@ -11,28 +10,15 @@ import Text from '@commercetools-uikit/text';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { PageNotFound } from '@commercetools-frontend/application-components';
-import {
-  formatLocalizedString,
-  TProduct,
-} from 'commercetools-demo-shared-helpers';
-import LoadGraph from './load-graph';
-import messages from './messages';
-import { useIntl } from 'react-intl';
-import SelectField from '@commercetools-uikit/select-field';
-import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import Constraints from '@commercetools-uikit/constraints';
-import { designTokens } from '@commercetools-uikit/design-system';
+import Root from './views/Root';
 
-const sigmaStyle = { height: '100%', width: '100%' };
+import { Cluster } from './views/PanelItem';
 
-export type Props = { products: Array<TProduct> };
+import { Tag } from './views/TagsPanel';
+
+export type Props = {};
 
 const Visualize: FC<Props> = ({}) => {
-  const intl = useIntl();
-  const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale ?? '',
-    projectLanguages: context.project?.languages ?? [],
-  }));
   const { products, loading, error } = useProductsFetcher({
     limit: 200,
     offset: 0,
@@ -47,8 +33,6 @@ const Visualize: FC<Props> = ({}) => {
     limit: 20,
     offset: 0,
   });
-
-  const [searchString, setSearchString] = useState('');
 
   if (error) {
     return (
@@ -76,94 +60,49 @@ const Visualize: FC<Props> = ({}) => {
     return <PageNotFound />;
   }
 
+  const clusters: Array<Cluster> = [
+    {
+      key: 'product',
+      color: '#6359FF',
+      clusterLabel: 'Product',
+    },
+    {
+      key: 'variant',
+      color: '#C2C2FF',
+      clusterLabel: 'Variant',
+    },
+    { key: 'store', color: '#0BBFBF', clusterLabel: 'Store' },
+    { key: 'channel', color: '#9FF7EE', clusterLabel: 'Channel' },
+    {
+      key: 'productSelection',
+      color: '#FFC806',
+      clusterLabel: 'Product Selection',
+    },
+  ];
+
+  const tags: Array<Tag> = [
+    {
+      key: 'Furniture and decor',
+      // image: 'https://www.sigmajs.org/demo/images/company.svg',
+    },
+    {
+      key: 'Product sets',
+      // image: 'https://www.sigmajs.org/demo/images/company.svg',
+    },
+    {
+      key: 'Configurable',
+      // image: 'https://www.sigmajs.org/demo/images/company.svg',
+    },
+  ];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'row', padding: '20px' }}>
-      <SigmaContainer style={sigmaStyle}>
-        <LoadGraph
-          products={products.results}
-          stores={stores.results}
-          selectedNode={searchString}
-        />
-      </SigmaContainer>
-      <Constraints.Horizontal max={6}>
-        <Spacings.Stack scale={'m'}>
-          <SelectField
-            name="title"
-            value={searchString}
-            options={products.results
-              .map((product) => ({
-                value: product.id,
-                label: formatLocalizedString(
-                  product.masterData.current?.nameAllLocales,
-                  dataLocale,
-                  projectLanguages
-                ),
-              }))
-              .concat(
-                stores.results.map((store) => ({
-                  value: store.id,
-                  label: formatLocalizedString(
-                    store.nameAllLocales,
-                    dataLocale,
-                    projectLanguages
-                  ),
-                }))
-              )}
-            isClearable={true}
-            title={intl.formatMessage(messages.title)}
-            onChange={(event) =>
-              setSearchString((event.target.value as string) || '')
-            }
-          />
-          <Spacings.Stack>
-            <div
-              style={{
-                backgroundColor: '#6359FF',
-                padding: '10px',
-                color: designTokens.colorPrimary98,
-              }}
-            >
-              Product
-            </div>
-            <div
-              style={{
-                backgroundColor: '#C2C2FF',
-                padding: '10px',
-                color: designTokens.colorPrimary10,
-              }}
-            >
-              Variant
-            </div>
-            <div
-              style={{
-                backgroundColor: '#0BBFBF',
-                padding: '10px',
-                color: designTokens.colorPrimary10,
-              }}
-            >
-              Store
-            </div>
-            <div
-              style={{
-                backgroundColor: '#9FF7EE',
-                padding: '10px',
-                color: designTokens.colorPrimary10,
-              }}
-            >
-              Channel
-            </div>
-            <div
-              style={{
-                backgroundColor: '#FFC806',
-                padding: '10px',
-                color: designTokens.colorPrimary10,
-              }}
-            >
-              Product Selection
-            </div>
-          </Spacings.Stack>
-        </Spacings.Stack>
-      </Constraints.Horizontal>
+      <Root
+        stores={stores.results}
+        products={products.results}
+        clusters={clusters}
+        tags={tags}
+      />
     </div>
   );
 };

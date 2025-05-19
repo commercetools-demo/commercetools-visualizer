@@ -1,13 +1,13 @@
 import { useSigma } from '@react-sigma/core';
 import { FC, PropsWithChildren, useEffect } from 'react';
 
-import { FiltersState } from './Root';
+import { Edge, FiltersState, Node } from './Root';
 
 const GraphDataController: FC<PropsWithChildren<{ filters: FiltersState }>> = ({
   filters,
   children,
 }) => {
-  const sigma = useSigma();
+  const sigma = useSigma<Node, Edge>();
   const graph = sigma.getGraph();
 
   /**
@@ -19,7 +19,7 @@ const GraphDataController: FC<PropsWithChildren<{ filters: FiltersState }>> = ({
       graph.setNodeAttribute(
         node,
         'hidden',
-        !clusters[cluster] || (tag && !tags[tag])
+        (cluster && !clusters[cluster]) || (tag && !tags[tag]) || false
       )
     );
   }, [graph, filters]);

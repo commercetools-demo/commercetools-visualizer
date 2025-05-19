@@ -12,6 +12,7 @@ import GraphSettingsController from './GraphSettingsController';
 
 import {
   formatLocalizedString,
+  notEmpty,
   TProduct,
   TStore,
 } from 'commercetools-demo-shared-helpers';
@@ -26,6 +27,25 @@ import omit from 'lodash/omit';
 
 export const randomInteger = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+export type Node = {
+  size?: number;
+  label: string;
+  key?: string;
+  x: number;
+  y: number;
+  cluster?: string;
+  color?: string;
+  image?: string;
+  tag?: string;
+  score?: number;
+  hidden?: boolean;
+};
+
+export type Edge = {
+  label: string;
+  type: 'arrow';
 };
 
 const addOrUpdateEdge = (
@@ -97,7 +117,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
     projectLanguages: context.project?.languages ?? [],
   }));
 
-  const graph = useMemo(() => new DirectedGraph(), []);
+  const graph = useMemo(() => new DirectedGraph<Node, Edge>(), []);
   const [dataReady, setDataReady] = useState(false);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
@@ -134,7 +154,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
             dataLocale,
             projectLanguages
           ),
-          key: product.key,
+          key: product.key || undefined,
           x: randomInteger(0, 100),
           y: randomInteger(0, 100),
           cluster: 'product',
@@ -253,10 +273,10 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
     });
 
     // Use degrees as node sizes:
-    const scores = graph
+    const scores: Array<number> = graph
       .nodes()
       .map((node) => graph.getNodeAttribute(node, 'score'))
-      .filter((item) => item);
+      .filter(notEmpty);
     const minDegree = Math.min(...scores);
     const maxDegree = Math.max(...scores);
     const MIN_NODE_SIZE = 3;
@@ -264,7 +284,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
 
     graph.forEachNode((node) => {
       const newSize =
-        ((graph.getNodeAttribute(node, 'score') - minDegree) /
+        (((graph.getNodeAttribute(node, 'score') || 5) - minDegree) /
           (maxDegree - minDegree)) *
           (MAX_NODE_SIZE - MIN_NODE_SIZE) +
         MIN_NODE_SIZE;

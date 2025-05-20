@@ -52,8 +52,8 @@ export type Edge = {
 const addOrUpdateEdge = (
   id: string | number,
   parentId: string,
-  edgeName: string | undefined,
-  graph: Graph
+  edgeName: string,
+  graph: Graph<Node, Edge>
 ) => {
   if (graph.hasNode(id) && graph.hasNode(parentId)) {
     if (graph.hasEdge(parentId, id)) {
@@ -62,7 +62,9 @@ const addOrUpdateEdge = (
         parentId,
         id,
         'label',
-        edgeAttributes.label + ' + ' + edgeName
+        edgeAttributes.label === edgeName
+          ? edgeName
+          : edgeAttributes.label + ' + ' + edgeName
       );
     } else {
       graph.addEdge(parentId, id, { label: edgeName, type: 'arrow' });
@@ -71,41 +73,65 @@ const addOrUpdateEdge = (
 };
 
 const addOrUpdateNode = (
+  graph: Graph<Node, Edge>,
   id: string | number,
   label: string | undefined | null,
   cluster: string,
-  color: string,
-  graph: Graph
+  clusters: Array<Cluster>,
+  tag?: string,
+  tags?: Array<Tag>,
+  score = 1
 ) => {
+  const attributes: Node = {
+    label: label || String(id),
+    x: randomInteger(0, 100),
+    y: randomInteger(0, 100),
+    cluster: cluster,
+    size: 5,
+    //clusterName will be displayed on hover
+    ...omit(
+      clusters.find((c) => c.key === cluster),
+      'key'
+    ),
+    //image being used for overlay
+    image: (tag && tags?.find((t) => t.key === tag)?.image) || undefined,
+    score: score,
+  };
+
   if (!graph.hasNode(id)) {
     graph.addNode(id, {
-      size: 5,
-      label: label || id,
-      x: randomInteger(0, 100),
-      y: randomInteger(0, 100),
-      cluster: cluster,
-      color: color,
+      ...attributes,
     });
   } else {
-    graph.updateNode(id, (attributes) => {
-      attributes.label = label || id;
-      attributes.cluster = cluster;
-      attributes.color = color;
-      return attributes;
-    });
+    graph.updateNode(id, (oldAttributes) => ({
+      ...oldAttributes,
+      ...attributes,
+    }));
   }
 };
 
 const addNodeWithEdge = (
+  graph: Graph<Node, Edge>,
   id: string | number,
   label: string | undefined | null,
   parentId: string,
-  edgeName: string | undefined,
+  edgeName: string,
   cluster: string,
-  color: string,
-  graph: Graph
+  clusters: Array<Cluster>,
+  tag?: string,
+  tags?: Array<Tag>,
+  score = 1
 ) => {
-  addOrUpdateNode(id, label || String(id), cluster, color, graph);
+  addOrUpdateNode(
+    graph,
+    id,
+    label || String(id),
+    cluster,
+    clusters,
+    tag,
+    tags,
+    score
+  );
   addOrUpdateEdge(id, parentId, edgeName, graph);
 };
 
@@ -163,73 +189,60 @@ const Root: FC<Props> = ({
   // Load data on mount:
   useEffect(() => {
     products.forEach((product) => {
-      if (!graph.hasNode(product.id)) {
-        graph.addNode(product.id, {
-          label: formatLocalizedString(
-            product.masterData.current?.nameAllLocales,
-            dataLocale,
-            projectLanguages
-          ),
-          key: product.key || undefined,
-          x: randomInteger(0, 100),
-          y: randomInteger(0, 100),
-          cluster: 'product',
-          //clusterName will be displayed on hover
-          ...omit(
-            clusters.find((cluster) => cluster.key === 'product'),
-            'key'
-          ),
-          //image being used for overlay
-          image:
-            tags.find((tag) => tag.key === product.productType?.name)?.image ||
-            'none.svg',
-
-          score: product.masterData.current?.variants.length,
-          tag: product.productType?.name,
-        });
-      }
+      addOrUpdateNode(
+        graph,
+        product.id,
+        formatLocalizedString(
+          product.masterData.current?.nameAllLocales,
+          dataLocale,
+          projectLanguages
+        ),
+        'product',
+        clusters,
+        product.productType?.name,
+        tags,
+        product.masterData.current?.variants.length
+      );
       product.masterData.current?.masterVariant &&
         addNodeWithEdge(
+          graph,
           product.masterData.current?.masterVariant.id + product.id,
           product.masterData.current?.masterVariant.sku,
           product.id,
           'variant',
           'variant',
-          '#C2C2FF',
-          graph
+          clusters
         );
       product.masterData.current?.variants.forEach((variant) => {
         addNodeWithEdge(
+          graph,
           variant.id + product.id,
           variant.sku,
           product.id,
           'variant',
           'variant',
-          '#C2C2FF',
-          graph
+          clusters
         );
       });
     });
 
     stores.forEach((store) => {
-      if (!graph.hasNode(store.id)) {
-        graph.addNode(store.id, {
-          size: 5,
-          label: formatLocalizedString(
-            store.nameAllLocales,
-            dataLocale,
-            projectLanguages
-          ),
-          x: randomInteger(0, 100),
-          y: randomInteger(0, 100),
-          cluster: 'store',
-          color: clusters.find((cluster) => cluster.key === 'store')?.color,
-        });
-      }
+      addOrUpdateNode(
+        graph,
+        store.id,
+        formatLocalizedString(
+          store.nameAllLocales,
+          dataLocale,
+          projectLanguages
+        ),
+        'store',
+        clusters
+      );
     });
     stores.forEach((store) => {
       store.supplyChannels.forEach((channel) => {
         addNodeWithEdge(
+          graph,
           channel.id,
           formatLocalizedString(
             channel.nameAllLocales,
@@ -239,14 +252,14 @@ const Root: FC<Props> = ({
           store.id,
           'supplyChannel',
           'channel',
-          '#9FF7EE',
-          graph
+          clusters
         );
       });
     });
     stores.forEach((store) => {
       store.distributionChannels.forEach((channel) => {
         addNodeWithEdge(
+          graph,
           channel.id,
           formatLocalizedString(
             channel.nameAllLocales,
@@ -256,8 +269,7 @@ const Root: FC<Props> = ({
           store.id,
           'distributionChannel',
           'channel',
-          '#9FF7EE',
-          graph
+          clusters
         );
       });
     });
@@ -265,6 +277,7 @@ const Root: FC<Props> = ({
       store.productSelections.forEach((productSelection) => {
         productSelection.productSelection &&
           addNodeWithEdge(
+            graph,
             productSelection.productSelection.id,
             formatLocalizedString(
               productSelection.productSelection.nameAllLocales,
@@ -274,14 +287,11 @@ const Root: FC<Props> = ({
             store.id,
             'productSelection',
             'productSelection',
-            '#FFC806',
-            graph
+            clusters
           );
         productSelection.productSelection?.productRefs.results.forEach(
           (product) => {
             productSelection.productSelection &&
-              graph.hasNode(product.productRef.id) &&
-              graph.hasNode(productSelection.productSelection.id) &&
               addOrUpdateEdge(
                 product.productRef.id,
                 productSelection.productSelection.id,
@@ -294,20 +304,13 @@ const Root: FC<Props> = ({
     });
 
     businessUnits?.forEach((businessUnit) => {
-      if (!graph.hasNode(businessUnit.id)) {
-        graph.addNode(businessUnit.id, {
-          size: 5,
-          label: businessUnit.name,
-          x: randomInteger(0, 100),
-          y: randomInteger(0, 100),
-          cluster: 'businessUnit',
-          //clusterName will be displayed on hover
-          ...omit(
-            clusters.find((cluster) => cluster.key === 'businessUnit'),
-            'key'
-          ),
-        });
-      }
+      addOrUpdateNode(
+        graph,
+        businessUnit.id,
+        businessUnit.name,
+        'businessUnit',
+        clusters
+      );
       businessUnit.stores?.forEach((store) => {
         addOrUpdateEdge(store.id, businessUnit.id, 'store', graph);
       });

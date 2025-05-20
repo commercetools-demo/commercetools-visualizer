@@ -2,6 +2,7 @@ import { FC, useRef, useState } from 'react';
 import '@react-sigma/core/lib/style.css';
 import {
   getErrorMessage,
+  useBusinessUnitsFetcher,
   useProductsFetcher,
   useStoresFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
@@ -14,12 +15,15 @@ import Root from './views/Root';
 
 import { Cluster } from './views/PanelItem';
 
-import { Tag } from './views/TagsPanel';
-import { TProduct, TStore } from 'commercetools-demo-shared-helpers';
+import {
+  TBusinessUnit,
+  TProduct,
+  TStore,
+} from 'commercetools-demo-shared-helpers';
 
 export type Props = {};
 
-const Visualize: FC<Props> = ({}) => {
+const Visualize: FC<Props> = () => {
   const [allProducts, setAllProducts] = useState<Array<TProduct>>([]);
   const offsetProductsRef = useRef(0);
   const hasMoreProductsRef = useRef(true);
@@ -27,6 +31,12 @@ const Visualize: FC<Props> = ({}) => {
   const [allStores, setAllStores] = useState<Array<TStore>>([]);
   const offsetStoresRef = useRef(0);
   const hasMoreStoresRef = useRef(true);
+
+  const [allBusinessUnits, setAllBusinessUnits] = useState<
+    Array<TBusinessUnit>
+  >([]);
+  const offsetBusinessUnitsRef = useRef(0);
+  const hasMoreBusinessUnitsRef = useRef(true);
 
   const PAGE_SIZE = 30;
 
@@ -50,6 +60,7 @@ const Visualize: FC<Props> = ({}) => {
         if (initialProducts.length === 0) {
           hasMoreProductsRef.current = false;
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           autoFetchMoreProducts();
         }
       },
@@ -95,6 +106,7 @@ const Visualize: FC<Props> = ({}) => {
         if (initialStores.length === 0) {
           hasMoreStoresRef.current = false;
         } else {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           autoFetchMoreStores();
         }
       },
@@ -121,6 +133,51 @@ const Visualize: FC<Props> = ({}) => {
     });
   };
 
+  const {
+    loading: businessUnitsLoading,
+    error: businessUnitsError,
+    fetchMore: fetchMoreBusinessUnits,
+  } = useBusinessUnitsFetcher(
+    {
+      limit: PAGE_SIZE,
+      offset: offsetBusinessUnitsRef.current,
+    },
+    {
+      onCompleted: (initialData) => {
+        const initialBusinessUnits = initialData.businessUnits.results;
+        setAllBusinessUnits(initialBusinessUnits);
+        offsetBusinessUnitsRef.current = initialBusinessUnits.length;
+
+        if (initialBusinessUnits.length === 0) {
+          hasMoreBusinessUnitsRef.current = false;
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          autoFetchMoreBusinessUnits();
+        }
+      },
+    }
+  );
+
+  const autoFetchMoreBusinessUnits = () => {
+    fetchMoreBusinessUnits({
+      variables: {
+        offset: offsetBusinessUnitsRef.current,
+        limit: PAGE_SIZE,
+      },
+    }).then(({ data: moreData }) => {
+      const newBusinessUnits = moreData.businessUnits.results;
+      if (newBusinessUnits.length === 0) {
+        hasMoreBusinessUnitsRef.current = false;
+        return;
+      }
+
+      setAllBusinessUnits((prev) => [...prev, ...newBusinessUnits]);
+      offsetBusinessUnitsRef.current += newBusinessUnits.length;
+
+      autoFetchMoreBusinessUnits(); // recursive call
+    });
+  };
+
   if (error) {
     return (
       <ContentNotification type="error">
@@ -135,7 +192,14 @@ const Visualize: FC<Props> = ({}) => {
       </ContentNotification>
     );
   }
-  if (loading || storesLoading) {
+  if (businessUnitsError) {
+    return (
+      <ContentNotification type="error">
+        <Text.Body>{getErrorMessage(businessUnitsError)}</Text.Body>
+      </ContentNotification>
+    );
+  }
+  if (loading || storesLoading || businessUnitsLoading) {
     return (
       <Spacings.Stack alignItems="center">
         <LoadingSpinner />
@@ -159,6 +223,7 @@ const Visualize: FC<Props> = ({}) => {
       clusterLabel: 'Variant',
     },
     { key: 'store', color: '#0BBFBF', clusterLabel: 'Store' },
+    { key: 'businessUnit', color: '#FF8B00', clusterLabel: 'Business Unit' },
     { key: 'channel', color: '#9FF7EE', clusterLabel: 'Channel' },
     {
       key: 'productSelection',
@@ -167,30 +232,22 @@ const Visualize: FC<Props> = ({}) => {
     },
   ];
 
-  const tags: Array<Tag> = [
-    {
-      key: 'Furniture and decor',
-      // image: 'https://www.sigmajs.org/demo/images/company.svg',
-    },
-    {
-      key: 'Product sets',
-      // image: 'https://www.sigmajs.org/demo/images/company.svg',
-    },
-    {
-      key: 'Configurable',
-      // image: 'https://www.sigmajs.org/demo/images/company.svg',
-    },
-  ];
+  const productTypeNames: Set<string> = new Set();
+
+  allProducts.forEach(
+    (p) => p.productType && productTypeNames.add(p.productType?.name)
+  );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', padding: '20px' }}>
-      <Root
-        stores={allStores}
-        products={allProducts}
-        clusters={clusters}
-        tags={tags}
-      />
-    </div>
+    <Root
+      stores={allStores}
+      products={allProducts}
+      businessUnits={allBusinessUnits}
+      clusters={clusters}
+      tags={Array.from(productTypeNames).map((productTypeName) => ({
+        key: productTypeName,
+      }))}
+    />
   );
 };
 

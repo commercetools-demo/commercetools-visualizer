@@ -13,6 +13,7 @@ import GraphSettingsController from './GraphSettingsController';
 import {
   formatLocalizedString,
   notEmpty,
+  TBusinessUnit,
   TProduct,
   TStore,
 } from 'commercetools-demo-shared-helpers';
@@ -111,6 +112,7 @@ type Props = {
   stores: Array<TStore>;
   clusters: Array<Cluster>;
   tags: Array<Tag>;
+  businessUnits?: Array<TBusinessUnit>;
 };
 
 export interface FiltersState {
@@ -118,14 +120,19 @@ export interface FiltersState {
   tags: Record<string, boolean>;
 }
 
-const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
+const Root: FC<Props> = ({
+  products,
+  stores,
+  businessUnits,
+  clusters,
+  tags,
+}) => {
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
 
   const graph = useMemo(() => new DirectedGraph<Node, Edge>(), []);
-  const [dataReady, setDataReady] = useState(false);
   const [filtersState, setFiltersState] = useState<FiltersState>({
     clusters: {},
     tags: {},
@@ -138,6 +145,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
           size: { mode: 'force', value: 256 },
         }),
       },
+      allowInvalidContainer: true,
       defaultDrawNodeLabel: drawLabel,
       defaultDrawNodeHover: drawHover,
       defaultNodeType: 'image',
@@ -145,7 +153,6 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
       labelDensity: 0.07,
       labelGridCellSize: 60,
       labelRenderedSizeThreshold: 15,
-      labelFont: 'Lato, sans-serif',
       zIndex: true,
     }),
     []
@@ -285,6 +292,25 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
       });
     });
 
+    businessUnits?.forEach((businessUnit) => {
+      if (!graph.hasNode(businessUnit.id)) {
+        graph.addNode(businessUnit.id, {
+          size: 5,
+          label: businessUnit.name,
+          x: randomInteger(0, 100),
+          y: randomInteger(0, 100),
+          cluster: 'businessUnit',
+          color: clusters.find((cluster) => cluster.key === 'businessUnit')
+            ?.color,
+        });
+      }
+      businessUnit.stores?.forEach((store) => {
+        graph.hasNode(store.id) &&
+          graph.hasNode(businessUnit.id) &&
+          addOrUpdateEdge(store.id, businessUnit.id, 'store', graph);
+      });
+    });
+
     // Use degrees as node sizes:
     const scores: Array<number> = graph
       .nodes()
@@ -292,12 +318,12 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
       .filter(notEmpty);
     const minDegree = Math.min(...scores);
     const maxDegree = Math.max(...scores);
-    const MIN_NODE_SIZE = 3;
-    const MAX_NODE_SIZE = 30;
+    const MIN_NODE_SIZE = 1;
+    const MAX_NODE_SIZE = 15;
 
     graph.forEachNode((node) => {
       const newSize =
-        (((graph.getNodeAttribute(node, 'score') || 5) - minDegree) /
+        (((graph.getNodeAttribute(node, 'score') || 1) - minDegree) /
           (maxDegree - minDegree)) *
           (MAX_NODE_SIZE - MIN_NODE_SIZE) +
         MIN_NODE_SIZE;
@@ -308,7 +334,6 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
       clusters: mapValues(keyBy<Cluster>(clusters, 'key'), constant(true)),
       tags: mapValues(keyBy(tags, 'key'), constant(true)),
     });
-    requestAnimationFrame(() => setDataReady(true));
     forceAtlas2.assign(graph, {
       iterations: 100,
       settings: {
@@ -316,7 +341,7 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
         scalingRatio: 2,
       },
     });
-  }, [products, stores]);
+  }, [products, stores, businessUnits, clusters, tags]);
 
   // graph.forEachNode((node) => console.log(graph.getNodeAttributes(node)));
 
@@ -330,17 +355,13 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
       <GraphEventsController setHoveredNode={setHoveredNode} />
       <GraphDataController filters={filtersState} />
 
-      {dataReady && (
-        <>
-          <Controls />
-          <Panels
-            clusters={clusters}
-            tags={tags}
-            filters={filtersState}
-            setFiltersState={setFiltersState}
-          />
-        </>
-      )}
+      <Controls />
+      <Panels
+        clusters={clusters}
+        tags={tags}
+        filters={filtersState}
+        setFiltersState={setFiltersState}
+      />
     </SigmaContainer>
   );
 };

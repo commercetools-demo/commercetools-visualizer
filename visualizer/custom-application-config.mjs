@@ -34,6 +34,7 @@ const config = {
       'view_key_value_documents',
       'view_stores',
       'view_product_selections',
+      'view_business_units',
     ],
     manage: [
       'manage_states',

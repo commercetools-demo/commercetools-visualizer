@@ -9411,10 +9411,10 @@ commercetools-demo-shared-data-fetching-hooks@^0.0.8:
     react-intl "^6.4.7"
     react-redux "7.2.9"
 
-commercetools-demo-shared-data-fetching-hooks@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.1.5.tgz#0836bc2d89a85a99a445f21a3172304d2ac79441"
-  integrity sha512-pKR1HUYhy9q+HUXakg9qysFQIOZhvNvcUlnHvSswZb5NU14Gfuyord/kI48oapDzHX15R7Fk7sAA/gE71xyIQQ==
+commercetools-demo-shared-data-fetching-hooks@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-0.1.7.tgz#4c51c2d9bedf18528de216a70f0fe40583c7360a"
+  integrity sha512-9xN98CCtM/DMoAGdNiJeb3QWlJEU3SMeuezB0yFQ3pXO0jte7aTlrxQRmP1JYjNsU13nXb9v6p4LEv0VSJ5DQQ==
   dependencies:
     "@apollo/client" "3.7.14"
     "@babel/runtime" "^7.20.13"

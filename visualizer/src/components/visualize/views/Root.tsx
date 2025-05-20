@@ -55,16 +55,18 @@ const addOrUpdateEdge = (
   edgeName: string | undefined,
   graph: Graph
 ) => {
-  if (graph.hasEdge(parentId, id)) {
-    const edgeAttributes = graph.getEdgeAttributes(parentId, id);
-    graph.setEdgeAttribute(
-      parentId,
-      id,
-      'label',
-      edgeAttributes.label + ' + ' + edgeName
-    );
-  } else {
-    graph.addEdge(parentId, id, { label: edgeName, type: 'arrow' });
+  if (graph.hasNode(id) && graph.hasNode(parentId)) {
+    if (graph.hasEdge(parentId, id)) {
+      const edgeAttributes = graph.getEdgeAttributes(parentId, id);
+      graph.setEdgeAttribute(
+        parentId,
+        id,
+        'label',
+        edgeAttributes.label + ' + ' + edgeName
+      );
+    } else {
+      graph.addEdge(parentId, id, { label: edgeName, type: 'arrow' });
+    }
   }
 };
 
@@ -182,7 +184,6 @@ const Root: FC<Props> = ({
             tags.find((tag) => tag.key === product.productType?.name)?.image ||
             'none.svg',
 
-          color: clusters.find((cluster) => cluster.key === 'product')?.color,
           score: product.masterData.current?.variants.length,
           tag: product.productType?.name,
         });
@@ -300,15 +301,26 @@ const Root: FC<Props> = ({
           x: randomInteger(0, 100),
           y: randomInteger(0, 100),
           cluster: 'businessUnit',
-          color: clusters.find((cluster) => cluster.key === 'businessUnit')
-            ?.color,
+          //clusterName will be displayed on hover
+          ...omit(
+            clusters.find((cluster) => cluster.key === 'businessUnit'),
+            'key'
+          ),
         });
       }
       businessUnit.stores?.forEach((store) => {
-        graph.hasNode(store.id) &&
-          graph.hasNode(businessUnit.id) &&
-          addOrUpdateEdge(store.id, businessUnit.id, 'store', graph);
+        addOrUpdateEdge(store.id, businessUnit.id, 'store', graph);
       });
+    });
+    businessUnits?.forEach((businessUnit) => {
+      if (businessUnit.parentUnit?.id) {
+        addOrUpdateEdge(
+          businessUnit.parentUnit?.id,
+          businessUnit.id,
+          'parent',
+          graph
+        );
+      }
     });
 
     // Use degrees as node sizes:

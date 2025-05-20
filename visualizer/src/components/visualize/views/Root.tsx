@@ -83,6 +83,13 @@ const addOrUpdateNode = (
       cluster: cluster,
       color: color,
     });
+  } else {
+    graph.updateNode(id, (attributes) => {
+      attributes.label = label || id;
+      attributes.cluster = cluster;
+      attributes.color = color;
+      return attributes;
+    });
   }
 };
 
@@ -210,66 +217,72 @@ const Root: FC<Props> = ({ products, stores, clusters, tags }) => {
           cluster: 'store',
           color: clusters.find((cluster) => cluster.key === 'store')?.color,
         });
-        store.supplyChannels.forEach((channel) => {
-          addNodeWithEdge(
-            channel.id,
-            formatLocalizedString(
-              channel.nameAllLocales,
-              dataLocale,
-              projectLanguages
-            ),
-            store.id,
-            'supplyChannel',
-            'channel',
-            '#9FF7EE',
-            graph
-          );
-        });
-        store.distributionChannels.forEach((channel) => {
-          addNodeWithEdge(
-            channel.id,
-            formatLocalizedString(
-              channel.nameAllLocales,
-              dataLocale,
-              projectLanguages
-            ),
-            store.id,
-            'distributionChannel',
-            'channel',
-            '#9FF7EE',
-            graph
-          );
-        });
-        store.productSelections.forEach((productSelection) => {
-          productSelection.productSelection &&
-            addNodeWithEdge(
-              productSelection.productSelection.id,
-              formatLocalizedString(
-                productSelection.productSelection.nameAllLocales,
-                dataLocale,
-                projectLanguages
-              ),
-              store.id,
-              'productSelection',
-              'productSelection',
-              '#FFC806',
-              graph
-            );
-          productSelection.productSelection?.productRefs.results.forEach(
-            (product) => {
-              productSelection.productSelection &&
-                graph.hasNode(product.productRef.id) &&
-                graph.hasNode(productSelection.productSelection.id) &&
-                addOrUpdateEdge(
-                  product.productRef.id,
-                  productSelection.productSelection.id,
-                  'productSelection',
-                  graph
-                );
-            }
-          );
-        });
       }
+    });
+    stores.forEach((store) => {
+      store.supplyChannels.forEach((channel) => {
+        addNodeWithEdge(
+          channel.id,
+          formatLocalizedString(
+            channel.nameAllLocales,
+            dataLocale,
+            projectLanguages
+          ),
+          store.id,
+          'supplyChannel',
+          'channel',
+          '#9FF7EE',
+          graph
+        );
+      });
+    });
+    stores.forEach((store) => {
+      store.distributionChannels.forEach((channel) => {
+        addNodeWithEdge(
+          channel.id,
+          formatLocalizedString(
+            channel.nameAllLocales,
+            dataLocale,
+            projectLanguages
+          ),
+          store.id,
+          'distributionChannel',
+          'channel',
+          '#9FF7EE',
+          graph
+        );
+      });
+    });
+    stores.forEach((store) => {
+      store.productSelections.forEach((productSelection) => {
+        productSelection.productSelection &&
+          addNodeWithEdge(
+            productSelection.productSelection.id,
+            formatLocalizedString(
+              productSelection.productSelection.nameAllLocales,
+              dataLocale,
+              projectLanguages
+            ),
+            store.id,
+            'productSelection',
+            'productSelection',
+            '#FFC806',
+            graph
+          );
+        productSelection.productSelection?.productRefs.results.forEach(
+          (product) => {
+            productSelection.productSelection &&
+              graph.hasNode(product.productRef.id) &&
+              graph.hasNode(productSelection.productSelection.id) &&
+              addOrUpdateEdge(
+                product.productRef.id,
+                productSelection.productSelection.id,
+                'productSelection',
+                graph
+              );
+          }
+        );
+      });
     });
 
     // Use degrees as node sizes:

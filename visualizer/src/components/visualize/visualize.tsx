@@ -3,6 +3,7 @@ import '@react-sigma/core/lib/style.css';
 import {
   getErrorMessage,
   useBusinessUnitsFetcher,
+  useCustomersFetcher,
   useProductsFetcher,
   useStoresFetcher,
 } from 'commercetools-demo-shared-data-fetching-hooks';
@@ -39,6 +40,12 @@ const Visualize: FC<Props> = () => {
   const hasMoreBusinessUnitsRef = useRef(true);
 
   const PAGE_SIZE = 30;
+
+  const {
+    customers,
+    loading: customersLoading,
+    error: customersError,
+  } = useCustomersFetcher({ limit: 50, offset: 0 });
 
   const {
     products,
@@ -199,7 +206,14 @@ const Visualize: FC<Props> = () => {
       </ContentNotification>
     );
   }
-  if (loading || storesLoading || businessUnitsLoading) {
+  if (customersError) {
+    return (
+      <ContentNotification type="error">
+        <Text.Body>{getErrorMessage(customersError)}</Text.Body>
+      </ContentNotification>
+    );
+  }
+  if (loading || storesLoading || businessUnitsLoading || customersLoading) {
     return (
       <Spacings.Stack alignItems="center">
         <LoadingSpinner />
@@ -230,6 +244,11 @@ const Visualize: FC<Props> = () => {
       color: '#FFC806',
       clusterLabel: 'Product Selection',
     },
+    {
+      key: 'customer',
+      color: '#DEDAD4',
+      clusterLabel: 'Customer',
+    },
   ];
 
   const productTypeNames: Set<string> = new Set();
@@ -243,6 +262,7 @@ const Visualize: FC<Props> = () => {
       stores={allStores}
       products={allProducts}
       businessUnits={allBusinessUnits}
+      customers={customers?.results}
       clusters={clusters}
       tags={Array.from(productTypeNames).map((productTypeName) => ({
         key: productTypeName,

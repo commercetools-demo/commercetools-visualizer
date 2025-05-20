@@ -14,6 +14,7 @@ import {
   formatLocalizedString,
   notEmpty,
   TBusinessUnit,
+  TCustomer,
   TProduct,
   TStore,
 } from 'commercetools-demo-shared-helpers';
@@ -141,6 +142,7 @@ type Props = {
   clusters: Array<Cluster>;
   tags: Array<Tag>;
   businessUnits?: Array<TBusinessUnit>;
+  customers?: Array<TCustomer>;
 };
 
 export interface FiltersState {
@@ -152,6 +154,7 @@ const Root: FC<Props> = ({
   products,
   stores,
   businessUnits,
+  customers,
   clusters,
   tags,
 }) => {
@@ -188,6 +191,9 @@ const Root: FC<Props> = ({
 
   // Load data on mount:
   useEffect(() => {
+    customers?.forEach((customer) => {
+      addOrUpdateNode(graph, customer.id, customer.email, 'customer', clusters);
+    });
     products.forEach((product) => {
       addOrUpdateNode(
         graph,
@@ -314,6 +320,19 @@ const Root: FC<Props> = ({
       businessUnit.stores?.forEach((store) => {
         addOrUpdateEdge(store.id, businessUnit.id, 'store', graph);
       });
+      businessUnit.associates.forEach((associate) => {
+        const roles = new Set<string>();
+        associate.associateRoleAssignments.forEach(
+          (ara) => ara.associateRole.name && roles.add(ara.associateRole.name)
+        );
+        associate.customerRef?.id &&
+          addOrUpdateEdge(
+            associate.customerRef.id,
+            businessUnit.id,
+            Array.from(roles).join(' + '),
+            graph
+          );
+      });
     });
     businessUnits?.forEach((businessUnit) => {
       if (businessUnit.parentUnit?.id) {
@@ -356,7 +375,7 @@ const Root: FC<Props> = ({
         scalingRatio: 2,
       },
     });
-  }, [products, stores, businessUnits, clusters, tags]);
+  }, [products, stores, businessUnits, customers, clusters, tags]);
 
   // graph.forEachNode((node) => console.log(graph.getNodeAttributes(node)));
 

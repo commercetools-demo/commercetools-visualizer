@@ -26,7 +26,14 @@ const InfoCard: FC<TInfoCardProps> = ({
   const match = useRouteMatch();
   return (
     <Grid.Item>
-      <Card type={'raised'} insetScale={'m'} theme={'light'}>
+      <Card
+        type={'raised'}
+        insetScale={'m'}
+        theme={'light'}
+        css={{
+          height: '100%',
+        }}
+      >
         <Spacings.Stack alignItems={'stretch'}>
           <Text.Headline as={'h2'}>{title}</Text.Headline>
           <Text.Body>{content}</Text.Body>
@@ -58,6 +65,7 @@ const Welcome = () => {
           <Text.Headline as="h1" intlMessage={messages.title} />
           <Grid
             gridTemplateColumns={`repeat(3,1fr)`}
+            gridTemplateRows="minmax(180px, 200px)"
             gridGap={designTokens.spacingM}
             gridAutoColumns={'1fr'}
           >

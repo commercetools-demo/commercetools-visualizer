@@ -25,6 +25,10 @@ const config = {
       'view_products',
       'view_shopping_lists',
       'view_key_value_documents',
+      'view_business_units',
+      'view_stores',
+      'view_product_selections',
+      'view_standalone_prices'
     ],
     manage: [
       'manage_states',

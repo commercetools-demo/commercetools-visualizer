@@ -119,6 +119,13 @@ const Welcome = () => {
               }
               target={'custom-objects'}
             />
+            <InfoCard
+              title={'Visualize Drilldown'}
+              content={
+                'Interactive visualization tool for exploring and drilling down into your commercetools data structures and relationships.'
+              }
+              target={'visualize-drilldown'}
+            />
           </Grid>
         </Spacings.Stack>
       </PageContentWide>

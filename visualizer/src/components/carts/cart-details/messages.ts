@@ -9,6 +9,14 @@ export default defineMessages<string>({
     id: 'Cart.edit',
     defaultMessage: 'Edit',
   },
+  quote: {
+    id: 'Cart.quote',
+    defaultMessage: 'Create a new quote',
+  },
+  quoteSuccess: {
+    id: 'Cart.quoteSuccess',
+    defaultMessage: 'Quote request created successfully',
+  },
   panelCustomerTitle: {
     id: 'Orders.Details.General.Addresses.panelTitle',
     description: 'Header text for the panel label (customer addresses).',

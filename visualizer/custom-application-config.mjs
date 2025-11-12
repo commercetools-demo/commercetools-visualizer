@@ -38,6 +38,7 @@ const config = {
       'manage_orders',
       'manage_shopping_lists',
       'manage_key_value_documents',
+      'manage_quote_requests'
     ],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
@@ -86,6 +87,12 @@ const config = {
     {
       uriPath: 'custom-objects',
       defaultLabel: 'Custom Objects',
+      labelAllLocales: [],
+      // permissions: [PERMISSIONS.View],
+    },
+    {
+      uriPath: 'visualize-drilldown',
+      defaultLabel: 'Visualize Drilldown',
       labelAllLocales: [],
       // permissions: [PERMISSIONS.View],
     },

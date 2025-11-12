@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import {
   CustomFormModalPage,
   PageContentWide,
@@ -30,6 +30,7 @@ import {
   CartSummaryPricingBreakdown,
   CartDetailsItems,
 } from 'commercetools-demo-shared-cart-handling';
+import { useQuoteRequest } from '../hooks/use-quote-request';
 
 type Props = {
   onClose: () => void;
@@ -40,10 +41,10 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
   const { id } = useParams<{ id: string }>();
   const { push } = useHistory();
   const showNotification = useShowNotification();
+  const quoteCreator = useQuoteRequest();
+  const [isCreatingQuote, setIsCreatingQuote] = useState(false);
   const intl = useIntl();
-  const { dataLocale } = useApplicationContext((context) => ({
-    dataLocale: context.dataLocale ?? '',
-  }));
+  const { dataLocale, project } = useApplicationContext();
   const { cart, error, loading } = useCartFetcher({
     id: id,
     locale: dataLocale,
@@ -54,6 +55,29 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
   });
 
   const cartDeleter = useCartDeleter();
+
+  const handleCreateQuote = async () => {
+    if (cart) {
+      setIsCreatingQuote(true);
+      await quoteCreator
+        .createQuoteRequest({
+          cartId: cart.id,
+          cartVersion: cart.version,
+        })
+        .then((quoteRequest) => {
+          showNotification({
+            kind: 'success',
+            domain: DOMAINS.SIDE,
+            text: intl.formatMessage(messages.quoteSuccess),
+          });
+          push(`/${project.key}/orders/quotes/requests/${quoteRequest.id}`);
+        })
+        .catch(graphQLErrorHandler(showNotification))
+        .finally(() => {
+          setIsCreatingQuote(false);
+        });
+    }
+  };
 
   const handleDelete = async () => {
     if (cart) {
@@ -99,6 +123,12 @@ const CartDetails: FC<Props> = ({ onClose, linkToHome }) => {
       onClose={onClose}
       formControls={
         <>
+          <CustomFormModalPage.FormSecondaryButton
+            label={intl.formatMessage(messages.quote)}
+            onClick={handleCreateQuote}
+            iconLeft={isCreatingQuote ? <LoadingSpinner /> : <></>}
+            isDisabled={!canManage || isCreatingQuote}
+          />
           <CustomFormModalPage.FormPrimaryButton
             label={intl.formatMessage(messages.edit)}
             onClick={() => push(`${linkToHome}/edit/${id}`)}

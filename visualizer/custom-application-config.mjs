@@ -96,6 +96,11 @@ const config = {
       labelAllLocales: [],
       // permissions: [PERMISSIONS.View],
     },
+    {
+      uriPath: 'entity-diagram',
+      defaultLabel: 'Entity Diagram',
+      labelAllLocales: [],
+    },
   ],
 };
 

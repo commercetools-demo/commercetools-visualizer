@@ -13,6 +13,7 @@ import CartEdit from './components/carts/cart-edit/cart-edit';
 import ShoppingListsList from './components/shopping-lists/shopping-lists-list/shopping-lists-list';
 import CustomObjectsList from './components/custom-objects/custom-objects-list';
 import VisualizeDrilldown from './components/visualize-drilldown';
+import EntityDiagram from './components/entity-diagram';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -73,6 +74,9 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/visualize-drilldown`}>
         <VisualizeDrilldown />
+      </Route>
+      <Route path={`${match.path}/entity-diagram`}>
+        <EntityDiagram />
       </Route>
       <Route>
         <Welcome />

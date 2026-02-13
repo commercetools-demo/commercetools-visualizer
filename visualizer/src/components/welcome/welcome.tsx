@@ -126,6 +126,13 @@ const Welcome = () => {
               }
               target={'visualize-drilldown'}
             />
+            <InfoCard
+              title={'Entity Diagram'}
+              content={
+                'Interactive visualization tool for exploring and drilling down into your commercetools data structures and relationships.'
+              }
+              target={'entity-diagram'}
+            />
           </Grid>
         </Spacings.Stack>
       </PageContentWide>

@@ -116,6 +116,10 @@ const ExtensionsList = () => {
       <Switch>
         <SuspendedRoute path={`${match.path}/new`}>
           <ExtensionsCreate
+            onSuccess={async (id: string) => {
+              await refetch();
+              push(`${match.url}/${id}`);
+            }}
             onClose={async () => {
               await refetch();
               push(`${match.url}`);

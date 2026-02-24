@@ -1,6 +1,6 @@
 import { FC, useCallback } from 'react';
 import { FormModalPage } from '@commercetools-frontend/application-components';
-import messages from '../../types/types-create/messages';
+import messages from './messages';
 import ExtensionsForm, {
   TFormValues,
 } from '../extensions-form/extensions-form';
@@ -20,10 +20,11 @@ import {
 } from '../extensions-form/conversion';
 
 type Props = {
+  onSuccess: (id: string) => Promise<void>;
   onClose: () => void;
 };
 
-const ExtensionsCreate: FC<Props> = ({ onClose }) => {
+const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
   const intl = useIntl();
   const { dataLocale } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
@@ -40,12 +41,13 @@ const ExtensionsCreate: FC<Props> = ({ onClose }) => {
         .execute({
           draft: draft,
         })
-        .then(() => {
+        .then(({ createExtension }) => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.createSuccess),
           });
+          return onSuccess(createExtension?.id || '');
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },

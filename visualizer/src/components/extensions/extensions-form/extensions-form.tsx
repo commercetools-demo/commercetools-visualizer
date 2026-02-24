@@ -53,7 +53,6 @@ type TErrors = {
   key: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
   destinationName: { missing?: boolean };
   destinationHttpUrl: { missing?: boolean };
-  destinationHttpAuthenticationName: { missing?: boolean };
 };
 
 const validate = (formikValues: TFormValues) => {
@@ -61,7 +60,6 @@ const validate = (formikValues: TFormValues) => {
     key: {},
     destinationName: {},
     destinationHttpUrl: {},
-    destinationHttpAuthenticationName: {},
   };
 
   if (formikValues.key && formikValues.key.length > 0) {
@@ -85,9 +83,6 @@ const validate = (formikValues: TFormValues) => {
         formikValues.destinationHttpUrl.length === 0
       ) {
         errors.destinationHttpUrl.missing = true;
-      }
-      if (formikValues.destinationHttpAuthenticationName === undefined) {
-        errors.destinationHttpAuthenticationName.missing = true;
       }
     }
   }

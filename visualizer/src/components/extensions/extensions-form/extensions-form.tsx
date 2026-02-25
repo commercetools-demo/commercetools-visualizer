@@ -30,7 +30,7 @@ export type TFormValues = {
   key?: Maybe<string>;
   destinationName: DestinationName;
   destinationHttpUrl?: string;
-  destinationHttpAuthenticationName: DestinationHttpAuthenticationName;
+  destinationHttpAuthenticationName?: DestinationHttpAuthenticationName;
   destinationHttpAuthenticationAuthorizationHeaderValue?: string;
   destinationHttpAuthenticationAuthorizationKey?: string;
   destinationAwsAccessKey?: string;

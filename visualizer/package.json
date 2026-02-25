@@ -103,7 +103,7 @@
     "apollo-link-rest": "^0.9.0",
     "commercetools-demo-shared-cart-handling": "^1.0.0",
     "commercetools-demo-shared-checkbox-group": "^1.0.0",
-    "commercetools-demo-shared-data-fetching-hooks": "^1.0.3",
+    "commercetools-demo-shared-data-fetching-hooks": "^1.0.4",
     "commercetools-demo-shared-entity-selectors": "^1.0.0",
     "commercetools-demo-shared-helpers": "^1.0.0",
     "commercetools-demo-shared-paginatable-data-table": "^1.0.0",

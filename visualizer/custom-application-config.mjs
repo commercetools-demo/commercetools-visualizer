@@ -66,18 +66,6 @@ const config = {
       permissions: [PERMISSIONS.Manage],
     },
     {
-      uriPath: 'carts',
-      defaultLabel: 'Carts',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'shopping-lists',
-      defaultLabel: 'Shopping Lists',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
-    },
-    {
       uriPath: 'states',
       defaultLabel: 'States',
       labelAllLocales: [],

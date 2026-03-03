@@ -7,10 +7,6 @@ import SubscriptionDetailsPage from './components/subscriptions/subscription-det
 import SubscriptionCreate from './components/subscriptions/subscription-create/subscription-create';
 import TypesList from './components/types/types-list/types-list';
 import ExtensionsList from './components/extensions/extensions-list/extensions-list';
-import CartsList from './components/carts/carts-list';
-import CartCreate from './components/carts/cart-create/cart-create';
-import CartEdit from './components/carts/cart-edit/cart-edit';
-import ShoppingListsList from './components/shopping-lists/shopping-lists-list/shopping-lists-list';
 import CustomObjectsList from './components/custom-objects/custom-objects-list';
 import Visualize from './components/visualize/visualize';
 
@@ -53,20 +49,6 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/types`}>
         <TypesList />
-      </Route>
-      <Route
-        path={[`${match.path}/carts/new/:id/:step`, `${match.path}/carts/new`]}
-      >
-        <CartCreate linkToWelcome={match.url} />
-      </Route>
-      <Route path={`${match.path}/carts/edit/:id`}>
-        <CartEdit linkToWelcome={match.url} />
-      </Route>
-      <Route path={`${match.path}/carts`}>
-        <CartsList />
-      </Route>
-      <Route path={`${match.path}/shopping-lists`}>
-        <ShoppingListsList />
       </Route>
       <Route path={`${match.path}/custom-objects`}>
         <CustomObjectsList linkToHome={match.url} />

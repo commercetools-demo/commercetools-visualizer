@@ -150,6 +150,7 @@
     "@types/eslint": "<9",
     "@types/react-router": "<6",
     "@types/react-router-dom": "<6",
+    "formik": "2.4.6",
     "headers-polyfill": "3.2.5",
     "nwsapi": "2.2.7"
   },

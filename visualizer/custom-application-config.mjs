@@ -28,7 +28,7 @@ const config = {
       'view_business_units',
       'view_stores',
       'view_product_selections',
-      'view_standalone_prices'
+      'view_standalone_prices',
     ],
     manage: [
       'manage_states',
@@ -38,7 +38,7 @@ const config = {
       'manage_orders',
       'manage_shopping_lists',
       'manage_key_value_documents',
-      'manage_quote_requests'
+      'manage_quote_requests',
     ],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
@@ -53,18 +53,6 @@ const config = {
       defaultLabel: 'API Extensions',
       labelAllLocales: [],
       permissions: [PERMISSIONS.Manage],
-    },
-    {
-      uriPath: 'carts',
-      defaultLabel: 'Carts',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'shopping-lists',
-      defaultLabel: 'Shopping Lists',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
     },
     {
       uriPath: 'states',

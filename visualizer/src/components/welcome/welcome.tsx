@@ -99,25 +99,16 @@ const Welcome = () => {
               target={'extensions'}
             />
             <InfoCard
-              title={'Carts'}
-              content={
-                'A Cart is a representation of a shopping cart containing items that a customer intends to purchase.'
-              }
-              target={'carts'}
-            />
-            <InfoCard
-              title={'Shopping Lists'}
-              content={
-                'A Shopping List can be used to implement a "save-for-later" feature for an individual Customer, a shareable wishlist, or a public collection of Products.'
-              }
-              target={'shopping-lists'}
-            />
-            <InfoCard
               title={'Custom Objects'}
               content={
                 'Custom Objects store arbitrary JSON-formatted data on commercetools Composable Commerce.'
               }
               target={'custom-objects'}
+            />
+            <InfoCard
+              title={'Visualize'}
+              content={'A UI showing how your object interact with each other.'}
+              target={'visualize'}
             />
             <InfoCard
               title={'Visualize Drilldown'}

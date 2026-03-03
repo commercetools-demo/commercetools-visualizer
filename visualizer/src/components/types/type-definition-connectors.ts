@@ -1,4 +1,7 @@
-import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
+import {
+  transformLocalizedFieldToLocalizedString,
+  transformLocalizedStringToLocalizedField,
+} from '@commercetools-frontend/l10n';
 import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
 import {
   TEnumType,
@@ -10,6 +13,7 @@ import {
 } from '../../types/generated/ctp';
 import { TFormValues } from './types-form/types-form';
 import { LocalizedString } from './field-definition-input-for-enum/constants';
+import { TLocalizedString } from 'commercetools-demo-shared-helpers';
 
 export interface CustomFieldLocalizedEnumValue {
   key: string;
@@ -125,8 +129,14 @@ export const convertFieldDefinitionToActionData = (
   ...handleTFieldTypeInput(draft.type),
 });
 
-export const formValuesToDoc = (formValues: TFormValues) => ({
-  name: LocalizedTextInput.omitEmptyTranslations(formValues.name),
-  description: LocalizedTextInput.omitEmptyTranslations(formValues.description),
-  key: formValues.key,
-});
+export const formValuesToDoc = (formValues: TFormValues) => {
+  return {
+    nameAllLocales: transformLocalizedStringToLocalizedField(
+      LocalizedTextInput.omitEmptyTranslations(formValues.name)
+    ),
+    descriptionAllLocales: transformLocalizedStringToLocalizedField(
+      LocalizedTextInput.omitEmptyTranslations(formValues.description)
+    ),
+    key: formValues.key || undefined,
+  };
+};

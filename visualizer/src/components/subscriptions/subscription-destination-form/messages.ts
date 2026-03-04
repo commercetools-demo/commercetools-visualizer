@@ -37,4 +37,31 @@ export default defineMessages({
     description: 'destinationSQSAuthenticationMode',
     defaultMessage: 'Defines the method of authentication for the SQS queue.',
   },
+  destinationConfluentCloudBootstrapServer: {
+    id: 'Subscription.Destination.destinationConfluentCloudBootstrapServer',
+    description: 'destinationSQSAuthenticationMode',
+    defaultMessage:
+      'URL to the bootstrap server including the port number in the format {cluster}.{region}.{provider}.confluent.cloud:9092.',
+  },
+  destinationConfluentCloudApiKey: {
+    id: 'Subscription.Destination.destinationConfluentCloudApiKey',
+    description: 'destinationSQSAuthenticationMode',
+    defaultMessage: 'API Key to be used.',
+  },
+  destinationConfluentCloudApiSecret: {
+    id: 'Subscription.Destination.destinationConfluentCloudApiSecret',
+    description: 'destinationSQSAuthenticationMode',
+    defaultMessage: 'API Secret to be used.',
+  },
+  destinationConfluentCloudAcks: {
+    id: 'Subscription.Destination.destinationConfluentCloudAcks',
+    description: 'destinationSQSAuthenticationMode',
+    defaultMessage: 'The Kafka acks value. Can be "0", "1", or "all"',
+  },
+
+  destinationConfluentCloudTopic: {
+    id: 'Subscription.Destination.destinationConfluentCloudTopic',
+    description: 'destinationSQSAuthenticationMode',
+    defaultMessage: 'The name of the topic.',
+  },
 });

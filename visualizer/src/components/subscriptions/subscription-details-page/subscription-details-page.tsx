@@ -32,6 +32,9 @@ import {
   TGoogleCloudPubSubDestination,
   TSqsDestination,
 } from '../../../types/generated/ctp';
+import { TConfluentCloudDestination } from 'commercetools-demo-shared-helpers';
+import { FormikHelpers } from 'formik';
+import { convertFormValuesToSubscription } from './convert';
 
 type Props = {
   linkToWelcome: string;
@@ -56,11 +59,15 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     useSubscriptionFetcher(params);
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       if (subscription) {
+        const mapped = convertFormValuesToSubscription(formikValues);
         const updateActions = calculateSubscriptionUpdateActions(
           subscription,
-          formikValues
+          mapped
         );
         if (updateActions.length > 0) {
           await subscriptionKeyUpdater
@@ -129,6 +136,7 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     | {
         GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
         SQS?: TSqsDestination;
+        ConfluentCloud?: TConfluentCloudDestination;
       }
     | undefined;
 
@@ -137,10 +145,13 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
       GoogleCloudPubSub:
         subscription.destination as TGoogleCloudPubSubDestination,
     };
-  }
-  if (subscription.destination.type === 'SQS') {
+  } else if (subscription.destination.type === 'SQS') {
     dest = {
       SQS: subscription.destination as TSqsDestination,
+    };
+  } else if (subscription.destination.type === 'ConfluentCloud') {
+    dest = {
+      ConfluentCloud: subscription.destination as TConfluentCloudDestination,
     };
   }
 

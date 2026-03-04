@@ -4,7 +4,8 @@ import {
   TGoogleCloudPubSubDestinationInput,
   TSqsDestinationInput,
   TMessageSubscriptionInput,
-} from '../../../types/generated/ctp';
+  TConfluentCloudDestinationInput,
+} from 'commercetools-demo-shared-helpers';
 
 export type Step1 = { key: string | undefined | null };
 export type Step2 = { destinationType: string | undefined | null };
@@ -12,6 +13,7 @@ export type Step3 = {
   destination: {
     GoogleCloudPubSub?: TGoogleCloudPubSubDestinationInput;
     Sqs?: TSqsDestinationInput;
+    ConfluentCloud?: TConfluentCloudDestinationInput;
   };
 };
 export type Step4 = {

@@ -1,4 +1,4 @@
-import { FC, ReactElement } from 'react';
+import { FC, JSX, ReactElement } from 'react';
 import {
   useFormik,
   type FormikHelpers,
@@ -14,7 +14,8 @@ import {
   TGoogleCloudPubSubDestination,
   TMessageSubscriptionInput,
   TSqsDestination,
-} from '../../../types/generated/ctp';
+  TConfluentCloudDestination,
+} from 'commercetools-demo-shared-helpers';
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
 import SubscriptionMessagesForm from '../subscription-messages-form/subscription-messages-form';
@@ -25,11 +26,19 @@ type Formik = ReturnType<typeof useFormik>;
 export type TFormValues = {
   id: string;
   key: string;
-  destinationType: string;
+  destinationType: // | 'AzureServiceBus'
+  | 'ConfluentCloud'
+    // | 'EventBridge'
+    // | 'EventGrid'
+    | 'GoogleCloudPubSub'
+    // | 'SNS'
+    | 'SQS'
+    | string;
   destination:
     | {
         GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
         SQS?: TSqsDestination;
+        ConfluentCloud?: TConfluentCloudDestination;
       }
     | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;

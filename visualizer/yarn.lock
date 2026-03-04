@@ -3676,7 +3676,7 @@
   resolved "https://registry.yarnpkg.com/@commercetools/sdk-middleware-logger/-/sdk-middleware-logger-3.0.0.tgz#4bfc7441d485b3f1046001f44200d12926accb84"
   integrity sha512-DhMXAA2yIch/AaGxy7st85Z1HFmeLtHWGkr9z5rX4xKjan4PHGB/IE5saAR+SNGHhs6+1Lp8vZEHDo3tFqVLmg==
 
-"@commercetools/sync-actions@^8.0.1":
+"@commercetools/sync-actions@^8.0.1", "@commercetools/sync-actions@^8.1.0":
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/@commercetools/sync-actions/-/sync-actions-8.1.0.tgz#352b83ef1d4436c9b922c2f387c6f2ae5456e3df"
   integrity sha512-C87TQNOB3CKYoNxpkbH5L1Jxi0u7t2kRjbGl//79dFMmcLKchkOlDRlL+AXZ+0lFi3AyYTPllX9xHiH7pFdMMw==
@@ -8998,10 +8998,28 @@ commercetools-demo-shared-checkbox-group@^1.0.0:
     formik "^2.4.6"
     react-intl "^7.1.4"
 
-commercetools-demo-shared-data-fetching-hooks@^1.0.0, commercetools-demo-shared-data-fetching-hooks@^1.0.4:
+commercetools-demo-shared-data-fetching-hooks@^1.0.0:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-1.0.4.tgz#9b96db72962c504ee2c334eba97ba5276e63dc64"
   integrity sha512-ddvK/tf2vOdqqlwbCJimS7z5FPYMj2vm13bk59nXacuJu+fQ0dPTDKJC5qyyguxwRulUgXidvYq/M+l0vOtVGQ==
+  dependencies:
+    "@apollo/client" "3.13.9"
+    "@babel/runtime" "^7.22.15"
+    "@babel/runtime-corejs3" "^7.22.15"
+    "@commercetools-frontend/constants" "24.11.0"
+    "@commercetools-frontend/l10n" "24.11.0"
+    "@commercetools-frontend/sdk" "^24.11.0"
+    "@commercetools/platform-sdk" "^8.18.0"
+    "@commercetools/sync-actions" "^8.0.1"
+    commercetools-demo-shared-helpers "^1.0.1"
+    omit-empty-es "^1.2.0"
+    react-intl "^7.1.4"
+    react-redux "9.2.0"
+
+commercetools-demo-shared-data-fetching-hooks@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/commercetools-demo-shared-data-fetching-hooks/-/commercetools-demo-shared-data-fetching-hooks-1.0.8.tgz#0700291d36da0df5dc87bb5e50292bf95ad17b42"
+  integrity sha512-rTnV9a55ABuZzbaf7odd2gqhUnGZdlx4p1X48BHGJQgNFglTGqD586GtA/cqknLONlK0OeM47Vz6Q8LGTImcJg==
   dependencies:
     "@apollo/client" "3.13.9"
     "@babel/runtime" "^7.22.15"

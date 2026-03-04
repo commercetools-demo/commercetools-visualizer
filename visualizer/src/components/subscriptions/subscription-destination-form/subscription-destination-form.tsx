@@ -6,6 +6,7 @@ import { designTokens } from '@commercetools-uikit/design-system';
 import Card from '@commercetools-uikit/card';
 import Spacings from '@commercetools-uikit/spacings';
 import SQSDestination from './subscription-destination-form-sqs';
+import ConfluentCloudDestination from './subscription-destination-form-confluent-cloud';
 
 type Props = {
   destinationType: string;
@@ -23,6 +24,9 @@ const SubscriptionDestinationForm: FC<Props> = ({
       break;
     case 'SQS':
       toRender = <SQSDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'ConfluentCloud':
+      toRender = <ConfluentCloudDestination isReadOnly={isReadOnly} />;
       break;
   }
 

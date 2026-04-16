@@ -21,7 +21,7 @@ type Props = { isReadOnly?: boolean };
 const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'destinationType',
-    validate: (key) => validateKeyInput(key),
+    validate: validateKeyInput,
   });
   return (
     <Constraints.Horizontal max="scale">
@@ -82,6 +82,14 @@ const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
                     label: (
                       <FormattedMessage
                         {...messages.destinationGoogleCloudPubSub}
+                      />
+                    ),
+                  },
+                  {
+                    value: 'ConfluentCloud',
+                    label: (
+                      <FormattedMessage
+                        {...messages.destinationConfluentCloud}
                       />
                     ),
                   },

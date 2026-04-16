@@ -84,10 +84,12 @@ export const formValuesToTExtension = (
 ): TExtensionDraft => {
   const destination: TExtensionDestinationInput = {};
   if (formValues.destinationName === 'HTTP') {
-    const authentication: THttpDestinationAuthenticationInput = {};
+    let authentication: THttpDestinationAuthenticationInput | undefined =
+      undefined;
     if (formValues.destinationHttpAuthenticationName) {
       switch (formValues.destinationHttpAuthenticationName) {
         case 'AuthorizationHeader': {
+          authentication = {};
           authentication.AuthorizationHeader = {
             headerValue:
               formValues.destinationHttpAuthenticationAuthorizationHeaderValue ||
@@ -96,6 +98,7 @@ export const formValuesToTExtension = (
           break;
         }
         case 'AzureFunctions': {
+          authentication = {};
           authentication.AzureFunctions = {
             key: formValues.destinationHttpAuthenticationAuthorizationKey || '',
           };

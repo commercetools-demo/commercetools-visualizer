@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import TextField from '@commercetools-uikit/text-field';
-import { FormattedMessage } from 'react-intl';
+import { useIntl } from 'react-intl';
 import messages from './messages';
 import { TFormValues } from '../extensions-form/extensions-form';
 import { FC } from 'react';
@@ -11,13 +11,14 @@ type Props = {
 };
 
 const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
+  const intl = useIntl();
   return (
     <>
       <TextField
         name="destinationHttpUrl"
         isRequired
         value={formik.values.destinationHttpUrl || ''}
-        title={<FormattedMessage {...messages.destinationHttpUrl} />}
+        title={intl.formatMessage(messages.destinationHttpUrl)}
         errors={
           TextField.toFieldErrors<TFormValues>(formik.errors).destinationHttpUrl
         }
@@ -27,31 +28,24 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
       />
       <SelectField
         key={'destinationHttpAuthenticationName'}
-        title={<FormattedMessage {...messages.destinationHttpAuthentication} />}
+        title={intl.formatMessage(messages.destinationHttpAuthentication)}
         errors={
           SelectField.toFieldErrors<TFormValues>(formik.errors)
             .destinationHttpAuthenticationName
         }
-        name={
-          formik.values.destinationHttpAuthenticationName ||
-          'destinationHttpAuthenticationName'
-        }
+        name={'destinationHttpAuthenticationName'}
         isClearable={true}
         options={[
           {
             value: 'AzureFunctions',
-            label: (
-              <FormattedMessage
-                {...messages.destinationHttpAuthenticationAzureFunctions}
-              />
+            label: intl.formatMessage(
+              messages.destinationHttpAuthenticationAzureFunctions
             ),
           },
           {
             value: 'AuthorizationHeader',
-            label: (
-              <FormattedMessage
-                {...messages.destinationHttpAuthenticationAuthorizationHeader}
-              />
+            label: intl.formatMessage(
+              messages.destinationHttpAuthenticationAuthorizationHeader
             ),
           },
         ]}

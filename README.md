@@ -5,8 +5,6 @@ The commercetools Visualizer is a [custom application](https://docs.commercetool
 
 This repository contains components rendering non out-of-the-box types as a custom app. Currently these are:
  * [API Extensions](https://docs.commercetools.com/api/projects/api-extensions)
- * [Carts](https://docs.commercetools.com/api/projects/carts)
- * [Shopping Lists](https://docs.commercetools.com/api/projects/shoppingLists)
  * [States](https://docs.commercetools.com/api/projects/states)
  * [Subscriptions](https://docs.commercetools.com/api/projects/subscriptions)
  * [Types](https://docs.commercetools.com/api/projects/types)
@@ -27,24 +25,6 @@ List View
 ![Types-List.jpg](./visualizer/docs/Extensions-List.jpg)
 New View
 ![Types-New.jpg](./visualizer/docs/Extensions-New.jpg)
-
-### Carts
-
-List View
-![Types-List.jpg](./visualizer/docs/Carts-List.jpg)
-Detail View
-![Types-Details.jpg](./visualizer/docs/Carts-Details.jpg)
-New View
-![Types-New.jpg](./visualizer/docs/Carts-New.jpg)
-
-### Shopping Lists
-
-List View
-![Types-List.jpg](./visualizer/docs/Shoppinglists-List.jpg)
-Detail View
-![Types-Details.jpg](./visualizer/docs/Shoppinglists-Details.jpg)
-New View
-![Types-New.jpg](./visualizer/docs/Shoppinglists-New.jpg)
 
 ### States
 
@@ -97,8 +77,8 @@ yarn install
 yarn run start
 ```
 
-The code has been built sucessfully using 
-* Node v18.12.0
+The code has been built successfully using
+* Node v22.16.0
 * Yarn 1.22.22
 
 ## Known issues
@@ -107,5 +87,3 @@ The code has been built sucessfully using
  - On Types
    - Deleting enum and localized enum values is not supported
    - Change order of enum and localized enum values is not supported
- - On Carts
-   - Support for `Line Items` only, not for `Custom Line Items`

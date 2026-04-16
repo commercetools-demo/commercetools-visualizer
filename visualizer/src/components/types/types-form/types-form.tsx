@@ -17,7 +17,7 @@ import {
   TFieldDefinition,
   TQuery,
   TQuery_TypeDefinitionArgs,
-} from '../../../types/generated/ctp';
+} from 'commercetools-demo-shared-helpers';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
 import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';

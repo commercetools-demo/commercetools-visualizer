@@ -12,12 +12,3 @@ export const entryPointUriPath =
     : window.app.entryPointUriPath || 'visualizer';
 
 export const PERMISSIONS = entryPointUriPathToPermissionKeys(entryPointUriPath);
-
-export enum SHORT_ADDRESS_TYPE {
-  BILLING = 'billing',
-  SHIPPING = 'shipping',
-}
-
-export const INVENTORY_MODES = {
-  NONE: 'None',
-};

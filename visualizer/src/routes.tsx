@@ -7,10 +7,6 @@ import SubscriptionDetailsPage from './components/subscriptions/subscription-det
 import SubscriptionCreate from './components/subscriptions/subscription-create/subscription-create';
 import TypesList from './components/types/types-list/types-list';
 import ExtensionsList from './components/extensions/extensions-list/extensions-list';
-import CartsList from './components/carts/carts-list';
-import CartCreate from './components/carts/cart-create/cart-create';
-import CartEdit from './components/carts/cart-edit/cart-edit';
-import ShoppingListsList from './components/shopping-lists/shopping-lists-list/shopping-lists-list';
 import CustomObjectsList from './components/custom-objects/custom-objects-list';
 import VisualizeDrilldown from './components/visualize-drilldown';
 import EntityDiagram from './components/entity-diagram';
@@ -25,7 +21,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
    * When using routes, there is a good chance that you might want to
    * restrict the access to a certain route based on the user permissions.
    * You can evaluate user permissions using the `useIsAuthorized` hook.
-   * For more information see https://docs.commercetools.com/custom-applications/development/permissions
+   * For more information see https://docs.commercetools.com/merchant-center-customizations/development/permissions
    *
    * NOTE that by default the Custom Application implicitly checks for a "View" permission,
    * otherwise it won't render. Therefore, checking for "View" permissions here
@@ -54,20 +50,6 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/types`}>
         <TypesList />
-      </Route>
-      <Route
-        path={[`${match.path}/carts/new/:id/:step`, `${match.path}/carts/new`]}
-      >
-        <CartCreate linkToWelcome={match.url} />
-      </Route>
-      <Route path={`${match.path}/carts/edit/:id`}>
-        <CartEdit linkToWelcome={match.url} />
-      </Route>
-      <Route path={`${match.path}/carts`}>
-        <CartsList />
-      </Route>
-      <Route path={`${match.path}/shopping-lists`}>
-        <ShoppingListsList />
       </Route>
       <Route path={`${match.path}/custom-objects`}>
         <CustomObjectsList linkToHome={match.url} />

@@ -1,0 +1,90 @@
+# Custom Objects — commercetools GraphQL contract
+#
+# Target: Merchant Center GraphQL endpoint, `ctp` (commercetools platform) target.
+# Validated against the official commercetools public GraphQL schema
+# (resource `CustomObject`) with `commercetools-graphql-validate` — zero errors.
+#
+# IMPORTANT: there is NO update-action / diff model for Custom Objects.
+# Create and update both call the SAME mutation, `createOrUpdateCustomObject`.
+# The mutation upserts by (container, key): omitting `version` creates (or
+# blindly overwrites); passing the current `version` enforces optimistic
+# concurrency on update — a stale version surfaces as an error.
+#
+# Notes on scalars:
+#   - `value` in the read shape (CustomObject.value) is the `Json` scalar.
+#   - `value` in the write shape (CustomObjectDraft.value) is `String!`:
+#     the serialized / escaped JSON the form holds as a string.
+#   - `version` is the `Long` scalar.
+#   - `customObjects` REQUIRES a `container` (String!): the list is empty
+#     until a container is provided.
+
+# --- List ----------------------------------------------------------------
+
+query CustomObjects(
+  $container: String!
+  $limit: Int
+  $offset: Int
+  $sort: [String!]
+) {
+  customObjects(
+    container: $container
+    limit: $limit
+    offset: $offset
+    sort: $sort
+  ) {
+    total
+    count
+    offset
+    results {
+      id
+      container
+      key
+      value
+      version
+      createdAt
+      lastModifiedAt
+    }
+  }
+}
+
+# --- Fetch one -----------------------------------------------------------
+
+query CustomObject($id: String) {
+  customObject(id: $id) {
+    id
+    container
+    key
+    value
+    version
+    createdAt
+    lastModifiedAt
+  }
+}
+
+# --- Create or update (single mutation for BOTH) -------------------------
+#
+# `draft.value` is a String (serialized JSON). Pass `draft.version` only on
+# update to enforce optimistic concurrency; omit it to create.
+
+mutation CreateOrUpdateCustomObject($draft: CustomObjectDraft!) {
+  createOrUpdateCustomObject(draft: $draft) {
+    id
+    container
+    key
+    value
+    version
+    createdAt
+    lastModifiedAt
+  }
+}
+
+# --- Delete --------------------------------------------------------------
+
+mutation DeleteCustomObject($id: String, $version: Long) {
+  deleteCustomObject(id: $id, version: $version) {
+    id
+    container
+    key
+    version
+  }
+}

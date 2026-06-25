@@ -1,0 +1,214 @@
+# API Extensions — commercetools GraphQL contract
+#
+# Target: Merchant Center custom-app GraphQL endpoint, `ctp` target (project schema).
+# Validated against the official public commercetools GraphQL schema
+# (commercetools-graphql-schemata `Extension`; commercetools-graphql-validate → no errors).
+#
+# Resource: Extension. Destination is the `ExtensionDestination` interface, implemented by
+# `HttpDestination`, `AWSLambdaDestination`, and `GoogleCloudFunctionDestination`. The HTTP
+# `authentication` field is the union `AuthorizationHeader` | `AzureFunctionsAuthentication`.
+# GoogleCloudFunctionDestination exists in the schema but is NOT offered in the UI (see spec
+# §4 / data-model "schema only"); it is intentionally omitted from the read selections below.
+#
+# ---------------------------------------------------------------------------------------------
+# Update actions used by edit (see data-model "Update-action mapping"). Only changed fields
+# emit an action (diff of the loaded Extension vs the form draft):
+#   setKey            { key }            — change/clear key
+#   changeDestination { destination }    — replace destination (ExtensionDestinationInput)
+#   changeTriggers    { triggers }       — replace the full triggers array (TriggerInput[])
+#   setTimeoutInMs    { timeoutInMs }    — set/clear timeout
+#
+# Example `actions:` payload (variables for UpdateExtension):
+#   "actions": [
+#     { "setKey": { "key": "order-tax-hook" } },
+#     { "changeDestination": {
+#         "destination": { "HTTP": {
+#           "url": "https://hooks.example.com/ct",
+#           "authentication": { "AuthorizationHeader": { "headerValue": "Bearer xyz" } }
+#         } } } },
+#     { "changeTriggers": {
+#         "triggers": [ { "resourceTypeId": "order", "actions": ["Create", "Update"] } ] } },
+#     { "setTimeoutInMs": { "timeoutInMs": 2000 } }
+#   ]
+#
+# AWS Lambda destination input shape (for changeDestination / create draft):
+#   { "AWSLambda": { "arn": "arn:aws:lambda:...", "accessKey": "AKIA...", "accessSecret": "..." } }
+# ---------------------------------------------------------------------------------------------
+
+
+# ── List ─────────────────────────────────────────────────────────────────────────────────────
+# Paginated, sortable list. `sort` is an array of commercetools sort strings, e.g.
+# ["key asc"], ["createdAt desc"]. Returns results + total for pagination.
+query GetExtensions($limit: Int, $offset: Int, $sort: [String!]) {
+  extensions(limit: $limit, offset: $offset, sort: $sort) {
+    total
+    count
+    offset
+    results {
+      id
+      key
+      destination {
+        type
+        ... on HttpDestination {
+          url
+          authentication {
+            ... on AuthorizationHeader {
+              headerValue
+            }
+            ... on AzureFunctionsAuthentication {
+              key
+            }
+          }
+        }
+        ... on AWSLambdaDestination {
+          arn
+          accessKey
+          accessSecret
+        }
+      }
+      triggers {
+        resourceTypeId
+        actions
+        condition
+      }
+      timeoutInMs
+      version
+      createdAt
+      lastModifiedAt
+    }
+  }
+}
+
+
+# ── Fetch one (full selection for the edit form) ──────────────────────────────────────────────
+query GetExtension($id: String!) {
+  extension(id: $id) {
+    id
+    key
+    destination {
+      type
+      ... on HttpDestination {
+        url
+        authentication {
+          ... on AuthorizationHeader {
+            headerValue
+          }
+          ... on AzureFunctionsAuthentication {
+            key
+          }
+        }
+      }
+      ... on AWSLambdaDestination {
+        arn
+        accessKey
+        accessSecret
+      }
+    }
+    triggers {
+      resourceTypeId
+      actions
+      condition
+    }
+    timeoutInMs
+    version
+    createdAt
+    lastModifiedAt
+    createdBy {
+      isPlatformClient
+      externalUserId
+    }
+    lastModifiedBy {
+      isPlatformClient
+      externalUserId
+    }
+  }
+}
+
+
+# ── Create ────────────────────────────────────────────────────────────────────────────────────
+# $draft is built from the flat form via formValuesToTExtension (nested ExtensionDraft):
+#   { "key": "...", "destination": { "HTTP": { "url": "...", "authentication": { ... } } },
+#     "triggers": [ { "resourceTypeId": "order", "actions": ["Create"] } ], "timeoutInMs": 2000 }
+mutation CreateExtension($draft: ExtensionDraft!) {
+  createExtension(draft: $draft) {
+    id
+    key
+    version
+    destination {
+      type
+      ... on HttpDestination {
+        url
+        authentication {
+          ... on AuthorizationHeader {
+            headerValue
+          }
+          ... on AzureFunctionsAuthentication {
+            key
+          }
+        }
+      }
+      ... on AWSLambdaDestination {
+        arn
+        accessKey
+        accessSecret
+      }
+    }
+    triggers {
+      resourceTypeId
+      actions
+      condition
+    }
+    timeoutInMs
+    createdAt
+    lastModifiedAt
+  }
+}
+
+
+# ── Update ────────────────────────────────────────────────────────────────────────────────────
+# Optimistic concurrency: pass the loaded `version`. $actions = computed diff (see header).
+mutation UpdateExtension($id: String!, $version: Long!, $actions: [ExtensionUpdateAction!]!) {
+  updateExtension(id: $id, version: $version, actions: $actions) {
+    id
+    key
+    version
+    destination {
+      type
+      ... on HttpDestination {
+        url
+        authentication {
+          ... on AuthorizationHeader {
+            headerValue
+          }
+          ... on AzureFunctionsAuthentication {
+            key
+          }
+        }
+      }
+      ... on AWSLambdaDestination {
+        arn
+        accessKey
+        accessSecret
+      }
+    }
+    triggers {
+      resourceTypeId
+      actions
+      condition
+    }
+    timeoutInMs
+    createdAt
+    lastModifiedAt
+  }
+}
+
+
+# ── Delete ────────────────────────────────────────────────────────────────────────────────────
+# Optimistic concurrency: pass the loaded `version`.
+mutation DeleteExtension($id: String!, $version: Long!) {
+  deleteExtension(id: $id, version: $version) {
+    id
+    key
+    version
+  }
+}

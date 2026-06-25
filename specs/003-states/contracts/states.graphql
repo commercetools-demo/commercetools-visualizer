@@ -1,0 +1,126 @@
+# States — commercetools GraphQL contract
+#
+# Target:    Merchant Center custom application, ctp GraphQL endpoint.
+# Resource:  State (commercetools-graphql-schemata resourceName `State`).
+# Validated: against the official commercetools public schema with
+#            commercetools-graphql-validate (zero errors).
+#
+# These are the concrete query/mutation documents the data layer implements
+# (see ../data-model.md "API operations"). LocalizedString fields are read via
+# `nameAllLocales`/`descriptionAllLocales` ({ locale value }) and written via
+# `[LocalizedStringItemInputType!]`; transition references are written as
+# ReferenceInput `{ typeId, id }`.
+#
+# ---------------------------------------------------------------------------
+# Update actions (StateUpdateAction) used by the UI (see
+# calculateStateUpdateActions — diff of loaded State vs form draft; only
+# changed fields produce actions, and no update call is made if none result):
+#
+#   changeInitial  { initial }       — Initial flag changed
+#   setName        { name }          — localized Name changed (empty omitted)
+#   setDescription { description }   — localized Description changed (empty omitted)
+#   setTransitions { transitions }   — Transitions changed (ResourceIdentifierInput[])
+#
+# Also defined on StateUpdateAction but NOT used by the UI (key & type are
+# immutable after create, roles are not editable in the form):
+#   changeKey { key }, changeType { type },
+#   setRoles / addRoles / removeRoles { roles }
+#
+# Example `actions:` payload (UpdateState variables):
+#   {
+#     "id": "…",
+#     "version": 7,
+#     "actions": [
+#       { "changeInitial": { "initial": true } },
+#       { "setName": { "name": [{ "locale": "en", "value": "Shipped" }] } },
+#       { "setTransitions": { "transitions": [
+#           { "typeId": "state", "id": "…target-state-id…" }
+#       ] } }
+#     ]
+#   }
+# ---------------------------------------------------------------------------
+
+# Reusable selection of the read shape (data-model.md "State — read shape").
+fragment StateDetails on State {
+  id
+  version
+  key
+  type
+  name(locale: $locale)
+  nameAllLocales {
+    locale
+    value
+  }
+  description(locale: $locale)
+  descriptionAllLocales {
+    locale
+    value
+  }
+  initial
+  builtIn
+  roles
+  transitions {
+    id
+    key
+  }
+  createdAt
+  lastModifiedAt
+}
+
+# List states for the active type tab.
+# The UI passes a `where` such as `type="OrderState"` and, in edit mode,
+# additionally excludes the current state, e.g.
+#   where: "type=\"OrderState\" and id != \"…current-id…\""
+# Sorting is optional (e.g. sort: ["key asc"]). limit defaults to 100, offset 0.
+query States(
+  $where: String
+  $sort: [String!]
+  $limit: Int
+  $offset: Int
+  $locale: Locale
+) {
+  states(where: $where, sort: $sort, limit: $limit, offset: $offset) {
+    total
+    count
+    offset
+    results {
+      ...StateDetails
+    }
+  }
+}
+
+# Fetch a single state (edit view) by id.
+query State($id: String!, $locale: Locale) {
+  state(id: $id) {
+    ...StateDetails
+  }
+}
+
+# Create a state from a StateDraft.
+# draft.transitions use ReferenceInput { typeId: "state", id }; localized
+# name/description use LocalizedStringItemInputType and omit empty translations.
+mutation CreateState($draft: StateDraft!, $locale: Locale) {
+  createState(draft: $draft) {
+    ...StateDetails
+  }
+}
+
+# Update a state with optimistic concurrency (version) and update actions.
+mutation UpdateState(
+  $id: String!
+  $version: Long!
+  $actions: [StateUpdateAction!]!
+  $locale: Locale
+) {
+  updateState(id: $id, version: $version, actions: $actions) {
+    ...StateDetails
+  }
+}
+
+# Delete a state with optimistic concurrency (version).
+mutation DeleteState($id: String!, $version: Long!) {
+  deleteState(id: $id, version: $version) {
+    id
+    version
+  }
+}

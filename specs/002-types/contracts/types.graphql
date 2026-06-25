@@ -1,0 +1,234 @@
+# Contract: Types (commercetools `TypeDefinition`)
+#
+# API target: commercetools GraphQL (Merchant Center `ctp` target).
+# All documents below were VALIDATED against the official commercetools public
+# GraphQL schema with the `commercetools-graphql-validate` tool (zero errors).
+# Project-specific custom fields are not exercised by this resource, so the
+# public-schema validation covers every selection here.
+#
+# Localized strings are read via `*AllLocales { locale value }` (the data layer
+# omits empty translations when persisting; see ../../README.md §4).
+# Optimistic concurrency: reads expose `version`; update/delete send it back
+# (see ../../README.md §5).
+#
+# ---------------------------------------------------------------------------
+# Update actions (input type `TypeUpdateAction`) used by updateTypeDefinition
+# ---------------------------------------------------------------------------
+# The form layer computes a minimal action list as a diff between the loaded
+# Type and the form draft. Field-definition edits are single update actions.
+#
+#   changeName                     -> { name: [{ locale, value }] }
+#   setDescription                 -> { description: [{ locale, value }] }   (clears when omitted/empty)
+#   addFieldDefinition             -> { fieldDefinition: FieldDefinitionInput }
+#   removeFieldDefinition          -> { fieldName }
+#   changeLabel                    -> { fieldName, label: [{ locale, value }] }   (field-definition label)
+#   changeInputHint                -> { fieldName, inputHint: SingleLine|MultiLine }
+#   addEnumValue                   -> { fieldName, value: { key, label } }                 (Enum)
+#   changeEnumValueLabel           -> { fieldName, value: { key, label } }                 (Enum)
+#   addLocalizedEnumValue          -> { fieldName, value: { key, label: [{ locale, value }] } }  (LocalizedEnum)
+#   changeLocalizedEnumValueLabel  -> { fieldName, value: { key, label: [{ locale, value }] } }  (LocalizedEnum)
+#
+# NOT used (intentional limitations, see spec.md §6):
+#   removeEnumValue (no such action exists), changeEnumValueOrder /
+#   changeLocalizedEnumValueOrder (reordering), changeFieldDefinitionOrder.
+#
+# NOTE: the public schema has NO `changeFieldDefinitionRequired` action; the
+# `required` flag is only settable on creation via FieldDefinitionInput.required.
+# data-model.md lists it as "or equivalent" — there is no equivalent, so
+# editing `required` on a persisted field definition is not supported by the API.
+#
+# Example `actions:` payload (rename + add an enum value to field "color"):
+#
+#   actions: [
+#     { changeName: { name: [{ locale: "en", value: "Order metadata" }] } },
+#     { addEnumValue: { fieldName: "color", value: { key: "red", label: "Red" } } }
+#   ]
+#
+# ---------------------------------------------------------------------------
+
+
+# ===========================================================================
+# Reusable fragments
+# ===========================================================================
+
+# A field definition's `type` is a `FieldType` interface. Concrete types are
+# expanded via inline fragments: EnumType / LocalizedEnumType carry values,
+# ReferenceType carries referenceTypeId, SetType wraps a nested elementType.
+fragment FieldDefinitionDetails on FieldDefinition {
+  name
+  required
+  inputHint
+  labelAllLocales {
+    locale
+    value
+  }
+  type {
+    name
+    ... on EnumType {
+      values {
+        key
+        label
+      }
+    }
+    ... on LocalizedEnumType {
+      values {
+        key
+        labelAllLocales {
+          locale
+          value
+        }
+      }
+    }
+    ... on ReferenceType {
+      referenceTypeId
+    }
+    ... on SetType {
+      elementType {
+        name
+        ... on EnumType {
+          values {
+            key
+            label
+          }
+        }
+        ... on LocalizedEnumType {
+          values {
+            key
+            labelAllLocales {
+              locale
+              value
+            }
+          }
+        }
+        ... on ReferenceType {
+          referenceTypeId
+        }
+      }
+    }
+  }
+}
+
+fragment InitiatorDetails on Initiator {
+  isPlatformClient
+  externalUserId
+  customerRef {
+    typeId
+    id
+  }
+  userRef {
+    typeId
+    id
+  }
+}
+
+fragment TypeDefinitionDetails on TypeDefinition {
+  id
+  key
+  version
+  nameAllLocales {
+    locale
+    value
+  }
+  descriptionAllLocales {
+    locale
+    value
+  }
+  resourceTypeIds
+  createdAt
+  lastModifiedAt
+  createdBy {
+    ...InitiatorDetails
+  }
+  lastModifiedBy {
+    ...InitiatorDetails
+  }
+  fieldDefinitions {
+    ...FieldDefinitionDetails
+  }
+}
+
+
+# ===========================================================================
+# Queries
+# ===========================================================================
+
+# List view. `$sort` is commercetools sort syntax, e.g. ["key asc"],
+# ["name.en desc"], ["createdAt desc"]. `$where` is optional (e.g. search).
+# `fieldDefinitions { name }` lets the list show a field-definition count.
+query TypeDefinitions($limit: Int, $offset: Int, $sort: [String!], $where: String) {
+  typeDefinitions(limit: $limit, offset: $offset, sort: $sort, where: $where) {
+    total
+    count
+    offset
+    results {
+      id
+      key
+      version
+      nameAllLocales {
+        locale
+        value
+      }
+      descriptionAllLocales {
+        locale
+        value
+      }
+      resourceTypeIds
+      createdAt
+      lastModifiedAt
+      fieldDefinitions {
+        name
+      }
+    }
+  }
+}
+
+# Single Type, full selection for the edit view (incl. all field definitions).
+query TypeDefinitionById($id: String!) {
+  typeDefinition(id: $id) {
+    ...TypeDefinitionDetails
+  }
+}
+
+# Single field definition fetch for the field-definition edit form
+# (data-model.md: `typeDefinition(id) { fieldDefinitions(includeNames:[…]) }`).
+query TypeDefinitionFieldDefinition($id: String!, $includeNames: [String!]!) {
+  typeDefinition(id: $id) {
+    id
+    version
+    fieldDefinitions(includeNames: $includeNames) {
+      ...FieldDefinitionDetails
+    }
+  }
+}
+
+
+# ===========================================================================
+# Mutations
+# ===========================================================================
+
+# Create. `$draft: TypeDefinitionDraft!`:
+#   { key, name: [{ locale, value }], description?: [{ locale, value }],
+#     resourceTypeIds: [String!], fieldDefinitions?: [FieldDefinitionInput!] }
+# Per spec, field definitions are added after creation, so the form sends only
+# key / name / description / resourceTypeIds.
+mutation CreateTypeDefinition($draft: TypeDefinitionDraft!) {
+  createTypeDefinition(draft: $draft) {
+    ...TypeDefinitionDetails
+  }
+}
+
+# Update via the diffed action list (see header comment for the action set).
+mutation UpdateTypeDefinition($id: String!, $version: Long!, $actions: [TypeUpdateAction!]!) {
+  updateTypeDefinition(id: $id, version: $version, actions: $actions) {
+    ...TypeDefinitionDetails
+  }
+}
+
+# Delete. Returns the deleted resource; the UI returns to the list afterward.
+mutation DeleteTypeDefinition($id: String!, $version: Long!) {
+  deleteTypeDefinition(id: $id, version: $version) {
+    id
+    key
+    version
+  }
+}

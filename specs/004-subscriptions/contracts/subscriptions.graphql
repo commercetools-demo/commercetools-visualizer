@@ -1,0 +1,160 @@
+# Subscriptions — commercetools GraphQL contract
+#
+# Target:    Merchant Center custom-application GraphQL endpoint, `ctp` target
+#            (the project-scoped commercetools GraphQL API).
+# Validated: against the official commercetools public GraphQL schema with
+#            `commercetools-graphql-validate` — all five operations below report
+#            zero errors. Schema resource: `CommercetoolsSubscription`.
+#
+# ---------------------------------------------------------------------------
+# Notes on the schema shape (see specs/004-subscriptions/data-model.md)
+# ---------------------------------------------------------------------------
+# * `destination` is a GraphQL **interface** (`Destination { type }`), NOT a union.
+#   Concrete implementors selected here via inline fragments:
+#     GoogleCloudPubSubDestination, SQSDestination, ConfluentCloudDestination,
+#     SNSDestination, EventBridgeDestination, AzureServiceBusDestination,
+#     EventGridDestination  (EventGrid == "Azure Event Grid").
+#   `type` is the discriminator string (e.g. "GoogleCloudPubSub", "SQS",
+#   "ConfluentCloud", "SNS", "EventBridge", "AzureServiceBus", "EventGrid").
+# * `format` is also an interface (`NotificationFormat { type }`); the only
+#   non-trivial implementor is `CloudEventsSubscriptionsFormat`. PlatformFormat
+#   carries no extra fields, so only `type` is selected for it.
+# * `accessKey` is `String!` on EventGridDestination but `String` on SQS/SNS;
+#   selecting it under the same `destination` field forces the alias
+#   `eventGridAccessKey` to avoid a field-type conflict.
+#
+# UI scope: only GoogleCloudPubSub, SQS and ConfluentCloud are configurable in
+# this app. SNS, EventBridge, AzureServiceBus and EventGrid (Azure Event Grid)
+# are valid destinations in the schema and are read back here, but the app
+# exposes no configuration form for them (see spec §6).
+#
+# ---------------------------------------------------------------------------
+# Update actions (input: SubscriptionUpdateAction) used by this app
+# ---------------------------------------------------------------------------
+# The app computes actions as a diff of the loaded subscription vs. the form
+# (calculateSubscriptionUpdateActions). Actions used:
+#   * setKey           { setKey: { key } }
+#   * changeDestination{ changeDestination: { destination: <DestinationInput> } }
+#   * setMessages      { setMessages: { messages: [{ resourceTypeId, types }] } }
+#   * setChanges       { setChanges:  { changes:  [{ resourceTypeId }] } }
+# (Note: the schema exposes `setKey`, not a separate `changeKey`. `setEvents`
+#  exists but is not used by this app.)
+#
+# Example `actions:` payload (variables for UpdateSubscription $actions):
+#   [
+#     { "setKey": { "key": "orders-to-pubsub" } },
+#     { "changeDestination": {
+#         "destination": { "GoogleCloudPubSub": { "projectId": "my-proj", "topic": "orders" } } } },
+#     { "setChanges":  { "changes":  [ { "resourceTypeId": "order" } ] } },
+#     { "setMessages": { "messages": [ { "resourceTypeId": "order", "types": [ "OrderCreated" ] } ] } }
+#   ]
+#
+# Example `draft:` payload (variables for CreateSubscription $draft):
+#   {
+#     "key": "orders-to-pubsub",
+#     "destination": { "GoogleCloudPubSub": { "projectId": "my-proj", "topic": "orders" } },
+#     "changes":  [ { "resourceTypeId": "order" } ],
+#     "messages": [ { "resourceTypeId": "order", "types": [ "OrderCreated" ] } ],
+#     "format":   { "Platform": { } }
+#   }
+# ---------------------------------------------------------------------------
+
+
+# --- List ------------------------------------------------------------------
+# FR-001. Paginated, sortable list. Default sort: `["key asc"]`.
+query SubscriptionsList($limit: Int, $offset: Int, $sort: [String!]) {
+  subscriptions(limit: $limit, offset: $offset, sort: $sort) {
+    total
+    count
+    offset
+    results {
+      id
+      key
+      version
+      destination {
+        type
+        ... on GoogleCloudPubSubDestination { topic projectId }
+        ... on SQSDestination { queueUrl region authenticationMode }
+        ... on ConfluentCloudDestination { bootstrapServer acks topic }
+        ... on SNSDestination { topicArn authenticationMode }
+        ... on EventBridgeDestination { region accountId }
+        ... on AzureServiceBusDestination { connectionString }
+        ... on EventGridDestination { uri }
+      }
+      messages { resourceTypeId types }
+      changes { resourceTypeId }
+      createdAt
+      lastModifiedAt
+    }
+  }
+}
+
+
+# --- Detail (single by id) -------------------------------------------------
+# FR-009. Full selection incl. destination secrets-where-readable, format, status.
+query SubscriptionById($id: String!) {
+  subscription(id: $id) {
+    id
+    key
+    version
+    destination {
+      type
+      ... on GoogleCloudPubSubDestination { topic projectId }
+      ... on SQSDestination { queueUrl region authenticationMode accessKey }
+      ... on ConfluentCloudDestination { bootstrapServer acks topic apiKey }
+      ... on SNSDestination { topicArn authenticationMode accessKey }
+      ... on EventBridgeDestination { region accountId }
+      ... on AzureServiceBusDestination { connectionString }
+      ... on EventGridDestination { uri eventGridAccessKey: accessKey }
+    }
+    messages { resourceTypeId types }
+    changes { resourceTypeId }
+    format {
+      type
+      ... on CloudEventsSubscriptionsFormat { cloudEventsVersion }
+    }
+    status
+    createdAt
+    lastModifiedAt
+    createdBy { isPlatformClient clientId externalUserId }
+    lastModifiedBy { isPlatformClient clientId externalUserId }
+  }
+}
+
+
+# --- Create ----------------------------------------------------------------
+# FR-008. $draft: SubscriptionDraft (key, destination required, optional
+# changes/messages/format). See example payload in the header.
+mutation CreateSubscription($draft: SubscriptionDraft!) {
+  createSubscription(draft: $draft) {
+    id
+    key
+    version
+    destination { type }
+  }
+}
+
+
+# --- Update ----------------------------------------------------------------
+# FR-011. Optimistic concurrency via $version; $actions is the computed diff.
+mutation UpdateSubscription($id: String!, $version: Long!, $actions: [SubscriptionUpdateAction!]!) {
+  updateSubscription(id: $id, version: $version, actions: $actions) {
+    id
+    key
+    version
+    destination { type }
+    messages { resourceTypeId types }
+    changes { resourceTypeId }
+  }
+}
+
+
+# --- Delete ----------------------------------------------------------------
+# FR-011. Optimistic concurrency via $version.
+mutation DeleteSubscription($id: String!, $version: Long!) {
+  deleteSubscription(id: $id, version: $version) {
+    id
+    key
+    version
+  }
+}

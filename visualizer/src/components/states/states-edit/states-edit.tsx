@@ -27,7 +27,7 @@ import {
   calculateStateUpdateActions,
 } from 'commercetools-demo-shared-data-fetching-hooks';
 import {
-  formValuesToState,
+  formValuesToStatePartial,
   stateToFormValues,
 } from '../states-form/conversion';
 
@@ -54,7 +54,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
 
   const handleSubmit = useCallback(
     async (formikValues: TFormValues, formikHelpers) => {
-      const data = formValuesToState(formikValues);
+      const data = formValuesToStatePartial(formikValues);
       if (state && data) {
         const updateActions = calculateStateUpdateActions(state, data);
         if (updateActions.length > 0) {

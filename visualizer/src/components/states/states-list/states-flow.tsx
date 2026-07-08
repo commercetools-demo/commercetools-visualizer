@@ -79,7 +79,8 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
     let type = '';
     if (item.initial) {
       type = 'input';
-    } else if (item.transitions === undefined) {
+    } else if (!item.transitions || item.transitions.length === 0) {
+      // No outgoing transitions => terminal (leaf) state.
       type = 'output';
     }
     const result: Node = {

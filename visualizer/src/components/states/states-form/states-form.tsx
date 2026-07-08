@@ -41,6 +41,7 @@ export const resourceTypes = [
   { value: 'OrderState', label: 'Order State' },
   { value: 'LineItemState', label: 'Line Item State' },
   { value: 'ProductState', label: 'Product State' },
+  { value: 'ReviewState', label: 'Review State' },
   { value: 'PaymentState', label: 'Payment State' },
   { value: 'QuoteRequestState', label: 'Quote Request State' },
   { value: 'StagedQuoteState', label: 'Staged Quote State' },
@@ -202,34 +203,41 @@ const StatesForm: FC<Props> = ({
               </Grid.Item>
               <Grid.Item>
                 <Card type="flat" insetScale="s">
-                  <SelectField
-                    name="stateType"
-                    title={intl.formatMessage(messages.stateTypeTitle)}
-                    isRequired
-                    value={formik.values.stateType}
-                    options={resourceTypes}
-                    errors={
-                      SelectField.toFieldErrors<TFormValues>(formik.errors)
-                        .stateType
-                    }
-                    touched={
-                      formik.touched.stateType
-                        ? formik.touched.stateType
-                        : undefined
-                    }
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isDisabled={!createNewMode}
-                    isReadOnly={!canManage}
-                  />
-                  <CheckboxInput
-                    name="initial"
-                    isChecked={formik.values.initial}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  >
-                    <FormattedMessage {...messages.initialTitle} />
-                  </CheckboxInput>
+                  <Spacings.Stack scale="s">
+                    <SelectField
+                      name="stateType"
+                      title={intl.formatMessage(messages.stateTypeTitle)}
+                      isRequired
+                      value={formik.values.stateType}
+                      options={resourceTypes}
+                      errors={
+                        SelectField.toFieldErrors<TFormValues>(formik.errors)
+                          .stateType
+                      }
+                      touched={
+                        formik.touched.stateType
+                          ? formik.touched.stateType
+                          : undefined
+                      }
+                      onBlur={formik.handleBlur}
+                      onChange={formik.handleChange}
+                      isDisabled={!createNewMode}
+                      isReadOnly={!canManage}
+                    />
+                    <Spacings.Stack scale="xs">
+                      <CheckboxInput
+                        name="initial"
+                        isChecked={formik.values.initial}
+                        onChange={formik.handleChange}
+                        isReadOnly={!canManage}
+                      >
+                        <FormattedMessage {...messages.initialTitle} />
+                      </CheckboxInput>
+                      <Text.Detail tone="secondary">
+                        <FormattedMessage {...messages.initialHint} />
+                      </Text.Detail>
+                    </Spacings.Stack>
+                  </Spacings.Stack>
                 </Card>
               </Grid.Item>
               <Grid.Item>
@@ -289,7 +297,8 @@ const StatesForm: FC<Props> = ({
                     isMulti={true}
                     isClearable={true}
                     value={formik.values.transitions}
-                    title={'Transitions'}
+                    title={intl.formatMessage(messages.transitionsTitle)}
+                    hint={intl.formatMessage(messages.transitionsHint)}
                     errors={
                       SelectField.toFieldErrors<TFormValues>(formik.errors)
                         .transitions

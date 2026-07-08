@@ -14,7 +14,7 @@ import {
   TabularMainPage,
 } from '@commercetools-frontend/application-components';
 import { ContentNotification } from '@commercetools-uikit/notifications';
-import { lazy, ReactNode } from 'react';
+import { lazy, ReactNode, useEffect } from 'react';
 import Spacings from '@commercetools-uikit/spacings';
 import LoadingSpinner from '@commercetools-uikit/loading-spinner';
 import { TState } from '../../../types/generated/ctp';
@@ -71,6 +71,20 @@ const StatesList = (props: Props) => {
     offset: 0,
   });
 
+  // Redirect to the first available tab when no type is selected. Done in an
+  // effect (not during render) and guarded so an empty/no-builtIn result set
+  // does not crash.
+  useEffect(() => {
+    if (type || !states?.results?.length) {
+      return;
+    }
+    const defaultState =
+      states.results.find((item) => item.builtIn) ?? states.results[0];
+    if (defaultState) {
+      replace(`${match.url}/${defaultState.type.toLocaleLowerCase()}`);
+    }
+  }, [type, states, match.url, replace]);
+
   if (error) {
     return (
       <ContentNotification type="error">
@@ -105,13 +119,6 @@ const StatesList = (props: Props) => {
   };
 
   const { results } = states;
-  if (!type) {
-    replace(
-      match.url +
-        '/' +
-        results.filter((item) => item.builtIn)[0].type.toLocaleLowerCase()
-    );
-  }
 
   availableStates.forEach((value) => {
     const itemStates = results.filter((item) => {
@@ -164,7 +171,7 @@ const StatesList = (props: Props) => {
       tabControls={tab}
     >
       <Switch>
-        {itemsToRender.reverse().map((item, index) => {
+        {itemsToRender.map((item, index) => {
           return (
             <Route
               key={index}

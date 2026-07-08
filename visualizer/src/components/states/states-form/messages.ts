@@ -29,8 +29,8 @@ export default defineMessages({
   },
   duplicateKey: {
     id: 'State.form.GeneralInfoForm.duplicateKey',
-    description: 'The message shown when the business unit key already exists',
-    defaultMessage: 'A subscription with this key already exists.',
+    description: 'The message shown when the state key already exists',
+    defaultMessage: 'A state with this key already exists.',
   },
   requiredKey: {
     id: 'State.form.GeneralInfoForm.requiredKey',
@@ -49,10 +49,26 @@ export default defineMessages({
     description: 'Title for State Type ID field',
     defaultMessage: 'State Type',
   },
-  initialTitle: {
-    id: 'FieldForm.initialTitle.title',
-    description: 'Title for initial field',
+  transitionsTitle: {
+    id: 'State.form.transitions.title',
+    description: 'Title for the transitions field',
+    defaultMessage: 'Transitions to',
+  },
+  transitionsHint: {
+    id: 'State.form.transitions.hint',
+    description: 'Hint for the transitions field',
     defaultMessage:
-      'Set to false if the State is not the first step in a workflow.',
+      'The states this state is allowed to move to. Leave empty to make this a final state (no further transitions). This is one-directional — add this state to the other state as well if you need a two-way transition.',
+  },
+  initialTitle: {
+    id: 'State.form.initial.title',
+    description: 'Label for the initial state checkbox',
+    defaultMessage: 'Set as initial state',
+  },
+  initialHint: {
+    id: 'State.form.initial.hint',
+    description: 'Explanation of what the initial state checkbox does',
+    defaultMessage:
+      'Initial states are automatically assigned to a resource when it is created. Leave unchecked if this State is a later step in the workflow.',
   },
 });

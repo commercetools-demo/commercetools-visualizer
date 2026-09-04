@@ -1,15 +1,18 @@
-import { FC, ReactElement } from 'react';
+import { JSX, FC, ReactElement, ReactNode } from 'react';
 import { useFormik, type FormikHelpers } from 'formik';
-import TextField from '@commercetools-uikit/text-field';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
-import { designTokens } from '@commercetools-uikit/design-system';
-import LocalizedTextField from '@commercetools-uikit/localized-text-field';
-import Card from '@commercetools-uikit/card';
-import Spacings from '@commercetools-uikit/spacings';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
-import Grid from '@commercetools-uikit/grid';
-import SelectField from '@commercetools-uikit/select-field';
+import {
+  Box,
+  ComboBox,
+  FormField,
+  Grid,
+  Heading,
+  LocalizedField,
+  type LocalizedString,
+  Stack,
+  TextInput,
+} from '@commercetools/nimbus';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { ApolloQueryResult } from '@apollo/client';
 import {
@@ -18,15 +21,13 @@ import {
   TQuery,
   TQuery_TypeDefinitionArgs,
 } from 'commercetools-demo-shared-helpers';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
 import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
-import { PageContentWide } from '@commercetools-frontend/application-components';
-import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 
-const resourceTypes = RESOURCE_TYPES.map((t) => ({ label: t, value: t }));
+const resourceTypeItems = RESOURCE_TYPES.map((t) => ({ id: t, name: t }));
 type Formik = ReturnType<typeof useFormik>;
 
 type TErrors = {
@@ -53,7 +54,7 @@ const validate = (formikValues: TFormValues) => {
     errors.key.missing = true;
   }
 
-  if (LocalizedTextInput.isEmpty(formikValues.name)) {
+  if (LocalizedField.isEmpty(formikValues.name)) {
     errors.name.missing = true;
   }
   if (formikValues.resourceTypeIds.length < 1) {
@@ -62,24 +63,18 @@ const validate = (formikValues: TFormValues) => {
   return omitEmpty<TErrors>(errors);
 };
 
-const renderKeyInputErrors = (key: string) => {
-  switch (key) {
-    case 'invalidInput':
-      return <FormattedMessage {...messages.invalidKey} />;
-    case 'duplicate':
-      return <FormattedMessage {...messages.duplicateKey} />;
-    case 'missing':
-      return <FormattedMessage {...messages.requiredKey} />;
-    default:
-      return null;
-  }
+const renderKeyInputError = (key?: TErrors['key']): ReactNode => {
+  if (!key) return null;
+  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
+  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
+  return null;
 };
 
 export type TFormValues = {
   id: string;
   key?: Maybe<string>;
-  name: Record<string, string>;
-  description: Record<string, string>;
+  name: LocalizedString;
+  description: LocalizedString;
   resourceTypeIds: Array<string>;
   fieldDefinitions: Array<TFieldDefinition>;
 };
@@ -132,126 +127,136 @@ const TypesForm: FC<Props> = ({
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
+  const errors = formik.errors as Partial<TErrors>;
+
   const formElements = (
-    <PageContentWide>
-      <Spacings.Stack scale="xxxl">
-        <Spacings.Stack scale="m">
-          <CollapsiblePanel
-            header={
-              <CollapsiblePanel.Header>
-                <FormattedMessage {...messages.generalInformationTitle} />
-              </CollapsiblePanel.Header>
+    <Stack direction="column" gap="800">
+      <Stack direction="column" gap="400">
+        <Heading as="h2" size="md">
+          <FormattedMessage {...messages.generalInformationTitle} />
+        </Heading>
+        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
+          <LocalizedField
+            id="types-edit-name"
+            name="name"
+            type="text"
+            label={intl.formatMessage(messages.nameTitle)}
+            isRequired
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.name}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `name.${event.target.locale}`,
+                event.target.value
+              )
             }
+            onBlur={() => formik.setFieldTouched('name', true)}
+            touched={!!formik.touched.name}
+            error={
+              formik.touched.name && errors.name?.missing
+                ? intl.formatMessage(messages.requiredFieldError)
+                : undefined
+            }
+          />
+          <LocalizedField
+            id="types-edit-description"
+            name="description"
+            type="text"
+            label={intl.formatMessage(messages.descriptionTitle)}
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.description}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `description.${event.target.locale}`,
+                event.target.value
+              )
+            }
+            onBlur={() => formik.setFieldTouched('description', true)}
+          />
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode}
+            isInvalid={Boolean(formik.touched.key && errors.key)}
           >
-            <Grid
-              gridTemplateColumns={`repeat(2, ${designTokens.constraint11})`}
-              gridGap={designTokens.spacingM}
-            >
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <LocalizedTextField
-                    data-testid={'types-edit-name'}
-                    name="name"
-                    selectedLanguage={dataLocale}
-                    value={formik.values.name}
-                    title={intl.formatMessage(messages.nameTitle)}
-                    isRequired
-                    errors={
-                      LocalizedTextField.toFieldErrors<TFormValues>(
-                        formik.errors
-                      ).name
-                    }
-                    touched={!!formik.touched.name}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <LocalizedTextField
-                    name="description"
-                    selectedLanguage={dataLocale}
-                    value={formik.values.description}
-                    title={intl.formatMessage(messages.descriptionTitle)}
-                    errors={
-                      LocalizedTextField.toFieldErrors<TFormValues>(
-                        formik.errors
-                      ).description
-                    }
-                    touched={!!formik.touched.description}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <TextField
-                    name="key"
-                    value={formik.values.key || ''}
-                    title={intl.formatMessage(messages.keyTitle)}
-                    hint={intl.formatMessage(messages.keyHint)}
-                    isRequired
-                    errors={
-                      TextField.toFieldErrors<TFormValues>(formik.errors).key
-                    }
-                    touched={!!formik.touched.key}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!createNewMode}
-                    renderError={renderKeyInputErrors}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <SelectField
-                    name="resourceTypeIds"
-                    title={intl.formatMessage(messages.resourceTypeIdsTitle)}
-                    isRequired
-                    isMulti
-                    value={formik.values.resourceTypeIds}
-                    options={resourceTypes}
-                    errors={
-                      SelectField.toFieldErrors<TFormValues>(formik.errors)
-                        .resourceTypeIds
-                    }
-                    touched={
-                      formik.touched.resourceTypeIds
-                        ? formik.touched.resourceTypeIds
-                        : undefined
-                    }
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!createNewMode}
-                  />
-                </Card>
-              </Grid.Item>
-            </Grid>
-          </CollapsiblePanel>
-          {!createNewMode && (
-            <CollapsiblePanel
-              header={
-                <CollapsiblePanel.Header>
-                  <FormattedMessage {...messages.typeInformationTitle} />
-                </CollapsiblePanel.Header>
-              }
-            >
-              <FieldDefinitionsList
-                id={formik.values.id}
-                version={version}
-                value={formik.values.fieldDefinitions}
-                linkToHome={linkToHome}
-                refetch={refetch}
+            <FormField.Label>
+              {intl.formatMessage(messages.keyTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
+                aria-label={intl.formatMessage(messages.keyTitle)}
+                value={formik.values.key || ''}
+                isReadOnly={!createNewMode}
+                onChange={(value) => formik.setFieldValue('key', value)}
+                onBlur={() => formik.setFieldTouched('key', true)}
               />
-            </CollapsiblePanel>
-          )}
-        </Spacings.Stack>
-      </Spacings.Stack>
-    </PageContentWide>
+            </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.keyHint)}
+            </FormField.Description>
+            <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
+          </FormField.Root>
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode}
+            isInvalid={Boolean(
+              formik.touched.resourceTypeIds && errors.resourceTypeIds
+            )}
+          >
+            <FormField.Label>
+              {intl.formatMessage(messages.resourceTypeIdsTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <ComboBox.Root
+                aria-label={intl.formatMessage(messages.resourceTypeIdsTitle)}
+                items={resourceTypeItems}
+                selectionMode="multiple"
+                isReadOnly={!createNewMode}
+                selectedKeys={formik.values.resourceTypeIds}
+                onSelectionChange={(keys) =>
+                  formik.setFieldValue('resourceTypeIds', keys as string[])
+                }
+                onBlur={() => formik.setFieldTouched('resourceTypeIds', true)}
+              >
+                <ComboBox.Trigger />
+                <ComboBox.Popover>
+                  <ComboBox.ListBox>
+                    {(item: { id: string; name: string }) => (
+                      <ComboBox.Option id={item.id}>
+                        {item.name}
+                      </ComboBox.Option>
+                    )}
+                  </ComboBox.ListBox>
+                </ComboBox.Popover>
+              </ComboBox.Root>
+            </FormField.Input>
+            <FormField.Error>
+              {formik.touched.resourceTypeIds && errors.resourceTypeIds?.missing
+                ? intl.formatMessage(messages.requiredFieldError)
+                : null}
+            </FormField.Error>
+          </FormField.Root>
+        </Grid>
+      </Stack>
+
+      {!createNewMode && (
+        <Stack direction="column" gap="400">
+          <Heading as="h2" size="md">
+            <FormattedMessage {...messages.typeInformationTitle} />
+          </Heading>
+          <Box>
+            <FieldDefinitionsList
+              id={formik.values.id}
+              version={version}
+              value={formik.values.fieldDefinitions}
+              linkToHome={linkToHome}
+              refetch={refetch}
+            />
+          </Box>
+        </Stack>
+      )}
+    </Stack>
   );
 
   return children({

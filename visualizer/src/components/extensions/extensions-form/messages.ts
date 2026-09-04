@@ -59,4 +59,39 @@ export default defineMessages({
     description: 'destinationAWSLambda',
     defaultMessage: 'AWS Lambda',
   },
+  destinationTitle: {
+    id: 'Extension.form.panel.destination.title',
+    description: 'Title for destination panel',
+    defaultMessage: 'Destination',
+  },
+  triggersTitle: {
+    id: 'Extension.form.panel.triggers.title',
+    description: 'Title for triggers panel',
+    defaultMessage: 'Triggers',
+  },
+  submitButton: {
+    id: 'Extension.form.button.submit',
+    description: 'Label for submit button',
+    defaultMessage: 'Save',
+  },
+  revertButton: {
+    id: 'Extension.form.button.revert',
+    description: 'Label for revert button',
+    defaultMessage: 'Revert',
+  },
+  cancelButton: {
+    id: 'Extension.form.button.cancel',
+    description: 'Label for cancel button',
+    defaultMessage: 'Cancel',
+  },
+  deleteButton: {
+    id: 'Extension.form.button.delete',
+    description: 'Label for delete button',
+    defaultMessage: 'Delete',
+  },
+  requiredFieldError: {
+    id: 'Extension.form.error.required',
+    description: 'The error message for required fields',
+    defaultMessage: 'This field is required. Provide a value.',
+  },
 });

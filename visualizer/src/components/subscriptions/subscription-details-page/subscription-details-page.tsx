@@ -1,16 +1,14 @@
-import {
-  CustomFormDetailPage,
-  CustomFormModalPage,
-  FormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { FC, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
+import {
+  Alert,
+  Button,
+  Flex,
+  LoadingSpinner,
+  ModalPage,
+} from '@commercetools/nimbus';
 import { useIntl } from 'react-intl';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
@@ -27,7 +25,7 @@ import {
   graphQLErrorHandler,
   getErrorMessage,
   calculateSubscriptionUpdateActions,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
 import {
   TGoogleCloudPubSubDestination,
   TSqsDestination,
@@ -95,16 +93,17 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
   if (!subscription) {
@@ -171,34 +170,51 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     >
       {(formProps) => {
         return (
-          <CustomFormDetailPage
-            title={
-              formProps.values?.key ||
-              intl.formatMessage(messages.subscriptionKeyLabel)
-            }
-            onPreviousPathClick={() => history.push(linkToWelcome)}
-            formControls={
-              <>
-                <CustomFormDetailPage.FormSecondaryButton
-                  label={FormModalPage.Intl.revert}
-                  isDisabled={!formProps.isDirty}
-                  onClick={formProps.handleReset}
-                />
-                <CustomFormDetailPage.FormPrimaryButton
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                  onClick={() => formProps.submitForm()}
-                  label={FormModalPage.Intl.save}
-                />
-                <CustomFormModalPage.FormDeleteButton
-                  onClick={() => handleDelete()}
-                />
-              </>
-            }
-          >
-            {subscription && formProps.formElements}
-          </CustomFormDetailPage>
+          <ModalPage.Root isOpen onClose={() => history.push(linkToWelcome)}>
+            <ModalPage.TopBar
+              previousPathLabel={intl.formatMessage(messages.title)}
+              currentPathLabel={
+                formProps.values?.key ||
+                intl.formatMessage(messages.subscriptionKeyLabel)
+              }
+            />
+            <ModalPage.Header>
+              <ModalPage.Title>
+                {formProps.values?.key ||
+                  intl.formatMessage(messages.subscriptionKeyLabel)}
+              </ModalPage.Title>
+            </ModalPage.Header>
+            <ModalPage.Content>
+              {subscription && formProps.formElements}
+            </ModalPage.Content>
+            <ModalPage.Footer>
+              <Button
+                variant="outline"
+                isDisabled={!formProps.isDirty}
+                onPress={formProps.handleReset}
+              >
+                {intl.formatMessage(messages.revertButton)}
+              </Button>
+              <Button
+                colorPalette="primary"
+                variant="solid"
+                isDisabled={
+                  formProps.isSubmitting || !formProps.isDirty || !canManage
+                }
+                onPress={() => formProps.submitForm()}
+              >
+                {intl.formatMessage(messages.saveButton)}
+              </Button>
+              <Button
+                colorPalette="critical"
+                variant="outline"
+                isDisabled={!canManage}
+                onPress={() => handleDelete()}
+              >
+                {intl.formatMessage(messages.deleteButton)}
+              </Button>
+            </ModalPage.Footer>
+          </ModalPage.Root>
         );
       }}
     </SubscriptionDetailsForm>

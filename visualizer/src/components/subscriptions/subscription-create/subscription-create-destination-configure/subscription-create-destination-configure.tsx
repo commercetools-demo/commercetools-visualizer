@@ -4,8 +4,7 @@ import {
   SubscriptionStepProps,
 } from '../subscription-create-configuration';
 import { Formik } from 'formik';
-import Spacings from '@commercetools-uikit/spacings';
-import { PageContentWide } from '@commercetools-frontend/application-components';
+import { Stack } from '@commercetools/nimbus';
 
 import { useHistory } from 'react-router';
 import SubscriptionDestinationForm from '../../subscription-destination-form/subscription-destination-form';
@@ -37,11 +36,9 @@ const SubscriptionCreateDestinationConfigure: FC<SubscriptionStepProps> = ({
     >
       {(formikProps) => (
         <>
-          <PageContentWide columns="2/1" gapSize="20">
-            <Spacings.Stack scale="xxxl">
-              <SubscriptionDestinationForm destinationType={destinationType} />
-            </Spacings.Stack>
-          </PageContentWide>
+          <Stack direction="column" gap="800">
+            <SubscriptionDestinationForm destinationType={destinationType} />
+          </Stack>
           <SaveToolbar
             isVisible={formikProps.dirty || formik?.dirty}
             buttonProps={{ next: { isDisabled: !formikProps.isValid } }}

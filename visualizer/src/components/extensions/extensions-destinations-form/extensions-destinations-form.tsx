@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { Text } from '@commercetools/nimbus';
 import { TFormValues } from '../extensions-form/extensions-form';
 import ExtensionsDestinationsFormHttp from './extensions-destinations-form-http';
 import { useFormik } from 'formik';
@@ -9,7 +10,9 @@ type Props = {
 };
 const ExtensionsDestinationsForm: FC<Props> = ({ formik }) => {
   let toRender = (
-    <div>No mapping defined so far for {formik.values.destinationName}</div>
+    <Text color="neutral.11">
+      No mapping defined so far for {formik.values.destinationName}
+    </Text>
   );
   switch (formik.values.destinationName) {
     case 'HTTP':

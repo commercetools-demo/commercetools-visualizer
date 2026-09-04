@@ -1,23 +1,20 @@
+import { ReactElement } from 'react';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { Badge, Flex, Text } from '@commercetools/nimbus';
 import {
   TFieldType,
   TReferenceType,
   TSetType,
 } from '../../../types/generated/ctp';
-import Text from '@commercetools-uikit/text';
-import { FormattedMessage, useIntl } from 'react-intl';
 import messages from './messages';
-import Stamp from '@commercetools-uikit/stamp';
-import Spacings from '@commercetools-uikit/spacings';
-import { ReactElement } from 'react';
 
 const LocalizedLabel = () => {
   const intl = useIntl();
 
   return (
-    <Stamp
-      label={intl.formatMessage(messages.localizedLabel)}
-      tone="information"
-    />
+    <Badge colorPalette="info">
+      {intl.formatMessage(messages.localizedLabel)}
+    </Badge>
   );
 };
 
@@ -27,70 +24,70 @@ export const renderAttributeTypeName = (
   switch (fieldType?.name) {
     case 'Boolean':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelBoolean} />
-        </Text.Detail>
+        </Text>
       );
     case 'Date':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelDate} />
-        </Text.Detail>
+        </Text>
       );
     case 'DateTime':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelDateTime} />
-        </Text.Detail>
+        </Text>
       );
     case 'Enum':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelEnum} />
-        </Text.Detail>
+        </Text>
       );
 
     case 'LocalizedEnum':
       return (
-        <Spacings.Inline justifyContent={'space-between'}>
-          <Text.Detail>
+        <Flex justifyContent="space-between" alignItems="center" gap="200">
+          <Text>
             <FormattedMessage {...messages.attributeLabelEnum} />
-          </Text.Detail>
+          </Text>
           <LocalizedLabel />
-        </Spacings.Inline>
+        </Flex>
       );
     case 'LocalizedString':
       return (
-        <Spacings.Inline justifyContent={'space-between'}>
-          <Text.Detail>
+        <Flex justifyContent="space-between" alignItems="center" gap="200">
+          <Text>
             <FormattedMessage {...messages.attributeLabelText} />
-          </Text.Detail>
+          </Text>
           <LocalizedLabel />
-        </Spacings.Inline>
+        </Flex>
       );
     case 'Money':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelMoney} />
-        </Text.Detail>
+        </Text>
       );
     case 'Number':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelNumber} />
-        </Text.Detail>
+        </Text>
       );
     case 'Reference':
       const ref = fieldType as TReferenceType;
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage
             {...messages.attributeLabelReference}
             values={{
               referenceType: ref.referenceTypeId,
             }}
           />
-        </Text.Detail>
+        </Text>
       );
     case 'Set':
       const set = fieldType as TSetType;
@@ -98,18 +95,17 @@ export const renderAttributeTypeName = (
     case 'Text':
     case 'String':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelText} />
-        </Text.Detail>
+        </Text>
       );
     case 'Time':
       return (
-        <Text.Detail>
+        <Text>
           <FormattedMessage {...messages.attributeLabelTime} />
-        </Text.Detail>
+        </Text>
       );
     default:
-      console.log(fieldType);
-      return <Text.Detail>{fieldType?.name || ''}</Text.Detail>;
+      return <Text>{fieldType?.name || ''}</Text>;
   }
 };

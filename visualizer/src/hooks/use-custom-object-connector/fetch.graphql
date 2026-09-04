@@ -1,0 +1,7 @@
+#import "./fragments/custom-object-fragment.graphql"
+
+query GetCustomObject($container: String, $id: String, $key: String) {
+  customObject(id: $id, container: $container, key: $key) {
+    ...CustomObject
+  }
+}

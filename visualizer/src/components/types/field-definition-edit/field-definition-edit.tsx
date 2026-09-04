@@ -1,19 +1,18 @@
 import { FC, SyntheticEvent, useCallback } from 'react';
 import { useIntl } from 'react-intl';
-import {
-  CustomFormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
-import { RevertIcon } from '@commercetools-uikit/icons';
 import { useParams } from 'react-router-dom';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
+import {
+  Alert,
+  Button,
+  Flex,
+  LoadingSpinner,
+  ModalPage,
+} from '@commercetools/nimbus';
 import { PERMISSIONS } from '../../../constants';
 import messages from '../field-definition-input/messages';
 import FieldDefinitionInput from '../field-definition-input/field-definition-input';
@@ -28,7 +27,7 @@ import {
   useTypeDefinitionUpdater,
   getErrorMessage,
   calculateFieldDefinitionUpdateActions,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
 
 type Props = {
   onClose: (event: SyntheticEvent) => void;
@@ -92,16 +91,17 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.modalTitle)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.modalTitle)} />
+      </Flex>
     );
   }
   if (!fieldDefinitions || fieldDefinitions.length < 1) {
@@ -117,38 +117,39 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
       onSubmit={handleSubmit}
       dataLocale={dataLocale}
     >
-      {(formProps) => {
-        return (
-          <CustomFormModalPage
-            isOpen
-            onClose={onClose}
-            title={intl.formatMessage(messages.modalTitle)}
-            //subtitle={<LabelRequired />}
-            topBarCurrentPathLabel={intl.formatMessage(messages.modalTitle)}
-            formControls={
-              <>
-                <CustomFormModalPage.FormSecondaryButton
-                  label={intl.formatMessage(messages.revert)}
-                  iconLeft={<RevertIcon />}
-                  onClick={onClose}
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                />
-                <CustomFormModalPage.FormPrimaryButton
-                  label={messages.updateButton}
-                  onClick={() => formProps.submitForm()}
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                />
-              </>
-            }
-          >
-            {fieldDefinitions && formProps.formElements}
-          </CustomFormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.modalTitle)}
+            currentPathLabel={intl.formatMessage(messages.updateButton)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.modalTitle)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button
+              slot="close"
+              variant="outline"
+              onPress={(event) => onClose(event as unknown as SyntheticEvent)}
+            >
+              {intl.formatMessage(messages.revert)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(messages.updateButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </FieldDefinitionInput>
   );
 };

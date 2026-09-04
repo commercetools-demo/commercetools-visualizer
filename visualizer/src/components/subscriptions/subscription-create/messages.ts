@@ -34,4 +34,9 @@ export default defineMessages<string>({
     id: 'Subscriptions.subscriptionAdd',
     defaultMessage: 'Add new Subscription',
   },
+  backToSubscriptions: {
+    id: 'Subscriptions.CreateSubscriptionForm.backToSubscriptions',
+    description: 'The back link label to return to the subscriptions list',
+    defaultMessage: 'Back to subscriptions',
+  },
 });

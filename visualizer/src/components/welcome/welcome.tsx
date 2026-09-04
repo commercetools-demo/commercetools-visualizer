@@ -1,15 +1,16 @@
 import type { FC } from 'react';
 import { useHistory, useRouteMatch } from 'react-router-dom';
-import Grid from '@commercetools-uikit/grid';
-import { ListIcon } from '@commercetools-uikit/icons';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
+import { useIntl } from 'react-intl';
+import {
+  Button,
+  Card,
+  DefaultPage,
+  Grid,
+  Icon,
+  Text,
+} from '@commercetools/nimbus';
+import { List } from '@commercetools/nimbus-icons';
 import messages from './messages';
-import { PageContentWide } from '@commercetools-frontend/application-components';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Card from '@commercetools-uikit/card';
-import FlatButton from '@commercetools-uikit/flat-button';
-import AccessibleButton from '@commercetools-uikit/accessible-button';
 
 type TInfoCardProps = {
   title: string;
@@ -17,117 +18,82 @@ type TInfoCardProps = {
   target: string;
 };
 
-const InfoCard: FC<TInfoCardProps> = ({
-  title,
-  content,
-  target,
-}: TInfoCardProps) => {
+const InfoCard: FC<TInfoCardProps> = ({ title, content, target }) => {
   const { push } = useHistory();
   const match = useRouteMatch();
   return (
-    <Grid.Item>
-      <Card
-        type={'raised'}
-        insetScale={'m'}
-        theme={'light'}
-        css={{
-          height: '100%',
-        }}
-      >
-        <Spacings.Stack alignItems={'stretch'}>
-          <Text.Headline as={'h2'}>{title}</Text.Headline>
-          <Text.Body>{content}</Text.Body>
-          <FlatButton
-            label={`View ${title}`}
-            onClick={() => push(`${match.url}/${target}`)}
-            icon={
-              <AccessibleButton
-                as={'a'}
-                type={'button'}
-                label={`View ${title}`}
-              >
-                <ListIcon></ListIcon>
-              </AccessibleButton>
-            }
-          ></FlatButton>
-        </Spacings.Stack>
-      </Card>
-    </Grid.Item>
+    <Card.Root height="100%">
+      <Card.Header>
+        <Text fontSize="450" fontWeight="600" as="h2">
+          {title}
+        </Text>
+      </Card.Header>
+      <Card.Body>
+        <Text>{content}</Text>
+      </Card.Body>
+      <Card.Footer>
+        <Button variant="ghost" onPress={() => push(`${match.url}/${target}`)}>
+          <Icon as={List} size="2xs" />
+          {`View ${title}`}
+        </Button>
+      </Card.Footer>
+    </Card.Root>
   );
 };
 InfoCard.displayName = 'InfoCard';
 
 const Welcome = () => {
+  const intl = useIntl();
   return (
-    <Spacings.Inset scale="l">
-      <PageContentWide>
-        <Spacings.Stack scale="xl">
-          <Text.Headline as="h1" intlMessage={messages.title} />
-          <Grid
-            gridTemplateColumns={`repeat(3,1fr)`}
-            gridTemplateRows="minmax(180px, 200px)"
-            gridGap={designTokens.spacingM}
-            gridAutoColumns={'1fr'}
-          >
-            <InfoCard
-              title={'Types'}
-              content={
-                ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
-              }
-              target={'types'}
-            />
+    <DefaultPage.Root>
+      <DefaultPage.Header>
+        <DefaultPage.Title>
+          {intl.formatMessage(messages.title)}
+        </DefaultPage.Title>
+      </DefaultPage.Header>
+      <DefaultPage.Content>
+        <Grid
+          templateColumns="repeat(3, 1fr)"
+          autoRows="minmax(180px, 200px)"
+          gap="400"
+        >
+          <InfoCard
+            title={'Types'}
+            content={
+              ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
+            }
+            target={'types'}
+          />
 
-            <InfoCard
-              title={'Subscriptions'}
-              content={
-                'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
-              }
-              target={'subscriptions'}
-            />
-            <InfoCard
-              title={'States'}
-              content={
-                'States allow you to model finite state machines reflecting custom business logic. '
-              }
-              target={'states'}
-            />
-            <InfoCard
-              title={'API Extensions'}
-              content={
-                'Extend the behavior of an API with your business logic.'
-              }
-              target={'extensions'}
-            />
-            <InfoCard
-              title={'Custom Objects'}
-              content={
-                'Custom Objects store arbitrary JSON-formatted data on commercetools Composable Commerce.'
-              }
-              target={'custom-objects'}
-            />
-            <InfoCard
-              title={'Visualize'}
-              content={'A UI showing how your object interact with each other.'}
-              target={'visualize'}
-            />
-            <InfoCard
-              title={'Visualize Drilldown'}
-              content={
-                'Interactive visualization tool for exploring and drilling down into your commercetools data structures and relationships.'
-              }
-              target={'visualize-drilldown'}
-            />
-            <InfoCard
-              title={'Entity Diagram'}
-              content={
-                'Interactive visualization tool for exploring and drilling down into your commercetools data structures and relationships.'
-              }
-              target={'entity-diagram'}
-            />
-          </Grid>
-        </Spacings.Stack>
-      </PageContentWide>
-    </Spacings.Inset>
+          <InfoCard
+            title={'Subscriptions'}
+            content={
+              'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
+            }
+            target={'subscriptions'}
+          />
+          <InfoCard
+            title={'States'}
+            content={
+              'States allow you to model finite state machines reflecting custom business logic. '
+            }
+            target={'states'}
+          />
+          <InfoCard
+            title={'API Extensions'}
+            content={'Extend the behavior of an API with your business logic.'}
+            target={'extensions'}
+          />
+          <InfoCard
+            title={'Custom Objects'}
+            content={
+              'Custom Objects store arbitrary JSON-formatted data on commercetools Composable Commerce.'
+            }
+            target={'custom-objects'}
+          />
+        </Grid>
+      </DefaultPage.Content>
+    </DefaultPage.Root>
   );
 };
 Welcome.displayName = 'Welcome';

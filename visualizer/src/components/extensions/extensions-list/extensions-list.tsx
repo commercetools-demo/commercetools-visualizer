@@ -1,141 +1,143 @@
+import { useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import {
-  useDataTableSortingState,
-  usePaginationState,
-} from '@commercetools-uikit/hooks';
-import createColumnDefinitions from './column-definitions';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Text from '@commercetools-uikit/text';
-import Spacings from '@commercetools-uikit/spacings';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import {
-  InfoMainPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
-import {
-  getErrorMessage,
-  useExtensionsFetcher,
-} from 'commercetools-demo-shared-data-fetching-hooks';
-import { TExtension } from '../../../types/generated/ctp';
-import messages from './messages';
-import SecondaryButton from '@commercetools-uikit/secondary-button';
-import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import ExtensionsCreate from '../extensions-create/extensions-create';
+  Alert,
+  Button,
+  DataTable,
+  DefaultPage,
+  Flex,
+  LoadingSpinner,
+  Pagination,
+  Text,
+  type SortDescriptor,
+} from '@commercetools/nimbus';
+import { Add } from '@commercetools/nimbus-icons';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+import { getErrorMessage, useExtensionsFetcher } from '../../../hooks';
+import { TExtension } from '../../../types/generated/ctp';
+import { PERMISSIONS } from '../../../constants';
+import messages from './messages';
+import createColumnDefinitions from './column-definitions';
+import ExtensionsCreate from '../extensions-create/extensions-create';
 import ExtensionsEdit from '../extensions-edit/extensions-edit';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
-import {
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-helpers';
+
+const DEFAULT_PER_PAGE = 20;
+
+const toSortString = (sortDescriptor: SortDescriptor): string =>
+  `${String(sortDescriptor.column)} ${
+    sortDescriptor.direction === 'descending' ? 'desc' : 'asc'
+  }`;
 
 const ExtensionsList = () => {
   const intl = useIntl();
   const { push } = useHistory();
   const match = useRouteMatch();
-  const paginationState = usePaginationState();
-  const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
 
-  const { extensions, error, loading, refetch } = useExtensionsFetcher({
-    limit: paginationState.perPage.value,
-    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
-    sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'key',
+    direction: 'ascending',
   });
 
-  if (error) {
-    return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
-    );
-  }
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
 
-  if (loading) {
-    return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
-    );
-  }
+  const { extensions, error, loading, refetch } = useExtensionsFetcher({
+    limit: perPage,
+    offset: (page - 1) * perPage,
+    sort: [toSortString(sortDescriptor)],
+  });
 
-  if (!extensions || !extensions.results) {
-    return <PageNotFound />;
-  }
-
-  const { results, total } = extensions;
-
-  const itemRenderer: TDataTableProps<TExtension>['itemRenderer'] = (
-    item,
-    column
-  ) => {
-    switch (column.key) {
-      case 'destination':
-        return item.destination.type;
-      case 'triggers':
-        return item.triggers.map((value) => value.resourceTypeId).join(', ');
-      case 'createdAt':
-      case 'lastModifiedAt':
-        return formatDateAndTime(item[column.key], intl);
-      default:
-        return renderDefault(item[column.key as keyof TExtension]);
-    }
-  };
+  const total = extensions?.total ?? 0;
+  const results = (extensions?.results ?? []) as Array<TExtension>;
 
   return (
-    <InfoMainPage
-      customTitleRow={
-        <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h1" intlMessage={messages.title} />
-          <SecondaryButton
-            as={Link}
-            to={`${match.url}/new`}
-            iconLeft={<PlusBoldIcon />}
-            label={intl.formatMessage(messages.addType)}
-          />
-        </Spacings.Inline>
-      }
-    >
-      {total === 0 && <div>{intl.formatMessage(messages.noResults)}</div>}
+    <DefaultPage.Root>
+      <DefaultPage.Header>
+        <DefaultPage.Title>
+          {intl.formatMessage(messages.title)}
+        </DefaultPage.Title>
+        <DefaultPage.Actions>
+          <Button
+            variant="outline"
+            colorPalette="primary"
+            isDisabled={!canManage}
+            onPress={() => push(`${match.url}/new`)}
+          >
+            <Add />
+            {intl.formatMessage(messages.addType)}
+          </Button>
+        </DefaultPage.Actions>
+      </DefaultPage.Header>
+      <DefaultPage.Content>
+        {error ? (
+          <Alert.Root colorPalette="critical">
+            <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+            <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+          </Alert.Root>
+        ) : loading ? (
+          <Flex justifyContent="center" padding="600">
+            <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+          </Flex>
+        ) : total === 0 ? (
+          <Text color="neutral.11">
+            {intl.formatMessage(messages.noResults)}
+          </Text>
+        ) : (
+          <Flex direction="column" gap="400">
+            <DataTable<TExtension>
+              columns={createColumnDefinitions(intl)}
+              rows={results}
+              allowsSorting
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) => {
+                setSortDescriptor(descriptor);
+                setPage(1);
+              }}
+              onRowClick={(row) => push(`${match.url}/${row.id}`)}
+            />
+            <Pagination
+              totalItems={total}
+              currentPage={page}
+              pageSize={perPage}
+              onPageChange={setPage}
+              onPageSizeChange={(nextPageSize) => {
+                setPerPage(nextPageSize);
+                setPage(1);
+              }}
+              enablePageSizeSelector
+            />
+          </Flex>
+        )}
 
-      {total > 0 ? (
-        <PaginatableDataTable<TExtension>
-          columns={createColumnDefinitions(intl.formatMessage)}
-          visibleColumns={createColumnDefinitions(intl.formatMessage)}
-          rows={results}
-          itemRenderer={itemRenderer}
-          sortedBy={tableSorting.value.key}
-          sortDirection={tableSorting.value.order}
-          onSortChange={tableSorting.onChange}
-          onRowClick={(row) => push(`${match.url}/${row.id}`)}
-          totalItems={total}
-          paginationState={paginationState}
-        />
-      ) : null}
-      <Switch>
-        <SuspendedRoute path={`${match.path}/new`}>
-          <ExtensionsCreate
-            onSuccess={async (id: string) => {
-              await refetch();
-              push(`${match.url}/${id}`);
-            }}
-            onClose={async () => {
-              await refetch();
-              push(`${match.url}`);
-            }}
-          />
-        </SuspendedRoute>
-        <SuspendedRoute path={`${match.path}/:id`}>
-          <ExtensionsEdit
-            onClose={async () => {
-              await refetch();
-              push(`${match.url}`);
-            }}
-          />
-        </SuspendedRoute>
-      </Switch>
-    </InfoMainPage>
+        <Switch>
+          <SuspendedRoute path={`${match.path}/new`}>
+            <ExtensionsCreate
+              onSuccess={async (id: string) => {
+                await refetch();
+                push(`${match.url}/${id}`);
+              }}
+              onClose={async () => {
+                await refetch();
+                push(`${match.url}`);
+              }}
+            />
+          </SuspendedRoute>
+          <SuspendedRoute path={`${match.path}/:id`}>
+            <ExtensionsEdit
+              onClose={async () => {
+                await refetch();
+                push(`${match.url}`);
+              }}
+            />
+          </SuspendedRoute>
+        </Switch>
+      </DefaultPage.Content>
+    </DefaultPage.Root>
   );
 };
 

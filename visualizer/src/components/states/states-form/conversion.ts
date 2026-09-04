@@ -1,10 +1,24 @@
 import { TState, TStateDraft, TStateType } from '../../../types/generated/ctp';
 import { TFormValues } from './states-form';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import { LocalizedField, type LocalizedString } from '@commercetools/nimbus';
 import {
   transformLocalizedFieldToLocalizedString,
   transformLocalizedStringToLocalizedField,
 } from '@commercetools-frontend/l10n';
+
+// `LocalizedField.omitEmptyTranslations` returns Nimbus' `LocalizedString`
+// (values typed `string | undefined`). It has already dropped empty
+// translations, so the remaining values are defined strings — narrow the type
+// to `Record<string, string>` for `@commercetools-frontend/l10n`, dropping any
+// stray nullish values defensively.
+const omitEmptyTranslations = (
+  value: LocalizedString
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(LocalizedField.omitEmptyTranslations(value)).filter(
+      ([, translation]) => translation != null
+    )
+  ) as Record<string, string>;
 
 export const stateToFormValues = (
   projectLanguages: Array<string>,
@@ -15,12 +29,12 @@ export const stateToFormValues = (
     initial: state?.initial ?? false,
     stateType: state?.type || TStateType.LineItemState,
     key: state?.key || '',
-    name: LocalizedTextInput.createLocalizedString(
+    name: LocalizedField.createLocalizedString(
       projectLanguages,
       transformLocalizedFieldToLocalizedString(state?.nameAllLocales ?? []) ??
         {}
     ),
-    description: LocalizedTextInput.createLocalizedString(
+    description: LocalizedField.createLocalizedString(
       projectLanguages,
       transformLocalizedFieldToLocalizedString(
         state?.descriptionAllLocales ?? []
@@ -38,10 +52,10 @@ export const formValuesToState = (formValues: TFormValues): TStateDraft => {
     type: formValues.stateType as TStateType,
     key: formValues.key || '',
     name: transformLocalizedStringToLocalizedField(
-      LocalizedTextInput.omitEmptyTranslations(formValues.name)
+      omitEmptyTranslations(formValues.name)
     ),
     description: transformLocalizedStringToLocalizedField(
-      LocalizedTextInput.omitEmptyTranslations(formValues.description)
+      omitEmptyTranslations(formValues.description)
     ),
     transitions: formValues.transitions.map((transition) => ({
       typeId: formValues.stateType,

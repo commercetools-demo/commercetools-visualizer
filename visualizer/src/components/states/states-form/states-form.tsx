@@ -1,4 +1,4 @@
-import { FC, ReactElement } from 'react';
+import { FC, JSX, ReactElement, ReactNode } from 'react';
 import { FormikHelpers, useFormik } from 'formik';
 import {
   Maybe,
@@ -7,34 +7,29 @@ import {
   TStateType,
 } from '../../../types/generated/ctp';
 import { ApolloQueryResult } from '@apollo/client';
-import {
-  PageContentWide,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
-import Spacings from '@commercetools-uikit/spacings';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
 import { FormattedMessage, useIntl } from 'react-intl';
-import messages from './messages';
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Card from '@commercetools-uikit/card';
-import LocalizedTextField from '@commercetools-uikit/localized-text-field';
-import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import TextField from '@commercetools-uikit/text-field';
 import omitEmpty from 'omit-empty-es';
-import SelectField, { TOption } from '@commercetools-uikit/select-field';
 import {
-  getErrorMessage,
-  useStatesFetcher,
-} from 'commercetools-demo-shared-data-fetching-hooks';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Text from '@commercetools-uikit/text';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+  Alert,
+  Checkbox,
+  ComboBox,
+  FormField,
+  Grid,
+  Heading,
+  LoadingSpinner,
+  LocalizedField,
+  type LocalizedString,
+  Select,
+  Stack,
+  TextInput,
+} from '@commercetools/nimbus';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
-import CheckboxInput from '@commercetools-uikit/checkbox-input';
+import messages from './messages';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import { getErrorMessage, useStatesFetcher } from '../../../hooks';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+
 type Formik = ReturnType<typeof useFormik>;
 
 export const resourceTypes = [
@@ -60,8 +55,8 @@ type FormProps = {
 export type TFormValues = {
   id?: Maybe<string>;
   key?: Maybe<string>;
-  name: Record<string, string>;
-  description: Record<string, string>;
+  name: LocalizedString;
+  description: LocalizedString;
   stateType: TStateType;
   transitions: Array<string>;
   initial: boolean;
@@ -88,17 +83,11 @@ const validate = (formikValues: TFormValues) => {
   return omitEmpty<TErrors>(errors);
 };
 
-const renderKeyInputErrors = (key: string) => {
-  switch (key) {
-    case 'invalidInput':
-      return <FormattedMessage {...messages.invalidKey} />;
-    case 'duplicate':
-      return <FormattedMessage {...messages.duplicateKey} />;
-    case 'missing':
-      return <FormattedMessage {...messages.requiredKey} />;
-    default:
-      return null;
-  }
+const renderKeyInputError = (key?: TErrors['key']): ReactNode => {
+  if (!key) return null;
+  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
+  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
+  return null;
 };
 
 type Props = {
@@ -107,7 +96,7 @@ type Props = {
     formikHelpers: FormikHelpers<TFormValues>
   ) => void | Promise<unknown>;
   initialValues: TFormValues;
-  children: (formProps: FormProps) => React.JSX.Element;
+  children: (formProps: FormProps) => JSX.Element;
   refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
@@ -136,6 +125,8 @@ const StatesForm: FC<Props> = ({
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
+  const errors = formik.errors as Partial<TErrors>;
+
   let where = `type="${formik.values.stateType}"`;
   if (formik.values.id) {
     where = `${where} and id != "${formik.values.id}"`;
@@ -149,176 +140,160 @@ const StatesForm: FC<Props> = ({
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>
+          {intl.formatMessage(messages.generalInformationTitle)}
+        </Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Stack direction="row" justifyContent="center" padding="600">
+        <LoadingSpinner
+          aria-label={intl.formatMessage(messages.generalInformationTitle)}
+        />
+      </Stack>
     );
   }
 
-  if (!states || !states.results) {
-    return <PageNotFound />;
-  }
+  const transitionOptions = (states?.results ?? []).map((result) => {
+    const name = LocalizedField.createLocalizedString(
+      projectLanguages,
+      transformLocalizedFieldToLocalizedString(result.nameAllLocales ?? []) ??
+        {}
+    );
+    return { id: result.id, name: name[dataLocale] || name['en'] || '' };
+  });
 
   const formElements = (
-    <PageContentWide columns="2/1" gapSize="20">
-      <Spacings.Stack scale="xxxl">
-        <Spacings.Stack scale="m">
-          <CollapsiblePanel
-            header={
-              <CollapsiblePanel.Header>
-                <FormattedMessage {...messages.generalInformationTitle} />
-              </CollapsiblePanel.Header>
-            }
-          >
-            <Grid
-              gridTemplateColumns={`repeat(2, ${designTokens.constraint11})`}
-              gridGap={designTokens.spacingM}
+    <Stack direction="column" gap="400">
+      <Heading as="h2" size="md">
+        <FormattedMessage {...messages.generalInformationTitle} />
+      </Heading>
+      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
+        <FormField.Root
+          isRequired
+          isReadOnly={!createNewMode || !canManage}
+          isInvalid={Boolean(formik.touched.key && errors.key)}
+        >
+          <FormField.Label>
+            {intl.formatMessage(messages.keyTitle)}
+          </FormField.Label>
+          <FormField.Input>
+            <TextInput
+              aria-label={intl.formatMessage(messages.keyTitle)}
+              value={formik.values.key || ''}
+              isReadOnly={!createNewMode || !canManage}
+              onChange={(value) => formik.setFieldValue('key', value)}
+              onBlur={() => formik.setFieldTouched('key', true)}
+            />
+          </FormField.Input>
+          <FormField.Description>
+            {intl.formatMessage(messages.keyHint)}
+          </FormField.Description>
+          <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
+        </FormField.Root>
+
+        <FormField.Root isRequired isReadOnly={!createNewMode || !canManage}>
+          <FormField.Label>
+            {intl.formatMessage(messages.stateTypeTitle)}
+          </FormField.Label>
+          <FormField.Input>
+            <Select.Root
+              aria-label={intl.formatMessage(messages.stateTypeTitle)}
+              selectedKey={formik.values.stateType}
+              isDisabled={!createNewMode || !canManage}
+              onSelectionChange={(key) =>
+                formik.setFieldValue('stateType', key as TStateType)
+              }
             >
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <TextField
-                    name="key"
-                    value={formik.values.key || ''}
-                    title={intl.formatMessage(messages.keyTitle)}
-                    hint={intl.formatMessage(messages.keyHint)}
-                    isRequired
-                    errors={
-                      TextField.toFieldErrors<TFormValues>(formik.errors).key
-                    }
-                    isDisabled={!createNewMode}
-                    touched={!!formik.touched.key}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    renderError={renderKeyInputErrors}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <Spacings.Stack scale="s">
-                    <SelectField
-                      name="stateType"
-                      title={intl.formatMessage(messages.stateTypeTitle)}
-                      isRequired
-                      value={formik.values.stateType}
-                      options={resourceTypes}
-                      errors={
-                        SelectField.toFieldErrors<TFormValues>(formik.errors)
-                          .stateType
-                      }
-                      touched={
-                        formik.touched.stateType
-                          ? formik.touched.stateType
-                          : undefined
-                      }
-                      onBlur={formik.handleBlur}
-                      onChange={formik.handleChange}
-                      isDisabled={!createNewMode}
-                      isReadOnly={!canManage}
-                    />
-                    <Spacings.Stack scale="xs">
-                      <CheckboxInput
-                        name="initial"
-                        isChecked={formik.values.initial}
-                        onChange={formik.handleChange}
-                        isReadOnly={!canManage}
-                      >
-                        <FormattedMessage {...messages.initialTitle} />
-                      </CheckboxInput>
-                      <Text.Detail tone="secondary">
-                        <FormattedMessage {...messages.initialHint} />
-                      </Text.Detail>
-                    </Spacings.Stack>
-                  </Spacings.Stack>
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <LocalizedTextField
-                    name="name"
-                    selectedLanguage={dataLocale}
-                    value={formik.values.name}
-                    title={intl.formatMessage(messages.nameTitle)}
-                    errors={
-                      LocalizedTextField.toFieldErrors<TFormValues>(
-                        formik.errors
-                      ).name
-                    }
-                    touched={!!formik.touched.name}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <LocalizedTextField
-                    name="description"
-                    selectedLanguage={dataLocale}
-                    value={formik.values.description}
-                    title={intl.formatMessage(messages.descriptionTitle)}
-                    errors={
-                      LocalizedTextField.toFieldErrors<TFormValues>(
-                        formik.errors
-                      ).description
-                    }
-                    touched={!!formik.touched.description}
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-              <Grid.Item>
-                <Card type="flat" insetScale="s">
-                  <SelectField
-                    name="transitions"
-                    options={states.results.map((result): TOption => {
-                      const name = LocalizedTextInput.createLocalizedString(
-                        projectLanguages,
-                        transformLocalizedFieldToLocalizedString(
-                          result.nameAllLocales ?? []
-                        ) ?? {}
-                      );
-                      return {
-                        value: result.id,
-                        label: name[dataLocale] || name['en'] || '',
-                      };
-                    })}
-                    isMulti={true}
-                    isClearable={true}
-                    value={formik.values.transitions}
-                    title={intl.formatMessage(messages.transitionsTitle)}
-                    hint={intl.formatMessage(messages.transitionsHint)}
-                    errors={
-                      SelectField.toFieldErrors<TFormValues>(formik.errors)
-                        .transitions
-                    }
-                    touched={
-                      formik.touched.transitions
-                        ? formik.touched.transitions
-                        : undefined
-                    }
-                    onBlur={formik.handleBlur}
-                    onChange={formik.handleChange}
-                    isReadOnly={!canManage}
-                  />
-                </Card>
-              </Grid.Item>
-            </Grid>
-          </CollapsiblePanel>
-        </Spacings.Stack>
-      </Spacings.Stack>
-    </PageContentWide>
+              <Select.Options items={resourceTypes}>
+                {(item) => (
+                  <Select.Option id={item.value}>{item.label}</Select.Option>
+                )}
+              </Select.Options>
+            </Select.Root>
+          </FormField.Input>
+        </FormField.Root>
+
+        <FormField.Root isReadOnly={!canManage}>
+          <FormField.Input>
+            <Checkbox
+              isSelected={formik.values.initial}
+              isReadOnly={!canManage}
+              onChange={(isSelected) =>
+                formik.setFieldValue('initial', isSelected)
+              }
+            >
+              <FormattedMessage {...messages.initialTitle} />
+            </Checkbox>
+          </FormField.Input>
+        </FormField.Root>
+
+        <FormField.Root isReadOnly={!canManage}>
+          <FormField.Label>
+            {intl.formatMessage(messages.transitionsTitle)}
+          </FormField.Label>
+          <FormField.Input>
+            <ComboBox.Root
+              aria-label={intl.formatMessage(messages.transitionsTitle)}
+              items={transitionOptions}
+              selectionMode="multiple"
+              isReadOnly={!canManage}
+              selectedKeys={formik.values.transitions}
+              onSelectionChange={(keys) =>
+                formik.setFieldValue('transitions', keys as string[])
+              }
+              onBlur={() => formik.setFieldTouched('transitions', true)}
+            >
+              <ComboBox.Trigger />
+              <ComboBox.Popover>
+                <ComboBox.ListBox>
+                  {(item: { id: string; name: string }) => (
+                    <ComboBox.Option id={item.id}>{item.name}</ComboBox.Option>
+                  )}
+                </ComboBox.ListBox>
+              </ComboBox.Popover>
+            </ComboBox.Root>
+          </FormField.Input>
+        </FormField.Root>
+
+        <LocalizedField
+          id="states-edit-name"
+          name="name"
+          type="text"
+          label={intl.formatMessage(messages.nameTitle)}
+          isReadOnly={!canManage}
+          defaultLocaleOrCurrency={dataLocale}
+          valuesByLocaleOrCurrency={formik.values.name}
+          onChange={(event) =>
+            formik.setFieldValue(
+              `name.${event.target.locale}`,
+              event.target.value
+            )
+          }
+          onBlur={() => formik.setFieldTouched('name', true)}
+        />
+        <LocalizedField
+          id="states-edit-description"
+          name="description"
+          type="text"
+          label={intl.formatMessage(messages.descriptionTitle)}
+          isReadOnly={!canManage}
+          defaultLocaleOrCurrency={dataLocale}
+          valuesByLocaleOrCurrency={formik.values.description}
+          onChange={(event) =>
+            formik.setFieldValue(
+              `description.${event.target.locale}`,
+              event.target.value
+            )
+          }
+          onBlur={() => formik.setFieldTouched('description', true)}
+        />
+      </Grid>
+    </Stack>
   );
 
   return children({

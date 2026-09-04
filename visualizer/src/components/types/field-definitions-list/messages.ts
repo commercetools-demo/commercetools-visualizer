@@ -36,6 +36,11 @@ export default defineMessages({
     description: 'Text for add field definition button',
     defaultMessage: 'Add Field Definition',
   },
+  removeFieldDefinitionButton: {
+    id: 'Type.form.button.removeFieldDefinition',
+    description: 'Label for remove field definition action',
+    defaultMessage: 'Remove Field Definition',
+  },
   removeFieldDefinitionButtonSuccess: {
     id: 'Type.form.button.removeFieldDefinitionSuccess',
     description: 'Label for remove field button success',

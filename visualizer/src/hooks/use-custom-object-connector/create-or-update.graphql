@@ -1,0 +1,7 @@
+#import "./fragments/custom-object-fragment.graphql"
+
+mutation CreateOrUpdateCustomObject($draft: CustomObjectDraft!) {
+  createOrUpdateCustomObject(draft: $draft) {
+    ...CustomObject
+  }
+}

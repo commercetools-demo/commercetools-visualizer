@@ -4,10 +4,9 @@ import {
   SubscriptionStepProps,
 } from '../subscription-create-configuration';
 import { Formik } from 'formik';
-import Spacings from '@commercetools-uikit/spacings';
+import { Stack } from '@commercetools/nimbus';
 import { useHistory } from 'react-router';
 import SubscriptionChangesForm from '../../subscription-changes-form/subscription-changes-form';
-import { PageContentWide } from '@commercetools-frontend/application-components';
 import { SaveToolbar } from 'commercetools-demo-shared-save-toolbar';
 
 const SubscriptionCreateChanges: FC<SubscriptionStepProps> = ({
@@ -35,11 +34,9 @@ const SubscriptionCreateChanges: FC<SubscriptionStepProps> = ({
     >
       {(formikProps) => (
         <>
-          <PageContentWide>
-            <Spacings.Stack scale="xxxl">
-              <SubscriptionChangesForm />
-            </Spacings.Stack>
-          </PageContentWide>
+          <Stack direction="column" gap="800">
+            <SubscriptionChangesForm />
+          </Stack>
           <SaveToolbar
             isVisible={formikProps.dirty || formik?.dirty}
             buttonProps={{ next: { isDisabled: !formikProps.isValid } }}

@@ -1,12 +1,7 @@
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Constraints from '@commercetools-uikit/constraints';
-import Card from '@commercetools-uikit/card';
+import { Card, Heading, Stack } from '@commercetools/nimbus';
 import { TActionType, TTriggerInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { IntlShape, useIntl } from 'react-intl';
-import Text from '@commercetools-uikit/text';
-import Spacings from '@commercetools-uikit/spacings';
 import {
   CheckboxGroup,
   CheckboxGroupItem,
@@ -165,46 +160,37 @@ const ExtensionsTriggersForm = () => {
   };
 
   return (
-    <Constraints.Horizontal max="scale">
-      <Grid
-        gridGap={designTokens.spacing50}
-        gridTemplateColumns={`repeat(auto-fill, '')`}
-      >
-        <Grid.Item>
-          <Constraints.Horizontal max="scale">
-            <Card insetScale="s" type="flat">
-              <Spacings.Stack scale="s">
-                <Text.Headline as={'h2'}>
-                  {intl.formatMessage(messages.messagesLabel)}
-                </Text.Headline>
-                {entries(intl).map((item) => {
+    <Card.Root variant="outlined" size="sm">
+      <Card.Body>
+        <Stack direction="column" gap="400">
+          <Heading as="h2" size="md">
+            {intl.formatMessage(messages.messagesLabel)}
+          </Heading>
+          {entries(intl).map((item) => {
+            return (
+              <CheckboxGroup
+                key={item.triggerId}
+                name="triggers"
+                label={item.label}
+              >
+                {actions(intl).map((entry, index) => {
                   return (
-                    <CheckboxGroup
-                      key={item.triggerId}
-                      name="triggers"
-                      label={item.label}
-                    >
-                      {actions(intl).map((entry, index) => {
-                        return (
-                          <CheckboxGroupItem<TTriggerInput>
-                            key={index}
-                            label={entry.value}
-                            value={item.triggerId + '#' + entry.key}
-                            isChecked={isChecked}
-                            addItem={addItem}
-                            removeItem={removeItem}
-                          />
-                        );
-                      })}
-                    </CheckboxGroup>
+                    <CheckboxGroupItem<TTriggerInput>
+                      key={index}
+                      label={entry.value}
+                      value={item.triggerId + '#' + entry.key}
+                      isChecked={isChecked}
+                      addItem={addItem}
+                      removeItem={removeItem}
+                    />
                   );
                 })}
-              </Spacings.Stack>
-            </Card>
-          </Constraints.Horizontal>
-        </Grid.Item>
-      </Grid>
-    </Constraints.Horizontal>
+              </CheckboxGroup>
+            );
+          })}
+        </Stack>
+      </Card.Body>
+    </Card.Root>
   );
 };
 export default ExtensionsTriggersForm;

@@ -1,6 +1,11 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  requiredFieldError: {
+    id: 'Subscription.Destination.error.required',
+    description: 'The error message for required destination fields',
+    defaultMessage: 'This field is required. Provide a value.',
+  },
   destinationGoogleCloudPubSubTopic: {
     id: 'Subscription.Destination.destinationGoogleCloudPubSubTopic',
     description: 'destinationGoogleCloudPubSubTopic',

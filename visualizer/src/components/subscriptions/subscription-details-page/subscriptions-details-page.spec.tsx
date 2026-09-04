@@ -303,13 +303,7 @@ describe('notifications', () => {
     // updating subscription details
     const saveButton = screen.getByRole('button', { name: /save/i });
     fireEvent.click(saveButton);
-    // The `ModalPage` this page renders into marks the rest of the app
-    // `aria-hidden` while open (correct modal a11y behavior) — that also
-    // covers the app shell's notification container, so it must be queried
-    // with `hidden: true` to be found by role.
-    const notification = await screen.findByRole('alertdialog', {
-      hidden: true,
-    });
+    const notification = await screen.findByRole('alertdialog');
     within(notification).getByText(/subscription .+ updated/i);
   }, 10000);
 

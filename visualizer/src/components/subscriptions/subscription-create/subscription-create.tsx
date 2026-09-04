@@ -1,16 +1,16 @@
 import { FC, useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 import { Route, Switch, useHistory, useParams } from 'react-router';
-import { useFormik } from 'formik';
+import { FormikHelpers, useFormik } from 'formik';
 
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import Steps from 'commercetools-demo-shared-stepper';
 import messages from './messages';
 
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
 import { useSubscriptionCreator, graphQLErrorHandler } from '../../../hooks';
-import { DefaultPage } from '@commercetools/nimbus';
+import { DefaultPage, Steps } from '@commercetools/nimbus';
+import { Check } from '@commercetools/nimbus-icons';
 import { ContextData } from './subscription-create-configuration';
 import SubscriptionCreateDetailsStep from './subscription-create-details-step/subscription-create-details-step';
 import SubscriptionCreateDestination from './subscription-create-destination/subscription-create-destination';
@@ -38,7 +38,10 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
   const showNotification = useShowNotification();
 
   const handleSubmit = useCallback(
-    async (formikValues: ContextData, formikHelpers) => {
+    async (
+      formikValues: ContextData,
+      formikHelpers: FormikHelpers<ContextData>
+    ) => {
       const subscriptionDraft: TSubscriptionDraft = {
         key:
           formikValues.subscriptionStepsDraft[1].key &&
@@ -147,7 +150,26 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
         </DefaultPage.Title>
       </DefaultPage.Header>
       <DefaultPage.Content>
-        <Steps steps={createStepsDefinition} activeStepKey={step} />
+        <Steps.Root step={current} count={createStepsDefinition.length}>
+          <Steps.List>
+            {createStepsDefinition.map((stepDefinition, index) => (
+              <Steps.Item key={stepDefinition.key} index={index}>
+                <Steps.Trigger>
+                  <Steps.Indicator>
+                    <Steps.Status
+                      complete={<Check />}
+                      incomplete={<Steps.Number />}
+                    />
+                  </Steps.Indicator>
+                  <Steps.Title>{stepDefinition.label}</Steps.Title>
+                </Steps.Trigger>
+                {index < createStepsDefinition.length - 1 && (
+                  <Steps.Separator />
+                )}
+              </Steps.Item>
+            ))}
+          </Steps.List>
+        </Steps.Root>
         <Switch>
           <Route exact path={linkToWelcome + '/subscription/new'}>
             <SubscriptionCreateDetailsStep

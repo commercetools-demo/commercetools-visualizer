@@ -1,4 +1,4 @@
-import { TState } from 'commercetools-demo-shared-helpers';
+import { TState } from '../../types/generated/ctp';
 import { State } from '@commercetools/platform-sdk';
 import { transformLocalizedFieldToLocalizedString } from '../shared/graphql-helpers';
 

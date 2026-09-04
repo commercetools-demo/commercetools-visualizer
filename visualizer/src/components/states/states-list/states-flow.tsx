@@ -17,7 +17,7 @@ import ReactFlow, {
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { TState } from '../../../types/generated/ctp';
 import 'reactflow/dist/style.css';
-import { formatLocalizedString } from 'commercetools-demo-shared-helpers';
+import { formatLocalizedString } from '../../../utils/format-localized-string';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));

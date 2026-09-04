@@ -1,6 +1,5 @@
 import type { DataTableColumnItem } from '@commercetools/nimbus';
 import type { IntlShape } from 'react-intl';
-import { formatDateAndTime } from 'commercetools-demo-shared-helpers';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import destinationMessages from '../subscription-destination-type-form/messages';
 import messages from './messages';
@@ -29,7 +28,8 @@ const createColumnDefinitions = ({
   {
     id: 'createdAt',
     header: intl.formatMessage(messages.columnCreatedAt),
-    accessor: (row) => formatDateAndTime(row.createdAt, intl),
+    accessor: (row) =>
+      `${intl.formatDate(row.createdAt)} ${intl.formatTime(row.createdAt)}`,
   },
   {
     id: 'destinationType',

@@ -14,7 +14,7 @@ import {
   TMessageSubscriptionInput,
   TSqsDestination,
   TConfluentCloudDestination,
-} from 'commercetools-demo-shared-helpers';
+} from '../../../types/generated/ctp';
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
 import SubscriptionMessagesForm from '../subscription-messages-form/subscription-messages-form';

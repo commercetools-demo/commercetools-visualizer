@@ -20,7 +20,7 @@ import {
   TFieldDefinition,
   TQuery,
   TQuery_TypeDefinitionArgs,
-} from 'commercetools-demo-shared-helpers';
+} from '../../../types/generated/ctp';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';

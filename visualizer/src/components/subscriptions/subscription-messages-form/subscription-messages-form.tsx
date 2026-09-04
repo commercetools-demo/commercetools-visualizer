@@ -1,8 +1,11 @@
-import { Heading, Stack } from '@commercetools/nimbus';
 import {
-  CheckboxGroup,
-  CheckboxGroupItem,
-} from 'commercetools-demo-shared-checkbox-group';
+  Accordion,
+  Checkbox,
+  Grid,
+  Heading,
+  Stack,
+} from '@commercetools/nimbus';
+import { useField } from 'formik';
 import { TMessageSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { useIntl } from 'react-intl';
@@ -140,104 +143,38 @@ type Props = {
 };
 const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
+  const [field, , helpers] =
+    useField<Array<TMessageSubscriptionInput>>('messages');
 
-  const isChecked = (
-    values: Array<TMessageSubscriptionInput> | undefined,
-    value: string
-  ) => {
-    return Boolean(
-      values &&
-        values.find((item) => {
-          if (!item || !item.types) {
-            return false;
-          }
-          const [resourceTypeId, name] = value.split('#');
-          return (
-            item.resourceTypeId === resourceTypeId &&
-            item.types.indexOf(name) >= 0
-          );
-        })
+  const isChecked = (resourceTypeId: string, name: string) =>
+    Boolean(
+      field.value?.find(
+        (item) =>
+          item.resourceTypeId === resourceTypeId &&
+          item.types?.indexOf(name) !== -1
+      )
     );
-  };
 
-  const addItem = (
-    values: Array<TMessageSubscriptionInput> | undefined,
-    value: string
+  const toggle = (
+    resourceTypeId: string,
+    name: string,
+    isSelected: boolean
   ) => {
-    const [resourceTypeId, name] = value.split('#');
-    if (values) {
-      const inValues = values.find((entry) => {
-        return entry.resourceTypeId === resourceTypeId;
-      });
-      if (inValues) {
-        const removed = values.filter((item) => {
-          return item.resourceTypeId !== resourceTypeId;
-        });
-        if (inValues.types) {
-          return [
-            ...removed,
-            {
-              resourceTypeId: resourceTypeId,
-              types: [...inValues.types, name],
-            },
-          ];
-        } else {
-          return [
-            ...removed,
-            {
-              resourceTypeId: resourceTypeId,
-              types: [name],
-            },
-          ];
-        }
-      }
-      return [
-        ...values,
-        {
-          resourceTypeId: resourceTypeId,
-          types: [name],
-        },
-      ];
-    } else {
-      return [
-        {
-          resourceTypeId: resourceTypeId,
-          types: [name],
-        },
-      ];
-    }
-  };
+    const others = (field.value ?? []).filter(
+      (item) => item.resourceTypeId !== resourceTypeId
+    );
+    const existingTypes =
+      field.value?.find((item) => item.resourceTypeId === resourceTypeId)
+        ?.types ?? [];
+    const nextTypes = isSelected
+      ? [...existingTypes, name]
+      : existingTypes.filter((type) => type !== name);
 
-  const removeItem = (
-    values: Array<TMessageSubscriptionInput> | undefined,
-    value: string
-  ) => {
-    if (!values) {
-      return [];
-    }
-    const [resourceTypeId, name] = value.split('#');
-    const inValues = values.find((entry) => {
-      return entry.resourceTypeId === resourceTypeId;
-    });
-    if (inValues && inValues.types) {
-      const removed = values.filter((item) => {
-        return item.resourceTypeId !== resourceTypeId;
-      });
-      if (inValues.types.length > 1) {
-        return [
-          ...removed,
-          {
-            resourceTypeId: resourceTypeId,
-            types: inValues.types.filter((item) => {
-              return item !== name;
-            }),
-          },
-        ];
-      } else {
-        return removed;
-      }
-    }
-    return values;
+    helpers.setValue(
+      nextTypes.length > 0
+        ? [...others, { resourceTypeId, types: nextTypes }]
+        : others
+    );
   };
 
   return (
@@ -245,32 +182,40 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
       <Heading as="h2" size="md">
         {intl.formatMessage(messages.messagesLabel)}
       </Heading>
-      {entries().map((item) => {
-        return (
-          <CheckboxGroup
-            key={item.resourceTypeId}
-            name="messages"
-            label={intl.formatMessage(messages.resourceTypeLabel, {
-              label: item.resourceTypeName,
-              amount: item.amountOfMessage,
-            })}
-          >
-            {item.types.map((entry, index) => {
-              return (
-                <CheckboxGroupItem
-                  key={index}
-                  label={entry.value}
-                  value={item.resourceTypeId + '#' + entry.key}
-                  isChecked={isChecked}
-                  addItem={addItem}
-                  removeItem={removeItem}
-                  isReadOnly={isReadOnly}
-                />
-              );
-            })}
-          </CheckboxGroup>
-        );
-      })}
+      <Accordion.Root
+        allowsMultipleExpanded
+        expandedKeys={entries().map((item) => item.resourceTypeId)}
+      >
+        {entries().map((item) => (
+          <Accordion.Item key={item.resourceTypeId} value={item.resourceTypeId}>
+            <Accordion.Header>
+              {intl.formatMessage(messages.resourceTypeLabel, {
+                label: item.resourceTypeName,
+                amount: item.amountOfMessage,
+              })}
+            </Accordion.Header>
+            <Accordion.Content>
+              <Grid
+                templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
+                gap="200"
+              >
+                {item.types.map((entry) => (
+                  <Checkbox
+                    key={entry.key}
+                    isSelected={isChecked(item.resourceTypeId, entry.key)}
+                    isReadOnly={isReadOnly}
+                    onChange={(isSelected) =>
+                      toggle(item.resourceTypeId, entry.key, isSelected)
+                    }
+                  >
+                    {entry.value}
+                  </Checkbox>
+                ))}
+              </Grid>
+            </Accordion.Content>
+          </Accordion.Item>
+        ))}
+      </Accordion.Root>
     </Stack>
   );
 };

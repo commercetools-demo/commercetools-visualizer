@@ -10,7 +10,7 @@ import {
   TQuery,
   TQuery_CustomObjectArgs,
   TQuery_CustomObjectsArgs,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 import { mcApiContext } from '../shared/mc-api-context';
 import { extractErrorFromGraphQlResponse } from '../shared/graphql-helpers';
 import FetchAllQuery from './fetch-all.graphql';

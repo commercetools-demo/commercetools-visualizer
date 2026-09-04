@@ -182,11 +182,11 @@ const ExtensionsForm: FC<Props> = ({
                 <Select.Root
                   aria-label={intl.formatMessage(messages.destinationLabel)}
                   isDisabled={!createNewMode}
-                  selectedKey={formik.values.destinationName || null}
-                  onSelectionChange={(key) =>
+                  value={formik.values.destinationName || ''}
+                  onChange={(value) =>
                     formik.setFieldValue(
                       'destinationName',
-                      key as DestinationName
+                      value as DestinationName
                     )
                   }
                   onBlur={() => formik.setFieldTouched('destinationName', true)}

@@ -216,8 +216,8 @@ const FieldDefinitionInput: FC<Props> = ({
             <Select.Root
               aria-label={intl.formatMessage(messages.typeTitle)}
               isDisabled={isImmutable}
-              selectedKey={formik.values.typeName || null}
-              onSelectionChange={(key) => formik.setFieldValue('typeName', key)}
+              value={formik.values.typeName || ''}
+              onChange={(value) => formik.setFieldValue('typeName', value)}
             >
               <Select.Options>
                 {fieldTypeOptions.map((option) => (
@@ -283,9 +283,9 @@ const FieldDefinitionInput: FC<Props> = ({
               <Select.Root
                 aria-label={intl.formatMessage(messages.referenceTitle)}
                 isDisabled={isImmutable}
-                selectedKey={formik.values.referenceTypeId || null}
-                onSelectionChange={(key) =>
-                  formik.setFieldValue('referenceTypeId', key)
+                value={formik.values.referenceTypeId || ''}
+                onChange={(value) =>
+                  formik.setFieldValue('referenceTypeId', value)
                 }
               >
                 <Select.Options>

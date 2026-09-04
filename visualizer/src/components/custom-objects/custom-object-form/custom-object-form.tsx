@@ -1,21 +1,26 @@
+import { FC, ReactElement } from 'react';
+import { type FormikHelpers, useFormik } from 'formik';
+import { FormattedMessage, useIntl } from 'react-intl';
+import omitEmpty from 'omit-empty-es';
+import {
+  Box,
+  FormField,
+  Grid,
+  Heading,
+  Stack,
+  Text,
+  TextInput,
+} from '@commercetools/nimbus';
+import { ApolloQueryResult } from '@apollo/client';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { PERMISSIONS } from '../../../constants';
 import {
   TQuery,
   TQuery_TypeDefinitionArgs,
 } from '../../../types/generated/ctp';
-import { FC, ReactElement } from 'react';
-import { type FormikHelpers, FormikProvider, useFormik } from 'formik';
-import { ApolloQueryResult } from '@apollo/client';
-import { PageContentWide } from '@commercetools-frontend/application-components';
-import Spacings from '@commercetools-uikit/spacings';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
-import { FormattedMessage, useIntl } from 'react-intl';
-import messages from './messages';
-import TextField from '@commercetools-uikit/text-field';
-import omitEmpty from 'omit-empty-es';
-import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import { PERMISSIONS } from '../../../constants';
 import ValueEditor from './value-editor';
-import FieldLabel from '@commercetools-uikit/field-label';
+import messages from './messages';
+
 type Formik = ReturnType<typeof useFormik>;
 
 export type TFormValues = {
@@ -75,7 +80,12 @@ type Props = {
   createNewMode?: boolean;
 };
 
-const CustomObjectForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
+const CustomObjectForm: FC<Props> = ({
+  initialValues,
+  onSubmit,
+  children,
+  createNewMode = false,
+}) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
@@ -86,61 +96,77 @@ const CustomObjectForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
   const intl = useIntl();
+  const errors = formik.errors as Partial<TErrors>;
 
   const formElements = (
-    <PageContentWide columns="2/1" gapSize="20">
-      <Spacings.Stack scale="m">
-        <FormikProvider value={formik}>
-          <CollapsiblePanel
-            header={
-              <CollapsiblePanel.Header>
-                <FormattedMessage {...messages.generalInformationTitle} />
-              </CollapsiblePanel.Header>
-            }
+    <Stack direction="column" gap="800">
+      <Stack direction="column" gap="400">
+        <Heading as="h2" size="md">
+          <FormattedMessage {...messages.generalInformationTitle} />
+        </Heading>
+        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode}
+            isInvalid={Boolean(formik.touched.key && errors.key)}
           >
-            <Spacings.Stack scale={'l'}>
-              <TextField
+            <FormField.Label>
+              {intl.formatMessage(messages.keyTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
                 name="key"
                 value={formik.values.key}
-                title={intl.formatMessage(messages.keyTitle)}
-                hint={intl.formatMessage(messages.keyHint)}
-                isRequired
-                errors={TextField.toFieldErrors<TFormValues>(formik.errors).key}
-                touched={!!formik.touched.key}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                isReadOnly={!canManage}
+                isReadOnly={!createNewMode}
+                onChange={(value) => formik.setFieldValue('key', value)}
+                onBlur={() => formik.setFieldTouched('key', true)}
               />
-              <TextField
+            </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.keyHint)}
+            </FormField.Description>
+            <FormField.Error>
+              {formik.touched.key && errors.key?.missing
+                ? intl.formatMessage(messages.requiredFieldError)
+                : null}
+            </FormField.Error>
+          </FormField.Root>
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode}
+            isInvalid={Boolean(formik.touched.container && errors.container)}
+          >
+            <FormField.Label>
+              {intl.formatMessage(messages.containerTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
                 name="container"
                 value={formik.values.container}
-                title={intl.formatMessage(messages.containerTitle)}
-                isRequired
-                errors={
-                  TextField.toFieldErrors<TFormValues>(formik.errors).container
-                }
-                touched={!!formik.touched.container}
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                isReadOnly={!canManage}
+                isReadOnly={!createNewMode}
+                onChange={(value) => formik.setFieldValue('container', value)}
+                onBlur={() => formik.setFieldTouched('container', true)}
               />
-            </Spacings.Stack>
-          </CollapsiblePanel>
-          {/*<TextField*/}
-          {/*  name="value"*/}
-          {/*  value={formik.values.value}*/}
-          {/*  title={intl.formatMessage(messages.containerValue)}*/}
-          {/*  errors={TextField.toFieldErrors<TFormValues>(formik.errors).value}*/}
-          {/*  touched={!!formik.touched.value}*/}
-          {/*  onBlur={formik.handleBlur}*/}
-          {/*  onChange={formik.handleChange}*/}
-          {/*  isReadOnly={!canManage}*/}
-          {/*/>*/}
-          <FieldLabel title={intl.formatMessage(messages.containerValue)} />
+            </FormField.Input>
+            <FormField.Error>
+              {formik.touched.container && errors.container?.missing
+                ? intl.formatMessage(messages.requiredFieldError)
+                : null}
+            </FormField.Error>
+          </FormField.Root>
+        </Grid>
+      </Stack>
+
+      <Stack direction="column" gap="400">
+        <Text fontWeight="500">
+          {intl.formatMessage(messages.containerValue)}
+        </Text>
+        <Box>
           <ValueEditor
             content={{
               text: formik.values.value,
             }}
+            readOnly={!canManage}
             onChange={(content) => {
               if ('json' in content) {
                 formik.setFieldValue('value', JSON.stringify(content.json));
@@ -149,9 +175,9 @@ const CustomObjectForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
               }
             }}
           />
-        </FormikProvider>
-      </Spacings.Stack>
-    </PageContentWide>
+        </Box>
+      </Stack>
+    </Stack>
   );
 
   return children({
@@ -163,4 +189,7 @@ const CustomObjectForm: FC<Props> = ({ initialValues, onSubmit, children }) => {
     handleReset: formik.handleReset,
   });
 };
+
+CustomObjectForm.displayName = 'CustomObjectForm';
+
 export default CustomObjectForm;

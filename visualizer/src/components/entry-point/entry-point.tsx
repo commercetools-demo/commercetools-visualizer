@@ -3,7 +3,9 @@ import {
   ApplicationShell,
   setupGlobalErrorListener,
 } from '@commercetools-frontend/application-shell';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import type { ApplicationWindow } from '@commercetools-frontend/constants';
+import { NimbusProvider } from '@commercetools/nimbus';
 import loadMessages from '../../load-messages';
 
 declare let window: ApplicationWindow;
@@ -19,13 +21,25 @@ const AsyncApplicationRoutes = lazy(
 // in order to catch possible errors on rendering/mounting.
 setupGlobalErrorListener();
 
+const ApplicationRoutesWithNimbus = () => {
+  const dataLocale = useApplicationContext(
+    (context) => context.dataLocale ?? ''
+  );
+
+  return (
+    <NimbusProvider locale={dataLocale || 'en'} loadFonts={false}>
+      <AsyncApplicationRoutes />
+    </NimbusProvider>
+  );
+};
+
 const EntryPoint = () => (
   <ApplicationShell
     enableReactStrictMode
     environment={window.app}
     applicationMessages={loadMessages}
   >
-    <AsyncApplicationRoutes />
+    <ApplicationRoutesWithNimbus />
   </ApplicationShell>
 );
 EntryPoint.displayName = 'EntryPoint';

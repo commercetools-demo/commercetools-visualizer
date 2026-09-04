@@ -1,34 +1,23 @@
-import {
-  InfoMainPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import { useIntl } from 'react-intl';
-import { useHistory, Link, useLocation } from 'react-router-dom';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
-import { TColumn } from '@commercetools-uikit/data-table';
+import { useHistory, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
-  useDataTableSortingState,
-  usePaginationState,
-} from '@commercetools-uikit/hooks';
-import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import SecondaryButton from '@commercetools-uikit/secondary-button';
+  Alert,
+  Button,
+  DataTable,
+  DefaultPage,
+  Flex,
+  LoadingSpinner,
+  Pagination,
+  Text,
+  type SortDescriptor,
+} from '@commercetools/nimbus';
+import { Add } from '@commercetools/nimbus-icons';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import messages from './messages';
-import destinationMessages from '../subscription-destination-type-form/messages';
-import {
-  getErrorMessage,
-  useSubscriptionsFetcher,
-} from 'commercetools-demo-shared-data-fetching-hooks';
-import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import { useEffect } from 'react';
-import {
-  formatDateAndTime,
-  renderDefault,
-} from 'commercetools-demo-shared-helpers';
+import { getErrorMessage, useSubscriptionsFetcher } from '../../../hooks';
+import createColumnDefinitions from './column-definitions';
 
 type Props = {
   linkToHome: string;
@@ -38,16 +27,28 @@ interface LocationState {
   refetch?: boolean;
 }
 
+const DEFAULT_PER_PAGE = 20;
+
+const toSortString = (sortDescriptor: SortDescriptor): string =>
+  `${String(sortDescriptor.column)} ${
+    sortDescriptor.direction === 'descending' ? 'desc' : 'asc'
+  }`;
+
 const SubscriptionList = (props: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
 
-  const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
-  const paginationState = usePaginationState();
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'key',
+    direction: 'ascending',
+  });
+
   const { subscriptions, error, loading, refetch } = useSubscriptionsFetcher({
-    limit: paginationState.perPage.value,
-    offset: (paginationState.page.value - 1) * paginationState.perPage.value,
-    sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+    limit: perPage,
+    offset: (page - 1) * perPage,
+    sort: [toSortString(sortDescriptor)],
   });
 
   const location = useLocation<LocationState>();
@@ -60,16 +61,17 @@ const SubscriptionList = (props: Props) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
 
@@ -77,93 +79,60 @@ const SubscriptionList = (props: Props) => {
     return <PageNotFound />;
   }
 
-  const { results } = subscriptions;
+  const { results, total } = subscriptions;
 
-  const columns: Array<TColumn> = [
-    { key: 'key', label: 'Key', isSortable: true },
-    { key: 'version', label: 'Version' },
-    { key: 'createdAt', label: 'Created At' },
-    { key: 'destinationType', label: 'Destination Type' },
-    // { key: 'messages', label: 'Messages' },
-  ];
-
-  const itemRenderer: TDataTableProps<TCommercetoolsSubscription>['itemRenderer'] =
-    (item, column) => {
-      switch (column.key) {
-        case 'messages': {
-          return item.messages.map((item, key) => {
-            return (
-              <div key={key}>
-                <div>
-                  {`${item.resourceTypeId}: `}
-                  {item.types?.map((type, index) => {
-                    return <span key={index}>{type}</span>;
-                  })}
-                </div>
-              </div>
-            );
-          });
-        }
-        case 'createdAt':
-        case 'lastModifiedAt':
-          return formatDateAndTime(item[column.key], intl);
-        case 'destinationType':
-          try {
-            return intl.formatMessage(
-              destinationMessages[
-                ('destination' +
-                  item.destination.type) as keyof typeof destinationMessages
-              ]
-            );
-          } catch (e) {
-            return item.destination.type;
-          }
-        default:
-          return renderDefault(
-            item[column.key as keyof TCommercetoolsSubscription]
-          );
-      }
-    };
   return (
-    <InfoMainPage
-      customTitleRow={
-        <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h1">
-            {intl.formatMessage(messages.title)}
-          </Text.Headline>
-
-          <SecondaryButton
-            iconLeft={<PlusBoldIcon />}
-            as={Link}
-            to={props.linkToHome + '/subscription/new'}
-            label={intl.formatMessage(messages.subscriptionAdd)}
-          />
-        </Spacings.Inline>
-      }
-    >
-      {subscriptions.total === 0 && (
-        <div>{intl.formatMessage(messages.noResults)}</div>
-      )}
-      {subscriptions.total > 0 && (
-        <Spacings.Stack>
-          <PaginatableDataTable<TCommercetoolsSubscription>
-            isCondensed
-            columns={columns}
-            visibleColumns={columns}
-            rows={results}
-            itemRenderer={itemRenderer}
-            sortedBy={tableSorting.value.key}
-            sortDirection={tableSorting.value.order}
-            onSortChange={tableSorting.onChange}
-            onRowClick={(row) =>
-              push(`${props.linkToHome}/subscription/${row.id}`)
-            }
-            paginationState={paginationState}
-            totalItems={subscriptions.total}
-          />
-        </Spacings.Stack>
-      )}
-    </InfoMainPage>
+    <DefaultPage.Root>
+      <DefaultPage.Header>
+        <DefaultPage.Title>
+          {intl.formatMessage(messages.title)}
+        </DefaultPage.Title>
+        <DefaultPage.Actions>
+          <Button
+            variant="outline"
+            colorPalette="primary"
+            onPress={() => push(`${props.linkToHome}/subscription/new`)}
+          >
+            <Add />
+            {intl.formatMessage(messages.subscriptionAdd)}
+          </Button>
+        </DefaultPage.Actions>
+      </DefaultPage.Header>
+      <DefaultPage.Content>
+        {total === 0 ? (
+          <Text color="neutral.11">
+            {intl.formatMessage(messages.noResults)}
+          </Text>
+        ) : (
+          <Flex direction="column" gap="400">
+            <DataTable<TCommercetoolsSubscription>
+              columns={createColumnDefinitions({ intl })}
+              rows={results}
+              allowsSorting
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) => {
+                setSortDescriptor(descriptor);
+                setPage(1);
+              }}
+              onRowClick={(row) =>
+                push(`${props.linkToHome}/subscription/${row.id}`)
+              }
+            />
+            <Pagination
+              totalItems={total}
+              currentPage={page}
+              pageSize={perPage}
+              onPageChange={setPage}
+              onPageSizeChange={(nextPageSize) => {
+                setPerPage(nextPageSize);
+                setPage(1);
+              }}
+              enablePageSizeSelector
+            />
+          </Flex>
+        )}
+      </DefaultPage.Content>
+    </DefaultPage.Root>
   );
 };
 

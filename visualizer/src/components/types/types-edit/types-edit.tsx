@@ -2,24 +2,23 @@ import { FC, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
-import Text from '@commercetools-uikit/text';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import Spacings from '@commercetools-uikit/spacings';
-import {
-  CustomFormDetailPage,
-  CustomFormModalPage,
-  FormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
-import { ContentNotification } from '@commercetools-uikit/notifications';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import {
+  Alert,
+  Button,
+  Flex,
+  LoadingSpinner,
+  LocalizedField,
+  ModalPage,
+} from '@commercetools/nimbus';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { formValuesToDoc } from '../type-definition-connectors';
 import { PERMISSIONS } from '../../../constants';
 import TypesForm, { TFormValues } from '../types-form/types-form';
+import formMessages from '../types-form/messages';
 
 import messages from './messages';
 import {
@@ -29,7 +28,8 @@ import {
   useTypeDefinitionDeleter,
   useTypeDefinitionFetcher,
   useTypeDefinitionUpdater,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   linkToHome: string;
@@ -54,7 +54,10 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const data = formValuesToDoc(formikValues);
       if (typeDefinition) {
         const updateActions = calculateTypeDefinitionUpdateActions(
@@ -104,16 +107,17 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
   if (!typeDefinition) {
@@ -125,13 +129,13 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
       initialValues={{
         id: typeDefinition.id,
         key: typeDefinition.key,
-        name: LocalizedTextInput.createLocalizedString(
+        name: LocalizedField.createLocalizedString(
           projectLanguages,
           transformLocalizedFieldToLocalizedString(
             typeDefinition.nameAllLocales ?? []
           ) ?? {}
         ),
-        description: LocalizedTextInput.createLocalizedString(
+        description: LocalizedField.createLocalizedString(
           projectLanguages,
           transformLocalizedFieldToLocalizedString(
             typeDefinition.descriptionAllLocales ?? []
@@ -145,36 +149,50 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
       version={typeDefinition.version}
       refetch={refetch}
     >
-      {(formProps) => {
-        return (
-          <CustomFormModalPage
-            isOpen
-            title={intl.formatMessage(messages.title)}
-            onClose={onClose}
-            formControls={
-              <>
-                <CustomFormDetailPage.FormSecondaryButton
-                  label={FormModalPage.Intl.revert}
-                  isDisabled={!formProps.isDirty}
-                  onClick={formProps.handleReset}
-                />
-                <CustomFormDetailPage.FormPrimaryButton
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                  onClick={() => formProps.submitForm()}
-                  label={FormModalPage.Intl.save}
-                />
-                <CustomFormModalPage.FormDeleteButton
-                  onClick={() => handleDelete()}
-                />
-              </>
-            }
-          >
-            {typeDefinition && formProps.formElements}
-          </CustomFormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.backButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              variant="outline"
+              isDisabled={!formProps.isDirty}
+              onPress={formProps.handleReset}
+            >
+              {intl.formatMessage(formMessages.revertButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+            <Button
+              colorPalette="critical"
+              variant="outline"
+              isDisabled={!canManage}
+              onPress={() => handleDelete()}
+            >
+              {intl.formatMessage(formMessages.deleteButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </TypesForm>
   );
 };

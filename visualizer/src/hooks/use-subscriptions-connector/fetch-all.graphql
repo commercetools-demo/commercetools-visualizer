@@ -1,0 +1,32 @@
+#import "./fragments/subscription-destination-fragments.graphql"
+
+query FetchSubscriptions($limit: Int!, $offset: Int!, $sort: [String!]) {
+  subscriptions(limit: $limit, offset: $offset, sort: $sort) {
+    total
+    count
+    offset
+    results {
+      id
+      key
+      version
+      createdAt
+      destination {
+        type
+        ...AzureServiceBusDestinationFragment
+        ...EventBridgeDestinationFragment
+        ...EventGridDestinationFragment
+        ...GoogleCloudPubSubDestinationFragment
+        ...SNSDestinationFragment
+        ...SQSDestinationFragment
+        ...ConfluentCloudDestinationFragment
+      }
+      changes {
+        resourceTypeId
+      }
+      messages {
+        resourceTypeId
+        types
+      }
+    }
+  }
+}

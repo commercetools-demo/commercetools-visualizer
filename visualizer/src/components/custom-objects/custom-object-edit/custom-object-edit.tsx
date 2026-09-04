@@ -6,20 +6,19 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { useIntl } from 'react-intl';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
-import messages from './messages';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Text from '@commercetools-uikit/text';
-import Spacings from '@commercetools-uikit/spacings';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import {
-  CustomFormDetailPage,
-  CustomFormModalPage,
-  FormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+  Alert,
+  Button,
+  Flex,
+  LoadingSpinner,
+  ModalPage,
+} from '@commercetools/nimbus';
+import messages from './messages';
 import CustomObjectForm, {
   TFormValues,
 } from '../custom-object-form/custom-object-form';
+import formMessages from '../custom-object-form/messages';
 import {
   customObjectToFormValues,
   formValuesToTCustomObject,
@@ -30,7 +29,7 @@ import {
   useCustomObjectDeleter,
   useCustomObjectFetcher,
   useCustomObjectCreatorOrUpdater,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -101,16 +100,17 @@ const CustomObjectEdit: FC<Props> = ({ onClose, onIdChange }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
   if (!customObject) {
@@ -125,37 +125,54 @@ const CustomObjectEdit: FC<Props> = ({ onClose, onIdChange }) => {
       version={customObject.version}
       refetch={refetch}
     >
-      {(formProps) => {
-        return (
-          <CustomFormModalPage
-            isOpen
-            title={intl.formatMessage(messages.title)}
-            onClose={onClose}
-            formControls={
-              <>
-                <CustomFormDetailPage.FormSecondaryButton
-                  label={FormModalPage.Intl.revert}
-                  isDisabled={!formProps.isDirty}
-                  onClick={formProps.handleReset}
-                />
-                <CustomFormDetailPage.FormPrimaryButton
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                  onClick={() => formProps.submitForm()}
-                  label={FormModalPage.Intl.save}
-                />
-                <CustomFormModalPage.FormDeleteButton
-                  onClick={() => handleDelete()}
-                />
-              </>
-            }
-          >
-            {customObject && formProps.formElements}
-          </CustomFormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.backButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              variant="outline"
+              isDisabled={!formProps.isDirty}
+              onPress={formProps.handleReset}
+            >
+              {intl.formatMessage(formMessages.revertButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+            <Button
+              colorPalette="critical"
+              variant="outline"
+              isDisabled={!canManage}
+              onPress={() => handleDelete()}
+            >
+              {intl.formatMessage(formMessages.deleteButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </CustomObjectForm>
   );
 };
+
+CustomObjectEdit.displayName = 'CustomObjectEdit';
+
 export default CustomObjectEdit;

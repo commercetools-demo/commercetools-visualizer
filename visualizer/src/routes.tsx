@@ -8,8 +8,6 @@ import SubscriptionCreate from './components/subscriptions/subscription-create/s
 import TypesList from './components/types/types-list/types-list';
 import ExtensionsList from './components/extensions/extensions-list/extensions-list';
 import CustomObjectsList from './components/custom-objects/custom-objects-list';
-import VisualizeDrilldown from './components/visualize-drilldown';
-import EntityDiagram from './components/entity-diagram';
 
 type ApplicationRoutesProps = {
   children?: ReactNode;
@@ -53,12 +51,6 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       </Route>
       <Route path={`${match.path}/custom-objects`}>
         <CustomObjectsList linkToHome={match.url} />
-      </Route>
-      <Route path={`${match.path}/visualize-drilldown`}>
-        <VisualizeDrilldown />
-      </Route>
-      <Route path={`${match.path}/entity-diagram`}>
-        <EntityDiagram />
       </Route>
       <Route>
         <Welcome />

@@ -1,10 +1,6 @@
 import { FC } from 'react';
+import { Stack } from '@commercetools/nimbus';
 import GoogleCloudPubSubDestination from './subscription-destination-form-gcp';
-import Constraints from '@commercetools-uikit/constraints';
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Card from '@commercetools-uikit/card';
-import Spacings from '@commercetools-uikit/spacings';
 import SQSDestination from './subscription-destination-form-sqs';
 import ConfluentCloudDestination from './subscription-destination-form-confluent-cloud';
 
@@ -31,20 +27,9 @@ const SubscriptionDestinationForm: FC<Props> = ({
   }
 
   return (
-    <Constraints.Horizontal max="scale">
-      <Grid
-        gridGap={designTokens.spacing50}
-        gridTemplateColumns={`repeat(auto-fill, '')`}
-      >
-        <Grid.Item>
-          <Constraints.Horizontal max="scale">
-            <Card insetScale="s" type="flat">
-              <Spacings.Stack scale="m">{toRender}</Spacings.Stack>
-            </Card>
-          </Constraints.Horizontal>
-        </Grid.Item>
-      </Grid>
-    </Constraints.Horizontal>
+    <Stack direction="column" gap="400">
+      {toRender}
+    </Stack>
   );
 };
 

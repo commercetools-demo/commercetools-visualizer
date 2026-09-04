@@ -1,7 +1,4 @@
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Constraints from '@commercetools-uikit/constraints';
-import Card from '@commercetools-uikit/card';
+import { Stack } from '@commercetools/nimbus';
 import {
   CheckboxGroup,
   CheckboxGroupItem,
@@ -52,39 +49,28 @@ const SubscriptionChangesForm: FC<Props> = ({ isReadOnly }) => {
       : [];
   };
   return (
-    <Constraints.Horizontal max="scale">
-      <Grid
-        gridGap={designTokens.spacing50}
-        gridTemplateColumns={`repeat(auto-fill, '')`}
+    <Stack direction="column" gap="400">
+      <CheckboxGroup
+        name="changes"
+        label="Choose Changes you want to listen to."
       >
-        <Grid.Item>
-          <Constraints.Horizontal max="scale">
-            <Card insetScale="s" type="flat">
-              <CheckboxGroup
-                name="changes"
-                label="Choose Changes you want to listen to."
-              >
-                {changes.map((entry) => {
-                  return (
-                    <CheckboxGroupItem
-                      key={entry}
-                      label={intl.formatMessage(messages.label, {
-                        type: entry,
-                      })}
-                      value={entry}
-                      isChecked={isChecked}
-                      addItem={addItem}
-                      removeItem={removeItem}
-                      isReadOnly={isReadOnly}
-                    />
-                  );
-                })}
-              </CheckboxGroup>
-            </Card>
-          </Constraints.Horizontal>
-        </Grid.Item>
-      </Grid>
-    </Constraints.Horizontal>
+        {changes.map((entry) => {
+          return (
+            <CheckboxGroupItem
+              key={entry}
+              label={intl.formatMessage(messages.label, {
+                type: entry,
+              })}
+              value={entry}
+              isChecked={isChecked}
+              addItem={addItem}
+              removeItem={removeItem}
+              isReadOnly={isReadOnly}
+            />
+          );
+        })}
+      </CheckboxGroup>
+    </Stack>
   );
 };
 export default SubscriptionChangesForm;

@@ -1,7 +1,4 @@
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Constraints from '@commercetools-uikit/constraints';
-import Card from '@commercetools-uikit/card';
+import { Heading, Stack } from '@commercetools/nimbus';
 import {
   CheckboxGroup,
   CheckboxGroupItem,
@@ -9,8 +6,6 @@ import {
 import { TMessageSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { useIntl } from 'react-intl';
-import Text from '@commercetools-uikit/text';
-import Spacings from '@commercetools-uikit/spacings';
 import { FC } from 'react';
 import { subscriptionMessageTypes } from './subscription-message-types';
 
@@ -246,50 +241,37 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
   };
 
   return (
-    <Constraints.Horizontal max="scale">
-      <Grid
-        gridGap={designTokens.spacing50}
-        gridTemplateColumns={`repeat(auto-fill, '')`}
-      >
-        <Grid.Item>
-          <Constraints.Horizontal max="scale">
-            <Card insetScale="s" type="flat">
-              <Spacings.Stack scale="s">
-                <Text.Headline as={'h2'}>
-                  {intl.formatMessage(messages.messagesLabel)}
-                </Text.Headline>
-                {entries().map((item) => {
-                  return (
-                    <CheckboxGroup
-                      key={item.resourceTypeId}
-                      name="messages"
-                      label={intl.formatMessage(messages.resourceTypeLabel, {
-                        label: item.resourceTypeName,
-                        amount: item.amountOfMessage,
-                      })}
-                    >
-                      {item.types.map((entry, index) => {
-                        return (
-                          <CheckboxGroupItem
-                            key={index}
-                            label={entry.value}
-                            value={item.resourceTypeId + '#' + entry.key}
-                            isChecked={isChecked}
-                            addItem={addItem}
-                            removeItem={removeItem}
-                            isReadOnly={isReadOnly}
-                          />
-                        );
-                      })}
-                    </CheckboxGroup>
-                  );
-                })}
-              </Spacings.Stack>
-            </Card>
-          </Constraints.Horizontal>
-        </Grid.Item>
-      </Grid>
-    </Constraints.Horizontal>
+    <Stack direction="column" gap="200">
+      <Heading as="h2" size="md">
+        {intl.formatMessage(messages.messagesLabel)}
+      </Heading>
+      {entries().map((item) => {
+        return (
+          <CheckboxGroup
+            key={item.resourceTypeId}
+            name="messages"
+            label={intl.formatMessage(messages.resourceTypeLabel, {
+              label: item.resourceTypeName,
+              amount: item.amountOfMessage,
+            })}
+          >
+            {item.types.map((entry, index) => {
+              return (
+                <CheckboxGroupItem
+                  key={index}
+                  label={entry.value}
+                  value={item.resourceTypeId + '#' + entry.key}
+                  isChecked={isChecked}
+                  addItem={addItem}
+                  removeItem={removeItem}
+                  isReadOnly={isReadOnly}
+                />
+              );
+            })}
+          </CheckboxGroup>
+        );
+      })}
+    </Stack>
   );
 };
 export default SubscriptionMessagesForm;

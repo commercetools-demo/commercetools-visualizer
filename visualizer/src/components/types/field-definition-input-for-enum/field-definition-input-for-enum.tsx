@@ -1,22 +1,22 @@
-import Constraints from '@commercetools-uikit/constraints';
-import DataTable, { TRow } from '@commercetools-uikit/data-table';
-import Spacings from '@commercetools-uikit/spacings';
-import SecondaryButton from '@commercetools-uikit/secondary-button';
-import { BinLinearIcon, PlusBoldIcon } from '@commercetools-uikit/icons';
+import { FC } from 'react';
 import { useIntl } from 'react-intl';
-import messages from './messages';
-import { useCustomViewContext } from '@commercetools-frontend/application-shell-connectors';
-import { Item, LocalizedString } from './constants';
-import memoize from 'memoize-one';
-import IconButton from '@commercetools-uikit/icon-button';
-import { FC, Fragment } from 'react';
-import TextInput from '@commercetools-uikit/text-input';
 import { useFormik } from 'formik';
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Stack,
+  Text,
+  TextInput,
+} from '@commercetools/nimbus';
+import { Add, Delete } from '@commercetools/nimbus-icons';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import messages from './messages';
+import { Item, LocalizedString } from './constants';
 import { TFormValues } from '../field-definition-input/helpers';
-import { createColumnDefinitions } from './utils';
-type Formik = ReturnType<typeof useFormik>;
 
-type RowItem = { index: number } & Item & TRow;
+type Formik = ReturnType<typeof useFormik>;
 
 const getLocalizedEnumLabel = (
   docLabel: LocalizedString,
@@ -31,13 +31,12 @@ const formToDocLocalizedEnumLabel = (formColumnKey: string) =>
   formColumnKey.replace('_', '.');
 
 const getLangsFromEnums = (enums: Array<Item>): Array<string> => {
-  let map = enums
-    .map((item) => {
-      return item.label ? Object.keys(item.label) : [];
-    })
+  const map = enums
+    .map((item) => (item.label ? Object.keys(item.label) : []))
     .flat();
   return Array.from(new Set(map));
 };
+
 export function sortEnumLanguagesByResourceLanguages(
   enumLanguages: Array<string>,
   resourceLanguages: Array<string>
@@ -48,24 +47,27 @@ export function sortEnumLanguagesByResourceLanguages(
   ];
 }
 
-const getEnumLanguages = memoize((values) => (languages: Array<string>) => {
+const getEnumLanguages = (
+  values: Array<Item> | undefined,
+  languages: Array<string>
+) => {
   if (!values) {
     return languages;
   }
-  return values?.length > 0
+  return values.length > 0
     ? sortEnumLanguagesByResourceLanguages(getLangsFromEnums(values), languages)
     : languages;
-});
-const createEmptyLocalizedEnum = (enumLanguages: Array<string>) => ({
+};
+
+const createEmptyLocalizedEnum = (enumLanguages: Array<string>): Item => ({
   key: '',
-  ...enumLanguages.reduce<{
-    label: Record<string, string>;
-  }>((acc, lang) => ({ ...acc, label: { ...acc.label, [lang]: '' } }), {
-    label: {},
-  }),
+  label: enumLanguages.reduce<Record<string, string>>(
+    (acc, lang) => ({ ...acc, [lang]: '' }),
+    {}
+  ),
 });
 
-const createEmptyPlainEnum = () => ({
+const createEmptyPlainEnum = (): Item => ({
   key: '',
   label: '',
 });
@@ -73,7 +75,7 @@ const createEmptyPlainEnum = () => ({
 const createEmptyEnumValue = (
   isLocalized: boolean,
   locales: Array<string> = []
-) =>
+): Item =>
   isLocalized && locales.length > 0
     ? createEmptyLocalizedEnum(locales)
     : createEmptyPlainEnum();
@@ -81,11 +83,7 @@ const createEmptyEnumValue = (
 type Props = {
   onAddEnumValue: (item: Item) => void;
   onRemoveEnumValue: (absoluteIndex: number) => void;
-  onChangeEnumValue: ({
-    field,
-    nextValue,
-    absoluteIndex,
-  }: {
+  onChangeEnumValue: (args: {
     field: string;
     nextValue: string;
     absoluteIndex: number;
@@ -101,6 +99,7 @@ type Props = {
   };
   isDisabled?: boolean;
 };
+
 const FieldDefinitionInputForEnum: FC<Props> = ({
   formik,
   onAddEnumValue,
@@ -109,124 +108,111 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
   isDisabled,
 }) => {
   const intl = useIntl();
-  const { projectLanguages } = useCustomViewContext((context) => ({
+  const { projectLanguages } = useApplicationContext((context) => ({
     projectLanguages: context.project?.languages ?? [],
   }));
 
-  const handleAddEnumClick = () => {
-    const enumLanguages = getEnumLanguages(formik.values.enumValues)(
-      projectLanguages || []
-    );
+  const isLocalized = formik.values.isLocalized;
+  const enumLanguages = getEnumLanguages(
+    formik.values.enumValues,
+    projectLanguages || []
+  );
 
-    const newEnum = createEmptyEnumValue(
-      formik.values.isLocalized,
-      enumLanguages
-    );
-    onAddEnumValue(newEnum);
+  const handleAddEnumClick = () => {
+    onAddEnumValue(createEmptyEnumValue(isLocalized, enumLanguages));
   };
 
   const items =
     !formik.values.enumValues || formik.values.enumValues.length === 0
-      ? [createEmptyEnumValue(formik.values.isLocalized, projectLanguages)]
+      ? [createEmptyEnumValue(isLocalized, projectLanguages)]
       : formik.values.enumValues;
-  const rows = items.map(
-    (item, index): RowItem => ({
-      ...item,
-      id: index.toString(),
-      absoluteIndex: index,
-      index,
-    })
-  );
 
-  const renderEnum = ({
-    row,
-    rows,
-    key,
-    onChangeEnumValue,
-    isLocalized,
-    isDisabled,
-  }: {
-    row: RowItem;
-    rows: Array<Item>;
-    key: string;
-    onChangeEnumValue: ({
-      field,
-      nextValue,
-      absoluteIndex,
-    }: {
-      field: string;
-      nextValue: string;
-      absoluteIndex: number;
-    }) => void;
-    isLocalized: boolean;
-    isDisabled?: boolean;
-  }) => {
-    const nameAttribute = `enums.${row.index}.${key}`;
+  // Column keys: key, then one label column per language (localized) or a
+  // single "label" column (plain), then a delete column.
+  const labelColumnKeys = isLocalized
+    ? enumLanguages.map((lang) => `label_${lang}`)
+    : ['label'];
+  const templateColumns = `1fr ${labelColumnKeys
+    .map(() => '1fr')
+    .join(' ')} max-content`;
 
-    const value =
-      isLocalized && key.startsWith('label')
-        ? getLocalizedEnumLabel(row.label as LocalizedString, key)
-        : (row[key as keyof RowItem] as string) || '';
-    switch (key) {
-      case 'delete':
-        return (
-          <IconButton
-            icon={<BinLinearIcon />}
-            isDisabled={isDisabled || rows.length === 1}
-            label="Delete List Item"
-            size="medium"
-            onClick={() => onRemoveEnumValue(row.absoluteIndex || 0)}
-          />
-        );
-      default:
-        return (
-          <Fragment>
-            <TextInput
-              value={value}
-              name={nameAttribute}
-              onChange={(event) => {
-                onChangeEnumValue({
-                  absoluteIndex: row.absoluteIndex || 0,
-                  field: formToDocLocalizedEnumLabel(key),
-                  nextValue: event.target.value,
-                });
-              }}
-              isDisabled={isDisabled}
-            />
-          </Fragment>
-        );
+  const cellValue = (item: Item, columnKey: string): string => {
+    if (isLocalized && columnKey.startsWith('label')) {
+      return getLocalizedEnumLabel(item.label as LocalizedString, columnKey);
     }
+    if (columnKey === 'label') {
+      return (item.label as string) || '';
+    }
+    return (item.key as string) || '';
   };
+
   return (
-    <Spacings.Stack scale="m">
-      <Constraints.Horizontal max="scale">
-        <DataTable
-          columns={createColumnDefinitions(
-            getEnumLanguages(formik.values.enumValues)(projectLanguages || []),
-            formik.values.isLocalized
-          )}
-          rows={rows}
-          itemRenderer={(row, { key }) =>
-            renderEnum({
-              rows: items,
-              row,
-              key,
-              onChangeEnumValue: onChangeEnumValue,
-              isLocalized: formik.values.isLocalized,
-              isDisabled: isDisabled,
-            })
-          }
-          footer={
-            <SecondaryButton
-              iconLeft={<PlusBoldIcon />}
-              label={intl.formatMessage(messages.addEnumButtonLabel)}
-              onClick={handleAddEnumClick}
-              isDisabled={isDisabled}
-            />
-          }
-        ></DataTable>
-      </Constraints.Horizontal>
-    </Spacings.Stack>
+    <Stack direction="column" gap="300">
+      <Grid templateColumns={templateColumns} gap="300" alignItems="center">
+        <Text fontWeight="500">
+          {intl.formatMessage(messages.tableHeaderLabelKey)}
+        </Text>
+        {isLocalized ? (
+          enumLanguages.map((lang) => (
+            <Text key={lang} fontWeight="500">
+              {intl.formatMessage(messages.tableHeaderLocalizedLabelLabel, {
+                language: lang.toUpperCase(),
+              })}
+            </Text>
+          ))
+        ) : (
+          <Text fontWeight="500">
+            {intl.formatMessage(messages.tableHeaderLabelLabel)}
+          </Text>
+        )}
+        <Box />
+
+        {items.map((item, index) => {
+          const columnKeys = ['key', ...labelColumnKeys];
+          return columnKeys
+            .map((columnKey) => (
+              <TextInput
+                key={`${index}-${columnKey}`}
+                aria-label={`${columnKey}-${index}`}
+                value={cellValue(item, columnKey)}
+                isDisabled={isDisabled}
+                onChange={(nextValue) =>
+                  onChangeEnumValue({
+                    absoluteIndex: index,
+                    field:
+                      columnKey === 'key'
+                        ? 'key'
+                        : formToDocLocalizedEnumLabel(columnKey),
+                    nextValue,
+                  })
+                }
+              />
+            ))
+            .concat(
+              <IconButton
+                key={`${index}-delete`}
+                aria-label={intl.formatMessage(messages.addEnumButtonLabel)}
+                size="xs"
+                variant="ghost"
+                isDisabled={isDisabled || items.length === 1}
+                onPress={() => onRemoveEnumValue(index)}
+              >
+                <Delete />
+              </IconButton>
+            );
+        })}
+      </Grid>
+      <Box>
+        <Button
+          variant="outline"
+          isDisabled={isDisabled}
+          onPress={handleAddEnumClick}
+        >
+          <Add />
+          {intl.formatMessage(messages.addEnumButtonLabel)}
+        </Button>
+      </Box>
+    </Stack>
   );
 };
 

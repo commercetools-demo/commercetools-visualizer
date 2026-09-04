@@ -4,8 +4,7 @@ import {
   SubscriptionStepProps,
 } from '../subscription-create-configuration';
 import { Formik } from 'formik';
-import Spacings from '@commercetools-uikit/spacings';
-import { PageContentWide } from '@commercetools-frontend/application-components';
+import { Stack } from '@commercetools/nimbus';
 
 import { useHistory } from 'react-router';
 import SubscriptionMessagesForm from '../../subscription-messages-form/subscription-messages-form';
@@ -36,11 +35,9 @@ const SubscriptionCreateMessages: FC<SubscriptionStepProps> = ({
     >
       {(formikProps) => (
         <>
-          <PageContentWide>
-            <Spacings.Stack scale="xxxl">
-              <SubscriptionMessagesForm />
-            </Spacings.Stack>
-          </PageContentWide>
+          <Stack direction="column" gap="800">
+            <SubscriptionMessagesForm />
+          </Stack>
           <SaveToolbar
             isVisible={formikProps.dirty || formik?.dirty}
             buttonProps={{ next: { isDisabled: !formikProps.isValid } }}

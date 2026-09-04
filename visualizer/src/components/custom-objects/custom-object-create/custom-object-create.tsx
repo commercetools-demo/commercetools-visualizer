@@ -1,15 +1,16 @@
 import { FC, useCallback } from 'react';
-import { FormModalPage } from '@commercetools-frontend/application-components';
-import messages from './messages';
-import CustomObjectForm, {
-  TFormValues,
-} from '../custom-object-form/custom-object-form';
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { Button, ModalPage } from '@commercetools/nimbus';
 import { PERMISSIONS } from '../../../constants';
+import messages from './messages';
+import CustomObjectForm, {
+  TFormValues,
+} from '../custom-object-form/custom-object-form';
+import formMessages from '../custom-object-form/messages';
 import {
   formValuesToTCustomObject,
   customObjectToFormValues,
@@ -17,7 +18,7 @@ import {
 import {
   graphQLErrorHandler,
   useCustomObjectCreatorOrUpdater,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -61,24 +62,39 @@ const CustomObjectCreate: FC<Props> = ({ onClose, onSuccess }) => {
       version={-1}
       createNewMode={true}
     >
-      {(formProps) => {
-        return (
-          <FormModalPage
-            title={intl.formatMessage(messages.title)}
-            isOpen
-            onPrimaryButtonClick={() => formProps.submitForm()}
-            onSecondaryButtonClick={onClose}
-            hideControls={false}
-            labelPrimaryButton={intl.formatMessage(FormModalPage.Intl.save)}
-            isPrimaryButtonDisabled={
-              formProps.isSubmitting || !formProps.isDirty || !canManage
-            }
-          >
-            {formProps.formElements}
-          </FormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.backButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </CustomObjectForm>
   );
 };
+
+CustomObjectCreate.displayName = 'CustomObjectCreate';
+
 export default CustomObjectCreate;

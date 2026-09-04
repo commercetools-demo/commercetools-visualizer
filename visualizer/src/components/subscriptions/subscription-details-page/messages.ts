@@ -25,4 +25,16 @@ export default defineMessages<string>({
     id: 'Subscriptions.subscriptionAdd',
     defaultMessage: 'Add new Subscription',
   },
+  revertButton: {
+    id: 'Subscriptions.revertButton',
+    defaultMessage: 'Revert',
+  },
+  saveButton: {
+    id: 'Subscriptions.saveButton',
+    defaultMessage: 'Save',
+  },
+  deleteButton: {
+    id: 'Subscriptions.deleteButton',
+    defaultMessage: 'Delete',
+  },
 });

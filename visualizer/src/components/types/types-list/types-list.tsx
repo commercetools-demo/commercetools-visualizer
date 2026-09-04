@@ -1,41 +1,36 @@
-import { FC, lazy } from 'react';
+import { FC, lazy, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Link, Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import {
-  usePaginationState,
-  useDataTableSortingState,
-} from '@commercetools-uikit/hooks';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import {
-  InfoMainPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+  Alert,
+  Button,
+  DataTable,
+  DefaultPage,
+  Flex,
+  LoadingSpinner,
+  Pagination,
+  Text,
+  type SortDescriptor,
+} from '@commercetools/nimbus';
+import { Add } from '@commercetools/nimbus-icons';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { PlusBoldIcon } from '@commercetools-uikit/icons';
-import SecondaryButton from '@commercetools-uikit/secondary-button';
+import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { getErrorMessage, useTypeDefinitionsFetcher } from '../../../hooks';
 import { TTypeDefinition } from '../../../types/generated/ctp';
+import { PERMISSIONS } from '../../../constants';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
-import { SuspendedRoute } from '@commercetools-frontend/application-shell';
-import { TDataTableProps } from '@commercetools-uikit/data-table/dist/declarations/src/data-table';
-import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
-import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import { PERMISSIONS } from '../../../constants';
-import {
-  getErrorMessage,
-  useTypeDefinitionsFetcher,
-} from 'commercetools-demo-shared-data-fetching-hooks';
-import {
-  formatDateAndTime,
-  formatLocalizedString,
-  renderDefault,
-} from 'commercetools-demo-shared-helpers';
-const TypesCreate = lazy(() => import('../types-create/types-create'));
 
+const TypesCreate = lazy(() => import('../types-create/types-create'));
 const TypesEdit = lazy(() => import('../types-edit/types-edit'));
+
+const DEFAULT_PER_PAGE = 20;
+
+const toSortString = (sortDescriptor: SortDescriptor): string =>
+  `${String(sortDescriptor.column)} ${
+    sortDescriptor.direction === 'descending' ? 'desc' : 'asc'
+  }`;
 
 type Props = {};
 
@@ -43,8 +38,13 @@ const TypesList: FC<Props> = () => {
   const intl = useIntl();
   const { push } = useHistory();
   const match = useRouteMatch();
-  const paginationState = usePaginationState();
-  const tableSorting = useDataTableSortingState({ key: 'key', order: 'asc' });
+
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
+  const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
+    column: 'key',
+    direction: 'ascending',
+  });
 
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
@@ -54,121 +54,106 @@ const TypesList: FC<Props> = () => {
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
+
   const { typeDefinitions, error, loading, refetch } =
     useTypeDefinitionsFetcher({
-      limit: paginationState.perPage.value,
-      offset: (paginationState.page.value - 1) * paginationState.perPage.value,
-      sort: [`${tableSorting.value.key} ${tableSorting.value.order}`],
+      limit: perPage,
+      offset: (page - 1) * perPage,
+      sort: [toSortString(sortDescriptor)],
     });
 
-  if (error) {
-    return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
-    );
-  }
-
-  if (loading) {
-    return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
-    );
-  }
-
-  if (!typeDefinitions || !typeDefinitions.results) {
-    return <PageNotFound />;
-  }
-
-  const { results, total } = typeDefinitions;
-
-  const itemRenderer: TDataTableProps<TTypeDefinition>['itemRenderer'] = (
-    item,
-    column
-  ) => {
-    switch (column.key) {
-      case 'name':
-        return formatLocalizedString(
-          item.nameAllLocales,
-          dataLocale,
-          projectLanguages
-        );
-      case 'description':
-        return formatLocalizedString(
-          item.descriptionAllLocales,
-          dataLocale,
-          projectLanguages
-        );
-      case 'resourceTypeIds':
-        return item.resourceTypeIds.join(', ');
-      case 'fieldCount':
-        return item.fieldDefinitions.length;
-      case 'createdAt':
-      case 'lastModifiedAt':
-        return formatDateAndTime(item[column.key], intl);
-      default:
-        return renderDefault(item[column.key as keyof TTypeDefinition]);
-    }
-  };
+  const total = typeDefinitions?.total ?? 0;
+  const results = (typeDefinitions?.results ?? []) as Array<TTypeDefinition>;
 
   return (
-    <InfoMainPage
-      customTitleRow={
-        <Spacings.Inline justifyContent="space-between">
-          <Text.Headline as="h1" intlMessage={messages.title} />
-          <SecondaryButton
-            as={Link}
-            to={`${match.url}/new`}
-            iconLeft={<PlusBoldIcon />}
-            label={intl.formatMessage(messages.addType)}
+    <DefaultPage.Root>
+      <DefaultPage.Header>
+        <DefaultPage.Title>
+          {intl.formatMessage(messages.title)}
+        </DefaultPage.Title>
+        <DefaultPage.Actions>
+          <Button
+            variant="outline"
+            colorPalette="primary"
             isDisabled={!canManage}
-          />
-        </Spacings.Inline>
-      }
-    >
-      {total === 0 && <div>{intl.formatMessage(messages.noResults)}</div>}
+            onPress={() => push(`${match.url}/new`)}
+          >
+            <Add />
+            {intl.formatMessage(messages.addType)}
+          </Button>
+        </DefaultPage.Actions>
+      </DefaultPage.Header>
+      <DefaultPage.Content>
+        {error ? (
+          <Alert.Root colorPalette="critical">
+            <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+            <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+          </Alert.Root>
+        ) : loading ? (
+          <Flex justifyContent="center" padding="600">
+            <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+          </Flex>
+        ) : total === 0 ? (
+          <Text color="neutral.11">
+            {intl.formatMessage(messages.noResults)}
+          </Text>
+        ) : (
+          <Flex direction="column" gap="400">
+            <DataTable<TTypeDefinition>
+              columns={createColumnDefinitions({
+                intl,
+                dataLocale,
+                projectLanguages,
+              })}
+              rows={results}
+              allowsSorting
+              sortDescriptor={sortDescriptor}
+              onSortChange={(descriptor) => {
+                setSortDescriptor(descriptor);
+                setPage(1);
+              }}
+              onRowClick={(row) => push(`${match.url}/${row.id}`)}
+            />
+            <Pagination
+              totalItems={total}
+              currentPage={page}
+              pageSize={perPage}
+              onPageChange={setPage}
+              onPageSizeChange={(nextPageSize) => {
+                setPerPage(nextPageSize);
+                setPage(1);
+              }}
+              enablePageSizeSelector
+            />
+          </Flex>
+        )}
 
-      {total > 0 ? (
-        <PaginatableDataTable<TTypeDefinition>
-          isCondensed
-          columns={createColumnDefinitions(intl.formatMessage)}
-          visibleColumns={createColumnDefinitions(intl.formatMessage)}
-          rows={results}
-          itemRenderer={itemRenderer}
-          onRowClick={(row) => push(`${match.url}/${row.id}`)}
-          sortedBy={tableSorting.value.key}
-          sortDirection={tableSorting.value.order}
-          onSortChange={tableSorting.onChange}
-          paginationState={paginationState}
-          totalItems={total}
-        />
-      ) : null}
-      <Switch>
-        <SuspendedRoute path={`${match.path}/new`}>
-          <TypesCreate
-            linkToHome={match.url}
-            onClose={async () => {
-              await refetch();
-              push(`${match.url}`);
-            }}
-            onCreate={async (id: string) => {
-              await refetch();
-              push(`${match.url}/${id}`);
-            }}
-          />
-        </SuspendedRoute>
-        <SuspendedRoute path={`${match.path}/:id`}>
-          <TypesEdit
-            onClose={async () => {
-              await refetch();
-              push(`${match.url}`);
-            }}
-            linkToHome={match.url}
-          />
-        </SuspendedRoute>
-      </Switch>
-    </InfoMainPage>
+        <Switch>
+          <SuspendedRoute path={`${match.path}/new`}>
+            <TypesCreate
+              linkToHome={match.url}
+              onClose={async () => {
+                await refetch();
+                push(`${match.url}`);
+              }}
+              onCreate={async (id: string) => {
+                await refetch();
+                push(`${match.url}/${id}`);
+              }}
+            />
+          </SuspendedRoute>
+          <SuspendedRoute path={`${match.path}/:id`}>
+            <TypesEdit
+              onClose={async () => {
+                await refetch();
+                push(`${match.url}`);
+              }}
+              linkToHome={match.url}
+            />
+          </SuspendedRoute>
+        </Switch>
+      </DefaultPage.Content>
+    </DefaultPage.Root>
   );
 };
 TypesList.displayName = 'Types';

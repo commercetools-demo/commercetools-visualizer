@@ -1,10 +1,9 @@
-import PrimaryButton from '@commercetools-uikit/primary-button';
+import { Button } from '@commercetools/nimbus';
 import dagre from 'dagre';
 
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 
 import { FC, useCallback, useState } from 'react';
-// eslint-disable-next-line import/no-named-as-default
 import ReactFlow, {
   useNodesState,
   useEdgesState,
@@ -176,10 +175,13 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
         </ReactFlow>
       </div>
       <div>
-        <PrimaryButton
-          onClick={() => onLayout()}
-          label={isHorizontal ? 'horizontal layout' : 'vertical layout'}
-        ></PrimaryButton>
+        <Button
+          variant="solid"
+          colorPalette="primary"
+          onPress={() => onLayout()}
+        >
+          {isHorizontal ? 'horizontal layout' : 'vertical layout'}
+        </Button>
       </div>
     </div>
   );

@@ -1,10 +1,9 @@
 import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
-import { FormModalPage } from '@commercetools-frontend/application-components';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import { Button, LocalizedField, ModalPage } from '@commercetools/nimbus';
 import {
   transformLocalizedFieldToLocalizedString,
   transformLocalizedStringToLocalizedField,
@@ -12,13 +11,12 @@ import {
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
 import TypesForm from '../types-form/types-form';
+import { omitEmptyTranslations } from '../type-definition-connectors';
+import formMessages from '../types-form/messages';
 
 import { TTypeDefinitionDraft } from '../../../types/generated/ctp';
 import messages from './messages';
-import {
-  graphQLErrorHandler,
-  useTypeDefinitionCreator,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+import { graphQLErrorHandler, useTypeDefinitionCreator } from '../../../hooks';
 
 type Props = {
   linkToHome: string;
@@ -42,10 +40,10 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
       const draft: TTypeDefinitionDraft = {
         key: formikValues.key,
         name: transformLocalizedStringToLocalizedField(
-          LocalizedTextInput.omitEmptyTranslations(formikValues.name)
+          omitEmptyTranslations(formikValues.name)
         ),
         description: transformLocalizedStringToLocalizedField(
-          LocalizedTextInput.omitEmptyTranslations(formikValues.description)
+          omitEmptyTranslations(formikValues.description)
         ),
 
         resourceTypeIds: formikValues.resourceTypeIds,
@@ -72,11 +70,11 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
       initialValues={{
         id: '',
         key: '',
-        name: LocalizedTextInput.createLocalizedString(
+        name: LocalizedField.createLocalizedString(
           projectLanguages,
           transformLocalizedFieldToLocalizedString([]) ?? {}
         ),
-        description: LocalizedTextInput.createLocalizedString(
+        description: LocalizedField.createLocalizedString(
           projectLanguages,
           transformLocalizedFieldToLocalizedString([]) ?? {}
         ),
@@ -88,23 +86,35 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
       version={-1}
       createNewMode={true}
     >
-      {(formProps) => {
-        return (
-          <FormModalPage
-            title={intl.formatMessage(messages.title)}
-            isOpen
-            onPrimaryButtonClick={() => formProps.submitForm()}
-            onSecondaryButtonClick={onClose}
-            hideControls={false}
-            labelPrimaryButton={intl.formatMessage(FormModalPage.Intl.save)}
-            isPrimaryButtonDisabled={
-              formProps.isSubmitting || !formProps.isDirty || !canManage
-            }
-          >
-            {formProps.formElements}
-          </FormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.backButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </TypesForm>
   );
 };

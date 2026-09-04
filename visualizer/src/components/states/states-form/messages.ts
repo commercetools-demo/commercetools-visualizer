@@ -71,4 +71,34 @@ export default defineMessages({
     defaultMessage:
       'Initial states are automatically assigned to a resource when it is created. Leave unchecked if this State is a later step in the workflow.',
   },
+  transitionsTitle: {
+    id: 'State.form.transitions.title',
+    description: 'Title for transitions field',
+    defaultMessage: 'Transitions',
+  },
+  requiredFieldError: {
+    id: 'State.form.error.required',
+    description: 'The error message for required fields',
+    defaultMessage: 'This field is required. Provide a value.',
+  },
+  submitButton: {
+    id: 'State.form.button.submit',
+    description: 'Label for submit button',
+    defaultMessage: 'Save',
+  },
+  revertButton: {
+    id: 'State.form.button.revert',
+    description: 'Label for revert button',
+    defaultMessage: 'Revert',
+  },
+  cancelButton: {
+    id: 'State.form.button.cancel',
+    description: 'Label for cancel button',
+    defaultMessage: 'Cancel',
+  },
+  deleteButton: {
+    id: 'State.form.button.delete',
+    description: 'Label for delete button',
+    defaultMessage: 'Delete',
+  },
 });

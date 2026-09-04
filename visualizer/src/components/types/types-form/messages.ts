@@ -214,6 +214,21 @@ export default defineMessages({
     description: 'Label for submit button',
     defaultMessage: 'Save',
   },
+  revertButton: {
+    id: 'Type.form.button.revert',
+    description: 'Label for revert button',
+    defaultMessage: 'Revert',
+  },
+  cancelButton: {
+    id: 'Type.form.button.cancel',
+    description: 'Label for cancel button',
+    defaultMessage: 'Cancel',
+  },
+  deleteButton: {
+    id: 'Type.form.button.delete',
+    description: 'Label for delete button',
+    defaultMessage: 'Delete',
+  },
   requiredFieldError: {
     id: 'Type.form.error.required',
     description: 'The error message for required fields',

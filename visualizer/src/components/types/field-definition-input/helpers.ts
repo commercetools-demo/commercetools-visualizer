@@ -11,7 +11,10 @@ import {
   TSetType,
   TTextInputHint,
 } from '../../../types/generated/ctp';
-import LocalizedTextInput from '@commercetools-uikit/localized-text-input';
+import {
+  LocalizedField,
+  type LocalizedString as TLocalizedString,
+} from '@commercetools/nimbus';
 import {
   transformLocalizedFieldToLocalizedString,
   transformLocalizedStringToLocalizedField,
@@ -22,8 +25,20 @@ import {
   LocalizedString,
 } from '../field-definition-input-for-enum/constants';
 
+// `LocalizedField.omitEmptyTranslations` returns Nimbus' `LocalizedString`
+// (values `string | undefined`); narrow to `Record<string, string>` for
+// `@commercetools-frontend/l10n` after dropping empty translations.
+const omitEmptyTranslations = (
+  value: TLocalizedString
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(LocalizedField.omitEmptyTranslations(value)).filter(
+      ([, translation]) => translation != null
+    )
+  ) as Record<string, string>;
+
 export type TFormValues = {
-  label: Record<string, string>;
+  label: TLocalizedString;
   name: string;
   required?: boolean;
   isMultiLine: boolean;
@@ -61,9 +76,7 @@ export const fromFormValuesToTFieldDefinitionInput = (
             .map((value) => {
               const label: Array<TLocalizedStringItemInputType> =
                 transformLocalizedStringToLocalizedField(
-                  LocalizedTextInput.omitEmptyTranslations(
-                    value.label as LocalizedString
-                  )
+                  omitEmptyTranslations(value.label as LocalizedString)
                 ) || [];
               return { key: value.key || '', label: label };
             }) || [];
@@ -119,7 +132,7 @@ export const fromFormValuesToTFieldDefinitionInput = (
       : TTextInputHint.SingleLine,
     type: type,
     label: transformLocalizedStringToLocalizedField(
-      LocalizedTextInput.omitEmptyTranslations(values.label)
+      omitEmptyTranslations(values.label)
     ),
   };
   return actionDraft;
@@ -176,7 +189,7 @@ export const initialValuesFromFieldDefinition = (
   }
 
   return {
-    label: LocalizedTextInput.createLocalizedString(
+    label: LocalizedField.createLocalizedString(
       projectLanguages,
       transformLocalizedFieldToLocalizedString(
         fieldDefinition?.labelAllLocales ?? []

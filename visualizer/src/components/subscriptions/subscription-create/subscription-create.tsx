@@ -9,11 +9,8 @@ import Steps from 'commercetools-demo-shared-stepper';
 import messages from './messages';
 
 import { TSubscriptionDraft } from '../../../types/generated/ctp';
-import {
-  useSubscriptionCreator,
-  graphQLErrorHandler,
-} from 'commercetools-demo-shared-data-fetching-hooks';
-import { InfoDetailPage } from '@commercetools-frontend/application-components';
+import { useSubscriptionCreator, graphQLErrorHandler } from '../../../hooks';
+import { DefaultPage } from '@commercetools/nimbus';
 import { ContextData } from './subscription-create-configuration';
 import SubscriptionCreateDetailsStep from './subscription-create-details-step/subscription-create-details-step';
 import SubscriptionCreateDestination from './subscription-create-destination/subscription-create-destination';
@@ -134,12 +131,23 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
   });
 
   return (
-    <InfoDetailPage
-      onPreviousPathClick={() => history.push(linkToWelcome + '/subscriptions')}
-      title={intl.formatMessage(messages.subscriptionAdd)}
-      subtitle={<Steps steps={createStepsDefinition} activeStepKey={step} />}
-    >
-      <div>
+    <DefaultPage.Root>
+      <DefaultPage.Header>
+        <DefaultPage.BackLink
+          href="#"
+          onClick={(event) => {
+            event.preventDefault();
+            history.push(linkToWelcome + '/subscriptions');
+          }}
+        >
+          {intl.formatMessage(messages.backToSubscriptions)}
+        </DefaultPage.BackLink>
+        <DefaultPage.Title>
+          {intl.formatMessage(messages.subscriptionAdd)}
+        </DefaultPage.Title>
+      </DefaultPage.Header>
+      <DefaultPage.Content>
+        <Steps steps={createStepsDefinition} activeStepKey={step} />
         <Switch>
           <Route exact path={linkToWelcome + '/subscription/new'}>
             <SubscriptionCreateDetailsStep
@@ -248,8 +256,8 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
             />
           </Route>
         </Switch>
-      </div>
-    </InfoDetailPage>
+      </DefaultPage.Content>
+    </DefaultPage.Root>
   );
 };
 

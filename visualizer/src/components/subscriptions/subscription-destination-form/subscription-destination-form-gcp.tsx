@@ -38,6 +38,7 @@ const GoogleCloudPubSubDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => topicHelpers.setTouched(true)}
             onChange={(value) => topicHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>
@@ -63,6 +64,7 @@ const GoogleCloudPubSubDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => projectIdHelpers.setTouched(true)}
             onChange={(value) => projectIdHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>

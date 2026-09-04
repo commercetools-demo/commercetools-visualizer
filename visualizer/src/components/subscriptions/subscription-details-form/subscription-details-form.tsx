@@ -1,11 +1,5 @@
 import { FC, JSX, ReactElement } from 'react';
-import {
-  useFormik,
-  type FormikHelpers,
-  FormikErrors,
-  FormikProvider,
-} from 'formik';
-import omitEmpty from 'omit-empty-es';
+import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
 import SubscriptionGeneralInfoForm from '../subscription-general-info-form/subscription-general-info-form';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
 import {
@@ -44,21 +38,6 @@ export type TFormValues = {
   messages?: Array<TMessageSubscriptionInput> | null;
 };
 
-export type TErrors = {
-  key: { missing?: boolean };
-};
-
-const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
-  const errors: TErrors = {
-    key: {},
-  };
-
-  if (!formikValues.key || formikValues.key.trim().length === 0) {
-    errors.key.missing = true;
-  }
-  return omitEmpty(errors);
-};
-
 type FormProps = {
   formElements: ReactElement;
   values: Formik['values'];
@@ -88,7 +67,6 @@ const SubscriptionDetailsForm: FC<Props> = ({
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
-    validate,
     enableReinitialize: true,
   });
   const formElements = (

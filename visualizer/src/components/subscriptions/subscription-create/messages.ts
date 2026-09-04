@@ -1,31 +1,6 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages<string>({
-  stepKey: {
-    id: 'Subscriptions.CreateSubscriptionForm.step.key',
-    description: 'The label of the tab navigation step',
-    defaultMessage: 'Set key',
-  },
-  stepSelectProvider: {
-    id: 'Subscriptions.CreateSubscriptionForm.step.select.provider',
-    description: 'The label of the tab navigation step',
-    defaultMessage: 'Select Provider',
-  },
-  stepConfigureProvider: {
-    id: 'Subscriptions.CreateSubscriptionForm.step.configure.provider',
-    description: 'The label of the tab navigation step',
-    defaultMessage: 'Configure Provider',
-  },
-  stepChanges: {
-    id: 'Subscriptions.CreateSubscriptionForm.step.changes',
-    description: 'The label of the tab navigation step',
-    defaultMessage: 'Configure Changes',
-  },
-  stepMessages: {
-    id: 'Subscriptions.CreateSubscriptionForm.step.messages',
-    description: 'The label of the tab navigation step',
-    defaultMessage: 'Configure Messages',
-  },
   subscriptionCreated: {
     id: 'Subscriptions.subscriptionCreated',
     defaultMessage: 'Subscription {subscriptionKey} created',
@@ -38,5 +13,13 @@ export default defineMessages<string>({
     id: 'Subscriptions.CreateSubscriptionForm.backToSubscriptions',
     description: 'The back link label to return to the subscriptions list',
     defaultMessage: 'Back to subscriptions',
+  },
+  cancelButton: {
+    id: 'Subscriptions.CreateSubscriptionForm.cancelButton',
+    defaultMessage: 'Cancel',
+  },
+  createButton: {
+    id: 'Subscriptions.CreateSubscriptionForm.createButton',
+    defaultMessage: 'Create',
   },
 });

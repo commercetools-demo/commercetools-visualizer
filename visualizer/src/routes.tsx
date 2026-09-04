@@ -31,10 +31,7 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       <Route path={`${match.path}/states/:type?`}>
         <StatesList linkToWelcome={match.url} />
       </Route>
-      <Route path={`${match.path}/subscription/new/:step`}>
-        <SubscriptionCreate linkToWelcome={match.url} />
-      </Route>
-      <Route path={`${match.path}/subscription/new`} exact={true}>
+      <Route path={`${match.path}/subscription/new`}>
         <SubscriptionCreate linkToWelcome={match.url} />
       </Route>
       <Route path={`${match.path}/subscription/:id`}>

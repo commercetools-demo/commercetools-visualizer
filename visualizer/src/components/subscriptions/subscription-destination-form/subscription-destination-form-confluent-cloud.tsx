@@ -70,6 +70,7 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => bootstrapServerHelpers.setTouched(true)}
             onChange={(value) => bootstrapServerHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>
@@ -93,6 +94,7 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => apiKeyHelpers.setTouched(true)}
             onChange={(value) => apiKeyHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>
@@ -117,6 +119,7 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => apiSecretHelpers.setTouched(true)}
             onChange={(value) => apiSecretHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>
@@ -136,10 +139,10 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
         <FormField.Input>
           <Select.Root
             name={acksField.name}
-            isReadOnly={isReadOnly}
             value={acksMeta.value || ''}
             onChange={(value) => acksHelpers.setValue(value || '')}
             onBlur={() => acksHelpers.setTouched(true)}
+            width={'full'}
           >
             <Select.Options>
               {ACKS_OPTIONS.map((option) => (

@@ -71,6 +71,7 @@ const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
             keyHelpers.setValue(selected ?? '');
           }}
           onBlur={() => keyHelpers.setTouched(true)}
+          width={'full'}
         >
           <ComboBox.Trigger />
           <ComboBox.Popover>

@@ -35,7 +35,7 @@ type Props = { isReadOnly?: boolean };
 const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'key',
-    validate: (key) => validateKeyInput(key),
+    validate: (key: string) => validateKeyInput(key),
   });
   let parsedErrorKey: string | undefined;
   if (keyMeta.error) {
@@ -57,6 +57,7 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
           isReadOnly={isReadOnly}
           onBlur={() => keyHelpers.setTouched(true)}
           onChange={(value) => keyHelpers.setValue(value)}
+          width={'full'}
         />
       </FormField.Input>
       <FormField.Error>{renderKeyInputError(parsedErrorKey)}</FormField.Error>

@@ -74,7 +74,6 @@
     "@types/testing-library__jest-dom": "^5.14.9",
     "@xyflow/react": "^12.11.6",
     "apollo-link-rest": "^0.9.0",
-    "commercetools-demo-shared-save-toolbar": "^1.0.0",
     "dagre": "^0.8.5",
     "eslint": "^9.0.0",
     "eslint-formatter-pretty": "7.1.0",

@@ -29,6 +29,7 @@ import {
   formValuesToStatePartial,
   stateToFormValues,
 } from '../states-form/conversion';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => void;
@@ -52,7 +53,10 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const data = formValuesToStatePartial(formikValues);
       if (state && data) {
         const updateActions = calculateStateUpdateActions(state, data);

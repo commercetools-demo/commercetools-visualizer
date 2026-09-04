@@ -14,11 +14,10 @@ import {
   Checkbox,
   ComboBox,
   FormField,
-  Grid,
-  Heading,
   LoadingSpinner,
   LocalizedField,
   type LocalizedString,
+  PageContent,
   Select,
   Stack,
   TextInput,
@@ -168,132 +167,133 @@ const StatesForm: FC<Props> = ({
   });
 
   const formElements = (
-    <Stack direction="column" gap="400">
-      <Heading as="h2" size="md">
-        <FormattedMessage {...messages.generalInformationTitle} />
-      </Heading>
-      <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
-        <FormField.Root
-          isRequired
-          isReadOnly={!createNewMode || !canManage}
-          isInvalid={Boolean(formik.touched.key && errors.key)}
-        >
-          <FormField.Label>
-            {intl.formatMessage(messages.keyTitle)}
-          </FormField.Label>
-          <FormField.Input>
-            <TextInput
-              aria-label={intl.formatMessage(messages.keyTitle)}
-              value={formik.values.key || ''}
-              isReadOnly={!createNewMode || !canManage}
-              onChange={(value) => formik.setFieldValue('key', value)}
-              onBlur={() => formik.setFieldTouched('key', true)}
-            />
-          </FormField.Input>
-          <FormField.Description>
-            {intl.formatMessage(messages.keyHint)}
-          </FormField.Description>
-          <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
-        </FormField.Root>
-
-        <FormField.Root isRequired isReadOnly={!createNewMode || !canManage}>
-          <FormField.Label>
-            {intl.formatMessage(messages.stateTypeTitle)}
-          </FormField.Label>
-          <FormField.Input>
-            <Select.Root
-              aria-label={intl.formatMessage(messages.stateTypeTitle)}
-              selectedKey={formik.values.stateType}
-              isDisabled={!createNewMode || !canManage}
-              onSelectionChange={(key) =>
-                formik.setFieldValue('stateType', key as TStateType)
-              }
-            >
-              <Select.Options items={resourceTypes}>
-                {(item) => (
-                  <Select.Option id={item.value}>{item.label}</Select.Option>
-                )}
-              </Select.Options>
-            </Select.Root>
-          </FormField.Input>
-        </FormField.Root>
-
-        <FormField.Root isReadOnly={!canManage}>
-          <FormField.Input>
-            <Checkbox
-              isSelected={formik.values.initial}
-              isReadOnly={!canManage}
-              onChange={(isSelected) =>
-                formik.setFieldValue('initial', isSelected)
-              }
-            >
-              <FormattedMessage {...messages.initialTitle} />
-            </Checkbox>
-          </FormField.Input>
-        </FormField.Root>
-
-        <FormField.Root isReadOnly={!canManage}>
-          <FormField.Label>
-            {intl.formatMessage(messages.transitionsTitle)}
-          </FormField.Label>
-          <FormField.Input>
-            <ComboBox.Root
-              aria-label={intl.formatMessage(messages.transitionsTitle)}
-              items={transitionOptions}
-              selectionMode="multiple"
-              isReadOnly={!canManage}
-              selectedKeys={formik.values.transitions}
-              onSelectionChange={(keys) =>
-                formik.setFieldValue('transitions', keys as string[])
-              }
-              onBlur={() => formik.setFieldTouched('transitions', true)}
-            >
-              <ComboBox.Trigger />
-              <ComboBox.Popover>
-                <ComboBox.ListBox>
-                  {(item: { id: string; name: string }) => (
-                    <ComboBox.Option id={item.id}>{item.name}</ComboBox.Option>
+    <PageContent.Root variant="wide" columns="1/1">
+      <PageContent.Column>
+        <Stack direction="column" gap="400">
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode || !canManage}
+            isInvalid={Boolean(formik.touched.key && errors.key)}
+          >
+            <FormField.Label>
+              {intl.formatMessage(messages.keyTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
+                aria-label={intl.formatMessage(messages.keyTitle)}
+                value={formik.values.key || ''}
+                isReadOnly={!createNewMode || !canManage}
+                onChange={(value) => formik.setFieldValue('key', value)}
+                onBlur={() => formik.setFieldTouched('key', true)}
+              />
+            </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.keyHint)}
+            </FormField.Description>
+            <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
+          </FormField.Root>
+          <LocalizedField
+            id="states-edit-name"
+            name="name"
+            type="text"
+            label={intl.formatMessage(messages.nameTitle)}
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.name}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `name.${event.target.locale}`,
+                event.target.value
+              )
+            }
+            onBlur={() => formik.setFieldTouched('name', true)}
+          />
+          <FormField.Root isReadOnly={!canManage}>
+            <FormField.Input>
+              <Checkbox
+                isSelected={formik.values.initial}
+                isReadOnly={!canManage}
+                onChange={(isSelected) =>
+                  formik.setFieldValue('initial', isSelected)
+                }
+              >
+                <FormattedMessage {...messages.initialTitle} />
+              </Checkbox>
+            </FormField.Input>
+          </FormField.Root>
+        </Stack>
+      </PageContent.Column>
+      <PageContent.Column sticky>
+        <Stack direction="column" gap="400">
+          <FormField.Root isRequired isReadOnly={!createNewMode || !canManage}>
+            <FormField.Label>
+              {intl.formatMessage(messages.stateTypeTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <Select.Root
+                aria-label={intl.formatMessage(messages.stateTypeTitle)}
+                selectedKey={formik.values.stateType}
+                isDisabled={!createNewMode || !canManage}
+                onSelectionChange={(key) =>
+                  formik.setFieldValue('stateType', key as TStateType)
+                }
+              >
+                <Select.Options items={resourceTypes}>
+                  {(item) => (
+                    <Select.Option id={item.value}>{item.label}</Select.Option>
                   )}
-                </ComboBox.ListBox>
-              </ComboBox.Popover>
-            </ComboBox.Root>
-          </FormField.Input>
-        </FormField.Root>
-
-        <LocalizedField
-          id="states-edit-name"
-          name="name"
-          type="text"
-          label={intl.formatMessage(messages.nameTitle)}
-          isReadOnly={!canManage}
-          defaultLocaleOrCurrency={dataLocale}
-          valuesByLocaleOrCurrency={formik.values.name}
-          onChange={(event) =>
-            formik.setFieldValue(
-              `name.${event.target.locale}`,
-              event.target.value
-            )
-          }
-          onBlur={() => formik.setFieldTouched('name', true)}
-        />
-        <LocalizedField
-          id="states-edit-description"
-          name="description"
-          type="text"
-          label={intl.formatMessage(messages.descriptionTitle)}
-          isReadOnly={!canManage}
-          defaultLocaleOrCurrency={dataLocale}
-          valuesByLocaleOrCurrency={formik.values.description}
-          onChange={(event) =>
-            formik.setFieldValue(
-              `description.${event.target.locale}`,
-              event.target.value
-            )
-          }
-          onBlur={() => formik.setFieldTouched('description', true)}
-        />
-      </Grid>
-    </Stack>
+                </Select.Options>
+              </Select.Root>
+            </FormField.Input>
+          </FormField.Root>
+          <LocalizedField
+            id="states-edit-description"
+            name="description"
+            type="text"
+            label={intl.formatMessage(messages.descriptionTitle)}
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.description}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `description.${event.target.locale}`,
+                event.target.value
+              )
+            }
+            onBlur={() => formik.setFieldTouched('description', true)}
+          />
+          <FormField.Root isReadOnly={!canManage}>
+            <FormField.Label>
+              {intl.formatMessage(messages.transitionsTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <ComboBox.Root
+                aria-label={intl.formatMessage(messages.transitionsTitle)}
+                items={transitionOptions}
+                selectionMode="multiple"
+                isReadOnly={!canManage}
+                selectedKeys={formik.values.transitions}
+                onSelectionChange={(keys) =>
+                  formik.setFieldValue('transitions', keys as string[])
+                }
+                onBlur={() => formik.setFieldTouched('transitions', true)}
+              >
+                <ComboBox.Trigger />
+                <ComboBox.Popover>
+                  <ComboBox.ListBox>
+                    {(item: { id: string; name: string }) => (
+                      <ComboBox.Option id={item.id}>
+                        {item.name}
+                      </ComboBox.Option>
+                    )}
+                  </ComboBox.ListBox>
+                </ComboBox.Popover>
+              </ComboBox.Root>
+            </FormField.Input>
+          </FormField.Root>
+        </Stack>
+      </PageContent.Column>
+    </PageContent.Root>
   );
 
   return children({

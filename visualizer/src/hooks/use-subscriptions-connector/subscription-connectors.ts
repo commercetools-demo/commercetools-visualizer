@@ -19,7 +19,7 @@ import {
   TQuery_SubscriptionArgs,
   TQuery_SubscriptionsArgs,
   TSubscriptionUpdateAction,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 import { mcApiContext } from '../shared/mc-api-context';
 import {
   createGraphQlUpdateActions,

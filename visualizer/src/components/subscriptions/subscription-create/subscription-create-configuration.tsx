@@ -5,7 +5,7 @@ import {
   TSqsDestinationInput,
   TMessageSubscriptionInput,
   TConfluentCloudDestinationInput,
-} from 'commercetools-demo-shared-helpers';
+} from '../../../types/generated/ctp';
 
 export type Step1 = { key: string | undefined | null };
 export type Step2 = { destinationType: string | undefined | null };

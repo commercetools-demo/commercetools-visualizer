@@ -14,7 +14,7 @@ import {
   TQuery_TypeDefinitionArgs,
   TQuery_TypeDefinitionsArgs,
   TTypeUpdateAction,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 import { mcApiContext } from '../shared/mc-api-context';
 import {
   createGraphQlUpdateActions,

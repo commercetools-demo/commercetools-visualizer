@@ -23,7 +23,7 @@ import {
   TQuery,
   TQuery_ExtensionArgs,
   TQuery_ExtensionsArgs,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 import { mcApiContext } from '../shared/mc-api-context';
 import {
   createGraphQlUpdateActions,

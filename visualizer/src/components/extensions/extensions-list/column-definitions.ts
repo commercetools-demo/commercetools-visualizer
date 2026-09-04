@@ -1,6 +1,5 @@
 import type { DataTableColumnItem } from '@commercetools/nimbus';
 import type { IntlShape } from 'react-intl';
-import { formatDateAndTime } from 'commercetools-demo-shared-helpers';
 import { TExtension } from '../../../types/generated/ctp';
 import messages from './messages';
 
@@ -37,13 +36,17 @@ const createColumnDefinitions = (
     id: 'createdAt',
     header: intl.formatMessage(messages.columnCreatedAt),
     isSortable: true,
-    accessor: (row) => formatDateAndTime(row.createdAt, intl),
+    accessor: (row) =>
+      `${intl.formatDate(row.createdAt)} ${intl.formatTime(row.createdAt)}`,
   },
   {
     id: 'lastModifiedAt',
     header: intl.formatMessage(messages.columnLastModifiedAt),
     isSortable: true,
-    accessor: (row) => formatDateAndTime(row.lastModifiedAt, intl),
+    accessor: (row) =>
+      `${intl.formatDate(row.lastModifiedAt)} ${intl.formatTime(
+        row.lastModifiedAt
+      )}`,
   },
 ];
 

@@ -5,9 +5,9 @@ import { useHistory, useParams } from 'react-router-dom';
 import {
   Alert,
   Button,
+  DefaultPage,
   Flex,
   LoadingSpinner,
-  ModalPage,
 } from '@commercetools/nimbus';
 import { useIntl } from 'react-intl';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
@@ -27,10 +27,10 @@ import {
   calculateSubscriptionUpdateActions,
 } from '../../../hooks';
 import {
+  TConfluentCloudDestination,
   TGoogleCloudPubSubDestination,
   TSqsDestination,
 } from '../../../types/generated/ctp';
-import { TConfluentCloudDestination } from 'commercetools-demo-shared-helpers';
 import { FormikHelpers } from 'formik';
 import { convertFormValuesToSubscription } from './convert';
 
@@ -170,24 +170,26 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     >
       {(formProps) => {
         return (
-          <ModalPage.Root isOpen onClose={() => history.push(linkToWelcome)}>
-            <ModalPage.TopBar
-              previousPathLabel={intl.formatMessage(messages.title)}
-              currentPathLabel={
-                formProps.values?.key ||
-                intl.formatMessage(messages.subscriptionKeyLabel)
-              }
-            />
-            <ModalPage.Header>
-              <ModalPage.Title>
+          <DefaultPage.Root>
+            <DefaultPage.Header>
+              <DefaultPage.BackLink
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  history.push(linkToWelcome);
+                }}
+              >
+                {intl.formatMessage(messages.title)}
+              </DefaultPage.BackLink>
+              <DefaultPage.Title>
                 {formProps.values?.key ||
                   intl.formatMessage(messages.subscriptionKeyLabel)}
-              </ModalPage.Title>
-            </ModalPage.Header>
-            <ModalPage.Content>
+              </DefaultPage.Title>
+            </DefaultPage.Header>
+            <DefaultPage.Content>
               {subscription && formProps.formElements}
-            </ModalPage.Content>
-            <ModalPage.Footer>
+            </DefaultPage.Content>
+            <DefaultPage.Footer>
               <Button
                 variant="outline"
                 isDisabled={!formProps.isDirty}
@@ -213,8 +215,8 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
               >
                 {intl.formatMessage(messages.deleteButton)}
               </Button>
-            </ModalPage.Footer>
-          </ModalPage.Root>
+            </DefaultPage.Footer>
+          </DefaultPage.Root>
         );
       }}
     </SubscriptionDetailsForm>

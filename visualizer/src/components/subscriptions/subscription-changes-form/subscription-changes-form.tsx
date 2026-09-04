@@ -1,75 +1,51 @@
-import { Stack } from '@commercetools/nimbus';
-import {
-  CheckboxGroup,
-  CheckboxGroupItem,
-} from 'commercetools-demo-shared-checkbox-group';
+import { FC } from 'react';
+import { useField } from 'formik';
+import { Checkbox, Grid, Heading, Stack } from '@commercetools/nimbus';
+import { useIntl } from 'react-intl';
 import { TChangeSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
-import { useIntl } from 'react-intl';
-import { FC } from 'react';
 import { changes } from './subscription-changes-types';
 
 type Props = {
   isReadOnly?: boolean;
 };
+
 const SubscriptionChangesForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
+  const [field, , helpers] =
+    useField<Array<TChangeSubscriptionInput>>('changes');
 
-  const isChecked = (
-    values: Array<TChangeSubscriptionInput> | undefined,
-    value: string
-  ) => {
-    return Boolean(
-      values && values.find((item) => item.resourceTypeId === value)
+  const isChecked = (resourceTypeId: string) =>
+    Boolean(
+      field.value?.find((item) => item.resourceTypeId === resourceTypeId)
     );
+
+  const toggle = (resourceTypeId: string, isSelected: boolean) => {
+    const nextValue = isSelected
+      ? [...(field.value ?? []), { resourceTypeId }]
+      : (field.value ?? []).filter(
+          (item) => item.resourceTypeId !== resourceTypeId
+        );
+    helpers.setValue(nextValue);
   };
 
-  const addItem = (
-    values: Array<TChangeSubscriptionInput> | undefined,
-    value: string
-  ) => {
-    const toAdd: TChangeSubscriptionInput = {
-      resourceTypeId: value,
-    };
-    if (values) {
-      return [...values, toAdd];
-    } else {
-      return [toAdd];
-    }
-  };
-
-  const removeItem = (
-    values: Array<TChangeSubscriptionInput> | undefined,
-    value: string
-  ) => {
-    return values
-      ? values.filter((item) => {
-          return item.resourceTypeId !== value;
-        })
-      : [];
-  };
   return (
     <Stack direction="column" gap="400">
-      <CheckboxGroup
-        name="changes"
-        label="Choose Changes you want to listen to."
-      >
-        {changes.map((entry) => {
-          return (
-            <CheckboxGroupItem
-              key={entry}
-              label={intl.formatMessage(messages.label, {
-                type: entry,
-              })}
-              value={entry}
-              isChecked={isChecked}
-              addItem={addItem}
-              removeItem={removeItem}
-              isReadOnly={isReadOnly}
-            />
-          );
-        })}
-      </CheckboxGroup>
+      <Heading as="h2" size="md">
+        {intl.formatMessage(messages.ChangesLabel)}
+      </Heading>
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }} gap="200">
+        {changes.map((entry) => (
+          <Checkbox
+            key={entry}
+            isSelected={isChecked(entry)}
+            isReadOnly={isReadOnly}
+            onChange={(isSelected) => toggle(entry, isSelected)}
+          >
+            {intl.formatMessage(messages.label, { type: entry })}
+          </Checkbox>
+        ))}
+      </Grid>
     </Stack>
   );
 };

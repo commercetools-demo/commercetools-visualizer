@@ -6,6 +6,11 @@ export default defineMessages({
     description: 'messageLabel',
     defaultMessage: 'Choose Messages you want to listen to.',
   },
+  columnResourceType: {
+    id: 'ExtensionsTriggersForm.columnResourceType',
+    description: 'columnResourceType',
+    defaultMessage: 'Resource type',
+  },
   cart: {
     id: 'cart',
     description: 'cart',

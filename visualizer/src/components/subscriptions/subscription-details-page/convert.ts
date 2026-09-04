@@ -1,5 +1,5 @@
 import { TFormValues } from '../subscription-details-form/subscription-details-form';
-import { TCommercetoolsSubscription } from 'commercetools-demo-shared-helpers';
+import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 
 export const convertFormValuesToSubscription = (
   formValues: TFormValues

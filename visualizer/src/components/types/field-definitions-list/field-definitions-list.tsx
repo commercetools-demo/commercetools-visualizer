@@ -28,7 +28,7 @@ import messages from './messages';
 import { useTypeDefinitionUpdater } from '../../../hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
 import { PERMISSIONS } from '../../../constants';
-import { formatLocalizedString } from 'commercetools-demo-shared-helpers';
+import { formatLocalizedString } from '../../../utils/format-localized-string';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')

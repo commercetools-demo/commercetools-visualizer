@@ -78,17 +78,6 @@ const config = {
       labelAllLocales: [],
       // permissions: [PERMISSIONS.View],
     },
-    {
-      uriPath: 'visualize-drilldown',
-      defaultLabel: 'Visualize Drilldown',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'entity-diagram',
-      defaultLabel: 'Entity Diagram',
-      labelAllLocales: [],
-    },
   ],
 };
 

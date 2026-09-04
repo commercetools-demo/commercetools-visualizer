@@ -20,7 +20,7 @@ import {
   TStateUpdateAction,
   TTypeUpdateAction,
   TSubscriptionUpdateAction,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 
 export const getErrorMessage = (error: ApolloError) =>
   error.graphQLErrors?.map((e) => e.message).join('\n') || error.message;

@@ -4,7 +4,7 @@ import {
   TFieldType,
   TLocalizedEnumType,
   TTypeDefinition,
-} from 'commercetools-demo-shared-helpers';
+} from '../../types/generated/ctp';
 import { FieldDefinition, Type } from '@commercetools/platform-sdk';
 import { transformLocalizedFieldToLocalizedString } from '../shared/graphql-helpers';
 

@@ -62,9 +62,9 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
           <Select.Root
             name={authenticationModeField.name}
             isReadOnly={isReadOnly}
-            selectedKey={authenticationModeMeta.value || null}
-            onSelectionChange={(key) =>
-              authenticationModeHelpers.setValue((key as string) || '')
+            value={authenticationModeMeta.value || ''}
+            onChange={(value) =>
+              authenticationModeHelpers.setValue(value || '')
             }
             onBlur={() => authenticationModeHelpers.setTouched(true)}
           >

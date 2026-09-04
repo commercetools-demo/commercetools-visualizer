@@ -232,10 +232,10 @@ const StatesForm: FC<Props> = ({
             <FormField.Input>
               <Select.Root
                 aria-label={intl.formatMessage(messages.stateTypeTitle)}
-                selectedKey={formik.values.stateType}
+                value={formik.values.stateType}
                 isDisabled={!createNewMode || !canManage}
-                onSelectionChange={(key) =>
-                  formik.setFieldValue('stateType', key as TStateType)
+                onChange={(value) =>
+                  formik.setFieldValue('stateType', value as TStateType)
                 }
               >
                 <Select.Options items={resourceTypes}>

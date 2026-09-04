@@ -41,13 +41,11 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
               messages.destinationHttpAuthentication
             )}
             isClearable
-            selectedKey={
-              formik.values.destinationHttpAuthenticationName || null
-            }
-            onSelectionChange={(key) =>
+            value={formik.values.destinationHttpAuthenticationName || ''}
+            onChange={(value) =>
               formik.setFieldValue(
                 'destinationHttpAuthenticationName',
-                key as DestinationHttpAuthenticationName
+                value as DestinationHttpAuthenticationName
               )
             }
             onBlur={() =>

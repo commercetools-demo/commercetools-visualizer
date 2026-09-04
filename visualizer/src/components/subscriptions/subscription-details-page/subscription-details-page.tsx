@@ -7,6 +7,7 @@ import {
   Button,
   DefaultPage,
   Flex,
+  Group,
   LoadingSpinner,
 } from '@commercetools/nimbus';
 import { useIntl } from 'react-intl';
@@ -190,31 +191,33 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
               {subscription && formProps.formElements}
             </DefaultPage.Content>
             <DefaultPage.Footer>
-              <Button
-                variant="outline"
-                isDisabled={!formProps.isDirty}
-                onPress={formProps.handleReset}
-              >
-                {intl.formatMessage(messages.revertButton)}
-              </Button>
-              <Button
-                colorPalette="primary"
-                variant="solid"
-                isDisabled={
-                  formProps.isSubmitting || !formProps.isDirty || !canManage
-                }
-                onPress={() => formProps.submitForm()}
-              >
-                {intl.formatMessage(messages.saveButton)}
-              </Button>
-              <Button
-                colorPalette="critical"
-                variant="outline"
-                isDisabled={!canManage}
-                onPress={() => handleDelete()}
-              >
-                {intl.formatMessage(messages.deleteButton)}
-              </Button>
+              <Group aria-label="Form actions" gap="300">
+                <Button
+                  variant="solid"
+                  colorPalette="critical"
+                  isDisabled={!canManage}
+                  onPress={() => handleDelete()}
+                >
+                  {intl.formatMessage(messages.deleteButton)}
+                </Button>
+                <Button
+                  variant="outline"
+                  isDisabled={!formProps.isDirty}
+                  onPress={formProps.handleReset}
+                >
+                  {intl.formatMessage(messages.revertButton)}
+                </Button>
+                <Button
+                  variant="solid"
+                  colorPalette="primary"
+                  isDisabled={
+                    formProps.isSubmitting || !formProps.isDirty || !canManage
+                  }
+                  onPress={() => formProps.submitForm()}
+                >
+                  {intl.formatMessage(messages.saveButton)}
+                </Button>
+              </Group>
             </DefaultPage.Footer>
           </DefaultPage.Root>
         );

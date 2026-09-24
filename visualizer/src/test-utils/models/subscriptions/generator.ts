@@ -10,7 +10,7 @@ import type { TSubscription } from './types';
 import {
   ChangeSubscription,
   MessageSubscription,
-} from '@commercetools/platform-sdk/dist/declarations/src/generated/models/subscription';
+} from '@commercetools/platform-sdk';
 
 const [getOlderDate, getNewerDate] = createRelatedDates();
 const generator = Generator<TSubscription>({
@@ -281,6 +281,7 @@ const generator = Generator<TSubscription>({
       'Healthy',
       'TemporaryError'
     ),
+    events: null,
   },
 });
 export default generator;

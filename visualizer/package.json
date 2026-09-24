@@ -18,7 +18,7 @@
     "format": "prettier --write '**/*.{js,ts,tsx}'",
     "typecheck": "tsc --noEmit",
     "versions:test-data": "manypkg upgrade @commercetools-test-data",
-    "generate-types:ctp": "graphql-codegen -r dotenv/config --config codegen.ctp.yml",
+    "generate-types:ctp": "node ./scripts/login.js && graphql-codegen -r ./scripts/load-env.js --config codegen.ctp.yml",
     "generate-types:chakra": "chakra typegen node_modules/@commercetools/nimbus/dist/theme.es.js",
     "postinstall": "yarn generate-types:chakra"
   },

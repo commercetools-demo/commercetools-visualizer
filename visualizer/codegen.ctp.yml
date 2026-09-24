@@ -3,7 +3,7 @@ schema:
       headers:
         Cookie: mcAccessToken=${MC_ACCESS_TOKEN}
         X-Graphql-Target: ctp
-        X-Project-Key: ${CTP_PROJECT_KEY}
+        X-Project-Key: ${INITIAL_PROJECT_KEY}
 extensions:
   codegen:
     generates:

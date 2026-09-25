@@ -1,4 +1,4 @@
-import { FC, SyntheticEvent, useCallback } from 'react';
+import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import { useParams } from 'react-router-dom';
 import { PageNotFound } from '@commercetools-frontend/application-components';
@@ -28,9 +28,10 @@ import {
   getErrorMessage,
   calculateFieldDefinitionUpdateActions,
 } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
-  onClose: (event: SyntheticEvent) => void;
+  onClose: () => void;
 };
 
 const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
@@ -59,7 +60,10 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
     });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const fieldDefinitionInput =
         fromFormValuesToTFieldDefinitionInput(formikValues);
       if (fieldDefinitions) {
@@ -130,11 +134,7 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
           </ModalPage.Header>
           <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
           <ModalPage.Footer>
-            <Button
-              slot="close"
-              variant="outline"
-              onPress={(event) => onClose(event as unknown as SyntheticEvent)}
-            >
+            <Button slot="close" variant="outline" onPress={onClose}>
               {intl.formatMessage(messages.revert)}
             </Button>
             <Button

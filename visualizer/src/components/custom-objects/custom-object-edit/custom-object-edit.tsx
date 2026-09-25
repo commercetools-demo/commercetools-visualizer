@@ -30,6 +30,7 @@ import {
   useCustomObjectFetcher,
   useCustomObjectCreatorOrUpdater,
 } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -54,7 +55,10 @@ const CustomObjectEdit: FC<Props> = ({ onClose, onIdChange }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const data = formValuesToTCustomObject(formikValues);
       if (customObject) {
         await customObjectUpdater

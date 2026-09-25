@@ -10,13 +10,14 @@ import {
 } from '@commercetools-frontend/l10n';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
-import TypesForm from '../types-form/types-form';
+import TypesForm, { TFormValues } from '../types-form/types-form';
 import { omitEmptyTranslations } from '../type-definition-connectors';
 import formMessages from '../types-form/messages';
 
 import { TTypeDefinitionDraft } from '../../../types/generated/ctp';
 import messages from './messages';
 import { graphQLErrorHandler, useTypeDefinitionCreator } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   linkToHome: string;
@@ -36,9 +37,12 @@ const TypesCreate: FC<Props> = ({ linkToHome, onClose, onCreate }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft: TTypeDefinitionDraft = {
-        key: formikValues.key,
+        key: formikValues.key || '',
         name: transformLocalizedStringToLocalizedField(
           omitEmptyTranslations(formikValues.name)
         ),

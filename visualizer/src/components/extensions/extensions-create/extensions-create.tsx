@@ -16,6 +16,7 @@ import {
 import formMessages from '../extensions-form/messages';
 import messages from './messages';
 import { graphQLErrorHandler, useExtensionCreator } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onSuccess: (id: string) => Promise<void>;
@@ -34,7 +35,10 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
   const showNotification = useShowNotification();
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft = formValuesToTExtension(formikValues);
       await extensionCreator
         .execute({

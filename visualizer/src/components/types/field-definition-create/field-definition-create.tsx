@@ -15,6 +15,7 @@ import {
   TFormValues,
 } from '../field-definition-input/helpers';
 import { graphQLErrorHandler, useTypeDefinitionUpdater } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -39,7 +40,10 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
   const intl = useIntl();
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const actionDraft = fromFormValuesToTFieldDefinitionInput(formikValues);
       await typeDefinitionUpdater
         .execute({

@@ -1,0 +1,25 @@
+#import "./subscription-destination-fragments.graphql"
+
+fragment SubscriptionFragment on CommercetoolsSubscription {
+  id
+  key
+  version
+  createdAt
+  destination {
+    type
+    ...AzureServiceBusDestinationFragment
+    ...EventBridgeDestinationFragment
+    ...EventGridDestinationFragment
+    ...GoogleCloudPubSubDestinationFragment
+    ...SNSDestinationFragment
+    ...SQSDestinationFragment
+    ...ConfluentCloudDestinationFragment
+  }
+  changes {
+    resourceTypeId
+  }
+  messages {
+    resourceTypeId
+    types
+  }
+}

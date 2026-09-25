@@ -16,6 +16,7 @@ import {
 import { useStateCreator, graphQLErrorHandler } from '../../../hooks';
 import { useParams } from 'react-router-dom';
 import { TStateType } from '../../../types/generated/ctp';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => void;
@@ -34,7 +35,10 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft = formValuesToState(formikValues);
       await stateCreator
         .execute({

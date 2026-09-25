@@ -19,6 +19,7 @@ import {
   graphQLErrorHandler,
   useCustomObjectCreatorOrUpdater,
 } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => Promise<void>;
@@ -36,7 +37,10 @@ const CustomObjectCreate: FC<Props> = ({ onClose, onSuccess }) => {
   const extensionCreator = useCustomObjectCreatorOrUpdater();
   const showNotification = useShowNotification();
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft = formValuesToTCustomObject(formikValues);
       await extensionCreator
         .execute({

@@ -75,10 +75,8 @@ which action buttons are shown.
 
 - **FR-009** Fetch the subscription by id and populate the shared form (§FR-002) with its
   current values; the Key field becomes read-only per FR-003.
-- **FR-010** Without Manage: on edit, all sections render read-only and Save/Delete are
-  disabled. **On create, only Save is disabled — the fields themselves are not forced
-  read-only** (the create page never passes `isReadOnly` to the shared form; tracked as a
-  gap, see §6).
+- **FR-010** Without Manage: on both create and edit, all sections render read-only and
+  Save/Delete are disabled; "Add new Subscription" on the list is disabled too.
 - **FR-011** Save converts the form to a subscription, computes update actions (changeKey,
   changeDestination, changeMessages/setMessages, changeChanges/setChanges), and updates with
   the current version only when actions exist; on success show an updated notification and
@@ -116,9 +114,6 @@ which action buttons are shown.
   / ConfigurationErrorDeliveryStopped) is on the entity but not surfaced in list or detail.
 - **No draft persistence on create** — navigating away or refreshing loses progress (there is
   no autosave and no "resume later").
-- **Create doesn't enforce read-only without Manage** the way edit does — see FR-010. The
-  "Add new Subscription" button and the create page's fields are not disabled/read-only for a
-  View-only user, only the Save action is; edit correctly disables/read-only's everything.
 - Changing destination type in the detail view should re-initialize the destination config;
   ensure the change is captured as an update action.
 - No bulk operations, no cloning, no search/virtualization in the (large) message-type list.

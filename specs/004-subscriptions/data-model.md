@@ -48,9 +48,9 @@ SNS              { type:'SNS', … }
 
 ### Create/edit form values (shared)
 
-Both the create page and the edit page use the same Formik shape — create just starts from
-empty `initialValues` and never sets `isReadOnly`, while edit populates it from the fetched
-subscription and sets `isReadOnly={!canManage}`.
+Both the create page and the edit page use the same Formik shape and both set
+`isReadOnly={!canManage}` — they differ only in `initialValues` (empty vs the fetched
+subscription).
 
 ```
 TFormValues {

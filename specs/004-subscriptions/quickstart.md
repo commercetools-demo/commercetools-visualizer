@@ -87,10 +87,8 @@ component — no stepper, no per-step routes. All sections are visible and edita
 - **Initial values** — create starts empty; edit populates from `SubscriptionById`.
 - **Key field** — editable on create; read-only on edit (immutable after creation,
   ../README.md §6).
-- **`isReadOnly` gating** — edit passes `isReadOnly={!canManage}` down into every section;
-  create does **not**, so without Manage its fields stay editable and only the Save button
-  is disabled (tracked as a gap — see spec.md §6). Fix this the same way as edit if you're
-  closing that gap rather than reproducing it.
+- **`isReadOnly` gating** — both create and edit pass `isReadOnly={!canManage}` down into
+  every section, so without Manage all fields render read-only, not just Save.
 - **Actions** — create has Cancel/Save; edit additionally has Revert (resets to loaded
   values, disabled when pristine) and Delete.
 
@@ -138,8 +136,7 @@ and returns to the list with `refetch`.
 All per ../README.md — do not reinvent:
 
 - **Permissions** (§3): View to render; Manage to create/save/delete. No Manage → read-only,
-  disabled affordances — **edit follows this; create currently doesn't fully** (see Known
-  gaps below).
+  disabled affordances — both create and edit follow this.
 - **Notifications** (§7): success/error via the MC side-channel; convert GraphQL errors to
   human-readable messages; loading + error states on list and detail.
 - **Localization** (§4): externalize all strings (destination-type labels, resource-type
@@ -154,9 +151,6 @@ All per ../README.md — do not reinvent:
 - **`format`** (Platform vs CloudEvents) is **not surfaced**; always defaults to Platform.
 - **`status`** is read but **not surfaced** in list or detail.
 - **No draft persistence on create** — navigating away or refreshing loses progress.
-- **Create doesn't force read-only without Manage** — only Save is disabled; edit correctly
-  disables/read-only's everything. The create page never passes `isReadOnly` into the shared
-  form the way the edit page does.
 - No bulk operations, cloning, or search/virtualization in the (large) message-type list.
 - Fix legacy key-validation copy that references "business unit".
 
@@ -176,6 +170,6 @@ All per ../README.md — do not reinvent:
 - [ ] Update sends only the diffed actions with the current version; no actions → no call;
       version mismatch → error notification.
 - [ ] Revert disabled when pristine; Delete works and returns with `refetch`.
-- [ ] Without Manage: edit is fully read-only, Save/Delete disabled (not hidden); create's
-      Save is disabled too, but note its fields are not (known gap, replicate or fix as you see fit).
+- [ ] Without Manage: both create and edit are fully read-only, Save/Delete disabled (not
+      hidden); "Add new Subscription" on the list is disabled too.
 - [ ] All five contract operations resolve against the `ctp` target.

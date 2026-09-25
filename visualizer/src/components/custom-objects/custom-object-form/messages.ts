@@ -7,7 +7,7 @@ export default defineMessages({
     defaultMessage: 'General Information',
   },
   keyTitle: {
-    id: 'Type.form.key.title',
+    id: 'CustomObject.form.key.title',
     description: 'Title for key field',
     defaultMessage: 'Key',
   },
@@ -18,13 +18,13 @@ export default defineMessages({
       'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
   },
   containerTitle: {
-    id: 'Type.form.key.title',
-    description: 'Title for key field',
+    id: 'CustomObject.form.container.title',
+    description: 'Title for container field',
     defaultMessage: 'Container',
   },
   containerValue: {
-    id: 'Type.form.key.title',
-    description: 'Title for key field',
+    id: 'CustomObject.form.value.title',
+    description: 'Title for value field',
     defaultMessage: 'Value',
   },
   submitButton: {

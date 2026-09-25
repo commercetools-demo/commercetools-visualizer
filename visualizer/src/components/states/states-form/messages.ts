@@ -49,11 +49,6 @@ export default defineMessages({
     description: 'Title for State Type ID field',
     defaultMessage: 'State Type',
   },
-  transitionsTitle: {
-    id: 'State.form.transitions.title',
-    description: 'Title for the transitions field',
-    defaultMessage: 'Transitions to',
-  },
   transitionsHint: {
     id: 'State.form.transitions.hint',
     description: 'Hint for the transitions field',

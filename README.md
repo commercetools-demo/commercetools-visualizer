@@ -73,13 +73,13 @@ Run the following commands
 
 ```shell    
 cd ./visualizer
-yarn install
-yarn run start
+npm install
+npm run start
 ```
 
 The code has been built successfully using
 * Node v22.16.0
-* Yarn 1.22.22
+* npm 10.9.2
 
 ## Known issues
  - On Subscriptions:

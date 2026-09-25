@@ -12,7 +12,7 @@ States, Subscriptions, (custom) Types, and Custom Objects, plus two purpose-buil
 visualization tools for exploring a project's data graph. It is built from scratch —
 not a fork of any b2c/b2b storefront starter — and ships as a commercetools Connect
 deployment (`connect.yaml`) with a matching `netlify.toml` SPA rewrite for local/preview
-hosting. The app code lives under `visualizer/` (a Yarn 1 / `@commercetools-frontend`
+hosting. The app code lives under `visualizer/` (an npm / `@commercetools-frontend`
 `mc-scripts` project); routing, forms and data-fetching lean on shared internal
 `commercetools-demo-shared-*` packages (checkbox-group, data-fetching-hooks,
 entity-selectors, paginatable-data-table, save-toolbar, stepper, helpers) rather than
@@ -142,7 +142,7 @@ any storefront starter's code.
   (`applicationType: merchant-center-custom-application`) with standard configuration
   for `CUSTOM_APPLICATION_ID`, `ENTRY_POINT_URI_PATH` (default `visualizer`),
   `INITIAL_PROJECT_KEY`, and `CLOUD_IDENTIFIER` (default `gcp-eu`) (`connect.yaml`).
-- Local development via `.env.local` + `yarn start` against a real commercetools
+- Local development via `.env.local` + `npm start` against a real commercetools
   project (`README.md`); GraphQL types are generated against the CT GraphQL API via
   `codegen.ctp.yml` / `generate-types:ctp`.
 - `netlify.toml` SPA rewrite (`/* -> /index.html`) supports hosting a static preview

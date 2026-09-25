@@ -5,7 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Repo layout
 
 This repo has an unusual nesting: the actual application lives in the **`visualizer/`
-subdirectory** (`visualizer/visualizer/` from the repo root), which is its own Yarn
+subdirectory** (`visualizer/visualizer/` from the repo root), which is its own npm
 project with its own `package.json`. **Run all commands below from inside `visualizer/`**,
 not the repo root. The repo root only holds `connect.yaml` (the commercetools Connect
 deployment descriptor), `netlify.toml`, and `specs/` (see "Specs / constitution" below).
@@ -14,22 +14,22 @@ deployment descriptor), `netlify.toml`, and `specs/` (see "Specs / constitution"
 
 ```shell
 cd visualizer
-yarn install                # postinstall runs generate-types:chakra automatically
-yarn start                  # mc-scripts dev server
-yarn build                  # production build
-yarn test                   # jest (jest.test.config.js)
-yarn test:watch
-yarn test path/to/file.spec.tsx   # run a single test file
-yarn test -t "test name"          # run tests matching a name
-yarn lint                   # eslint . (also lints **/*.ctp.graphql via @graphql-eslint)
-yarn format                 # prettier --write
-yarn typecheck              # tsc --noEmit
+npm install                 # postinstall runs generate-types:chakra automatically
+npm start                    # mc-scripts dev server
+npm run build                # production build
+npm test                     # jest (jest.test.config.js)
+npm run test:watch
+npm test -- path/to/file.spec.tsx   # run a single test file
+npm test -- -t "test name"          # run tests matching a name
+npm run lint                 # eslint . (also lints **/*.ctp.graphql via @graphql-eslint)
+npm run format                # prettier --write
+npm run typecheck             # tsc --noEmit
 ```
 
-CI (`.github/workflows/ci.yml`) only runs `yarn build` and `yarn test` on PRs into
+CI (`.github/workflows/ci.yml`) only runs `npm run build` and `npm run test` on PRs into
 `main` — it does **not** run `lint` or `typecheck`.
 
-`yarn typecheck` currently fails immediately with
+`npm run typecheck` currently fails immediately with
 `Cannot find type definition file for 'graphql-ctp'` / `'json-stable-stringify'`. This
 is a pre-existing environment issue in the base `tsconfig-mc-app.json` `types` list, not
 something introduced by your change — it aborts before checking any project file, so it
@@ -38,7 +38,7 @@ gives no signal either way about your edits.
 ### Regenerating GraphQL types (`generate-types:ctp`)
 
 ```shell
-yarn generate-types:ctp
+npm run generate-types:ctp
 ```
 
 This runs `scripts/login.js` (derives `--mc-api-url` from `CLOUD_IDENTIFIER` via

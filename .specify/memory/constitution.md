@@ -1,13 +1,11 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0
-- Modified principles:
-  - IV. Localization Completeness — expanded from data-level localized-string fields
-    only to also require react-intl for every piece of the app's own UI text (no raw
-    JSX string literals), globally-unique message ids, and en/de catalog parity.
-    Prompted by a live audit: the Welcome page was entirely hardcoded and never wired
-    to react-intl, and 14 message ids collided with different text across components,
-    both classes of bug invisible until the German catalog was actually populated.
+- Version change: 1.1.0 → 1.1.1
+- Modified principles: none this round
+- Modified sections:
+  - Development Workflow — the project moved from Yarn to npm (yarn.lock removed,
+    package-lock.json added, `packageManager` field, CI, and Netlify build command
+    updated to match); all example commands here updated accordingly.
 - Added sections: none this round
 - Removed sections: none
 - Templates requiring updates: none checked in this run — dependent templates/commands
@@ -68,7 +66,7 @@ falls back to each call site's own local `defaultMessage` when the compiled cata
 has no matching entry, so nothing breaks until a catalog actually populates that id)
 but silently show the wrong text once one does. The catalogs are flat per-locale JSON
 files at `src/i18n/data/{core,en,de}.json`, regenerated from every `messages.ts` via
-`yarn extract-intl`; `en.json` and `de.json` MUST carry the exact same key set with
+`npm run extract-intl`; `en.json` and `de.json` MUST carry the exact same key set with
 matching `{placeholder}` tokens (verify programmatically, not by eye — a full pass is
 one `Object.keys` diff plus a placeholder-regex diff, not something to skip). This
 project's German locale is the reference: keep it fully in sync whenever messages
@@ -153,13 +151,13 @@ happened once in this codebase and been reverted — see commit `07aca33`.
 ## Development Workflow
 
 - The application lives in the `visualizer/` subdirectory (`visualizer/visualizer/`
-  from the repo root) as its own Yarn project. All commands (`yarn install`, `yarn
-  start`, `yarn build`, `yarn test`, `yarn lint`, `yarn typecheck`, `yarn format`) MUST
-  be run from inside `visualizer/`, not the repo root.
-- CI (`.github/workflows/ci.yml`) runs only `yarn build` and `yarn test` on PRs into
-  `main`. It does **not** run `lint` or `typecheck` — contributors remain responsible
-  for running those locally before requesting review.
-- `yarn typecheck` currently fails immediately on a pre-existing environment issue
+  from the repo root) as its own npm project. All commands (`npm install`, `npm start`,
+  `npm run build`, `npm test`, `npm run lint`, `npm run typecheck`, `npm run format`)
+  MUST be run from inside `visualizer/`, not the repo root.
+- CI (`.github/workflows/ci.yml`) runs only `npm run build` and `npm run test` on PRs
+  into `main`. It does **not** run `lint` or `typecheck` — contributors remain
+  responsible for running those locally before requesting review.
+- `npm run typecheck` currently fails immediately on a pre-existing environment issue
   (missing type definitions for `graphql-ctp` / `json-stable-stringify` in the base
   `tsconfig-mc-app.json`), unrelated to any specific change. This MUST NOT be treated
   as a regression signal until the underlying `tsconfig` issue is fixed upstream.
@@ -174,7 +172,7 @@ happened once in this codebase and been reverted — see commit `07aca33`.
   Rationale: mocking hooks tests the mock, not the query/fragment shape actually sent
   over the wire — the GraphQL-layer approach has caught schema-shape regressions that
   hook mocking would have missed.
-- `yarn extract-intl`'s glob MUST exclude `.d.ts` files
+- `npm run extract-intl`'s glob MUST exclude `.d.ts` files
   (`src/**/!(*.spec|*.d).(ts|tsx)`). Including them crashes `formatjs`'s TypeScript
   extraction on ambient-only declaration files (`src/globals.d.ts`) with an internal
   "Debug Failure" — the command still exits 0 but silently overwrites
@@ -202,4 +200,4 @@ connector fragment structure MUST be checked against the relevant principle abov
 before merge. Deviations require an explicit rationale in the PR description, not
 silent drift.
 
-**Version**: 1.1.0 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-09-25
+**Version**: 1.1.1 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-09-25

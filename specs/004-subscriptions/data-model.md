@@ -46,19 +46,11 @@ SNS              { type:'SNS', … }
 
 ## Form / draft models
 
-### Wizard per-step draft
+### Create/edit form values (shared)
 
-```
-subscriptionStepsDraft {
-  1: { key }
-  2: { destinationType }
-  3: { destination: { GoogleCloudPubSub?, SQS?, ConfluentCloud? } }
-  4: { changes: { resourceTypeId }[] }
-  5: { messages: { resourceTypeId, types: string[] }[] }
-}
-```
-
-### Detail-view form values
+Both the create page and the edit page use the same Formik shape — create just starts from
+empty `initialValues` and never sets `isReadOnly`, while edit populates it from the fetched
+subscription and sets `isReadOnly={!canManage}`.
 
 ```
 TFormValues {

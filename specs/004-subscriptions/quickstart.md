@@ -25,16 +25,12 @@ From spec.md §4 — register these routes under the app's router:
 | View | Route |
 |------|-------|
 | List | `/subscriptions` |
-| Wizard step 1 — Define key | `/subscription/new` |
-| Wizard step 2 — Select provider | `/subscription/new/select-provider` |
-| Wizard step 3 — Configure provider | `/subscription/new/configure-provider` |
-| Wizard step 4 — Configure changes | `/subscription/new/changes` |
-| Wizard step 5 — Configure messages | `/subscription/new/messages` |
+| Create | `/subscription/new` |
 | Detail / edit | `/subscription/:id` |
 
-Steps 2–5 are children of the wizard; the stepper drives navigation between them.
-A `refetch` navigation state passed back to `/subscriptions` (after create/delete) forces
-the list to reload.
+Create and detail/edit render the same form component — see §4 and §5. A `refetch`
+navigation state passed back to `/subscriptions` (after create/delete) forces the list to
+reload.
 
 ## 2. Data layer
 
@@ -82,21 +78,28 @@ Full-page data table (../README.md §8: paginated, sortable, empty state, row-cl
 - "No items available" empty state; loading indicator while fetching; error notification on
   failure. Honor the `refetch` state on return from create/delete.
 
-## 4. Create wizard
+## 4. Create & edit (shared form)
 
-Five sequential steps in a horizontal stepper; no skipping. Each step has its own route,
-Next/Previous controls, and Cancel (→ list). **Next is disabled until the active step is
-valid**; the final step's primary action is **Save** (see spec.md §3, FR-002…FR-008).
+Create (`/subscription/new`) and detail/edit (`/subscription/:id`) render the same form
+component — no stepper, no per-step routes. All sections are visible and editable at once
+(see spec.md §3, FR-002…FR-011). They differ only in:
 
-Accumulate values in a per-step draft (`subscriptionStepsDraft`, data-model.md):
+- **Initial values** — create starts empty; edit populates from `SubscriptionById`.
+- **Key field** — editable on create; read-only on edit (immutable after creation,
+  ../README.md §6).
+- **`isReadOnly` gating** — edit passes `isReadOnly={!canManage}` down into every section;
+  create does **not**, so without Manage its fields stay editable and only the Save button
+  is disabled (tracked as a gap — see spec.md §6). Fix this the same way as edit if you're
+  closing that gap rather than reproducing it.
+- **Actions** — create has Cancel/Save; edit additionally has Revert (resets to loaded
+  values, disabled when pristine) and Delete.
 
-1. **Define key** (`/subscription/new`) — field **Key**, required, shared key rule
-   (../README.md §6). Next enabled only when valid.
-2. **Select provider** (`/subscription/new/select-provider`) — **Destination type**,
-   required, clearable searchable select over the 7 types. Changing it re-initializes the
-   step-3 config.
-3. **Configure provider** (`/subscription/new/configure-provider`) — render fields for the
-   chosen type. The **3 implemented configs** and their **required fields**:
+**Four collapsible sections**, same in both:
+
+1. **Key** (expanded) — field **Key**, required, shared key rule (../README.md §6).
+2. **Destination** (expanded) — **Destination type**: required, clearable, searchable select
+   over the 7 types. Changing it re-initializes the type-specific config below. The
+   **3 implemented configs** and their **required fields**:
    - **Google Cloud Pub/Sub** — `topic` (required), `projectId` (required).
    - **AWS SQS** — `authenticationMode` (`IAM` | `Credentials`, required); `accessKey` &
      `accessSecret` (required **only** when mode = `Credentials`); `queueUrl` (required);
@@ -104,66 +107,56 @@ Accumulate values in a per-step draft (`subscriptionStepsDraft`, data-model.md):
    - **Confluent Cloud** — `bootstrapServer`, `apiKey`, `apiSecret`, `acks` (`0`|`1`|`all`),
      `topic` — all required.
    - **SNS / EventBridge / Azure Service Bus / Azure Event Grid** — no form; show
-     "No mapping defined so far for {type}" and **block progression** (Next stays disabled).
-4. **Configure changes** (`/subscription/new/changes`) — optional multi-select over the 40
-   resource types; each selection adds `{ resourceTypeId }`. **Next always enabled** (zero
-   allowed).
-5. **Configure messages** (`/subscription/new/messages`) — optional, **grouped by resource
-   type**; each group is labelled with its message-type count and lists message-type
-   checkboxes. Checking adds the type to that resource's `types[]`; unchecking removes it,
-   and **removes the resource entry when its `types[]` becomes empty**. **Save always
-   enabled**.
+     "No mapping defined so far for {type}". On create this blocks Save; on edit, existing
+     subscriptions of these types can't have their destination edited (key/changes/messages
+     remain editable).
+3. **Changes** (collapsed) — optional multi-select over the 40 resource types; each
+   selection adds `{ resourceTypeId }`. Zero allowed.
+4. **Messages** (collapsed) — optional, **grouped by resource type**; each group is labelled
+   with its message-type count and lists message-type checkboxes. Checking adds the type to
+   that resource's `types[]`; unchecking removes it, and **removes the resource entry when
+   its `types[]` becomes empty**.
 
 **Changes vs messages semantics:** *changes* = whole-resource change notifications
 (`{ resourceTypeId }` only); *messages* = specific message types per resource
 (`{ resourceTypeId, types: [...] }`). A subscription may use either, both, or neither.
 
-**Building the `SubscriptionDraft` on Save** (FR-008): assemble `key`; `destination` from the
-chosen type's config mapped to the `DestinationInput` key; include `changes` only if
-non-empty; include `messages` only if non-empty; set `format` to Platform
+**Building the `SubscriptionDraft` on create Save** (FR-008): assemble `key`; `destination`
+from the chosen type's config mapped to the `DestinationInput` key; include `changes` only
+if non-empty; include `messages` only if non-empty; set `format` to Platform
 (`{ Platform: {} }`). On success: created notification, return to `/subscriptions` with
-`refetch`.
+`refetch`. Formik still blocks an invalid submit and surfaces field errors, but the Save
+button itself is only disabled while submitting or without Manage — not on invalidity or
+read-only state (see the gating note above).
 
-## 5. Detail / edit view
+On edit Save: compute the update-action diff (§2) and call update with the current version
+only when actions exist → updated notification + refetch. Delete removes the subscription
+and returns to the list with `refetch`.
 
-Detail page populated from `SubscriptionById`, with **four collapsible sections** mirroring
-the wizard (FR-009):
-
-- **Key** — expanded. Key is immutable after creation (../README.md §6): read-only.
-- **Destination** — expanded. Type select + type-specific config (same fields/validation as
-  wizard step 3). Changing the type re-initializes the config and must be captured as a
-  `changeDestination` action. Unsupported types (SNS/EventBridge/Azure*) cannot have their
-  destination edited; key/changes/messages remain editable.
-- **Changes** — collapsed.
-- **Messages** — collapsed.
-
-Actions: **Save** computes the update-action diff (§2) and calls update with the current
-version only when actions exist → updated notification + refetch. **Revert** resets to the
-loaded values (disabled when pristine). **Delete** removes the subscription and returns to
-the list with `refetch`.
-
-Without **Manage**, all sections render **read-only** and Save/Delete are **disabled, not
-hidden** (../README.md §3).
-
-## 6. Cross-cutting
+## 5. Cross-cutting
 
 All per ../README.md — do not reinvent:
 
 - **Permissions** (§3): View to render; Manage to create/save/delete. No Manage → read-only,
-  disabled affordances.
+  disabled affordances — **edit follows this; create currently doesn't fully** (see Known
+  gaps below).
 - **Notifications** (§7): success/error via the MC side-channel; convert GraphQL errors to
   human-readable messages; loading + error states on list and detail.
 - **Localization** (§4): externalize all strings (destination-type labels, resource-type
-  labels, step titles, validation copy). Subscription fields here are not localized
+  labels, section labels, validation copy). Subscription fields here are not localized
   commercetools strings, but UI labels still come from the message catalog.
 
 ## Known gaps to carry over (spec §6)
 
 - **Only GCP Pub/Sub, AWS SQS, and Confluent Cloud are configurable.** The other 4 types
-  appear in the picker but block the wizard and can't be edited in detail.
+  appear in the destination-type picker but block Save on create and can't be edited in
+  detail.
 - **`format`** (Platform vs CloudEvents) is **not surfaced**; always defaults to Platform.
 - **`status`** is read but **not surfaced** in list or detail.
-- **No wizard draft persistence** — navigating away or refreshing loses progress.
+- **No draft persistence on create** — navigating away or refreshing loses progress.
+- **Create doesn't force read-only without Manage** — only Save is disabled; edit correctly
+  disables/read-only's everything. The create page never passes `isReadOnly` into the shared
+  form the way the edit page does.
 - No bulk operations, cloning, or search/virtualization in the (large) message-type list.
 - Fix legacy key-validation copy that references "business unit".
 
@@ -171,16 +164,18 @@ All per ../README.md — do not reinvent:
 
 - [ ] List loads with Key / Version / Created At / Destination Type columns; sortable by key;
       paginated; empty + error + loading states; row-click → detail; `refetch` honored.
-- [ ] Wizard enforces the 5-step order; Next gated on per-step validity; Cancel → list.
-- [ ] Step 3 renders correct required fields for GCP / SQS / Confluent; SQS credentials
-      required only in `Credentials` mode; unsupported types block progression.
+- [ ] Create and edit render the same four-section form; no stepper/per-step routes; Cancel
+      → list.
+- [ ] Destination section renders correct required fields for GCP / SQS / Confluent; SQS
+      credentials required only in `Credentials` mode; unsupported types block create Save.
 - [ ] Changes (resourceTypeId) and Messages (resourceTypeId + types) selection semantics
       behave as specified, incl. removing an empty message group.
-- [ ] Save builds a valid `SubscriptionDraft` (omits empty changes/messages; format=Platform);
-      created notification; returns with `refetch`.
-- [ ] Detail sections match wizard; key read-only; destination type-change → `changeDestination`.
+- [ ] Create Save builds a valid `SubscriptionDraft` (omits empty changes/messages;
+      format=Platform); created notification; returns with `refetch`.
+- [ ] Edit: key read-only; destination type-change → `changeDestination`.
 - [ ] Update sends only the diffed actions with the current version; no actions → no call;
       version mismatch → error notification.
 - [ ] Revert disabled when pristine; Delete works and returns with `refetch`.
-- [ ] Without Manage: everything read-only, Save/Delete disabled (not hidden).
+- [ ] Without Manage: edit is fully read-only, Save/Delete disabled (not hidden); create's
+      Save is disabled too, but note its fields are not (known gap, replicate or fix as you see fit).
 - [ ] All five contract operations resolve against the `ctp` target.

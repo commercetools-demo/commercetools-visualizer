@@ -26,6 +26,7 @@ import {
   graphQLErrorHandler,
   getErrorMessage,
   calculateSubscriptionUpdateActions,
+  type ErrorCodeMapping,
 } from '../../../hooks';
 import {
   TConfluentCloudDestination,
@@ -34,6 +35,10 @@ import {
 } from '../../../types/generated/ctp';
 import { FormikHelpers } from 'formik';
 import { convertFormValuesToSubscription } from './convert';
+
+const errorCodeMapping: ErrorCodeMapping = [
+  { errorCode: 'DuplicateField', errorObject: { duplicate: true } },
+];
 
 type Props = {
   linkToWelcome: string;
@@ -85,7 +90,13 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
               });
               return refetch();
             })
-            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+            .catch(
+              graphQLErrorHandler(
+                showNotification,
+                formikHelpers,
+                errorCodeMapping
+              )
+            );
         }
       }
     },

@@ -39,7 +39,11 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   });
   let parsedErrorKey: string | undefined;
   if (keyMeta.error) {
-    parsedErrorKey = Object.keys(JSON.parse(keyMeta.error || '{}'))[0];
+    const parsedError =
+      typeof keyMeta.error === 'string'
+        ? JSON.parse(keyMeta.error)
+        : keyMeta.error;
+    parsedErrorKey = Object.keys(parsedError)[0];
   }
   return (
     <FormField.Root

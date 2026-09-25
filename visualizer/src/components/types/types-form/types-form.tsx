@@ -3,14 +3,13 @@ import { useFormik, type FormikHelpers } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
 import {
-  Box,
   ComboBox,
+  Flex,
   FormField,
-  Grid,
   Heading,
   LocalizedField,
   type LocalizedString,
-  Stack,
+  PageContent,
   TextInput,
 } from '@commercetools/nimbus';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
@@ -130,12 +129,14 @@ const TypesForm: FC<Props> = ({
   const errors = formik.errors as Partial<TErrors>;
 
   const formElements = (
-    <Stack direction="column" gap="800">
-      <Stack direction="column" gap="400">
+    <Flex direction="column" gap="400">
+      <PageContent.Root variant="wide">
         <Heading as="h2" size="md">
           <FormattedMessage {...messages.generalInformationTitle} />
         </Heading>
-        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
+      </PageContent.Root>
+      <PageContent.Root variant="wide" columns="1/1">
+        <PageContent.Column>
           <LocalizedField
             id="types-edit-name"
             name="name"
@@ -158,22 +159,7 @@ const TypesForm: FC<Props> = ({
                 ? intl.formatMessage(messages.requiredFieldError)
                 : undefined
             }
-          />
-          <LocalizedField
-            id="types-edit-description"
-            name="description"
-            type="text"
-            label={intl.formatMessage(messages.descriptionTitle)}
-            isReadOnly={!canManage}
-            defaultLocaleOrCurrency={dataLocale}
-            valuesByLocaleOrCurrency={formik.values.description}
-            onChange={(event) =>
-              formik.setFieldValue(
-                `description.${event.target.locale}`,
-                event.target.value
-              )
-            }
-            onBlur={() => formik.setFieldTouched('description', true)}
+            width={'full'}
           />
           <FormField.Root
             isRequired
@@ -190,6 +176,7 @@ const TypesForm: FC<Props> = ({
                 isReadOnly={!createNewMode || !canManage}
                 onChange={(value) => formik.setFieldValue('key', value)}
                 onBlur={() => formik.setFieldTouched('key', true)}
+                width={'full'}
               />
             </FormField.Input>
             <FormField.Description>
@@ -197,6 +184,25 @@ const TypesForm: FC<Props> = ({
             </FormField.Description>
             <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
           </FormField.Root>
+        </PageContent.Column>
+        <PageContent.Column>
+          <LocalizedField
+            id="types-edit-description"
+            name="description"
+            type="text"
+            label={intl.formatMessage(messages.descriptionTitle)}
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.description}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `description.${event.target.locale}`,
+                event.target.value
+              )
+            }
+            onBlur={() => formik.setFieldTouched('description', true)}
+            width={'full'}
+          />
           <FormField.Root
             isRequired
             isReadOnly={!createNewMode || !canManage}
@@ -218,6 +224,7 @@ const TypesForm: FC<Props> = ({
                   formik.setFieldValue('resourceTypeIds', keys as string[])
                 }
                 onBlur={() => formik.setFieldTouched('resourceTypeIds', true)}
+                width={'full'}
               >
                 <ComboBox.Trigger />
                 <ComboBox.Popover>
@@ -237,26 +244,25 @@ const TypesForm: FC<Props> = ({
                 : null}
             </FormField.Error>
           </FormField.Root>
-        </Grid>
-      </Stack>
-
-      {!createNewMode && (
-        <Stack direction="column" gap="400">
-          <Heading as="h2" size="md">
-            <FormattedMessage {...messages.typeInformationTitle} />
-          </Heading>
-          <Box>
-            <FieldDefinitionsList
-              id={formik.values.id}
-              version={version}
-              value={formik.values.fieldDefinitions}
-              linkToHome={linkToHome}
-              refetch={refetch}
-            />
-          </Box>
-        </Stack>
-      )}
-    </Stack>
+        </PageContent.Column>
+      </PageContent.Root>
+      <PageContent.Root variant={'wide'}>
+        <Heading as="h2" size="md">
+          <FormattedMessage {...messages.typeInformationTitle} />
+        </Heading>
+      </PageContent.Root>
+      <PageContent.Root variant={'full'}>
+        {!createNewMode && (
+          <FieldDefinitionsList
+            id={formik.values.id}
+            version={version}
+            value={formik.values.fieldDefinitions}
+            linkToHome={linkToHome}
+            refetch={refetch}
+          />
+        )}
+      </PageContent.Root>
+    </Flex>
   );
 
   return children({

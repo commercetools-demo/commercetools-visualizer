@@ -1,3 +1,11 @@
+[build]
+  base    = "visualizer"
+  command = "yarn run build"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "22"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

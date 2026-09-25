@@ -1,0 +1,26 @@
+#import "./type-definition-base-fields-fragment.graphql"
+
+fragment TypeDefinitionFragment on TypeDefinition {
+  ...TypeDefinitionBaseFieldsFragment
+  version
+  fieldDefinitions {
+    name
+    required
+    inputHint
+    labelAllLocales {
+      locale
+      value
+    }
+    type {
+      name
+      ... on ReferenceType {
+        referenceTypeId
+      }
+      ... on SetType {
+        elementType {
+          name
+        }
+      }
+    }
+  }
+}

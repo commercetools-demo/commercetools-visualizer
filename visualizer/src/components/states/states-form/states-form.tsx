@@ -132,7 +132,9 @@ const StatesForm: FC<Props> = ({
   }
 
   const { states, error, loading } = useStatesFetcher({
-    limit: 100,
+    // Needs every state of this type for the transition-options dropdown, so
+    // request the API's max page size rather than paginating.
+    limit: 500,
     offset: 0,
     where: where,
   });

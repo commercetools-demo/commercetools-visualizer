@@ -1,3 +1,5 @@
+#import "./fragments/extension-fragment.graphql"
+
 mutation UpdateExtension(
   $id: String
   $key: String
@@ -5,6 +7,6 @@ mutation UpdateExtension(
   $actions: [ExtensionUpdateAction!]!
 ) {
   updateExtension(id: $id, key: $key, version: $version, actions: $actions) {
-    id
+    ...ExtensionFragment
   }
 }

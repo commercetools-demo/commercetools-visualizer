@@ -1,21 +1,7 @@
+#import "./fragments/state-detail-fragment.graphql"
+
 query FetchState($id: String, $key: String) {
   state(id: $id, key: $key) {
-    transitions {
-      id
-    }
-    id
-    initial
-    type
-    key
-    builtIn
-    nameAllLocales {
-      locale
-      value
-    }
-    descriptionAllLocales {
-      locale
-      value
-    }
-    version
+    ...StateDetailFragment
   }
 }

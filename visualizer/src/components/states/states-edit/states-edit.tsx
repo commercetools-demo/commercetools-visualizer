@@ -48,7 +48,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
-  const { state, error, loading, refetch } = useStateFetcher({
+  const { state, error, loading } = useStateFetcher({
     id: id,
   });
 
@@ -73,13 +73,12 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
                 domain: DOMAINS.SIDE,
                 text: intl.formatMessage(messages.updateSuccess),
               });
-              return refetch();
             })
             .catch(graphQLErrorHandler(showNotification, formikHelpers));
         }
       }
     },
-    [refetch, state]
+    [state]
   );
 
   const handleDelete = async () => {

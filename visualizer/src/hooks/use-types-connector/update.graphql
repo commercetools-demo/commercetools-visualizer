@@ -1,3 +1,5 @@
+#import "./fragments/type-definition-fragment.graphql"
+
 mutation UpdateTypeDefinition(
   $id: String
   $key: String
@@ -5,6 +7,6 @@ mutation UpdateTypeDefinition(
   $actions: [TypeUpdateAction!]!
 ) {
   updateTypeDefinition(id: $id, key: $key, version: $version, actions: $actions) {
-    id
+    ...TypeDefinitionFragment
   }
 }

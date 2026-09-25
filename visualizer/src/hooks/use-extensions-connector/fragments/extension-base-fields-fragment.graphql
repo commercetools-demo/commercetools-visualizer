@@ -1,0 +1,8 @@
+fragment ExtensionBaseFieldsFragment on Extension {
+  id
+  version
+  createdAt
+  lastModifiedAt
+  key
+  timeoutInMs
+}

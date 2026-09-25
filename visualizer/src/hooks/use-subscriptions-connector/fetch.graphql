@@ -1,27 +1,7 @@
-#import "./fragments/subscription-destination-fragments.graphql"
+#import "./fragments/subscription-fragment.graphql"
 
 query FetchSubscription($id: String, $key: String) {
   subscription(id: $id, key: $key) {
-    id
-    key
-    version
-    createdAt
-    destination {
-      type
-      ...AzureServiceBusDestinationFragment
-      ...EventBridgeDestinationFragment
-      ...EventGridDestinationFragment
-      ...GoogleCloudPubSubDestinationFragment
-      ...SNSDestinationFragment
-      ...SQSDestinationFragment
-      ...ConfluentCloudDestinationFragment
-    }
-    changes {
-      resourceTypeId
-    }
-    messages {
-      resourceTypeId
-      types
-    }
+    ...SubscriptionFragment
   }
 }

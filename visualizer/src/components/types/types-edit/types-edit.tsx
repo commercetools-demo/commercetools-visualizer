@@ -77,13 +77,12 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
                 domain: DOMAINS.SIDE,
                 text: intl.formatMessage(messages.updateSuccess),
               });
-              return refetch();
             })
             .catch(graphQLErrorHandler(showNotification, formikHelpers));
         }
       }
     },
-    [intl, refetch, showNotification, typeDefinition, typeDefinitionUpdater]
+    [intl, showNotification, typeDefinition, typeDefinitionUpdater]
   );
 
   const handleDelete = async () => {

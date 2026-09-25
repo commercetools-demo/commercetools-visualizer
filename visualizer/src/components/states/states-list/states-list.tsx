@@ -64,7 +64,9 @@ const StatesList = (props: Props) => {
   });
 
   const { states, error, loading, refetch } = useStatesFetcher({
-    limit: 100,
+    // The flow diagram needs every state across all types in one shot, so
+    // request the API's max page size rather than paginating.
+    limit: 500,
     offset: 0,
   });
 

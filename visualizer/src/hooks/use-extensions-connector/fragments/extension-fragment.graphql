@@ -1,11 +1,4 @@
-fragment ExtensionBaseFieldsFragment on Extension {
-  id
-  version
-  createdAt
-  lastModifiedAt
-  key
-  timeoutInMs
-}
+#import "./extension-base-fields-fragment.graphql"
 
 fragment ExtensionFragment on Extension {
   ...ExtensionBaseFieldsFragment

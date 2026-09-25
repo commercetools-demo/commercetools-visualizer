@@ -31,6 +31,7 @@ import {
   useExtensionFetcher,
   useExtensionUpdater,
 } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => void;
@@ -54,7 +55,10 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const data = formValuesToTExtension(formikValues);
       if (extension) {
         const updateActions = calculateExtensionsUpdateActions(extension, data);
@@ -71,13 +75,12 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
                 domain: DOMAINS.SIDE,
                 text: intl.formatMessage(messages.updateSuccess),
               });
-              return refetch();
             })
             .catch(graphQLErrorHandler(showNotification, formikHelpers));
         }
       }
     },
-    [intl, refetch, showNotification, extension, extensionsUpdater]
+    [intl, showNotification, extension, extensionsUpdater]
   );
 
   const handleDelete = async () => {

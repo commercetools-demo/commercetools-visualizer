@@ -59,8 +59,7 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   }));
 
   const params = useParams<{ id: string }>();
-  const { loading, error, subscription, refetch } =
-    useSubscriptionFetcher(params);
+  const { loading, error, subscription } = useSubscriptionFetcher(params);
 
   const handleSubmit = useCallback(
     async (
@@ -88,7 +87,6 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
                   subscriptionKey: subscription?.key,
                 }),
               });
-              return refetch();
             })
             .catch(
               graphQLErrorHandler(

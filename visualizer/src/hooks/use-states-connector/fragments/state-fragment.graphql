@@ -16,8 +16,3 @@ fragment StateFragment on State {
     value
   }
 }
-
-fragment StateDetailFragment on State {
-  ...StateFragment
-  version
-}

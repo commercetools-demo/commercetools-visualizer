@@ -1,3 +1,5 @@
+#import "./fragments/state-detail-fragment.graphql"
+
 mutation UpdateState(
   $id: String
   $key: String
@@ -5,6 +7,6 @@ mutation UpdateState(
   $actions: [StateUpdateAction!]!
 ) {
   updateState(id: $id, key: $key, version: $version, actions: $actions) {
-    id
+    ...StateDetailFragment
   }
 }

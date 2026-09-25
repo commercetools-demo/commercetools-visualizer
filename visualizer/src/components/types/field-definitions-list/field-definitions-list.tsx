@@ -1,39 +1,34 @@
 import { FC, lazy } from 'react';
 import { useIntl } from 'react-intl';
-import { TColumn } from '@commercetools-uikit/data-table';
-import IconButton from '@commercetools-uikit/icon-button';
-import SecondaryButton from '@commercetools-uikit/secondary-button';
-import {
-  CheckActiveIcon,
-  CheckInactiveIcon,
-  BinFilledIcon,
-  PlusBoldIcon,
-} from '@commercetools-uikit/icons';
-import Spacings from '@commercetools-uikit/spacings';
-import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { DOMAINS } from '@commercetools-frontend/constants';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
-import { ApolloQueryResult } from '@apollo/client';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import { DOMAINS } from '@commercetools-frontend/constants';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { ApolloQueryResult } from '@apollo/client';
+import {
+  Box,
+  Button,
+  DataTable,
+  Flex,
+  IconButton,
+  Stack,
+  Text,
+  type DataTableColumnItem,
+} from '@commercetools/nimbus';
+import { Add, Check, Close, Delete } from '@commercetools/nimbus-icons';
 import {
   TFieldDefinition,
   TQuery,
   TQuery_TypeDefinitionArgs,
   TTypeUpdateAction,
 } from '../../../types/generated/ctp';
-import createColumnDefinitions from './field-definitions-list-column-definitions';
 import messages from './messages';
-import { useTypeDefinitionUpdater } from 'commercetools-demo-shared-data-fetching-hooks';
+import { useTypeDefinitionUpdater } from '../../../hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
-import { PageContentFull } from '@commercetools-frontend/application-components';
-import { PaginatableDataTable } from 'commercetools-demo-shared-paginatable-data-table';
-import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
-import {
-  formatLocalizedString,
-  renderDefault,
-} from 'commercetools-demo-shared-helpers';
+import { formatLocalizedString } from '../../../utils/format-localized-string';
 
 const NewFieldDefinitionInput = lazy(
   () => import('../field-definition-create/field-definition-create')
@@ -53,6 +48,17 @@ type Props = {
 };
 
 type TFieldDefinitionWithId = { id: string } & TFieldDefinition;
+
+const BooleanCell = ({ value }: { value: boolean }) =>
+  value ? (
+    <Box color="primary.9" aria-label="yes">
+      <Check />
+    </Box>
+  ) : (
+    <Box color="neutral.9" aria-label="no">
+      <Close />
+    </Box>
+  );
 
 const FieldDefinitionsList: FC<Props> = ({
   id,
@@ -74,9 +80,11 @@ const FieldDefinitionsList: FC<Props> = ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
-  const fields: Array<TFieldDefinitionWithId> = value.map((item, index) => {
-    return { ...item, id: index + '' };
-  });
+
+  const fields: Array<TFieldDefinitionWithId> = value.map((item, index) => ({
+    ...item,
+    id: index + '',
+  }));
 
   const deleteItem = async (name: string) => {
     const deleteAction: TTypeUpdateAction = {
@@ -95,110 +103,99 @@ const FieldDefinitionsList: FC<Props> = ({
     refetch && (await refetch());
   };
 
-  const rowClick = async (
-    row: TFieldDefinitionWithId,
-    _rowIndex: number,
-    columnKey: string
-  ) => {
-    if (columnKey === 'delete') {
-      await deleteItem(row.name);
-    } else {
-      push(`${match.url}/${row.name}`);
-    }
-  };
-
-  const itemRendered = (
-    item: TFieldDefinitionWithId,
-    column: TColumn<TFieldDefinitionWithId>
-  ) => {
-    switch (column.key) {
-      case 'name':
-        return item.name;
-      case 'label':
-        return formatLocalizedString(
-          item.labelAllLocales,
+  const columns: Array<DataTableColumnItem<TFieldDefinitionWithId>> = [
+    {
+      id: 'name',
+      header: intl.formatMessage(messages.columnFieldName),
+      isRowHeader: true,
+      accessor: (row) => row.name,
+    },
+    {
+      id: 'label',
+      header: intl.formatMessage(messages.columnFieldLabel),
+      accessor: (row) =>
+        formatLocalizedString(
+          row.labelAllLocales,
           dataLocale,
           projectLanguages
-        );
-      case 'required':
-        if (item.required) {
-          return <CheckActiveIcon color={'primary'} />;
-        } else {
-          return <CheckInactiveIcon color={'neutral60'} />;
-        }
-      case 'type': {
-        return renderAttributeTypeName(item.type);
-      }
-      case 'set': {
-        switch (item.type.name) {
-          case 'Set': {
-            return <CheckActiveIcon color={'primary'} />;
-          }
-        }
-        return <CheckInactiveIcon color={'neutral60'} />;
-      }
-      case 'delete':
-        return (
-          <IconButton
-            label=""
-            size={'30'}
-            icon={<BinFilledIcon />}
-            isDisabled={!canManage}
-          />
-        );
-      default:
-        return renderDefault(item[column.key as keyof TFieldDefinitionWithId]);
-    }
-  };
+        ),
+    },
+    {
+      id: 'required',
+      header: intl.formatMessage(messages.columnFieldRequired),
+      accessor: (row) => <BooleanCell value={Boolean(row.required)} />,
+    },
+    {
+      id: 'type',
+      header: intl.formatMessage(messages.columnFieldType),
+      accessor: (row) => renderAttributeTypeName(row.type),
+    },
+    {
+      id: 'set',
+      header: intl.formatMessage(messages.columnFieldSet),
+      accessor: (row) => <BooleanCell value={row.type?.name === 'Set'} />,
+    },
+    {
+      id: 'delete',
+      header: '',
+      isSortable: false,
+      accessor: (row) => (
+        <IconButton
+          aria-label={intl.formatMessage(messages.removeFieldDefinitionButton)}
+          size="xs"
+          variant="ghost"
+          isDisabled={!canManage}
+          onPress={() => deleteItem(row.name)}
+        >
+          <Delete />
+        </IconButton>
+      ),
+    },
+  ];
+
   return (
-    <PageContentFull>
-      {/* <FieldDefinitionInput
-          isOpen={FieldDefinitionInputOpen}
-          onClose={() => {
-            setFieldDefinitionInputOpen(false);
-          }}
-          onSubmit={updateFieldDefinition}
-          existingFieldDefinition={FieldDefinitionInputData}
-        /> */}
-      <Spacings.Stack scale="m">
-        <div style={{ display: 'flex', flexDirection: 'row-reverse' }}>
-          <SecondaryButton
-            onClick={() => {
-              push(`${linkToHome}/${id}/${version}/new`);
-            }}
-            iconLeft={<PlusBoldIcon />}
-            label={intl.formatMessage(messages.addField)}
-            isDisabled={!canManage}
-          />
-        </div>
-        <PaginatableDataTable<TFieldDefinitionWithId>
-          visibleColumns={createColumnDefinitions(intl.formatMessage)}
-          columns={createColumnDefinitions(intl.formatMessage)}
-          isCondensed={true}
+    <Stack direction="column" gap="400">
+      <Flex justifyContent="flex-end">
+        <Button
+          variant="outline"
+          colorPalette="primary"
+          isDisabled={!canManage}
+          onPress={() => push(`${linkToHome}/${id}/${version}/new`)}
+        >
+          <Add />
+          {intl.formatMessage(messages.addField)}
+        </Button>
+      </Flex>
+      {fields.length === 0 ? (
+        <Text color="neutral.11">
+          {intl.formatMessage(messages.fieldHeaderTitle)}
+        </Text>
+      ) : (
+        <DataTable<TFieldDefinitionWithId>
+          columns={columns}
           rows={fields}
-          itemRenderer={itemRendered}
-          onRowClick={rowClick}
+          onRowClick={(row) => push(`${match.url}/${row.name}`)}
         />
-        <Switch>
-          <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
-            <NewFieldDefinitionInput
-              onClose={async () => {
-                refetch && (await refetch());
-                push(`${match.url}`);
-              }}
-            />
-          </SuspendedRoute>
-          <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
-            <FieldDefinitionInput
-              onClose={async () => {
-                refetch && (await refetch());
-                push(`${match.url}`);
-              }}
-            />
-          </SuspendedRoute>
-        </Switch>
-      </Spacings.Stack>
-    </PageContentFull>
+      )}
+      <Switch>
+        <SuspendedRoute path={`${linkToHome}/:id/:version/new`}>
+          <NewFieldDefinitionInput
+            onClose={async () => {
+              refetch && (await refetch());
+              push(`${match.url}`);
+            }}
+          />
+        </SuspendedRoute>
+        <SuspendedRoute path={`${linkToHome}/:id/:fieldDefinitionName`}>
+          <FieldDefinitionInput
+            onClose={async () => {
+              refetch && (await refetch());
+              push(`${match.url}`);
+            }}
+          />
+        </SuspendedRoute>
+      </Switch>
+    </Stack>
   );
 };
 

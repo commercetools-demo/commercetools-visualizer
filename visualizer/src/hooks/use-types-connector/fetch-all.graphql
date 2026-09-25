@@ -1,0 +1,15 @@
+#import "./fragments/type-definition-base-fields-fragment.graphql"
+
+query FetchTypes($limit: Int!, $offset: Int!, $sort: [String!]) {
+  typeDefinitions(limit: $limit, offset: $offset, sort: $sort) {
+    total
+    count
+    offset
+    results {
+      ...TypeDefinitionBaseFieldsFragment
+      fieldDefinitions {
+        name
+      }
+    }
+  }
+}

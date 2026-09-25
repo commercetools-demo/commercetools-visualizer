@@ -1,23 +1,22 @@
 import { FC, useCallback } from 'react';
-import { FormModalPage } from '@commercetools-frontend/application-components';
-import messages from './messages';
+import { useIntl } from 'react-intl';
+import { useShowNotification } from '@commercetools-frontend/actions-global';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
+import { Button, ModalPage } from '@commercetools/nimbus';
+import { DOMAINS } from '@commercetools-frontend/constants';
+import { PERMISSIONS } from '../../../constants';
 import ExtensionsForm, {
   TFormValues,
 } from '../extensions-form/extensions-form';
-import { useIntl } from 'react-intl';
-import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { useShowNotification } from '@commercetools-frontend/actions-global';
-import { DOMAINS } from '@commercetools-frontend/constants';
-import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import { PERMISSIONS } from '../../../constants';
-import {
-  useExtensionCreator,
-  graphQLErrorHandler,
-} from 'commercetools-demo-shared-data-fetching-hooks';
 import {
   formValuesToTExtension,
   tExtensionToFormValues,
 } from '../extensions-form/conversion';
+import formMessages from '../extensions-form/messages';
+import messages from './messages';
+import { graphQLErrorHandler, useExtensionCreator } from '../../../hooks';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onSuccess: (id: string) => Promise<void>;
@@ -34,8 +33,12 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
   });
   const extensionCreator = useExtensionCreator();
   const showNotification = useShowNotification();
+
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft = formValuesToTExtension(formikValues);
       await extensionCreator
         .execute({
@@ -51,8 +54,9 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
-    [extensionCreator]
+    [extensionCreator, intl, onSuccess, showNotification]
   );
+
   return (
     <ExtensionsForm
       initialValues={tExtensionToFormValues()}
@@ -61,24 +65,37 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
       version={-1}
       createNewMode={true}
     >
-      {(formProps) => {
-        return (
-          <FormModalPage
-            title={intl.formatMessage(messages.title)}
-            isOpen
-            onPrimaryButtonClick={() => formProps.submitForm()}
-            onSecondaryButtonClick={onClose}
-            hideControls={false}
-            labelPrimaryButton={intl.formatMessage(FormModalPage.Intl.save)}
-            isPrimaryButtonDisabled={
-              formProps.isSubmitting || !formProps.isDirty || !canManage
-            }
-          >
-            {formProps.formElements}
-          </FormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(messages.backButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </ExtensionsForm>
   );
 };
+
 export default ExtensionsCreate;

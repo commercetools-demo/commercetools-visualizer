@@ -1,16 +1,15 @@
-import {
-  CustomFormDetailPage,
-  CustomFormModalPage,
-  FormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { FC, useCallback } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Spacings from '@commercetools-uikit/spacings';
-import Text from '@commercetools-uikit/text';
+import {
+  Alert,
+  Button,
+  DefaultPage,
+  Flex,
+  Group,
+  LoadingSpinner,
+} from '@commercetools/nimbus';
 import { useIntl } from 'react-intl';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
@@ -27,14 +26,19 @@ import {
   graphQLErrorHandler,
   getErrorMessage,
   calculateSubscriptionUpdateActions,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+  type ErrorCodeMapping,
+} from '../../../hooks';
 import {
+  TConfluentCloudDestination,
   TGoogleCloudPubSubDestination,
   TSqsDestination,
 } from '../../../types/generated/ctp';
-import { TConfluentCloudDestination } from 'commercetools-demo-shared-helpers';
 import { FormikHelpers } from 'formik';
 import { convertFormValuesToSubscription } from './convert';
+
+const errorCodeMapping: ErrorCodeMapping = [
+  { errorCode: 'DuplicateField', errorObject: { duplicate: true } },
+];
 
 type Props = {
   linkToWelcome: string;
@@ -55,8 +59,7 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
   }));
 
   const params = useParams<{ id: string }>();
-  const { loading, error, subscription, refetch } =
-    useSubscriptionFetcher(params);
+  const { loading, error, subscription } = useSubscriptionFetcher(params);
 
   const handleSubmit = useCallback(
     async (
@@ -84,9 +87,14 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
                   subscriptionKey: subscription?.key,
                 }),
               });
-              return refetch();
             })
-            .catch(graphQLErrorHandler(showNotification, formikHelpers));
+            .catch(
+              graphQLErrorHandler(
+                showNotification,
+                formikHelpers,
+                errorCodeMapping
+              )
+            );
         }
       }
     },
@@ -95,16 +103,17 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
   if (!subscription) {
@@ -171,34 +180,55 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
     >
       {(formProps) => {
         return (
-          <CustomFormDetailPage
-            title={
-              formProps.values?.key ||
-              intl.formatMessage(messages.subscriptionKeyLabel)
-            }
-            onPreviousPathClick={() => history.push(linkToWelcome)}
-            formControls={
-              <>
-                <CustomFormDetailPage.FormSecondaryButton
-                  label={FormModalPage.Intl.revert}
+          <DefaultPage.Root>
+            <DefaultPage.Header>
+              <DefaultPage.BackLink
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  history.push(linkToWelcome);
+                }}
+              >
+                {intl.formatMessage(messages.title)}
+              </DefaultPage.BackLink>
+              <DefaultPage.Title>
+                {formProps.values?.key ||
+                  intl.formatMessage(messages.subscriptionKeyLabel)}
+              </DefaultPage.Title>
+            </DefaultPage.Header>
+            <DefaultPage.Content>
+              {subscription && formProps.formElements}
+            </DefaultPage.Content>
+            <DefaultPage.Footer>
+              <Group aria-label="Form actions" gap="300">
+                <Button
+                  variant="solid"
+                  colorPalette="critical"
+                  isDisabled={!canManage}
+                  onPress={() => handleDelete()}
+                >
+                  {intl.formatMessage(messages.deleteButton)}
+                </Button>
+                <Button
+                  variant="outline"
                   isDisabled={!formProps.isDirty}
-                  onClick={formProps.handleReset}
-                />
-                <CustomFormDetailPage.FormPrimaryButton
+                  onPress={formProps.handleReset}
+                >
+                  {intl.formatMessage(messages.revertButton)}
+                </Button>
+                <Button
+                  variant="solid"
+                  colorPalette="primary"
                   isDisabled={
                     formProps.isSubmitting || !formProps.isDirty || !canManage
                   }
-                  onClick={() => formProps.submitForm()}
-                  label={FormModalPage.Intl.save}
-                />
-                <CustomFormModalPage.FormDeleteButton
-                  onClick={() => handleDelete()}
-                />
-              </>
-            }
-          >
-            {subscription && formProps.formElements}
-          </CustomFormDetailPage>
+                  onPress={() => formProps.submitForm()}
+                >
+                  {intl.formatMessage(messages.saveButton)}
+                </Button>
+              </Group>
+            </DefaultPage.Footer>
+          </DefaultPage.Root>
         );
       }}
     </SubscriptionDetailsForm>

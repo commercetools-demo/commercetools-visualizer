@@ -7,7 +7,7 @@ export default defineMessages({
     defaultMessage: 'General Information',
   },
   keyTitle: {
-    id: 'Type.form.key.title',
+    id: 'CustomObject.form.key.title',
     description: 'Title for key field',
     defaultMessage: 'Key',
   },
@@ -18,13 +18,38 @@ export default defineMessages({
       'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
   },
   containerTitle: {
-    id: 'Type.form.key.title',
-    description: 'Title for key field',
+    id: 'CustomObject.form.container.title',
+    description: 'Title for container field',
     defaultMessage: 'Container',
   },
   containerValue: {
-    id: 'Type.form.key.title',
-    description: 'Title for key field',
+    id: 'CustomObject.form.value.title',
+    description: 'Title for value field',
     defaultMessage: 'Value',
+  },
+  submitButton: {
+    id: 'CustomObject.form.button.submit',
+    description: 'Label for submit button',
+    defaultMessage: 'Save',
+  },
+  revertButton: {
+    id: 'CustomObject.form.button.revert',
+    description: 'Label for revert button',
+    defaultMessage: 'Revert',
+  },
+  cancelButton: {
+    id: 'CustomObject.form.button.cancel',
+    description: 'Label for cancel button',
+    defaultMessage: 'Cancel',
+  },
+  deleteButton: {
+    id: 'CustomObject.form.button.delete',
+    description: 'Label for delete button',
+    defaultMessage: 'Delete',
+  },
+  requiredFieldError: {
+    id: 'CustomObject.form.error.required',
+    description: 'The error message for required fields',
+    defaultMessage: 'This field is required. Provide a value.',
   },
 });

@@ -1,102 +1,131 @@
 import { useFormik } from 'formik';
-import TextField from '@commercetools-uikit/text-field';
 import { useIntl } from 'react-intl';
-import messages from './messages';
-import { TFormValues } from '../extensions-form/extensions-form';
 import { FC } from 'react';
-import SelectField from '@commercetools-uikit/select-field';
+import { FormField, Select, Stack, TextInput } from '@commercetools/nimbus';
+import messages from './messages';
+import {
+  DestinationHttpAuthenticationName,
+  TFormValues,
+} from '../extensions-form/extensions-form';
 
 type Props = {
   formik: ReturnType<typeof useFormik<TFormValues>>;
+  isReadOnly?: boolean;
 };
 
-const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
+const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
   const intl = useIntl();
   return (
-    <>
-      <TextField
-        name="destinationHttpUrl"
-        isRequired
-        value={formik.values.destinationHttpUrl || ''}
-        title={intl.formatMessage(messages.destinationHttpUrl)}
-        errors={
-          TextField.toFieldErrors<TFormValues>(formik.errors).destinationHttpUrl
-        }
-        touched={!!formik.touched.destinationHttpUrl}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-      />
-      <SelectField
-        key={'destinationHttpAuthenticationName'}
-        title={intl.formatMessage(messages.destinationHttpAuthentication)}
-        errors={
-          SelectField.toFieldErrors<TFormValues>(formik.errors)
-            .destinationHttpAuthenticationName
-        }
-        name={'destinationHttpAuthenticationName'}
-        isClearable={true}
-        options={[
-          {
-            value: 'AzureFunctions',
-            label: intl.formatMessage(
-              messages.destinationHttpAuthenticationAzureFunctions
-            ),
-          },
-          {
-            value: 'AuthorizationHeader',
-            label: intl.formatMessage(
-              messages.destinationHttpAuthenticationAuthorizationHeader
-            ),
-          },
-        ]}
-        value={formik.values.destinationHttpAuthenticationName || ''}
-        touched={!!formik.touched.destinationHttpAuthenticationName}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-      />
-      {formik.values.destinationHttpAuthenticationName &&
-        formik.values.destinationHttpAuthenticationName ===
-          'AuthorizationHeader' && (
-          <TextField
-            name="destinationHttpAuthenticationAuthorizationHeaderValue"
-            value={
-              formik.values
-                .destinationHttpAuthenticationAuthorizationHeaderValue || ''
+    <Stack direction="column" gap="400">
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
+        <FormField.Label>
+          {intl.formatMessage(messages.destinationHttpUrl)}
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            aria-label={intl.formatMessage(messages.destinationHttpUrl)}
+            value={formik.values.destinationHttpUrl || ''}
+            isReadOnly={isReadOnly}
+            onChange={(value) =>
+              formik.setFieldValue('destinationHttpUrl', value)
             }
-            title={'Authorization header'}
-            errors={
-              TextField.toFieldErrors<TFormValues>(formik.errors)
-                .destinationHttpAuthenticationAuthorizationHeaderValue
-            }
-            touched={
-              !!formik.touched
-                .destinationHttpAuthenticationAuthorizationHeaderValue
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
+            onBlur={() => formik.setFieldTouched('destinationHttpUrl', true)}
           />
-        )}
-      {formik.values.destinationHttpAuthenticationName &&
-        formik.values.destinationHttpAuthenticationName ===
-          'AzureFunctions' && (
-          <TextField
-            name="destinationHttpAuthenticationAuthorizationKey"
-            value={
-              formik.values.destinationHttpAuthenticationAuthorizationKey || ''
+        </FormField.Input>
+      </FormField.Root>
+      <FormField.Root isReadOnly={isReadOnly}>
+        <FormField.Label>
+          {intl.formatMessage(messages.destinationHttpAuthentication)}
+        </FormField.Label>
+        <FormField.Input>
+          <Select.Root
+            aria-label={intl.formatMessage(
+              messages.destinationHttpAuthentication
+            )}
+            isClearable
+            isDisabled={isReadOnly}
+            value={formik.values.destinationHttpAuthenticationName || ''}
+            onChange={(value) =>
+              formik.setFieldValue(
+                'destinationHttpAuthenticationName',
+                value as DestinationHttpAuthenticationName
+              )
             }
-            title={'Authorization Key'}
-            errors={
-              TextField.toFieldErrors<TFormValues>(formik.errors)
-                .destinationHttpAuthenticationAuthorizationKey
+            onBlur={() =>
+              formik.setFieldTouched('destinationHttpAuthenticationName', true)
             }
-            touched={
-              !!formik.touched.destinationHttpAuthenticationAuthorizationKey
-            }
-            onBlur={formik.handleBlur}
-            onChange={formik.handleChange}
-          />
-        )}
-    </>
+          >
+            <Select.Options>
+              <Select.Option id="AzureFunctions">
+                {intl.formatMessage(
+                  messages.destinationHttpAuthenticationAzureFunctions
+                )}
+              </Select.Option>
+              <Select.Option id="AuthorizationHeader">
+                {intl.formatMessage(
+                  messages.destinationHttpAuthenticationAuthorizationHeader
+                )}
+              </Select.Option>
+            </Select.Options>
+          </Select.Root>
+        </FormField.Input>
+      </FormField.Root>
+      {formik.values.destinationHttpAuthenticationName ===
+        'AuthorizationHeader' && (
+        <FormField.Root isReadOnly={isReadOnly}>
+          <FormField.Label>Authorization header</FormField.Label>
+          <FormField.Input>
+            <TextInput
+              aria-label="Authorization header"
+              value={
+                formik.values
+                  .destinationHttpAuthenticationAuthorizationHeaderValue || ''
+              }
+              isReadOnly={isReadOnly}
+              onChange={(value) =>
+                formik.setFieldValue(
+                  'destinationHttpAuthenticationAuthorizationHeaderValue',
+                  value
+                )
+              }
+              onBlur={() =>
+                formik.setFieldTouched(
+                  'destinationHttpAuthenticationAuthorizationHeaderValue',
+                  true
+                )
+              }
+            />
+          </FormField.Input>
+        </FormField.Root>
+      )}
+      {formik.values.destinationHttpAuthenticationName === 'AzureFunctions' && (
+        <FormField.Root isReadOnly={isReadOnly}>
+          <FormField.Label>Authorization Key</FormField.Label>
+          <FormField.Input>
+            <TextInput
+              aria-label="Authorization Key"
+              value={
+                formik.values.destinationHttpAuthenticationAuthorizationKey ||
+                ''
+              }
+              isReadOnly={isReadOnly}
+              onChange={(value) =>
+                formik.setFieldValue(
+                  'destinationHttpAuthenticationAuthorizationKey',
+                  value
+                )
+              }
+              onBlur={() =>
+                formik.setFieldTouched(
+                  'destinationHttpAuthenticationAuthorizationKey',
+                  true
+                )
+              }
+            />
+          </FormField.Input>
+        </FormField.Root>
+      )}
+    </Stack>
   );
 };
 

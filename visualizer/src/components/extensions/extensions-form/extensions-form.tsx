@@ -7,17 +7,15 @@ import {
 import { FC, ReactElement } from 'react';
 import { type FormikHelpers, FormikProvider, useFormik } from 'formik';
 import { ApolloQueryResult } from '@apollo/client';
-import { PageContentWide } from '@commercetools-frontend/application-components';
-import Spacings from '@commercetools-uikit/spacings';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
+import { Accordion, FormField, Select, TextInput } from '@commercetools/nimbus';
 import { FormattedMessage, useIntl } from 'react-intl';
-import messages from './messages';
-import TextField from '@commercetools-uikit/text-field';
 import omitEmpty from 'omit-empty-es';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
+import messages from './messages';
 import ExtensionsTriggersForm from '../extensions-triggers-form/extensions-triggers-form';
-import SelectField from '@commercetools-uikit/select-field';
 import ExtensionsDestinationsForm from '../extensions-destinations-form/extensions-destinations-form';
-import Constraints from '@commercetools-uikit/constraints';
+import { PERMISSIONS } from '../../../constants';
+
 type Formik = ReturnType<typeof useFormik>;
 
 export type DestinationName = 'HTTP' | 'GoogleCloudFunction' | 'AWSLambda';
@@ -90,17 +88,11 @@ const validate = (formikValues: TFormValues) => {
   return omitEmpty<TErrors>(errors);
 };
 
-const renderKeyInputErrors = (key: string) => {
-  switch (key) {
-    case 'invalidInput':
-      return <FormattedMessage {...messages.invalidKey} />;
-    case 'duplicate':
-      return <FormattedMessage {...messages.duplicateKey} />;
-    case 'missing':
-      return <FormattedMessage {...messages.requiredKey} />;
-    default:
-      return null;
-  }
+const renderKeyInputError = (key?: TErrors['key']): ReactElement | null => {
+  if (!key) return null;
+  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
+  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
+  return null;
 };
 
 type Props = {
@@ -122,7 +114,7 @@ const ExtensionsForm: FC<Props> = ({
   initialValues,
   onSubmit,
   children,
-  createNewMode,
+  createNewMode = false,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -131,82 +123,117 @@ const ExtensionsForm: FC<Props> = ({
     enableReinitialize: true,
   });
   const intl = useIntl();
+  const errors = formik.errors as Partial<TErrors>;
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+  // Key and destination type are immutable once created (createNewMode), independent of
+  // permission; destination config and triggers have no such immutability rule and are only
+  // gated by canManage.
+  const isImmutableFieldReadOnly = !createNewMode || !canManage;
 
   const formElements = (
-    <PageContentWide columns="2/1" gapSize="20">
-      <Spacings.Stack scale="m">
-        <FormikProvider value={formik}>
-          <CollapsiblePanel
-            header={
-              <CollapsiblePanel.Header>
-                <FormattedMessage {...messages.generalInformationTitle} />
-              </CollapsiblePanel.Header>
-            }
-          >
-            <TextField
-              name="key"
-              value={formik.values.key || ''}
-              title={intl.formatMessage(messages.keyTitle)}
-              hint={intl.formatMessage(messages.keyHint)}
+    <FormikProvider value={formik}>
+      <Accordion.Root
+        allowsMultipleExpanded
+        defaultExpandedKeys={
+          createNewMode ? ['general', 'destination', 'triggers'] : ['general']
+        }
+      >
+        <Accordion.Item value="general">
+          <Accordion.Header>
+            <FormattedMessage {...messages.generalInformationTitle} />
+          </Accordion.Header>
+          <Accordion.Content>
+            <FormField.Root
               isRequired
-              errors={TextField.toFieldErrors<TFormValues>(formik.errors).key}
-              touched={!!formik.touched.key}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              renderError={renderKeyInputErrors}
-            />
-          </CollapsiblePanel>
-          <CollapsiblePanel
-            header={
-              <CollapsiblePanel.Header>Destination</CollapsiblePanel.Header>
-            }
-            isDefaultClosed={!createNewMode}
-          >
-            <Constraints.Horizontal max={'scale'}>
-              <Spacings.Stack scale="m">
-                <SelectField
-                  key={'destinationName'}
-                  title={<FormattedMessage {...messages.destinationLabel} />}
-                  description={
-                    <FormattedMessage {...messages.destinationDescription} />
-                  }
-                  errors={
-                    SelectField.toFieldErrors<TFormValues>(formik.errors)
-                      .destinationName
-                  }
-                  name={'destinationName'}
-                  isRequired={true}
-                  isDisabled={!createNewMode}
-                  options={[
-                    {
-                      value: 'HTTP',
-                      label: <FormattedMessage {...messages.destinationHTTP} />,
-                    },
-                    {
-                      value: 'AWSLambda',
-                      label: (
-                        <FormattedMessage {...messages.destinationAWSLambda} />
-                      ),
-                    },
-                  ]}
-                  value={formik.values.destinationName || ''}
-                  touched={!!formik.touched.destinationName}
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
+              isReadOnly={isImmutableFieldReadOnly}
+              isInvalid={Boolean(formik.touched.key && errors.key)}
+            >
+              <FormField.Label>
+                {intl.formatMessage(messages.keyTitle)}
+              </FormField.Label>
+              <FormField.Input>
+                <TextInput
+                  aria-label={intl.formatMessage(messages.keyTitle)}
+                  value={formik.values.key || ''}
+                  isReadOnly={isImmutableFieldReadOnly}
+                  onChange={(value) => formik.setFieldValue('key', value)}
+                  onBlur={() => formik.setFieldTouched('key', true)}
                 />
-                <ExtensionsDestinationsForm formik={formik} />
-              </Spacings.Stack>
-            </Constraints.Horizontal>
-          </CollapsiblePanel>
-          <CollapsiblePanel
-            header={<CollapsiblePanel.Header>Triggers</CollapsiblePanel.Header>}
-            isDefaultClosed={!createNewMode}
-          >
-            <ExtensionsTriggersForm />
-          </CollapsiblePanel>
-        </FormikProvider>
-      </Spacings.Stack>
-    </PageContentWide>
+              </FormField.Input>
+              <FormField.Description>
+                {intl.formatMessage(messages.keyHint)}
+              </FormField.Description>
+              <FormField.Error>
+                {renderKeyInputError(errors.key)}
+              </FormField.Error>
+            </FormField.Root>
+          </Accordion.Content>
+        </Accordion.Item>
+
+        <Accordion.Item value="destination">
+          <Accordion.Header>
+            <FormattedMessage {...messages.destinationTitle} />
+          </Accordion.Header>
+          <Accordion.Content>
+            <FormField.Root
+              isRequired
+              isReadOnly={isImmutableFieldReadOnly}
+              isInvalid={Boolean(
+                formik.touched.destinationName && errors.destinationName
+              )}
+            >
+              <FormField.Label>
+                {intl.formatMessage(messages.destinationLabel)}
+              </FormField.Label>
+              <FormField.Input>
+                <Select.Root
+                  aria-label={intl.formatMessage(messages.destinationLabel)}
+                  isDisabled={isImmutableFieldReadOnly}
+                  value={formik.values.destinationName || ''}
+                  onChange={(value) =>
+                    formik.setFieldValue(
+                      'destinationName',
+                      value as DestinationName
+                    )
+                  }
+                  onBlur={() => formik.setFieldTouched('destinationName', true)}
+                >
+                  <Select.Options>
+                    <Select.Option id="HTTP">
+                      {intl.formatMessage(messages.destinationHTTP)}
+                    </Select.Option>
+                    <Select.Option id="AWSLambda">
+                      {intl.formatMessage(messages.destinationAWSLambda)}
+                    </Select.Option>
+                  </Select.Options>
+                </Select.Root>
+              </FormField.Input>
+              <FormField.Description>
+                {intl.formatMessage(messages.destinationDescription)}
+              </FormField.Description>
+              <FormField.Error>
+                {formik.touched.destinationName &&
+                errors.destinationName?.missing
+                  ? intl.formatMessage(messages.requiredFieldError)
+                  : null}
+              </FormField.Error>
+            </FormField.Root>
+            <ExtensionsDestinationsForm formik={formik} isReadOnly={!canManage} />
+          </Accordion.Content>
+        </Accordion.Item>
+
+        <Accordion.Item value="triggers">
+          <Accordion.Header>
+            <FormattedMessage {...messages.triggersTitle} />
+          </Accordion.Header>
+          <Accordion.Content>
+            <ExtensionsTriggersForm isReadOnly={!canManage} />
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>
+    </FormikProvider>
   );
 
   return children({

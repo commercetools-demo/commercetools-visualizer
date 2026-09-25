@@ -1,21 +1,20 @@
 import { FC, useCallback } from 'react';
-import {
-  CustomFormDetailPage,
-  CustomFormModalPage,
-  FormModalPage,
-  PageNotFound,
-} from '@commercetools-frontend/application-components';
+import { PageNotFound } from '@commercetools-frontend/application-components';
 import messages from './messages';
 import { useIntl } from 'react-intl';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { useParams } from 'react-router-dom';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
-import { ContentNotification } from '@commercetools-uikit/notifications';
-import Text from '@commercetools-uikit/text';
-import Spacings from '@commercetools-uikit/spacings';
-import LoadingSpinner from '@commercetools-uikit/loading-spinner';
+import {
+  Alert,
+  Button,
+  Flex,
+  LoadingSpinner,
+  ModalPage,
+} from '@commercetools/nimbus';
 import StatesForm, { TFormValues } from '../states-form/states-form';
+import formMessages from '../states-form/messages';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import {
@@ -25,11 +24,12 @@ import {
   graphQLErrorHandler,
   getErrorMessage,
   calculateStateUpdateActions,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+} from '../../../hooks';
 import {
   formValuesToStatePartial,
   stateToFormValues,
 } from '../states-form/conversion';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => void;
@@ -48,12 +48,15 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
-  const { state, error, loading, refetch } = useStateFetcher({
+  const { state, error, loading } = useStateFetcher({
     id: id,
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const data = formValuesToStatePartial(formikValues);
       if (state && data) {
         const updateActions = calculateStateUpdateActions(state, data);
@@ -70,13 +73,12 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
                 domain: DOMAINS.SIDE,
                 text: intl.formatMessage(messages.updateSuccess),
               });
-              return refetch();
             })
             .catch(graphQLErrorHandler(showNotification, formikHelpers));
         }
       }
     },
-    [refetch, state]
+    [state]
   );
 
   const handleDelete = async () => {
@@ -98,16 +100,17 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
 
   if (error) {
     return (
-      <ContentNotification type="error">
-        <Text.Body>{getErrorMessage(error)}</Text.Body>
-      </ContentNotification>
+      <Alert.Root colorPalette="critical">
+        <Alert.Title>{intl.formatMessage(messages.title)}</Alert.Title>
+        <Alert.Description>{getErrorMessage(error)}</Alert.Description>
+      </Alert.Root>
     );
   }
   if (loading) {
     return (
-      <Spacings.Stack alignItems="center">
-        <LoadingSpinner />
-      </Spacings.Stack>
+      <Flex justifyContent="center" padding="600">
+        <LoadingSpinner aria-label={intl.formatMessage(messages.title)} />
+      </Flex>
     );
   }
   if (!state) {
@@ -119,37 +122,50 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
       onSubmit={handleSubmit}
       createNewMode={!(state?.builtIn && state?.builtIn === true)}
     >
-      {(formProps) => {
-        return (
-          <CustomFormModalPage
-            isOpen
-            title={intl.formatMessage(messages.title)}
-            onClose={onClose}
-            formControls={
-              <>
-                <CustomFormDetailPage.FormSecondaryButton
-                  label={FormModalPage.Intl.revert}
-                  isDisabled={!formProps.isDirty}
-                  onClick={formProps.handleReset}
-                />
-                <CustomFormDetailPage.FormPrimaryButton
-                  isDisabled={
-                    formProps.isSubmitting || !formProps.isDirty || !canManage
-                  }
-                  onClick={() => formProps.submitForm()}
-                  label={FormModalPage.Intl.save}
-                />
-                <CustomFormModalPage.FormDeleteButton
-                  onClick={() => handleDelete()}
-                  isDisabled={!canManage}
-                />
-              </>
-            }
-          >
-            {state && formProps.formElements}
-          </CustomFormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(formMessages.cancelButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              variant="outline"
+              isDisabled={!formProps.isDirty}
+              onPress={formProps.handleReset}
+            >
+              {intl.formatMessage(formMessages.revertButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+            <Button
+              colorPalette="critical"
+              variant="outline"
+              isDisabled={!canManage}
+              onPress={() => handleDelete()}
+            >
+              {intl.formatMessage(formMessages.deleteButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </StatesForm>
   );
 };

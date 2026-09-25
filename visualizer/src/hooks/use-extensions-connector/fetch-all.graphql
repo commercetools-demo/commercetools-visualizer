@@ -1,0 +1,19 @@
+#import "./fragments/extension-base-fields-fragment.graphql"
+
+query FetchExtensions($where: String, $sort: [String!], $limit: Int, $offset: Int) {
+  extensions(where: $where, sort: $sort, limit: $limit, offset: $offset) {
+    count
+    total
+    offset
+    results {
+      ...ExtensionBaseFieldsFragment
+      destination {
+        type
+      }
+      triggers {
+        resourceTypeId
+        actions
+      }
+    }
+  }
+}

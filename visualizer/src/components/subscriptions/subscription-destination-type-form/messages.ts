@@ -1,6 +1,11 @@
 import { defineMessages } from 'react-intl';
 
 export default defineMessages({
+  destinationRequired: {
+    id: 'Subscription.Destination.destinationRequired',
+    description: 'The message shown when no destination type is selected',
+    defaultMessage: 'This field is required. Provide a value.',
+  },
   destinationLabel: {
     id: 'Subscription.Destination.destinationLabel',
     description: 'destinationLabel',

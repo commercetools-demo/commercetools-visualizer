@@ -5,19 +5,18 @@ import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { DOMAINS } from '@commercetools-frontend/constants';
+import { Button, ModalPage } from '@commercetools/nimbus';
 import messages from './messages';
-import { FormModalPage } from '@commercetools-frontend/application-components';
+import formMessages from '../states-form/messages';
 import StatesForm, { TFormValues } from '../states-form/states-form';
 import {
   formValuesToState,
   stateToFormValues,
 } from '../states-form/conversion';
-import {
-  useStateCreator,
-  graphQLErrorHandler,
-} from 'commercetools-demo-shared-data-fetching-hooks';
+import { useStateCreator, graphQLErrorHandler } from '../../../hooks';
 import { useParams } from 'react-router-dom';
 import { TStateType } from '../../../types/generated/ctp';
+import { FormikHelpers } from 'formik';
 
 type Props = {
   onClose: () => void;
@@ -36,7 +35,10 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
   });
 
   const handleSubmit = useCallback(
-    async (formikValues: TFormValues, formikHelpers) => {
+    async (
+      formikValues: TFormValues,
+      formikHelpers: FormikHelpers<TFormValues>
+    ) => {
       const draft = formValuesToState(formikValues);
       await stateCreator
         .execute({
@@ -67,24 +69,35 @@ const StatesCreate: FC<Props> = ({ onClose, onCreate }) => {
       onSubmit={handleSubmit}
       createNewMode={true}
     >
-      {(formProps) => {
-        return (
-          <FormModalPage
-            title={intl.formatMessage(messages.title)}
-            isOpen
-            onPrimaryButtonClick={() => formProps.submitForm()}
-            onSecondaryButtonClick={onClose}
-            onClose={onClose}
-            hideControls={false}
-            labelPrimaryButton={intl.formatMessage(FormModalPage.Intl.save)}
-            isPrimaryButtonDisabled={
-              formProps.isSubmitting || !formProps.isDirty || !canManage
-            }
-          >
-            {formProps.formElements}
-          </FormModalPage>
-        );
-      }}
+      {(formProps) => (
+        <ModalPage.Root isOpen onClose={onClose}>
+          <ModalPage.TopBar
+            previousPathLabel={intl.formatMessage(formMessages.cancelButton)}
+            currentPathLabel={intl.formatMessage(messages.title)}
+          />
+          <ModalPage.Header>
+            <ModalPage.Title>
+              {intl.formatMessage(messages.title)}
+            </ModalPage.Title>
+          </ModalPage.Header>
+          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
+          <ModalPage.Footer>
+            <Button slot="close" variant="outline" onPress={onClose}>
+              {intl.formatMessage(formMessages.cancelButton)}
+            </Button>
+            <Button
+              colorPalette="primary"
+              variant="solid"
+              isDisabled={
+                formProps.isSubmitting || !formProps.isDirty || !canManage
+              }
+              onPress={() => formProps.submitForm()}
+            >
+              {intl.formatMessage(formMessages.submitButton)}
+            </Button>
+          </ModalPage.Footer>
+        </ModalPage.Root>
+      )}
     </StatesForm>
   );
 };

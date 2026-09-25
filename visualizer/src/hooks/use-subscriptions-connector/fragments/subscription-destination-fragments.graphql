@@ -1,0 +1,39 @@
+fragment AzureServiceBusDestinationFragment on AzureServiceBusDestination {
+  connectionString
+}
+
+fragment EventBridgeDestinationFragment on EventBridgeDestination {
+  source
+  region
+  accountId
+}
+fragment EventGridDestinationFragment on EventGridDestination {
+  uri
+  eventGridAccessKey: accessKey
+}
+fragment GoogleCloudPubSubDestinationFragment on GoogleCloudPubSubDestination {
+  projectId
+  topic
+}
+fragment SNSDestinationFragment on SNSDestination {
+  topicArn
+  accessKey
+  accessSecret
+  authenticationMode
+  topicArn
+}
+fragment SQSDestinationFragment on SQSDestination {
+  queueUrl
+  accessKey
+  accessSecret
+  region
+  authenticationMode
+}
+
+fragment ConfluentCloudDestinationFragment on ConfluentCloudDestination {
+  acks
+  apiKey
+  apiSecret
+  bootstrapServer
+  topic
+}

@@ -1,15 +1,19 @@
-import TextField from '@commercetools-uikit/text-field';
 import { FC } from 'react';
 import { useField } from 'formik';
-import Text from '@commercetools-uikit/text';
 import { FormattedMessage } from 'react-intl';
+import { FormField, Heading, Select, TextInput } from '@commercetools/nimbus';
 import messages from './messages';
 import { validateInput } from './validate';
-import SelectField from '@commercetools-uikit/select-field';
 
 type Props = {
   isReadOnly?: boolean;
 };
+
+const ACKS_OPTIONS = [
+  { id: '0', label: '0' },
+  { id: '1', label: '1' },
+  { id: 'all', label: 'all' },
+];
 
 const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
   const [bootstrapServerField, bootstrapServerMeta, bootstrapServerHelpers] =
@@ -38,21 +42,18 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
 
   return (
     <>
-      <Text.Headline as="h3">
+      <Heading as="h3" size="sm">
         Configure Confluent Cloud Destination
-      </Text.Headline>
+      </Heading>
 
-      <TextField
-        errors={JSON.parse(bootstrapServerMeta.error || '{}')}
-        name={bootstrapServerField.name}
-        isRequired={true}
-        onBlur={() => {
-          bootstrapServerHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          bootstrapServerHelpers.setValue(event.target.value);
-        }}
-        title={
+      <FormField.Root
+        isRequired
+        isReadOnly={isReadOnly}
+        isInvalid={Boolean(
+          bootstrapServerMeta.touched && bootstrapServerMeta.error
+        )}
+      >
+        <FormField.Label>
           <FormattedMessage
             {...messages.destinationConfluentCloudBootstrapServer}
             values={{
@@ -61,92 +62,126 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
               provider: '<provider>',
             }}
           />
-        }
-        touched={bootstrapServerMeta.touched}
-        value={bootstrapServerMeta.value || ''}
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={bootstrapServerField.name}
+            value={bootstrapServerMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => bootstrapServerHelpers.setTouched(true)}
+            onChange={(value) => bootstrapServerHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {bootstrapServerMeta.touched && bootstrapServerMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
-      <TextField
-        errors={JSON.parse(apiKeyMeta.error || '{}')}
-        name={apiKeyField.name}
-        isRequired={true}
-        onBlur={() => {
-          apiKeyHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          apiKeyHelpers.setValue(event.target.value);
-        }}
-        title={
+        isInvalid={Boolean(apiKeyMeta.touched && apiKeyMeta.error)}
+      >
+        <FormField.Label>
           <FormattedMessage {...messages.destinationConfluentCloudApiKey} />
-        }
-        touched={apiKeyMeta.touched}
-        value={apiKeyMeta.value || ''}
-        isReadOnly={isReadOnly}
-      />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={apiKeyField.name}
+            value={apiKeyMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => apiKeyHelpers.setTouched(true)}
+            onChange={(value) => apiKeyHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {apiKeyMeta.touched && apiKeyMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
 
-      <TextField
-        errors={JSON.parse(apiSecretMeta.error || '{}')}
-        name={apiSecretField.name}
-        isRequired={true}
-        onBlur={() => {
-          apiSecretHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          apiSecretHelpers.setValue(event.target.value);
-        }}
-        title={
+      <FormField.Root
+        isRequired
+        isReadOnly={isReadOnly}
+        isInvalid={Boolean(apiSecretMeta.touched && apiSecretMeta.error)}
+      >
+        <FormField.Label>
           <FormattedMessage {...messages.destinationConfluentCloudApiSecret} />
-        }
-        touched={apiSecretMeta.touched}
-        value={apiSecretMeta.value || ''}
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={apiSecretField.name}
+            value={apiSecretMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => apiSecretHelpers.setTouched(true)}
+            onChange={(value) => apiSecretHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {apiSecretMeta.touched && apiSecretMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
-      <SelectField
-        errors={JSON.parse(acksMeta.error || '{}')}
-        name={acksField.name}
-        options={[
-          {
-            value: '0',
-            label: '0',
-          },
-          {
-            value: '1',
-            label: '1',
-          },
-          {
-            value: 'all',
-            label: 'all',
-          },
-        ]}
-        isRequired={true}
-        onBlur={() => {
-          acksHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          acksHelpers.setValue(event.target.value as string);
-        }}
-        title={<FormattedMessage {...messages.destinationConfluentCloudAcks} />}
-        touched={acksMeta.touched}
-        value={acksMeta.value || ''}
+        isInvalid={Boolean(acksMeta.touched && acksMeta.error)}
+      >
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationConfluentCloudAcks} />
+        </FormField.Label>
+        <FormField.Input>
+          <Select.Root
+            name={acksField.name}
+            value={acksMeta.value || ''}
+            onChange={(value) => acksHelpers.setValue(value || '')}
+            onBlur={() => acksHelpers.setTouched(true)}
+            width={'full'}
+          >
+            <Select.Options>
+              {ACKS_OPTIONS.map((option) => (
+                <Select.Option key={option.id} id={option.id}>
+                  {option.label}
+                </Select.Option>
+              ))}
+            </Select.Options>
+          </Select.Root>
+        </FormField.Input>
+        <FormField.Error>
+          {acksMeta.touched && acksMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
-      <TextField
-        errors={JSON.parse(topicMeta.error || '{}')}
-        name={topicField.name}
-        isRequired={true}
-        onBlur={() => {
-          topicHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          topicHelpers.setValue(event.target.value);
-        }}
-        title={
+        isInvalid={Boolean(topicMeta.touched && topicMeta.error)}
+      >
+        <FormField.Label>
           <FormattedMessage {...messages.destinationConfluentCloudTopic} />
-        }
-        touched={topicMeta.touched}
-        value={topicMeta.value || ''}
-        isReadOnly={isReadOnly}
-      />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={topicField.name}
+            value={topicMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => topicHelpers.setTouched(true)}
+            onChange={(value) => topicHelpers.setValue(value)}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {topicMeta.touched && topicMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
     </>
   );
 };

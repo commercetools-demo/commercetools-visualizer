@@ -1,0 +1,7 @@
+#import "./fragments/subscription-fragment.graphql"
+
+query FetchSubscription($id: String, $key: String) {
+  subscription(id: $id, key: $key) {
+    ...SubscriptionFragment
+  }
+}

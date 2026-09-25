@@ -1,0 +1,7 @@
+#import "./fragments/state-detail-fragment.graphql"
+
+query FetchState($id: String, $key: String) {
+  state(id: $id, key: $key) {
+    ...StateDetailFragment
+  }
+}

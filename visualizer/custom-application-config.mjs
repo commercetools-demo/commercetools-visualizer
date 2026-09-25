@@ -28,7 +28,6 @@ const config = {
       'view_business_units',
       'view_stores',
       'view_product_selections',
-      'view_standalone_prices',
     ],
     manage: [
       'manage_states',
@@ -38,7 +37,6 @@ const config = {
       'manage_orders',
       'manage_shopping_lists',
       'manage_key_value_documents',
-      'manage_quote_requests',
     ],
   },
   icon: '${path:@commercetools-frontend/assets/application-icons/rocket.svg}',
@@ -52,7 +50,7 @@ const config = {
       uriPath: 'extensions',
       defaultLabel: 'API Extensions',
       labelAllLocales: [],
-      permissions: [PERMISSIONS.Manage],
+      // permissions: [PERMISSIONS.View],
     },
     {
       uriPath: 'states',
@@ -64,7 +62,7 @@ const config = {
       uriPath: 'subscriptions',
       defaultLabel: 'Subscriptions',
       labelAllLocales: [],
-      permissions: [PERMISSIONS.Manage],
+      // permissions: [PERMISSIONS.View],
     },
     {
       uriPath: 'types',
@@ -77,17 +75,6 @@ const config = {
       defaultLabel: 'Custom Objects',
       labelAllLocales: [],
       // permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'visualize-drilldown',
-      defaultLabel: 'Visualize Drilldown',
-      labelAllLocales: [],
-      // permissions: [PERMISSIONS.View],
-    },
-    {
-      uriPath: 'entity-diagram',
-      defaultLabel: 'Entity Diagram',
-      labelAllLocales: [],
     },
   ],
 };

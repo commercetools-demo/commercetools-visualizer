@@ -17,4 +17,20 @@ export default defineMessages<string>({
     id: 'Subscriptions.subscriptionAdd',
     defaultMessage: 'Add new Subscription',
   },
+  columnKey: {
+    id: 'Subscriptions.columnKey',
+    defaultMessage: 'Key',
+  },
+  columnVersion: {
+    id: 'Subscriptions.columnVersion',
+    defaultMessage: 'Version',
+  },
+  columnCreatedAt: {
+    id: 'Subscriptions.columnCreatedAt',
+    defaultMessage: 'Created At',
+  },
+  columnDestinationType: {
+    id: 'Subscriptions.columnDestinationType',
+    defaultMessage: 'Destination Type',
+  },
 });

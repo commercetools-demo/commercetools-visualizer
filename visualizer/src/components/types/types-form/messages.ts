@@ -54,11 +54,6 @@ export default defineMessages({
     description: 'Label for add field button',
     defaultMessage: 'Add FieldDefinition',
   },
-  removeFieldDefinitionButton: {
-    id: 'Type.form.button.removeFieldDefinition',
-    description: 'Label for remove field button',
-    defaultMessage: 'Remove FieldDefinition',
-  },
   nameTitle: {
     id: 'Type.form.name.title',
     description: 'Title for fieldDefinitions name field',
@@ -213,6 +208,21 @@ export default defineMessages({
     id: 'Type.form.button.submit',
     description: 'Label for submit button',
     defaultMessage: 'Save',
+  },
+  revertButton: {
+    id: 'Type.form.button.revert',
+    description: 'Label for revert button',
+    defaultMessage: 'Revert',
+  },
+  cancelButton: {
+    id: 'Type.form.button.cancel',
+    description: 'Label for cancel button',
+    defaultMessage: 'Cancel',
+  },
+  deleteButton: {
+    id: 'Type.form.button.delete',
+    description: 'Label for delete button',
+    defaultMessage: 'Delete',
   },
   requiredFieldError: {
     id: 'Type.form.error.required',

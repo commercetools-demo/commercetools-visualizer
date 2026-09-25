@@ -1,0 +1,12 @@
+#import "./fragments/state-detail-fragment.graphql"
+
+mutation UpdateState(
+  $id: String
+  $key: String
+  $version: Long!
+  $actions: [StateUpdateAction!]!
+) {
+  updateState(id: $id, key: $key, version: $version, actions: $actions) {
+    ...StateDetailFragment
+  }
+}

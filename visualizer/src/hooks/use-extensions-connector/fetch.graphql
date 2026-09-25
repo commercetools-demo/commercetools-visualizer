@@ -1,0 +1,7 @@
+#import "./fragments/extension-fragment.graphql"
+
+query GetExtension($id: String, $key: String) {
+  extension(id: $id, key: $key) {
+    ...ExtensionFragment
+  }
+}

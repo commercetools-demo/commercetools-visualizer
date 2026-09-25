@@ -1,0 +1,27 @@
+fragment TypeDefinitionBaseFieldsFragment on TypeDefinition {
+  id
+  nameAllLocales {
+    locale
+    value
+  }
+  descriptionAllLocales {
+    locale
+    value
+  }
+  key
+  resourceTypeIds
+  createdAt
+  createdBy {
+    isPlatformClient
+    externalUserId
+    anonymousId
+    clientId
+  }
+  lastModifiedAt
+  lastModifiedBy {
+    isPlatformClient
+    externalUserId
+    anonymousId
+    clientId
+  }
+}

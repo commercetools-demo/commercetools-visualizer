@@ -1,54 +1,63 @@
 import { useFormik } from 'formik';
-import TextField from '@commercetools-uikit/text-field';
+import { FormField, Stack, TextInput } from '@commercetools/nimbus';
 import { TFormValues } from '../extensions-form/extensions-form';
 import { FC } from 'react';
 
 type Props = {
   formik: ReturnType<typeof useFormik<TFormValues>>;
+  isReadOnly?: boolean;
 };
 
-const ExtensionsDestinationsFormAws: FC<Props> = ({ formik }) => {
+const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
   return (
-    <>
-      <TextField
-        name="destinationAwsArn"
-        isRequired
-        value={formik.values.destinationAwsArn || ''}
-        title={'ARN'}
-        errors={
-          TextField.toFieldErrors<TFormValues>(formik.errors).destinationAwsArn
-        }
-        touched={!!formik.touched.destinationAwsArn}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-      />
-      <TextField
-        name="destinationAwsAccessKey"
-        isRequired
-        value={formik.values.destinationAwsAccessKey || ''}
-        title={'AccessKey'}
-        errors={
-          TextField.toFieldErrors<TFormValues>(formik.errors)
-            .destinationAwsAccessKey
-        }
-        touched={!!formik.touched.destinationAwsAccessKey}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-      />
-      <TextField
-        name="destinationAwsAccessSecret"
-        isRequired
-        value={formik.values.destinationAwsAccessSecret || ''}
-        title={'AccessSecret'}
-        errors={
-          TextField.toFieldErrors<TFormValues>(formik.errors)
-            .destinationAwsAccessSecret
-        }
-        touched={!!formik.touched.destinationAwsAccessSecret}
-        onBlur={formik.handleBlur}
-        onChange={formik.handleChange}
-      />
-    </>
+    <Stack direction="column" gap="400">
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
+        <FormField.Label>ARN</FormField.Label>
+        <FormField.Input>
+          <TextInput
+            aria-label="ARN"
+            value={formik.values.destinationAwsArn || ''}
+            isReadOnly={isReadOnly}
+            onChange={(value) =>
+              formik.setFieldValue('destinationAwsArn', value)
+            }
+            onBlur={() => formik.setFieldTouched('destinationAwsArn', true)}
+          />
+        </FormField.Input>
+      </FormField.Root>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
+        <FormField.Label>AccessKey</FormField.Label>
+        <FormField.Input>
+          <TextInput
+            aria-label="AccessKey"
+            value={formik.values.destinationAwsAccessKey || ''}
+            isReadOnly={isReadOnly}
+            onChange={(value) =>
+              formik.setFieldValue('destinationAwsAccessKey', value)
+            }
+            onBlur={() =>
+              formik.setFieldTouched('destinationAwsAccessKey', true)
+            }
+          />
+        </FormField.Input>
+      </FormField.Root>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
+        <FormField.Label>AccessSecret</FormField.Label>
+        <FormField.Input>
+          <TextInput
+            aria-label="AccessSecret"
+            value={formik.values.destinationAwsAccessSecret || ''}
+            isReadOnly={isReadOnly}
+            onChange={(value) =>
+              formik.setFieldValue('destinationAwsAccessSecret', value)
+            }
+            onBlur={() =>
+              formik.setFieldTouched('destinationAwsAccessSecret', true)
+            }
+          />
+        </FormField.Input>
+      </FormField.Root>
+    </Stack>
   );
 };
 

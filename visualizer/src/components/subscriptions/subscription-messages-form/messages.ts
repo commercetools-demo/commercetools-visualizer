@@ -2,7 +2,7 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   messagesLabel: {
-    id: 'Subscription.Message.messageLabel',
+    id: 'SubscriptionMessagesForm.messagesLabel',
     description: 'messageLabel',
     defaultMessage: 'Choose Messages you want to listen to.',
   },

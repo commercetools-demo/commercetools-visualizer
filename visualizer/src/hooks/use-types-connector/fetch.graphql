@@ -1,0 +1,7 @@
+#import "./fragments/type-definition-fragment.graphql"
+
+query FetchType($id: String, $key: String) {
+  typeDefinition(id: $id, key: $key) {
+    ...TypeDefinitionFragment
+  }
+}

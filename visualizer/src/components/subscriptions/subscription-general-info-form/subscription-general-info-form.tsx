@@ -1,13 +1,8 @@
 import { useField } from 'formik';
-import TextField from '@commercetools-uikit/text-field';
-import messages from './messages';
 import { FormattedMessage } from 'react-intl';
-import Constraints from '@commercetools-uikit/constraints';
-import Grid from '@commercetools-uikit/grid';
-import { designTokens } from '@commercetools-uikit/design-system';
-import Card from '@commercetools-uikit/card';
-import { FC } from 'react';
-import { TFieldErrors } from '@commercetools-uikit/multiline-text-field/dist/declarations/src/multiline-text-field';
+import { FC, ReactNode } from 'react';
+import { FormField, TextInput } from '@commercetools/nimbus';
+import messages from './messages';
 
 export const validateKeyInput = (key: string) => {
   const hasKeyValue = Boolean(key);
@@ -22,7 +17,7 @@ export const validateKeyInput = (key: string) => {
   return undefined;
 };
 
-const renderBusinessUnitKeyInputErrors = (key: string) => {
+const renderKeyInputError = (key?: string): ReactNode => {
   switch (key) {
     case 'invalidInput':
       return <FormattedMessage {...messages.invalidKey} />;
@@ -40,44 +35,37 @@ type Props = { isReadOnly?: boolean };
 const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   const [keyField, keyMeta, keyHelpers] = useField<string>({
     name: 'key',
-    validate: (key) => validateKeyInput(key),
+    validate: (key: string) => validateKeyInput(key),
   });
-  let parsedErrors: TFieldErrors | undefined;
+  let parsedErrorKey: string | undefined;
   if (keyMeta.error) {
-    if (typeof keyMeta.error === 'string') {
-      parsedErrors = JSON.parse(keyMeta.error || '{}');
-    } else parsedErrors = keyMeta.error;
+    const parsedError =
+      typeof keyMeta.error === 'string'
+        ? JSON.parse(keyMeta.error)
+        : keyMeta.error;
+    parsedErrorKey = Object.keys(parsedError)[0];
   }
   return (
-    <Constraints.Horizontal max="scale">
-      <Grid
-        gridGap={designTokens.spacing50}
-        gridTemplateColumns={`repeat(auto-fill, '')`}
-      >
-        <Grid.Item>
-          <Constraints.Horizontal max="scale">
-            <Card insetScale="s" type="flat">
-              <TextField
-                errors={parsedErrors}
-                name={keyField.name}
-                isRequired={true}
-                onBlur={() => {
-                  keyHelpers.setTouched(true);
-                }}
-                onChange={(event) => {
-                  keyHelpers.setValue(event.target.value);
-                }}
-                renderError={renderBusinessUnitKeyInputErrors}
-                title={<FormattedMessage {...messages.subscriptionKeyLabel} />}
-                touched={keyMeta.touched}
-                value={keyMeta.value || ''}
-                isReadOnly={isReadOnly}
-              />
-            </Card>
-          </Constraints.Horizontal>
-        </Grid.Item>
-      </Grid>
-    </Constraints.Horizontal>
+    <FormField.Root
+      isRequired
+      isReadOnly={isReadOnly}
+      isInvalid={Boolean(keyMeta.touched && parsedErrorKey)}
+    >
+      <FormField.Label>
+        <FormattedMessage {...messages.subscriptionKeyLabel} />
+      </FormField.Label>
+      <FormField.Input>
+        <TextInput
+          name={keyField.name}
+          value={keyMeta.value || ''}
+          isReadOnly={isReadOnly}
+          onBlur={() => keyHelpers.setTouched(true)}
+          onChange={(value) => keyHelpers.setValue(value)}
+          width={'full'}
+        />
+      </FormField.Input>
+      <FormField.Error>{renderKeyInputError(parsedErrorKey)}</FormField.Error>
+    </FormField.Root>
   );
 };
 

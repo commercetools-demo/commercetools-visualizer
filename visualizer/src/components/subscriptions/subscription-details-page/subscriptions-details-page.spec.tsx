@@ -1,21 +1,25 @@
 import { graphql, type GraphQLHandler } from 'msw';
 import { setupServer } from 'msw/node';
+import { Route } from 'react-router-dom';
 import {
   fireEvent,
   screen,
   waitFor,
   mapResourceAccessToAppliedPermissions,
+  renderAppWithRedux,
   type TRenderAppWithReduxOptions,
   within,
 } from '@commercetools-frontend/application-shell/test-utils';
+import { createApolloClient } from '@commercetools-frontend/application-shell';
 import { buildGraphqlList } from '@commercetools-test-data/core';
-import { renderApplicationWithRoutesAndRedux } from '../../../test-utils';
+import { NimbusProvider } from '@commercetools/nimbus';
+import SubscriptionDetailsPage from './subscription-details-page';
 import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 import {
   random,
   TSubscription,
 } from '../../../test-utils/models/subscriptions';
-import { act, cleanup } from '@testing-library/react-hooks';
+import { cleanup } from '@testing-library/react';
 
 const mockServer = setupServer();
 afterEach(async () => {
@@ -37,6 +41,12 @@ const TEST_SUBSCRIPTION_ID = 'b8a40b99-0c11-43bc-8680-fc570d624747';
 const TEST_SUBSCRIPTION_KEY = 'test-key';
 const TEST_SUBSCRIPTION_NEW_KEY = 'new-test-key';
 
+// `SubscriptionDetailsPage` is rendered in isolation (rather than via
+// `<ApplicationRoutes />`) so the test does not transitively import unrelated
+// routes (e.g. Custom Objects' JSON editor, which Jest cannot parse). It is
+// wrapped in a `Route` that provides the `:id` param. `NimbusProvider` is
+// normally supplied once by `EntryPoint`, which isn't rendered here, so it's
+// added explicitly.
 const renderApp = (
   options: Partial<TRenderAppWithReduxOptions> = {},
   includeManagePermissions = true
@@ -44,18 +54,29 @@ const renderApp = (
   const route =
     options.route ||
     `/my-project/${entryPointUriPath}/subscription/${TEST_SUBSCRIPTION_ID}`;
-  const { history } = renderApplicationWithRoutesAndRedux({
-    route,
-    project: {
-      allAppliedPermissions: mapResourceAccessToAppliedPermissions(
-        [
-          PERMISSIONS.View,
-          includeManagePermissions ? PERMISSIONS.Manage : '',
-        ].filter(Boolean)
-      ),
-    },
-    ...options,
-  });
+  const { history } = renderAppWithRedux(
+    <Route path={`/:projectKey/${entryPointUriPath}/subscription/:id`}>
+      <NimbusProvider locale="en" loadFonts={false}>
+        <SubscriptionDetailsPage
+          linkToWelcome={`/my-project/${entryPointUriPath}/subscriptions`}
+        />
+      </NimbusProvider>
+    </Route>,
+    {
+      route,
+      environment: { entryPointUriPath },
+      apolloClient: createApolloClient(),
+      project: {
+        allAppliedPermissions: mapResourceAccessToAppliedPermissions(
+          [
+            PERMISSIONS.View,
+            includeManagePermissions ? PERMISSIONS.Manage : '',
+          ].filter(Boolean)
+        ),
+      },
+      ...options,
+    }
+  );
   return { history };
 };
 
@@ -168,7 +189,7 @@ describe('rendering', () => {
     );
     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_KEY);
 
-    screen.getByRole('combobox', { name: 'Destination *' });
+    screen.getByRole('combobox', { name: 'Destination' });
 
     expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument();
   });
@@ -209,7 +230,7 @@ describe('rendering', () => {
       expect(keyInput.hasAttribute('readonly')).toBeTruthy();
 
       const destinationSelect = screen.getByRole('combobox', {
-        name: 'Destination *',
+        name: 'Destination',
       });
       expect(destinationSelect.hasAttribute('readonly')).toBeTruthy();
 
@@ -267,17 +288,17 @@ describe('notifications', () => {
     expect(keyInput.value).toBe(TEST_SUBSCRIPTION_NEW_KEY);
 
     const destinations = screen.getByRole('combobox', {
-      name: 'Destination *',
+      name: 'Destination',
     });
     fireEvent.focus(destinations);
     fireEvent.keyDown(destinations, { key: 'ArrowDown' });
     const inventorySupplyOption = await screen.findByText('AWS SNS');
 
-    act(() => {
-      inventorySupplyOption.click();
-    });
+    fireEvent.click(inventorySupplyOption);
 
-    expect(screen.getByText(/AWS SNS/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect((destinations as HTMLInputElement).value).toBe('AWS SNS');
+    });
 
     // updating subscription details
     const saveButton = screen.getByRole('button', { name: /save/i });

@@ -1,12 +1,5 @@
 import { FC, JSX, ReactElement } from 'react';
-import {
-  useFormik,
-  type FormikHelpers,
-  FormikErrors,
-  FormikProvider,
-} from 'formik';
-import TextInput from '@commercetools-uikit/text-input';
-import omitEmpty from 'omit-empty-es';
+import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
 import SubscriptionGeneralInfoForm from '../subscription-general-info-form/subscription-general-info-form';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
 import {
@@ -15,11 +8,11 @@ import {
   TMessageSubscriptionInput,
   TSqsDestination,
   TConfluentCloudDestination,
-} from 'commercetools-demo-shared-helpers';
+} from '../../../types/generated/ctp';
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
 import SubscriptionMessagesForm from '../subscription-messages-form/subscription-messages-form';
-import CollapsiblePanel from '@commercetools-uikit/collapsible-panel';
+import { Accordion } from '@commercetools/nimbus';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -43,21 +36,6 @@ export type TFormValues = {
     | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;
   messages?: Array<TMessageSubscriptionInput> | null;
-};
-
-export type TErrors = {
-  key: { missing?: boolean };
-};
-
-const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
-  const errors: TErrors = {
-    key: {},
-  };
-
-  if (!formikValues.key || TextInput.isEmpty(formikValues.key)) {
-    errors.key.missing = true;
-  }
-  return omitEmpty(errors);
 };
 
 type FormProps = {
@@ -89,42 +67,43 @@ const SubscriptionDetailsForm: FC<Props> = ({
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
-    validate,
     enableReinitialize: true,
   });
   const formElements = (
     <FormikProvider value={formik}>
-      <CollapsiblePanel
-        header={<CollapsiblePanel.Header>Key</CollapsiblePanel.Header>}
+      <Accordion.Root
+        allowsMultipleExpanded
+        defaultExpandedKeys={['key', 'destination']}
       >
-        <SubscriptionGeneralInfoForm isReadOnly={isReadOnly} />
-      </CollapsiblePanel>
-      <CollapsiblePanel
-        header={
-          <CollapsiblePanel.Header>
-            Subscription Destination
-          </CollapsiblePanel.Header>
-        }
-        isDefaultClosed={false}
-      >
-        <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
-        <SubscriptionDestinationForm
-          destinationType={formik.values.destinationType}
-          isReadOnly={isReadOnly}
-        />
-      </CollapsiblePanel>
-      <CollapsiblePanel
-        header={<CollapsiblePanel.Header>Changes</CollapsiblePanel.Header>}
-        isDefaultClosed={true}
-      >
-        <SubscriptionChangesForm isReadOnly={isReadOnly} />
-      </CollapsiblePanel>
-      <CollapsiblePanel
-        header={<CollapsiblePanel.Header>Messages</CollapsiblePanel.Header>}
-        isDefaultClosed={true}
-      >
-        <SubscriptionMessagesForm isReadOnly={isReadOnly} />
-      </CollapsiblePanel>
+        <Accordion.Item value="key">
+          <Accordion.Header>Key</Accordion.Header>
+          <Accordion.Content>
+            <SubscriptionGeneralInfoForm isReadOnly={isReadOnly} />
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="destination">
+          <Accordion.Header>Subscription Destination</Accordion.Header>
+          <Accordion.Content>
+            <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
+            <SubscriptionDestinationForm
+              destinationType={formik.values.destinationType}
+              isReadOnly={isReadOnly}
+            />
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="changes">
+          <Accordion.Header>Changes</Accordion.Header>
+          <Accordion.Content>
+            <SubscriptionChangesForm isReadOnly={isReadOnly} />
+          </Accordion.Content>
+        </Accordion.Item>
+        <Accordion.Item value="messages">
+          <Accordion.Header>Messages</Accordion.Header>
+          <Accordion.Content>
+            <SubscriptionMessagesForm isReadOnly={isReadOnly} />
+          </Accordion.Content>
+        </Accordion.Item>
+      </Accordion.Root>
     </FormikProvider>
   );
 

@@ -1,0 +1,6 @@
+#import "./state-fragment.graphql"
+
+fragment StateDetailFragment on State {
+  ...StateFragment
+  version
+}

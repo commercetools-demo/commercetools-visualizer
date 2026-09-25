@@ -1,0 +1,34 @@
+#import "./extension-base-fields-fragment.graphql"
+
+fragment ExtensionFragment on Extension {
+  ...ExtensionBaseFieldsFragment
+  destination {
+    type
+    ... on AWSLambdaDestination {
+      arn
+      accessKey
+      accessSecret
+    }
+    ... on GoogleCloudFunctionDestination {
+      url
+    }
+    ... on HttpDestination {
+      type
+      url
+      authentication {
+        type
+        ... on AuthorizationHeader {
+          headerValue
+        }
+        ... on AzureFunctionsAuthentication {
+          key
+        }
+      }
+    }
+  }
+  triggers {
+    resourceTypeId
+    actions
+    condition
+  }
+}

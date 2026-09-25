@@ -1,15 +1,18 @@
-import TextField from '@commercetools-uikit/text-field';
 import { FC } from 'react';
 import { useField } from 'formik';
-import Text from '@commercetools-uikit/text';
 import { FormattedMessage } from 'react-intl';
+import { FormField, Heading, Select, TextInput } from '@commercetools/nimbus';
 import messages from './messages';
 import { validateInput } from './validate';
-import SelectField from '@commercetools-uikit/select-field';
 
 type Props = {
   isReadOnly?: boolean;
 };
+
+const AUTHENTICATION_MODES = [
+  { id: 'IAM', label: 'IAM' },
+  { id: 'Credentials', label: 'Credentials' },
+];
 
 const SQSDestination: FC<Props> = ({ isReadOnly }) => {
   const [accessKeyField, accessKeyMeta, accessKeyHelpers] = useField<string>({
@@ -42,102 +45,144 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
 
   return (
     <>
-      <Text.Headline as="h3">Configure AWS SQS Destination</Text.Headline>
-      <SelectField
-        errors={JSON.parse(authenticationModeMeta.error || '{}')}
-        name={authenticationModeField.name}
-        options={[
-          {
-            value: 'IAM',
-            label: 'IAM',
-          },
-          {
-            value: 'Credentials',
-            label: 'Credentials',
-          },
-        ]}
-        isRequired={true}
-        onBlur={() => {
-          authenticationModeHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          authenticationModeHelpers.setValue(event.target.value as string);
-        }}
-        title={
-          <FormattedMessage {...messages.destinationSQSAuthenticationMode} />
-        }
-        touched={authenticationModeMeta.touched}
-        value={authenticationModeMeta.value || ''}
+      <Heading as="h3" size="sm">
+        Configure AWS SQS Destination
+      </Heading>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
+        isInvalid={Boolean(
+          authenticationModeMeta.touched && authenticationModeMeta.error
+        )}
+      >
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationSQSAuthenticationMode} />
+        </FormField.Label>
+        <FormField.Input>
+          <Select.Root
+            name={authenticationModeField.name}
+            isReadOnly={isReadOnly}
+            value={authenticationModeMeta.value || ''}
+            onChange={(value) =>
+              authenticationModeHelpers.setValue(value || '')
+            }
+            onBlur={() => authenticationModeHelpers.setTouched(true)}
+          >
+            <Select.Options>
+              {AUTHENTICATION_MODES.map((mode) => (
+                <Select.Option key={mode.id} id={mode.id}>
+                  {mode.label}
+                </Select.Option>
+              ))}
+            </Select.Options>
+          </Select.Root>
+        </FormField.Input>
+        <FormField.Error>
+          {authenticationModeMeta.touched && authenticationModeMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
       {authenticationModeField.value &&
         authenticationModeField.value === 'Credentials' && (
           <>
-            <TextField
-              errors={JSON.parse(accessKeyMeta.error || '{}')}
-              name={accessKeyField.name}
-              isRequired={true}
-              onBlur={() => {
-                accessKeyHelpers.setTouched(true);
-              }}
-              onChange={(event) => {
-                accessKeyHelpers.setValue(event.target.value);
-              }}
-              title={<FormattedMessage {...messages.destinationSQSAccessKey} />}
-              touched={accessKeyMeta.touched}
-              value={accessKeyMeta.value || ''}
+            <FormField.Root
+              isRequired
               isReadOnly={isReadOnly}
-            />
-            <TextField
-              errors={JSON.parse(accessSecretMeta.error || '{}')}
-              name={accessSecretField.name}
-              isRequired={true}
-              onBlur={() => {
-                accessSecretHelpers.setTouched(true);
-              }}
-              onChange={(event) => {
-                accessSecretHelpers.setValue(event.target.value);
-              }}
-              title={
+              isInvalid={Boolean(accessKeyMeta.touched && accessKeyMeta.error)}
+            >
+              <FormField.Label>
+                <FormattedMessage {...messages.destinationSQSAccessKey} />
+              </FormField.Label>
+              <FormField.Input>
+                <TextInput
+                  name={accessKeyField.name}
+                  value={accessKeyMeta.value || ''}
+                  isReadOnly={isReadOnly}
+                  onBlur={() => accessKeyHelpers.setTouched(true)}
+                  onChange={(value) => accessKeyHelpers.setValue(value)}
+                />
+              </FormField.Input>
+              <FormField.Error>
+                {accessKeyMeta.touched && accessKeyMeta.error ? (
+                  <FormattedMessage {...messages.requiredFieldError} />
+                ) : null}
+              </FormField.Error>
+            </FormField.Root>
+            <FormField.Root
+              isRequired
+              isReadOnly={isReadOnly}
+              isInvalid={Boolean(
+                accessSecretMeta.touched && accessSecretMeta.error
+              )}
+            >
+              <FormField.Label>
                 <FormattedMessage {...messages.destinationSQSAccessSecret} />
-              }
-              touched={accessSecretMeta.touched}
-              value={accessSecretMeta.value || ''}
-              isReadOnly={isReadOnly}
-            />
+              </FormField.Label>
+              <FormField.Input>
+                <TextInput
+                  name={accessSecretField.name}
+                  value={accessSecretMeta.value || ''}
+                  isReadOnly={isReadOnly}
+                  onBlur={() => accessSecretHelpers.setTouched(true)}
+                  onChange={(value) => accessSecretHelpers.setValue(value)}
+                />
+              </FormField.Input>
+              <FormField.Error>
+                {accessSecretMeta.touched && accessSecretMeta.error ? (
+                  <FormattedMessage {...messages.requiredFieldError} />
+                ) : null}
+              </FormField.Error>
+            </FormField.Root>
           </>
         )}
 
-      <TextField
-        errors={JSON.parse(queueUrlMeta.error || '{}')}
-        name={queueUrlField.name}
-        isRequired={true}
-        onBlur={() => {
-          queueUrlHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          queueUrlHelpers.setValue(event.target.value);
-        }}
-        title={<FormattedMessage {...messages.destinationSQSQueueUrl} />}
-        touched={queueUrlMeta.touched}
-        value={queueUrlMeta.value || ''}
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
-      <TextField
-        errors={JSON.parse(regionMeta.error || '{}')}
-        name={regionField.name}
-        isRequired={true}
-        onBlur={() => {
-          regionHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          regionHelpers.setValue(event.target.value);
-        }}
-        title={<FormattedMessage {...messages.destinationSQSRegion} />}
-        touched={regionMeta.touched}
-        value={regionMeta.value || ''}
+        isInvalid={Boolean(queueUrlMeta.touched && queueUrlMeta.error)}
+      >
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationSQSQueueUrl} />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={queueUrlField.name}
+            value={queueUrlMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => queueUrlHelpers.setTouched(true)}
+            onChange={(value) => queueUrlHelpers.setValue(value)}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {queueUrlMeta.touched && queueUrlMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
+        isInvalid={Boolean(regionMeta.touched && regionMeta.error)}
+      >
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationSQSRegion} />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={regionField.name}
+            value={regionMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => regionHelpers.setTouched(true)}
+            onChange={(value) => regionHelpers.setValue(value)}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {regionMeta.touched && regionMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
     </>
   );
 };

@@ -1,8 +1,7 @@
-import TextField from '@commercetools-uikit/text-field';
 import { FC } from 'react';
 import { useField } from 'formik';
-import Text from '@commercetools-uikit/text';
 import { FormattedMessage } from 'react-intl';
+import { FormField, Heading, TextInput } from '@commercetools/nimbus';
 import messages from './messages';
 import { validateInput } from './validate';
 
@@ -21,45 +20,59 @@ const GoogleCloudPubSubDestination: FC<Props> = ({ isReadOnly }) => {
   });
   return (
     <>
-      <Text.Headline as="h3">Configure GCP Pub/Sub Destination</Text.Headline>
-      <TextField
-        errors={JSON.parse(topicMeta.error || '{}')}
-        name={topicField.name}
-        isRequired={true}
-        onBlur={() => {
-          topicHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          topicHelpers.setValue(event.target.value);
-        }}
-        //renderError={renderBusinessUnitKeyInputErrors}
-        title={
-          <FormattedMessage {...messages.destinationGoogleCloudPubSubTopic} />
-        }
-        touched={topicMeta.touched}
-        value={topicMeta.value || ''}
+      <Heading as="h3" size="sm">
+        Configure GCP Pub/Sub Destination
+      </Heading>
+      <FormField.Root
+        isRequired
         isReadOnly={isReadOnly}
-      />
-      <TextField
-        errors={JSON.parse(projectIdMeta.error || '{}')}
-        name={projectIdField.name}
-        isRequired={true}
-        onBlur={() => {
-          projectIdHelpers.setTouched(true);
-        }}
-        onChange={(event) => {
-          projectIdHelpers.setValue(event.target.value);
-        }}
-        //renderError={renderBusinessUnitKeyInputErrors}
-        title={
+        isInvalid={Boolean(topicMeta.touched && topicMeta.error)}
+      >
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationGoogleCloudPubSubTopic} />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={topicField.name}
+            value={topicMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => topicHelpers.setTouched(true)}
+            onChange={(value) => topicHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {topicMeta.touched && topicMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
+      <FormField.Root
+        isRequired
+        isReadOnly={isReadOnly}
+        isInvalid={Boolean(projectIdMeta.touched && projectIdMeta.error)}
+      >
+        <FormField.Label>
           <FormattedMessage
             {...messages.destinationGoogleCloudPubSubprojectId}
           />
-        }
-        touched={projectIdMeta.touched}
-        value={projectIdMeta.value || ''}
-        isReadOnly={isReadOnly}
-      />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={projectIdField.name}
+            value={projectIdMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => projectIdHelpers.setTouched(true)}
+            onChange={(value) => projectIdHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
+        <FormField.Error>
+          {projectIdMeta.touched && projectIdMeta.error ? (
+            <FormattedMessage {...messages.requiredFieldError} />
+          ) : null}
+        </FormField.Error>
+      </FormField.Root>
     </>
   );
 };

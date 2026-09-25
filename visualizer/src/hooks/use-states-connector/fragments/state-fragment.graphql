@@ -1,0 +1,18 @@
+fragment StateFragment on State {
+  id
+  key
+  type
+  initial
+  builtIn
+  transitions {
+    id
+  }
+  nameAllLocales {
+    locale
+    value
+  }
+  descriptionAllLocales {
+    locale
+    value
+  }
+}

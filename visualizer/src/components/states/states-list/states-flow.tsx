@@ -1,11 +1,10 @@
-import PrimaryButton from '@commercetools-uikit/primary-button';
 import dagre from 'dagre';
 
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 
-import { FC, useCallback, useState } from 'react';
-// eslint-disable-next-line import/no-named-as-default
-import ReactFlow, {
+import { FC, useCallback } from 'react';
+import {
+  ReactFlow,
   useNodesState,
   useEdgesState,
   addEdge,
@@ -14,11 +13,11 @@ import ReactFlow, {
   Edge,
   Background,
   Controls,
-} from 'reactflow';
+} from '@xyflow/react';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import { TState } from '../../../types/generated/ctp';
-import 'reactflow/dist/style.css';
-import { formatLocalizedString } from 'commercetools-demo-shared-helpers';
+import '@xyflow/react/dist/style.css';
+import { formatLocalizedString } from '../../../utils/format-localized-string';
 
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -30,11 +29,9 @@ const getLayoutedElements = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nodes: Array<any>,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  edges: Array<any>,
-  direction = 'TB'
+  edges: Array<any>
 ) => {
-  const isHorizontal = direction === 'LR';
-  dagreGraph.setGraph({ rankdir: direction });
+  dagreGraph.setGraph({ rankdir: 'TB' });
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
@@ -48,8 +45,8 @@ const getLayoutedElements = (
 
   nodes.forEach((node) => {
     const nodeWithPosition = dagreGraph.node(node.id);
-    node.targetPosition = isHorizontal ? 'left' : 'top';
-    node.sourcePosition = isHorizontal ? 'right' : 'bottom';
+    node.targetPosition = 'top';
+    node.sourcePosition = 'bottom';
 
     // We are shifting the dagre node position (anchor=center center) to the top left
     // so it matches the React Flow node anchor point (top left).
@@ -74,7 +71,6 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
-  const [isHorizontal, setHorizontal] = useState<boolean>(false);
   const initialNodes: Array<Node> = items.map((item) => {
     let type = '';
     if (item.initial) {
@@ -93,19 +89,6 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
             projectLanguages,
             NO_VALUE_FALLBACK
           ) || item.key,
-        // description: formatLocalizedString(
-        //   {
-        //     name: transformLocalizedFieldToLocalizedString(
-        //       item.descriptionAllLocales ?? []
-        //     ),
-        //   },
-        //   {
-        //     key: 'name',
-        //     locale: dataLocale,
-        //     fallbackOrder: projectLanguages,
-        //     fallback: NO_VALUE_FALLBACK,
-        //   }
-        // ),
       },
       type: type,
       position: { x: 0, y: 0 },
@@ -131,7 +114,7 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
     initialEdges
   );
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
+  const [nodes, , onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
   const onConnect = useCallback(
@@ -145,42 +128,24 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
       ),
     [setEdges]
   );
-  const onLayout = useCallback(() => {
-    const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-      nodes,
-      edges,
-      isHorizontal ? 'TB' : 'LR'
-    );
-    setHorizontal(!isHorizontal);
-    setNodes([...layoutedNodes]);
-    setEdges([...layoutedEdges]);
-  }, [nodes, edges, setNodes, setEdges, isHorizontal]);
 
   return (
-    <div>
-      <div style={{ height: '400px', width: '100%' }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          connectionLineType={ConnectionLineType.SmoothStep}
-          fitView
-          onNodeClick={
-            onNodeClick ? (_event, node) => onNodeClick(node.id) : undefined
-          }
-        >
-          <Background />
-          <Controls />
-        </ReactFlow>
-      </div>
-      <div>
-        <PrimaryButton
-          onClick={() => onLayout()}
-          label={isHorizontal ? 'horizontal layout' : 'vertical layout'}
-        ></PrimaryButton>
-      </div>
+    <div style={{ height: '400px', width: '100%' }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        fitView
+        onNodeClick={
+          onNodeClick ? (_event, node) => onNodeClick(node.id) : undefined
+        }
+      >
+        <Background />
+        <Controls />
+      </ReactFlow>
     </div>
   );
 };

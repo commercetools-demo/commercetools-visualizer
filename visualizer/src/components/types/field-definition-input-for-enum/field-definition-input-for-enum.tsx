@@ -186,6 +186,7 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
                     nextValue,
                   })
                 }
+                width={'full'}
               />
             ))
             .concat(

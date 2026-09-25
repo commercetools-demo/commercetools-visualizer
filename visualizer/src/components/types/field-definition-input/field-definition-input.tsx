@@ -1,4 +1,4 @@
-import { FC, ReactElement, ReactNode } from 'react';
+import { FC, ReactElement, ReactNode, JSX } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { FormikErrors, type FormikHelpers, useFormik } from 'formik';
 import omitEmpty from 'omit-empty-es';
@@ -7,6 +7,7 @@ import {
   Checkbox,
   FormField,
   LocalizedField,
+  PageContent,
   RadioInput,
   Select,
   Stack,
@@ -158,201 +159,214 @@ const FieldDefinitionInput: FC<Props> = ({
   };
 
   const formElements = (
-    <Stack direction="column" gap="600">
-      <Stack direction="column" gap="400" maxWidth="600px">
-        <FormField.Root
-          isRequired
-          isReadOnly={!canManage}
-          isDisabled={isImmutable}
-          isInvalid={Boolean(formik.touched.name && errors.name)}
-        >
-          <FormField.Label>
-            {intl.formatMessage(messages.nameTitle)}
-          </FormField.Label>
-          <FormField.Input>
-            <TextInput
-              aria-label={intl.formatMessage(messages.nameTitle)}
-              value={formik.values.name}
-              isDisabled={isImmutable}
-              onChange={(value) => formik.setFieldValue('name', value)}
-              onBlur={() => formik.setFieldTouched('name', true)}
-            />
-          </FormField.Input>
-          <FormField.Description>
-            {intl.formatMessage(messages.nameHint)}
-          </FormField.Description>
-          <FormField.Error>{renderNameInputError(errors.name)}</FormField.Error>
-        </FormField.Root>
-
-        <LocalizedField
-          id="field-definition-label"
-          name="label"
-          type="text"
-          label={intl.formatMessage(messages.labelTitle)}
-          isRequired
-          isReadOnly={!canManage}
-          defaultLocaleOrCurrency={dataLocale}
-          valuesByLocaleOrCurrency={formik.values.label}
-          onChange={(event) =>
-            formik.setFieldValue(
-              `label.${event.target.locale}`,
-              event.target.value
-            )
-          }
-          onBlur={() => formik.setFieldTouched('label', true)}
-          touched={!!formik.touched.label}
-          error={
-            formik.touched.label && errors.label?.missing
-              ? intl.formatMessage(messages.requiredFieldError)
-              : undefined
-          }
-        />
-
-        <FormField.Root isRequired isDisabled={isImmutable}>
-          <FormField.Label>
-            {intl.formatMessage(messages.typeTitle)}
-          </FormField.Label>
-          <FormField.Input>
-            <Select.Root
-              aria-label={intl.formatMessage(messages.typeTitle)}
-              isDisabled={isImmutable}
-              value={formik.values.typeName || ''}
-              onChange={(value) => formik.setFieldValue('typeName', value)}
-            >
-              <Select.Options>
-                {fieldTypeOptions.map((option) => (
-                  <Select.Option key={option.value} id={option.value}>
-                    {intl.formatMessage(option.message)}
-                  </Select.Option>
-                ))}
-              </Select.Options>
-            </Select.Root>
-          </FormField.Input>
-        </FormField.Root>
-
-        {(formik.values.typeName === 'String' ||
-          formik.values.typeName === 'Enum') && (
-          <Checkbox
-            isSelected={formik.values.isLocalized}
-            isDisabled={isImmutable}
-            onChange={(value) => formik.setFieldValue('isLocalized', value)}
-          >
-            {intl.formatMessage(messages.localizedLabel)}
-          </Checkbox>
-        )}
-
-        {formik.values.typeName === 'Date' && (
-          <FormField.Root isDisabled={isImmutable}>
-            <FormField.Label>
-              {intl.formatMessage(messages.typeDate)}
-            </FormField.Label>
-            <FormField.Input>
-              <RadioInput.Root
-                aria-label={intl.formatMessage(messages.typeDate)}
-                orientation="horizontal"
-                isDisabled={isImmutable}
-                value={formik.values.format}
-                onChange={(value) => formik.setFieldValue('format', value)}
-              >
-                <RadioInput.Option value="date">
-                  {intl.formatMessage(messages.optionDate)}
-                </RadioInput.Option>
-                <RadioInput.Option value="time">
-                  {intl.formatMessage(messages.optionTime)}
-                </RadioInput.Option>
-                <RadioInput.Option value="datetime">
-                  {intl.formatMessage(messages.optionDateTime)}
-                </RadioInput.Option>
-              </RadioInput.Root>
-            </FormField.Input>
-          </FormField.Root>
-        )}
-
-        {formik.values.typeName === 'Reference' && (
+    <PageContent.Root variant={'narrow'}>
+      <Stack direction="column" gap="600">
+        <Stack direction="column" gap="400" maxWidth="600px">
           <FormField.Root
             isRequired
+            isReadOnly={!canManage}
             isDisabled={isImmutable}
-            isInvalid={Boolean(
-              formik.touched.referenceTypeId && errors.referenceTypeId
-            )}
+            isInvalid={Boolean(formik.touched.name && errors.name)}
           >
             <FormField.Label>
-              {intl.formatMessage(messages.referenceTitle)}
+              {intl.formatMessage(messages.nameTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
+                aria-label={intl.formatMessage(messages.nameTitle)}
+                value={formik.values.name}
+                isDisabled={isImmutable}
+                onChange={(value) => formik.setFieldValue('name', value)}
+                onBlur={() => formik.setFieldTouched('name', true)}
+                width={'full'}
+              />
+            </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.nameHint)}
+            </FormField.Description>
+            <FormField.Error>
+              {renderNameInputError(errors.name)}
+            </FormField.Error>
+          </FormField.Root>
+
+          <LocalizedField
+            id="field-definition-label"
+            name="label"
+            type="text"
+            label={intl.formatMessage(messages.labelTitle)}
+            isRequired
+            isReadOnly={!canManage}
+            defaultLocaleOrCurrency={dataLocale}
+            valuesByLocaleOrCurrency={formik.values.label}
+            onChange={(event) =>
+              formik.setFieldValue(
+                `label.${event.target.locale}`,
+                event.target.value
+              )
+            }
+            onBlur={() => formik.setFieldTouched('label', true)}
+            touched={!!formik.touched.label}
+            error={
+              formik.touched.label && errors.label?.missing
+                ? intl.formatMessage(messages.requiredFieldError)
+                : undefined
+            }
+            width={'full'}
+          />
+
+          <FormField.Root isRequired isDisabled={isImmutable}>
+            <FormField.Label>
+              {intl.formatMessage(messages.typeTitle)}
             </FormField.Label>
             <FormField.Input>
               <Select.Root
-                aria-label={intl.formatMessage(messages.referenceTitle)}
+                aria-label={intl.formatMessage(messages.typeTitle)}
                 isDisabled={isImmutable}
-                value={formik.values.referenceTypeId || ''}
-                onChange={(value) =>
-                  formik.setFieldValue('referenceTypeId', value)
-                }
+                value={formik.values.typeName || ''}
+                onChange={(value) => formik.setFieldValue('typeName', value)}
+                width={'full'}
               >
                 <Select.Options>
-                  {REFERENCE_TYPES.map((referenceType) => (
-                    <Select.Option key={referenceType} id={referenceType}>
-                      {referenceType}
+                  {fieldTypeOptions.map((option) => (
+                    <Select.Option key={option.value} id={option.value}>
+                      {intl.formatMessage(option.message)}
                     </Select.Option>
                   ))}
                 </Select.Options>
               </Select.Root>
             </FormField.Input>
-            <FormField.Error>
-              {formik.touched.referenceTypeId && errors.referenceTypeId?.missing
-                ? intl.formatMessage(messages.requiredFieldError)
-                : null}
-            </FormField.Error>
           </FormField.Root>
-        )}
 
-        <Checkbox
-          isSelected={formik.values.required}
-          isDisabled={isImmutable}
-          onChange={(value) => formik.setFieldValue('required', value)}
-        >
-          {intl.formatMessage(messages.requiredTitle)}
-        </Checkbox>
-
-        {formik.values.typeName === 'String' && (
-          <Checkbox
-            isSelected={formik.values.isMultiLine}
-            isDisabled={isImmutable}
-            onChange={(value) => formik.setFieldValue('isMultiLine', value)}
-          >
-            {intl.formatMessage(messages.inputHintTitle)}
-          </Checkbox>
-        )}
-
-        {formik.values.typeName && (
-          <Stack direction="column" gap="100">
+          {(formik.values.typeName === 'String' ||
+            formik.values.typeName === 'Enum') && (
             <Checkbox
-              isSelected={formik.values.isSet}
-              isDisabled={isImmutable || formik.values.required}
-              onChange={(value) => formik.setFieldValue('isSet', value)}
+              isSelected={formik.values.isLocalized}
+              isDisabled={isImmutable}
+              onChange={(value) => formik.setFieldValue('isLocalized', value)}
+              width={'full'}
             >
-              {intl.formatMessage(messages.setTitle)}
+              {intl.formatMessage(messages.localizedLabel)}
             </Checkbox>
-            {formik.values.required && (
-              <Text fontSize="350" color="neutral.11">
-                {intl.formatMessage(messages.setCannotBeRequiredTooltip)}
-              </Text>
-            )}
-          </Stack>
+          )}
+
+          {formik.values.typeName === 'Date' && (
+            <FormField.Root isDisabled={isImmutable}>
+              <FormField.Label>
+                {intl.formatMessage(messages.typeDate)}
+              </FormField.Label>
+              <FormField.Input>
+                <RadioInput.Root
+                  aria-label={intl.formatMessage(messages.typeDate)}
+                  orientation="horizontal"
+                  isDisabled={isImmutable}
+                  value={formik.values.format}
+                  onChange={(value) => formik.setFieldValue('format', value)}
+                  width={'full'}
+                >
+                  <RadioInput.Option value="date">
+                    {intl.formatMessage(messages.optionDate)}
+                  </RadioInput.Option>
+                  <RadioInput.Option value="time">
+                    {intl.formatMessage(messages.optionTime)}
+                  </RadioInput.Option>
+                  <RadioInput.Option value="datetime">
+                    {intl.formatMessage(messages.optionDateTime)}
+                  </RadioInput.Option>
+                </RadioInput.Root>
+              </FormField.Input>
+            </FormField.Root>
+          )}
+
+          {formik.values.typeName === 'Reference' && (
+            <FormField.Root
+              isRequired
+              isDisabled={isImmutable}
+              isInvalid={Boolean(
+                formik.touched.referenceTypeId && errors.referenceTypeId
+              )}
+            >
+              <FormField.Label>
+                {intl.formatMessage(messages.referenceTitle)}
+              </FormField.Label>
+              <FormField.Input>
+                <Select.Root
+                  aria-label={intl.formatMessage(messages.referenceTitle)}
+                  isDisabled={isImmutable}
+                  value={formik.values.referenceTypeId || ''}
+                  onChange={(value) =>
+                    formik.setFieldValue('referenceTypeId', value)
+                  }
+                  width={'full'}
+                >
+                  <Select.Options>
+                    {REFERENCE_TYPES.map((referenceType) => (
+                      <Select.Option key={referenceType} id={referenceType}>
+                        {referenceType}
+                      </Select.Option>
+                    ))}
+                  </Select.Options>
+                </Select.Root>
+              </FormField.Input>
+              <FormField.Error>
+                {formik.touched.referenceTypeId &&
+                errors.referenceTypeId?.missing
+                  ? intl.formatMessage(messages.requiredFieldError)
+                  : null}
+              </FormField.Error>
+            </FormField.Root>
+          )}
+
+          <Checkbox
+            isSelected={formik.values.required}
+            isDisabled={isImmutable}
+            onChange={(value) => formik.setFieldValue('required', value)}
+            width={'full'}
+          >
+            {intl.formatMessage(messages.requiredTitle)}
+          </Checkbox>
+
+          {formik.values.typeName === 'String' && (
+            <Checkbox
+              isSelected={formik.values.isMultiLine}
+              isDisabled={isImmutable}
+              onChange={(value) => formik.setFieldValue('isMultiLine', value)}
+              width={'full'}
+            >
+              {intl.formatMessage(messages.inputHintTitle)}
+            </Checkbox>
+          )}
+
+          {formik.values.typeName && (
+            <Stack direction="column" gap="100">
+              <Checkbox
+                isSelected={formik.values.isSet}
+                isDisabled={isImmutable || formik.values.required}
+                onChange={(value) => formik.setFieldValue('isSet', value)}
+                width={'full'}
+              >
+                {intl.formatMessage(messages.setTitle)}
+              </Checkbox>
+              {formik.values.required && (
+                <Text fontSize="350" color="neutral.11">
+                  {intl.formatMessage(messages.setCannotBeRequiredTooltip)}
+                </Text>
+              )}
+            </Stack>
+          )}
+        </Stack>
+        {formik.values.typeName === 'Enum' && (
+          <Box>
+            <FieldDefinitionInputForEnum
+              formik={formik}
+              isDisabled={!canManage}
+              onAddEnumValue={handleAddEnumValue}
+              onChangeEnumValue={handleChangeEnumValue}
+              onRemoveEnumValue={handleRemoveEnumValue}
+            />
+          </Box>
         )}
       </Stack>
-
-      {formik.values.typeName === 'Enum' && (
-        <Box>
-          <FieldDefinitionInputForEnum
-            formik={formik}
-            isDisabled={!canManage}
-            onAddEnumValue={handleAddEnumValue}
-            onChangeEnumValue={handleChangeEnumValue}
-            onRemoveEnumValue={handleRemoveEnumValue}
-          />
-        </Box>
-      )}
-    </Stack>
+    </PageContent.Root>
   );
 
   return children({

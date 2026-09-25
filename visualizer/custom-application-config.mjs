@@ -52,7 +52,7 @@ const config = {
       uriPath: 'extensions',
       defaultLabel: 'API Extensions',
       labelAllLocales: [],
-      permissions: [PERMISSIONS.Manage],
+      // permissions: [PERMISSIONS.View],
     },
     {
       uriPath: 'states',
@@ -64,7 +64,7 @@ const config = {
       uriPath: 'subscriptions',
       defaultLabel: 'Subscriptions',
       labelAllLocales: [],
-      permissions: [PERMISSIONS.Manage],
+      // permissions: [PERMISSIONS.View],
     },
     {
       uriPath: 'types',

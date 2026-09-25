@@ -1,21 +1,18 @@
 <!--
 Sync Impact Report
-- Version change: (unratified template) → 1.0.0
-- Modified principles: none (initial adoption in this file)
-- Added sections:
-  - Core Principles I–VIII (ported verbatim in substance from the "Constitution
-    (project principles)" section of specs/README.md, which predates this file)
-  - Data Layer Conventions (new — derived from CLAUDE.md "Data layer: connector
-    hooks")
-  - Development Workflow (new — derived from CLAUDE.md "Commands" / "Testing")
-  - Governance
+- Version change: 1.0.0 → 1.1.0
+- Modified principles:
+  - IV. Localization Completeness — expanded from data-level localized-string fields
+    only to also require react-intl for every piece of the app's own UI text (no raw
+    JSX string literals), globally-unique message ids, and en/de catalog parity.
+    Prompted by a live audit: the Welcome page was entirely hardcoded and never wired
+    to react-intl, and 14 message ids collided with different text across components,
+    both classes of bug invisible until the German catalog was actually populated.
+- Added sections: none this round
 - Removed sections: none
 - Templates requiring updates: none checked in this run — dependent templates/commands
   read this file at runtime per the Scope Guard and are not modified here.
-- Follow-up TODOs:
-  - TODO(RATIFICATION_DATE): none — dated from specs/README.md's introduction commit
-    (2026-06-25), where these principles were first written down as a project
-    constitution, even though they were not yet in spec-kit's canonical location.
+- Follow-up TODOs: none
 -->
 
 # Visualizer Constitution
@@ -50,11 +47,38 @@ hiding controls instead of disabling them removes the user's ability to understa
 why an action is unavailable, and is explicitly rejected by this project.
 
 ### IV. Localization Completeness
-All user-facing strings are externalized (react-intl style). Fields that hold
-commercetools localized strings MUST render one input per project language. On save,
-empty translations MUST be omitted rather than persisted as empty strings. Rationale:
+This principle covers two distinct localization axes; both are required, and neither
+substitutes for the other.
+
+**Data-level:** fields that hold commercetools localized strings (Type names,
+descriptions, etc.) MUST render one input per project language. On save, empty
+translations MUST be omitted rather than persisted as empty strings. Rationale:
 persisting empty translations pollutes the localized-string object and can mask
 missing-translation bugs in the merchant-facing UI.
+
+**App-UI-level:** every piece of this app's own UI text — labels, headings, button
+text, notification text, `aria-label`s, placeholders, anything visible or exposed to
+assistive tech — MUST go through react-intl: a `defineMessages` entry in that
+component's `messages.ts`, rendered via `intl.formatMessage(...)` or
+`<FormattedMessage {...} />`. A raw string literal in JSX (`<Text>Cancel</Text>`,
+`aria-label="Form actions"`) MUST NOT ship, even for a single word. Message `id`s MUST
+be globally unique across the whole app, not just within a file or component — id
+collisions with *different* `defaultMessage` text are invisible in dev (react-intl
+falls back to each call site's own local `defaultMessage` when the compiled catalog
+has no matching entry, so nothing breaks until a catalog actually populates that id)
+but silently show the wrong text once one does. The catalogs are flat per-locale JSON
+files at `src/i18n/data/{core,en,de}.json`, regenerated from every `messages.ts` via
+`yarn extract-intl`; `en.json` and `de.json` MUST carry the exact same key set with
+matching `{placeholder}` tokens (verify programmatically, not by eye — a full pass is
+one `Object.keys` diff plus a placeholder-regex diff, not something to skip). This
+project's German locale is the reference: keep it fully in sync whenever messages
+change, at least until a wider translation workflow exists. Rationale: this was audited
+and found broken in practice — the Welcome page's five feature cards were pure
+hardcoded English JSX, never wired to react-intl at all, and 14 message ids across
+Extensions/Subscriptions/Types/Custom-Objects/States collided with different text in
+different components, both invisible for the same reason (empty/local-fallback
+catalogs mask exactly this class of bug) until German translations were actually
+populated.
 
 ### V. Optimistic Concurrency & Minimal Updates
 Every entity carries a `version`. Update and delete operations MUST send the current
@@ -150,6 +174,12 @@ happened once in this codebase and been reverted — see commit `07aca33`.
   Rationale: mocking hooks tests the mock, not the query/fragment shape actually sent
   over the wire — the GraphQL-layer approach has caught schema-shape regressions that
   hook mocking would have missed.
+- `yarn extract-intl`'s glob MUST exclude `.d.ts` files
+  (`src/**/!(*.spec|*.d).(ts|tsx)`). Including them crashes `formatjs`'s TypeScript
+  extraction on ambient-only declaration files (`src/globals.d.ts`) with an internal
+  "Debug Failure" — the command still exits 0 but silently overwrites
+  `src/i18n/data/core.json` with `{}`. Run it and skim the diff before trusting it;
+  don't assume a clean exit means it worked.
 
 ## Governance
 
@@ -167,8 +197,9 @@ MAJOR for backward-incompatible principle removals/redefinitions, MINOR for a ne
 principle or materially expanded guidance, PATCH for wording/clarification fixes.
 
 **Compliance review:** PRs that touch permission gating, key validation, update-action
-calculation, localized-string persistence, or connector fragment structure MUST be
-checked against the relevant principle above before merge. Deviations require an
-explicit rationale in the PR description, not silent drift.
+calculation, localized-string persistence, new/changed UI text and message ids, or
+connector fragment structure MUST be checked against the relevant principle above
+before merge. Deviations require an explicit rationale in the PR description, not
+silent drift.
 
-**Version**: 1.0.0 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-09-25
+**Version**: 1.1.0 | **Ratified**: 2026-06-25 | **Last Amended**: 2026-09-25

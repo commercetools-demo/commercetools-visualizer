@@ -123,35 +123,29 @@ const FieldDefinitionsList: FC<Props> = ({
     {
       id: 'required',
       header: intl.formatMessage(messages.columnFieldRequired),
-      accessor: (row) => row.required,
-      render: ({ value: required }) => (
-        <BooleanCell value={Boolean(required)} />
-      ),
+      accessor: (row) => <BooleanCell value={Boolean(row.required)} />,
     },
     {
       id: 'type',
       header: intl.formatMessage(messages.columnFieldType),
-      accessor: (row) => row.type,
-      render: ({ value: type }) => renderAttributeTypeName(type),
+      accessor: (row) => renderAttributeTypeName(row.type),
     },
     {
       id: 'set',
       header: intl.formatMessage(messages.columnFieldSet),
-      accessor: (row) => row.type?.name === 'Set',
-      render: ({ value: isSet }) => <BooleanCell value={Boolean(isSet)} />,
+      accessor: (row) => <BooleanCell value={row.type?.name === 'Set'} />,
     },
     {
       id: 'delete',
       header: '',
       isSortable: false,
-      accessor: (row) => row.name,
-      render: ({ value: name }) => (
+      accessor: (row) => (
         <IconButton
           aria-label={intl.formatMessage(messages.removeFieldDefinitionButton)}
           size="xs"
           variant="ghost"
           isDisabled={!canManage}
-          onPress={() => deleteItem(name as string)}
+          onPress={() => deleteItem(row.name)}
         >
           <Delete />
         </IconButton>

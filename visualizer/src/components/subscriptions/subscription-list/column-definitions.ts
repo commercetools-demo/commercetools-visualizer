@@ -34,17 +34,16 @@ const createColumnDefinitions = ({
   {
     id: 'destinationType',
     header: intl.formatMessage(messages.columnDestinationType),
-    accessor: (row) => row.destination.type,
-    render: ({ value: destinationType }) => {
+    accessor: (row) => {
       try {
         return intl.formatMessage(
           destinationMessages[
             ('destination' +
-              destinationType) as keyof typeof destinationMessages
+              row.destination.type) as keyof typeof destinationMessages
           ]
         );
       } catch {
-        return destinationType as string;
+        return row.destination.type;
       }
     },
   },

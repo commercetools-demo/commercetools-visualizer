@@ -37,8 +37,7 @@ const createColumnDefinitions = ({
   {
     id: 'value',
     header: intl.formatMessage(messages.columnHasValue),
-    accessor: (row) => Boolean(row.value),
-    render: ({ value }) => <BooleanCell value={Boolean(value)} />,
+    accessor: (row) => <BooleanCell value={Boolean(row.value)} />,
   },
 ];
 

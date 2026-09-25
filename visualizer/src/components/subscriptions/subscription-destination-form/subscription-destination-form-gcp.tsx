@@ -21,7 +21,7 @@ const GoogleCloudPubSubDestination: FC<Props> = ({ isReadOnly }) => {
   return (
     <>
       <Heading as="h3" size="sm">
-        Configure GCP Pub/Sub Destination
+        <FormattedMessage {...messages.configureGoogleCloudPubSubHeading} />
       </Heading>
       <FormField.Root
         isRequired

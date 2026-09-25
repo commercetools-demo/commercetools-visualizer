@@ -200,7 +200,10 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
               {subscription && formProps.formElements}
             </DefaultPage.Content>
             <DefaultPage.Footer>
-              <Group aria-label="Form actions" gap="300">
+              <Group
+                aria-label={intl.formatMessage(messages.formActionsLabel)}
+                gap="300"
+              >
                 <Button
                   variant="solid"
                   colorPalette="critical"

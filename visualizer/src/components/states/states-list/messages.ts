@@ -46,4 +46,9 @@ export default defineMessages<string>({
     id: 'States.StagedQuoteState',
     defaultMessage: 'Staged Quote State list ({amount})',
   },
+  itemsCount: {
+    id: 'States.itemsCount',
+    description: 'Count of states shown above the flow diagram',
+    defaultMessage: 'Items: {amount}',
+  },
 });

@@ -109,7 +109,11 @@ const StatesList = (props: Props) => {
   const renderState = (itemStates: Array<TState>) => {
     return (
       <Stack direction="column" gap="400">
-        <Text>Items: {itemStates.length}</Text>
+        <Text>
+          {intl.formatMessage(messages.itemsCount, {
+            amount: itemStates.length,
+          })}
+        </Text>
         <StateFlow
           items={itemStates}
           onNodeClick={(id: string) => push(`${match.url}/${id}`)}

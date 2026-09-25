@@ -1,8 +1,10 @@
 import { FC } from 'react';
+import { useIntl } from 'react-intl';
 import { Stack } from '@commercetools/nimbus';
 import GoogleCloudPubSubDestination from './subscription-destination-form-gcp';
 import SQSDestination from './subscription-destination-form-sqs';
 import ConfluentCloudDestination from './subscription-destination-form-confluent-cloud';
+import messages from './messages';
 
 type Props = {
   destinationType: string;
@@ -13,7 +15,12 @@ const SubscriptionDestinationForm: FC<Props> = ({
   destinationType,
   isReadOnly,
 }) => {
-  let toRender = <div>No mapping defined so far for {destinationType}</div>;
+  const intl = useIntl();
+  let toRender = (
+    <div>
+      {intl.formatMessage(messages.noMappingDefined, { destinationType })}
+    </div>
+  );
   switch (destinationType) {
     case 'GoogleCloudPubSub':
       toRender = <GoogleCloudPubSubDestination isReadOnly={isReadOnly} />;

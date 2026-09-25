@@ -96,4 +96,14 @@ export default defineMessages({
     description: 'The label for a time attribute type',
     defaultMessage: 'Date / Time (Time)',
   },
+  booleanYes: {
+    id: 'Type.field.booleanYes',
+    description: 'Accessible label for a true boolean cell',
+    defaultMessage: 'yes',
+  },
+  booleanNo: {
+    id: 'Type.field.booleanNo',
+    description: 'Accessible label for a false boolean cell',
+    defaultMessage: 'no',
+  },
 });

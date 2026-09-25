@@ -1,5 +1,7 @@
 import { FC, JSX, ReactElement } from 'react';
 import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
+import { FormattedMessage } from 'react-intl';
+import messages from './messages';
 import SubscriptionGeneralInfoForm from '../subscription-general-info-form/subscription-general-info-form';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
 import {
@@ -76,13 +78,17 @@ const SubscriptionDetailsForm: FC<Props> = ({
         defaultExpandedKeys={['key', 'destination']}
       >
         <Accordion.Item value="key">
-          <Accordion.Header>Key</Accordion.Header>
+          <Accordion.Header>
+            <FormattedMessage {...messages.keySectionTitle} />
+          </Accordion.Header>
           <Accordion.Content>
             <SubscriptionGeneralInfoForm isReadOnly={isReadOnly} />
           </Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="destination">
-          <Accordion.Header>Subscription Destination</Accordion.Header>
+          <Accordion.Header>
+            <FormattedMessage {...messages.destinationSectionTitle} />
+          </Accordion.Header>
           <Accordion.Content>
             <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
             <SubscriptionDestinationForm
@@ -92,13 +98,17 @@ const SubscriptionDetailsForm: FC<Props> = ({
           </Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="changes">
-          <Accordion.Header>Changes</Accordion.Header>
+          <Accordion.Header>
+            <FormattedMessage {...messages.changesSectionTitle} />
+          </Accordion.Header>
           <Accordion.Content>
             <SubscriptionChangesForm isReadOnly={isReadOnly} />
           </Accordion.Content>
         </Accordion.Item>
         <Accordion.Item value="messages">
-          <Accordion.Header>Messages</Accordion.Header>
+          <Accordion.Header>
+            <FormattedMessage {...messages.messagesSectionTitle} />
+          </Accordion.Header>
           <Accordion.Content>
             <SubscriptionMessagesForm isReadOnly={isReadOnly} />
           </Accordion.Content>

@@ -1,5 +1,5 @@
 import { FC, lazy } from 'react';
-import { useIntl } from 'react-intl';
+import { useIntl, type IntlShape } from 'react-intl';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
@@ -49,13 +49,13 @@ type Props = {
 
 type TFieldDefinitionWithId = { id: string } & TFieldDefinition;
 
-const BooleanCell = ({ value }: { value: boolean }) =>
+const BooleanCell = ({ value, intl }: { value: boolean; intl: IntlShape }) =>
   value ? (
-    <Box color="primary.9" aria-label="yes">
+    <Box color="primary.9" aria-label={intl.formatMessage(messages.booleanYes)}>
       <Check />
     </Box>
   ) : (
-    <Box color="neutral.9" aria-label="no">
+    <Box color="neutral.9" aria-label={intl.formatMessage(messages.booleanNo)}>
       <Close />
     </Box>
   );
@@ -123,7 +123,9 @@ const FieldDefinitionsList: FC<Props> = ({
     {
       id: 'required',
       header: intl.formatMessage(messages.columnFieldRequired),
-      accessor: (row) => <BooleanCell value={Boolean(row.required)} />,
+      accessor: (row) => (
+        <BooleanCell value={Boolean(row.required)} intl={intl} />
+      ),
     },
     {
       id: 'type',
@@ -133,7 +135,9 @@ const FieldDefinitionsList: FC<Props> = ({
     {
       id: 'set',
       header: intl.formatMessage(messages.columnFieldSet),
-      accessor: (row) => <BooleanCell value={row.type?.name === 'Set'} />,
+      accessor: (row) => (
+        <BooleanCell value={row.type?.name === 'Set'} intl={intl} />
+      ),
     },
     {
       id: 'delete',

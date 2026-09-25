@@ -40,4 +40,14 @@ export default defineMessages<string>({
     description: 'Title of the table column (has value)',
     defaultMessage: 'Has Value',
   },
+  booleanYes: {
+    id: 'CustomObjects.booleanYes',
+    description: 'Accessible label for a true boolean cell',
+    defaultMessage: 'yes',
+  },
+  booleanNo: {
+    id: 'CustomObjects.booleanNo',
+    description: 'Accessible label for a false boolean cell',
+    defaultMessage: 'no',
+  },
 });

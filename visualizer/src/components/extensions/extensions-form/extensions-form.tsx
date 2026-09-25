@@ -220,7 +220,10 @@ const ExtensionsForm: FC<Props> = ({
                   : null}
               </FormField.Error>
             </FormField.Root>
-            <ExtensionsDestinationsForm formik={formik} isReadOnly={!canManage} />
+            <ExtensionsDestinationsForm
+              formik={formik}
+              isReadOnly={!canManage}
+            />
           </Accordion.Content>
         </Accordion.Item>
 

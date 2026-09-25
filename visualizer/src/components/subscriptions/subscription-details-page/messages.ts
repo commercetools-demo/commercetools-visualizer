@@ -37,4 +37,9 @@ export default defineMessages<string>({
     id: 'Subscriptions.deleteButton',
     defaultMessage: 'Delete',
   },
+  formActionsLabel: {
+    id: 'Subscriptions.formActionsLabel',
+    description: 'Accessible label for the form action button group',
+    defaultMessage: 'Form actions',
+  },
 });

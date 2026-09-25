@@ -103,7 +103,10 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
           </DefaultPage.Header>
           <DefaultPage.Content>{formProps.formElements}</DefaultPage.Content>
           <DefaultPage.Footer>
-            <Group aria-label="Form actions" gap="300">
+            <Group
+              aria-label={intl.formatMessage(messages.formActionsLabel)}
+              gap="300"
+            >
               <Button
                 variant="outline"
                 onPress={() => history.push(linkToWelcome + '/subscriptions')}

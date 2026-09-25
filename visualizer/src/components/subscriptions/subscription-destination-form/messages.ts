@@ -69,4 +69,24 @@ export default defineMessages({
     description: 'destinationSQSAuthenticationMode',
     defaultMessage: 'The name of the topic.',
   },
+  noMappingDefined: {
+    id: 'Subscription.Destination.noMappingDefined',
+    description: 'Shown for destination types with no configuration UI',
+    defaultMessage: 'No mapping defined so far for {destinationType}',
+  },
+  configureGoogleCloudPubSubHeading: {
+    id: 'Subscription.Destination.configureGoogleCloudPubSubHeading',
+    description: 'Heading for the GCP Pub/Sub destination config form',
+    defaultMessage: 'Configure GCP Pub/Sub Destination',
+  },
+  configureSQSHeading: {
+    id: 'Subscription.Destination.configureSQSHeading',
+    description: 'Heading for the AWS SQS destination config form',
+    defaultMessage: 'Configure AWS SQS Destination',
+  },
+  configureConfluentCloudHeading: {
+    id: 'Subscription.Destination.configureConfluentCloudHeading',
+    description: 'Heading for the Confluent Cloud destination config form',
+    defaultMessage: 'Configure Confluent Cloud Destination',
+  },
 });

@@ -73,10 +73,16 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
       {formik.values.destinationHttpAuthenticationName ===
         'AuthorizationHeader' && (
         <FormField.Root isReadOnly={isReadOnly}>
-          <FormField.Label>Authorization header</FormField.Label>
+          <FormField.Label>
+            {intl.formatMessage(
+              messages.destinationHttpAuthorizationHeaderFieldLabel
+            )}
+          </FormField.Label>
           <FormField.Input>
             <TextInput
-              aria-label="Authorization header"
+              aria-label={intl.formatMessage(
+                messages.destinationHttpAuthorizationHeaderFieldLabel
+              )}
               value={
                 formik.values
                   .destinationHttpAuthenticationAuthorizationHeaderValue || ''
@@ -100,10 +106,16 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
       )}
       {formik.values.destinationHttpAuthenticationName === 'AzureFunctions' && (
         <FormField.Root isReadOnly={isReadOnly}>
-          <FormField.Label>Authorization Key</FormField.Label>
+          <FormField.Label>
+            {intl.formatMessage(
+              messages.destinationHttpAuthorizationKeyFieldLabel
+            )}
+          </FormField.Label>
           <FormField.Input>
             <TextInput
-              aria-label="Authorization Key"
+              aria-label={intl.formatMessage(
+                messages.destinationHttpAuthorizationKeyFieldLabel
+              )}
               value={
                 formik.values.destinationHttpAuthenticationAuthorizationKey ||
                 ''

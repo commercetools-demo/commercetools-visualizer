@@ -8,13 +8,13 @@ type TCreateColumnDefinitions = {
   intl: IntlShape;
 };
 
-const BooleanCell = ({ value }: { value: boolean }) =>
+const BooleanCell = ({ value, intl }: { value: boolean; intl: IntlShape }) =>
   value ? (
-    <Box color="primary.9" aria-label="yes">
+    <Box color="primary.9" aria-label={intl.formatMessage(messages.booleanYes)}>
       <Check />
     </Box>
   ) : (
-    <Box color="neutral.9" aria-label="no">
+    <Box color="neutral.9" aria-label={intl.formatMessage(messages.booleanNo)}>
       <Close />
     </Box>
   );
@@ -37,7 +37,7 @@ const createColumnDefinitions = ({
   {
     id: 'value',
     header: intl.formatMessage(messages.columnHasValue),
-    accessor: (row) => <BooleanCell value={Boolean(row.value)} />,
+    accessor: (row) => <BooleanCell value={Boolean(row.value)} intl={intl} />,
   },
 ];
 

@@ -22,4 +22,9 @@ export default defineMessages<string>({
     id: 'Subscriptions.CreateSubscriptionForm.createButton',
     defaultMessage: 'Create',
   },
+  formActionsLabel: {
+    id: 'Subscriptions.formActionsLabel',
+    description: 'Accessible label for the form action button group',
+    defaultMessage: 'Form actions',
+  },
 });

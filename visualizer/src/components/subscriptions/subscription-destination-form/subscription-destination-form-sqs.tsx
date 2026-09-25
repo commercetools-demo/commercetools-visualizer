@@ -46,7 +46,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
   return (
     <>
       <Heading as="h3" size="sm">
-        Configure AWS SQS Destination
+        <FormattedMessage {...messages.configureSQSHeading} />
       </Heading>
       <FormField.Root
         isRequired

@@ -15,10 +15,16 @@ import messages from './messages';
 type TInfoCardProps = {
   title: string;
   content: string;
+  viewButtonLabel: string;
   target: string;
 };
 
-const InfoCard: FC<TInfoCardProps> = ({ title, content, target }) => {
+const InfoCard: FC<TInfoCardProps> = ({
+  title,
+  content,
+  viewButtonLabel,
+  target,
+}) => {
   const { push } = useHistory();
   const match = useRouteMatch();
   return (
@@ -34,7 +40,7 @@ const InfoCard: FC<TInfoCardProps> = ({ title, content, target }) => {
       <Card.Footer>
         <Button variant="ghost" onPress={() => push(`${match.url}/${target}`)}>
           <Icon as={List} size="2xs" />
-          {`View ${title}`}
+          {viewButtonLabel}
         </Button>
       </Card.Footer>
     </Card.Root>
@@ -58,37 +64,38 @@ const Welcome = () => {
           gap="400"
         >
           <InfoCard
-            title={'Types'}
-            content={
-              ' Types allow you to define additional project-specific fields on resources and data types, so-called "Custom Fields."'
-            }
+            title={intl.formatMessage(messages.typesTitle)}
+            content={intl.formatMessage(messages.typesContent)}
+            viewButtonLabel={intl.formatMessage(messages.typesViewButton)}
             target={'types'}
           />
 
           <InfoCard
-            title={'Subscriptions'}
-            content={
-              'Subscriptions allow you to be notified of new messages or changes via a message queue of your choice.'
-            }
+            title={intl.formatMessage(messages.subscriptionsTitle)}
+            content={intl.formatMessage(messages.subscriptionsContent)}
+            viewButtonLabel={intl.formatMessage(
+              messages.subscriptionsViewButton
+            )}
             target={'subscriptions'}
           />
           <InfoCard
-            title={'States'}
-            content={
-              'States allow you to model finite state machines reflecting custom business logic. '
-            }
+            title={intl.formatMessage(messages.statesTitle)}
+            content={intl.formatMessage(messages.statesContent)}
+            viewButtonLabel={intl.formatMessage(messages.statesViewButton)}
             target={'states'}
           />
           <InfoCard
-            title={'API Extensions'}
-            content={'Extend the behavior of an API with your business logic.'}
+            title={intl.formatMessage(messages.extensionsTitle)}
+            content={intl.formatMessage(messages.extensionsContent)}
+            viewButtonLabel={intl.formatMessage(messages.extensionsViewButton)}
             target={'extensions'}
           />
           <InfoCard
-            title={'Custom Objects'}
-            content={
-              'Custom Objects store arbitrary JSON-formatted data on commercetools Composable Commerce.'
-            }
+            title={intl.formatMessage(messages.customObjectsTitle)}
+            content={intl.formatMessage(messages.customObjectsContent)}
+            viewButtonLabel={intl.formatMessage(
+              messages.customObjectsViewButton
+            )}
             target={'custom-objects'}
           />
         </Grid>

@@ -43,7 +43,7 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
   return (
     <>
       <Heading as="h3" size="sm">
-        Configure Confluent Cloud Destination
+        <FormattedMessage {...messages.configureConfluentCloudHeading} />
       </Heading>
 
       <FormField.Root

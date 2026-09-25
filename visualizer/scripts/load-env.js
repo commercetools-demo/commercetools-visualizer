@@ -12,7 +12,7 @@ const credentialsPath = path.join(
 
 if (!fs.existsSync(credentialsPath)) {
   throw new Error(
-    `No Merchant Center credentials found at ${credentialsPath}. Run "yarn generate-types:login" first.`
+    `No Merchant Center credentials found at ${credentialsPath}. Run "npm run login" first.`
   );
 }
 

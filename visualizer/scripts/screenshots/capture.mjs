@@ -4,7 +4,7 @@
 // under CUSTOM_OBJECTS_CONTAINER) — this only navigates the UI, it never creates
 // or modifies data itself.
 //
-// Usage: yarn start (in the visualizer/ root, in another terminal), then:
+// Usage: npm start (in the visualizer/ root, in another terminal), then:
 //   npm install && npm run login && npm run capture
 
 import { fileURLToPath } from 'url';

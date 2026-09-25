@@ -20,7 +20,7 @@
     "versions:test-data": "manypkg upgrade @commercetools-test-data",
     "generate-types:ctp": "node ./scripts/login.js && graphql-codegen -r ./scripts/load-env.js --config codegen.ctp.yml",
     "generate-types:chakra": "chakra typegen node_modules/@commercetools/nimbus/dist/theme.es.js",
-    "postinstall": "yarn generate-types:chakra"
+    "postinstall": "npm run generate-types:chakra"
   },
   "dependencies": {
     "@apollo/client": "3.13.9",
@@ -114,5 +114,5 @@
     "@chakra-ui/cli": "^3.37.0",
     "@commercetools-test-data/type": "^10.15.3"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "npm@10.9.2"
 }

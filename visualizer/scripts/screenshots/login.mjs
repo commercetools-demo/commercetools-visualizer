@@ -2,7 +2,7 @@
 // Merchant Center by hand, then saves the resulting session (cookies + localStorage)
 // to auth-state.json for capture.mjs to reuse headlessly.
 //
-// Usage: yarn start (in the visualizer/ root, in another terminal), then:
+// Usage: npm start (in the visualizer/ root, in another terminal), then:
 //   npm install && npm run login
 
 import { fileURLToPath } from 'url';

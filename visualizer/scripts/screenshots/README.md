@@ -9,7 +9,7 @@ against a real, logged-in Merchant Center session, headlessly, using Playwright.
   Subscription, Type, and a Custom Object under the container passed as
   `CUSTOM_OBJECTS_CONTAINER`. This script only navigates the UI — it never creates or
   modifies data.
-- The dev server running in another terminal: `cd visualizer && yarn start` (defaults to
+- The dev server running in another terminal: `cd visualizer && npm start` (defaults to
   `http://localhost:3001`).
 
 ## Usage

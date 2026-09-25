@@ -83,6 +83,7 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
       }}
       onSubmit={handleSubmit}
       dataLocale=""
+      isReadOnly={!canManage}
     >
       {(formProps) => (
         <DefaultPage.Root>

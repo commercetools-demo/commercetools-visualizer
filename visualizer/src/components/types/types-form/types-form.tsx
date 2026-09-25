@@ -177,7 +177,7 @@ const TypesForm: FC<Props> = ({
           />
           <FormField.Root
             isRequired
-            isReadOnly={!createNewMode}
+            isReadOnly={!createNewMode || !canManage}
             isInvalid={Boolean(formik.touched.key && errors.key)}
           >
             <FormField.Label>
@@ -187,7 +187,7 @@ const TypesForm: FC<Props> = ({
               <TextInput
                 aria-label={intl.formatMessage(messages.keyTitle)}
                 value={formik.values.key || ''}
-                isReadOnly={!createNewMode}
+                isReadOnly={!createNewMode || !canManage}
                 onChange={(value) => formik.setFieldValue('key', value)}
                 onBlur={() => formik.setFieldTouched('key', true)}
               />
@@ -199,7 +199,7 @@ const TypesForm: FC<Props> = ({
           </FormField.Root>
           <FormField.Root
             isRequired
-            isReadOnly={!createNewMode}
+            isReadOnly={!createNewMode || !canManage}
             isInvalid={Boolean(
               formik.touched.resourceTypeIds && errors.resourceTypeIds
             )}
@@ -212,7 +212,7 @@ const TypesForm: FC<Props> = ({
                 aria-label={intl.formatMessage(messages.resourceTypeIdsTitle)}
                 items={resourceTypeItems}
                 selectionMode="multiple"
-                isReadOnly={!createNewMode}
+                isReadOnly={!createNewMode || !canManage}
                 selectedKeys={formik.values.resourceTypeIds}
                 onSelectionChange={(keys) =>
                   formik.setFieldValue('resourceTypeIds', keys as string[])

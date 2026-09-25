@@ -5,17 +5,19 @@ import { FC } from 'react';
 
 type Props = {
   formik: ReturnType<typeof useFormik<TFormValues>>;
+  isReadOnly?: boolean;
 };
 
-const ExtensionsDestinationsFormAws: FC<Props> = ({ formik }) => {
+const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
   return (
     <Stack direction="column" gap="400">
-      <FormField.Root isRequired>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
         <FormField.Label>ARN</FormField.Label>
         <FormField.Input>
           <TextInput
             aria-label="ARN"
             value={formik.values.destinationAwsArn || ''}
+            isReadOnly={isReadOnly}
             onChange={(value) =>
               formik.setFieldValue('destinationAwsArn', value)
             }
@@ -23,12 +25,13 @@ const ExtensionsDestinationsFormAws: FC<Props> = ({ formik }) => {
           />
         </FormField.Input>
       </FormField.Root>
-      <FormField.Root isRequired>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
         <FormField.Label>AccessKey</FormField.Label>
         <FormField.Input>
           <TextInput
             aria-label="AccessKey"
             value={formik.values.destinationAwsAccessKey || ''}
+            isReadOnly={isReadOnly}
             onChange={(value) =>
               formik.setFieldValue('destinationAwsAccessKey', value)
             }
@@ -38,12 +41,13 @@ const ExtensionsDestinationsFormAws: FC<Props> = ({ formik }) => {
           />
         </FormField.Input>
       </FormField.Root>
-      <FormField.Root isRequired>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
         <FormField.Label>AccessSecret</FormField.Label>
         <FormField.Input>
           <TextInput
             aria-label="AccessSecret"
             value={formik.values.destinationAwsAccessSecret || ''}
+            isReadOnly={isReadOnly}
             onChange={(value) =>
               formik.setFieldValue('destinationAwsAccessSecret', value)
             }

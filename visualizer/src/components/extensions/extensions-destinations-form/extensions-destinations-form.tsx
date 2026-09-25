@@ -7,8 +7,9 @@ import ExtensionsDestinationsFormAws from './extensions-destinations-form-aws';
 
 type Props = {
   formik: ReturnType<typeof useFormik<TFormValues>>;
+  isReadOnly?: boolean;
 };
-const ExtensionsDestinationsForm: FC<Props> = ({ formik }) => {
+const ExtensionsDestinationsForm: FC<Props> = ({ formik, isReadOnly }) => {
   let toRender = (
     <Text color="neutral.11">
       No mapping defined so far for {formik.values.destinationName}
@@ -16,10 +17,20 @@ const ExtensionsDestinationsForm: FC<Props> = ({ formik }) => {
   );
   switch (formik.values.destinationName) {
     case 'HTTP':
-      toRender = <ExtensionsDestinationsFormHttp formik={formik} />;
+      toRender = (
+        <ExtensionsDestinationsFormHttp
+          formik={formik}
+          isReadOnly={isReadOnly}
+        />
+      );
       break;
     case 'AWSLambda':
-      toRender = <ExtensionsDestinationsFormAws formik={formik} />;
+      toRender = (
+        <ExtensionsDestinationsFormAws
+          formik={formik}
+          isReadOnly={isReadOnly}
+        />
+      );
       break;
   }
   return <>{toRender}</>;

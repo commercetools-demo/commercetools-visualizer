@@ -107,7 +107,7 @@ const CustomObjectForm: FC<Props> = ({
         <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
           <FormField.Root
             isRequired
-            isReadOnly={!createNewMode}
+            isReadOnly={!createNewMode || !canManage}
             isInvalid={Boolean(formik.touched.key && errors.key)}
           >
             <FormField.Label>
@@ -117,7 +117,7 @@ const CustomObjectForm: FC<Props> = ({
               <TextInput
                 name="key"
                 value={formik.values.key}
-                isReadOnly={!createNewMode}
+                isReadOnly={!createNewMode || !canManage}
                 onChange={(value) => formik.setFieldValue('key', value)}
                 onBlur={() => formik.setFieldTouched('key', true)}
               />
@@ -133,7 +133,7 @@ const CustomObjectForm: FC<Props> = ({
           </FormField.Root>
           <FormField.Root
             isRequired
-            isReadOnly={!createNewMode}
+            isReadOnly={!createNewMode || !canManage}
             isInvalid={Boolean(formik.touched.container && errors.container)}
           >
             <FormField.Label>
@@ -143,7 +143,7 @@ const CustomObjectForm: FC<Props> = ({
               <TextInput
                 name="container"
                 value={formik.values.container}
-                isReadOnly={!createNewMode}
+                isReadOnly={!createNewMode || !canManage}
                 onChange={(value) => formik.setFieldValue('container', value)}
                 onBlur={() => formik.setFieldTouched('container', true)}
               />

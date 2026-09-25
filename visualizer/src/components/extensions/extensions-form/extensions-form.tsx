@@ -10,9 +10,11 @@ import { ApolloQueryResult } from '@apollo/client';
 import { Accordion, FormField, Select, TextInput } from '@commercetools/nimbus';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import messages from './messages';
 import ExtensionsTriggersForm from '../extensions-triggers-form/extensions-triggers-form';
 import ExtensionsDestinationsForm from '../extensions-destinations-form/extensions-destinations-form';
+import { PERMISSIONS } from '../../../constants';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -122,6 +124,13 @@ const ExtensionsForm: FC<Props> = ({
   });
   const intl = useIntl();
   const errors = formik.errors as Partial<TErrors>;
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
+  // Key and destination type are immutable once created (createNewMode), independent of
+  // permission; destination config and triggers have no such immutability rule and are only
+  // gated by canManage.
+  const isImmutableFieldReadOnly = !createNewMode || !canManage;
 
   const formElements = (
     <FormikProvider value={formik}>
@@ -138,7 +147,7 @@ const ExtensionsForm: FC<Props> = ({
           <Accordion.Content>
             <FormField.Root
               isRequired
-              isReadOnly={!createNewMode}
+              isReadOnly={isImmutableFieldReadOnly}
               isInvalid={Boolean(formik.touched.key && errors.key)}
             >
               <FormField.Label>
@@ -148,7 +157,7 @@ const ExtensionsForm: FC<Props> = ({
                 <TextInput
                   aria-label={intl.formatMessage(messages.keyTitle)}
                   value={formik.values.key || ''}
-                  isReadOnly={!createNewMode}
+                  isReadOnly={isImmutableFieldReadOnly}
                   onChange={(value) => formik.setFieldValue('key', value)}
                   onBlur={() => formik.setFieldTouched('key', true)}
                 />
@@ -170,7 +179,7 @@ const ExtensionsForm: FC<Props> = ({
           <Accordion.Content>
             <FormField.Root
               isRequired
-              isReadOnly={!createNewMode}
+              isReadOnly={isImmutableFieldReadOnly}
               isInvalid={Boolean(
                 formik.touched.destinationName && errors.destinationName
               )}
@@ -181,7 +190,7 @@ const ExtensionsForm: FC<Props> = ({
               <FormField.Input>
                 <Select.Root
                   aria-label={intl.formatMessage(messages.destinationLabel)}
-                  isDisabled={!createNewMode}
+                  isDisabled={isImmutableFieldReadOnly}
                   value={formik.values.destinationName || ''}
                   onChange={(value) =>
                     formik.setFieldValue(
@@ -211,7 +220,7 @@ const ExtensionsForm: FC<Props> = ({
                   : null}
               </FormField.Error>
             </FormField.Root>
-            <ExtensionsDestinationsForm formik={formik} />
+            <ExtensionsDestinationsForm formik={formik} isReadOnly={!canManage} />
           </Accordion.Content>
         </Accordion.Item>
 
@@ -220,7 +229,7 @@ const ExtensionsForm: FC<Props> = ({
             <FormattedMessage {...messages.triggersTitle} />
           </Accordion.Header>
           <Accordion.Content>
-            <ExtensionsTriggersForm />
+            <ExtensionsTriggersForm isReadOnly={!canManage} />
           </Accordion.Content>
         </Accordion.Item>
       </Accordion.Root>

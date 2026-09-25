@@ -10,13 +10,14 @@ import {
 
 type Props = {
   formik: ReturnType<typeof useFormik<TFormValues>>;
+  isReadOnly?: boolean;
 };
 
-const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
+const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
   const intl = useIntl();
   return (
     <Stack direction="column" gap="400">
-      <FormField.Root isRequired>
+      <FormField.Root isRequired isReadOnly={isReadOnly}>
         <FormField.Label>
           {intl.formatMessage(messages.destinationHttpUrl)}
         </FormField.Label>
@@ -24,6 +25,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
           <TextInput
             aria-label={intl.formatMessage(messages.destinationHttpUrl)}
             value={formik.values.destinationHttpUrl || ''}
+            isReadOnly={isReadOnly}
             onChange={(value) =>
               formik.setFieldValue('destinationHttpUrl', value)
             }
@@ -31,7 +33,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
           />
         </FormField.Input>
       </FormField.Root>
-      <FormField.Root>
+      <FormField.Root isReadOnly={isReadOnly}>
         <FormField.Label>
           {intl.formatMessage(messages.destinationHttpAuthentication)}
         </FormField.Label>
@@ -41,6 +43,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
               messages.destinationHttpAuthentication
             )}
             isClearable
+            isDisabled={isReadOnly}
             value={formik.values.destinationHttpAuthenticationName || ''}
             onChange={(value) =>
               formik.setFieldValue(
@@ -69,7 +72,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
       </FormField.Root>
       {formik.values.destinationHttpAuthenticationName ===
         'AuthorizationHeader' && (
-        <FormField.Root>
+        <FormField.Root isReadOnly={isReadOnly}>
           <FormField.Label>Authorization header</FormField.Label>
           <FormField.Input>
             <TextInput
@@ -78,6 +81,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
                 formik.values
                   .destinationHttpAuthenticationAuthorizationHeaderValue || ''
               }
+              isReadOnly={isReadOnly}
               onChange={(value) =>
                 formik.setFieldValue(
                   'destinationHttpAuthenticationAuthorizationHeaderValue',
@@ -95,7 +99,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
         </FormField.Root>
       )}
       {formik.values.destinationHttpAuthenticationName === 'AzureFunctions' && (
-        <FormField.Root>
+        <FormField.Root isReadOnly={isReadOnly}>
           <FormField.Label>Authorization Key</FormField.Label>
           <FormField.Input>
             <TextInput
@@ -104,6 +108,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik }) => {
                 formik.values.destinationHttpAuthenticationAuthorizationKey ||
                 ''
               }
+              isReadOnly={isReadOnly}
               onChange={(value) =>
                 formik.setFieldValue(
                   'destinationHttpAuthenticationAuthorizationKey',

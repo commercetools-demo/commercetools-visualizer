@@ -14,10 +14,12 @@ import {
   type SortDescriptor,
 } from '@commercetools/nimbus';
 import { Add } from '@commercetools/nimbus-icons';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import messages from './messages';
 import { getErrorMessage, useSubscriptionsFetcher } from '../../../hooks';
 import createColumnDefinitions from './column-definitions';
+import { PERMISSIONS } from '../../../constants';
 
 type Props = {
   linkToHome: string;
@@ -37,6 +39,9 @@ const toSortString = (sortDescriptor: SortDescriptor): string =>
 const SubscriptionList = (props: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
@@ -91,6 +96,7 @@ const SubscriptionList = (props: Props) => {
           <Button
             variant="outline"
             colorPalette="primary"
+            isDisabled={!canManage}
             onPress={() => push(`${props.linkToHome}/subscription/new`)}
           >
             <Add />

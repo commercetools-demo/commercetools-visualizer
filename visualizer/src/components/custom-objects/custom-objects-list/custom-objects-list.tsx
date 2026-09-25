@@ -18,12 +18,14 @@ import {
 } from '@commercetools/nimbus';
 import { Add } from '@commercetools/nimbus-icons';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
+import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { getErrorMessage, useCustomObjectsFetcher } from '../../../hooks';
 import { TCustomObject } from '../../../types/generated/ctp';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
 import CustomObjectEdit from '../custom-object-edit/custom-object-edit';
 import CustomObjectCreate from '../custom-object-create/custom-object-create';
+import { PERMISSIONS } from '../../../constants';
 
 const DEFAULT_PER_PAGE = 20;
 
@@ -35,6 +37,9 @@ const CustomObjectsList: FC<Props> = ({ linkToHome }) => {
   const intl = useIntl();
   const { push } = useHistory();
   const match = useRouteMatch();
+  const canManage = useIsAuthorized({
+    demandedPermissions: [PERMISSIONS.Manage],
+  });
 
   const [container, setContainer] = useState('');
   const [page, setPage] = useState(1);
@@ -76,6 +81,7 @@ const CustomObjectsList: FC<Props> = ({ linkToHome }) => {
           <Button
             variant="outline"
             colorPalette="primary"
+            isDisabled={!canManage}
             onPress={() => push(`${linkToHome}/custom-objects/new`)}
           >
             <Add />

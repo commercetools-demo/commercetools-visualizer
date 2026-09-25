@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { useField } from 'formik';
 import { Card, Checkbox, Heading, Stack, Table } from '@commercetools/nimbus';
 import { IntlShape, useIntl } from 'react-intl';
@@ -56,7 +57,11 @@ const toggleAction = (
     : otherTriggers;
 };
 
-const ExtensionsTriggersForm = () => {
+type Props = {
+  isReadOnly?: boolean;
+};
+
+const ExtensionsTriggersForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
   const [field, , helpers] = useField<Array<TTriggerInput>>('triggers');
 
@@ -93,6 +98,7 @@ const ExtensionsTriggersForm = () => {
                           intl,
                           action
                         )}`}
+                        isReadOnly={isReadOnly}
                         isSelected={isActionEnabled(
                           field.value,
                           resourceTypeId,

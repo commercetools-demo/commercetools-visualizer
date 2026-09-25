@@ -1,0 +1,12 @@
+{
+  "name": "visualizer-screenshots",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "login": "node login.mjs",
+    "capture": "node capture.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.61.0"
+  }
+}

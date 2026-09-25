@@ -147,13 +147,16 @@ export const initialValuesFromFieldDefinition = (
   let typeName = fieldDefinition?.type?.name || '';
   let format: 'date' | 'datetime' | 'time' = 'date';
   let enumValues: Array<Item> = [];
+  // For a Set, the element type (not the outer SetType) carries the
+  // type-specific fields (referenceTypeId, values, ...).
+  let actualType = fieldDefinition?.type;
 
   if (fieldDefinition?.type?.name) {
     if (fieldDefinition?.type?.name === 'Set') {
-      console.log(fieldDefinition?.type);
       const setType = fieldDefinition?.type as TSetType;
       isSet = true;
       typeName = setType.elementType.name;
+      actualType = setType.elementType;
     }
     if (typeName === 'DateTime') {
       format = 'datetime';
@@ -167,7 +170,7 @@ export const initialValuesFromFieldDefinition = (
     } else if (typeName === 'LocalizedEnum') {
       isLocalized = true;
       typeName = 'Enum';
-      let type = fieldDefinition?.type as TLocalizedEnumType;
+      let type = actualType as TLocalizedEnumType;
       enumValues = type.values.map(
         (value): Item => ({
           key: value.key,
@@ -178,7 +181,7 @@ export const initialValuesFromFieldDefinition = (
         })
       );
     } else if (typeName === 'Enum') {
-      let type = fieldDefinition?.type as TEnumType;
+      let type = actualType as TEnumType;
       enumValues = type.values.map(
         (value): Item => ({ key: value.key, label: value.label })
       );
@@ -202,7 +205,7 @@ export const initialValuesFromFieldDefinition = (
     typeName: typeName as Fields,
     referenceTypeId:
       typeName === 'Reference'
-        ? (fieldDefinition?.type as TReferenceType).referenceTypeId
+        ? (actualType as TReferenceType).referenceTypeId
         : '',
     enumValues: enumValues,
     isSet: isSet,

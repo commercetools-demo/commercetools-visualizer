@@ -16,6 +16,24 @@ query FetchTypeWithDefinitionByName($id: String, $includeNames: [String!]) {
         ... on SetType {
           elementType {
             name
+            ... on ReferenceType {
+              referenceTypeId
+            }
+            ... on EnumType {
+              values {
+                key
+                label
+              }
+            }
+            ... on LocalizedEnumType {
+              values {
+                key
+                labelAllLocales {
+                  locale
+                  value
+                }
+              }
+            }
           }
         }
         ... on EnumType {

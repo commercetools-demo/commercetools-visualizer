@@ -19,6 +19,9 @@ fragment TypeDefinitionFragment on TypeDefinition {
       ... on SetType {
         elementType {
           name
+          ... on ReferenceType {
+            referenceTypeId
+          }
         }
       }
     }

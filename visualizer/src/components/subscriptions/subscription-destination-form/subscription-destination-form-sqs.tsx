@@ -69,6 +69,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
               )
             }
             onBlur={() => authenticationModeHelpers.setTouched(true)}
+            width={'full'}
           >
             <Select.Options>
               {AUTHENTICATION_MODES.map((mode) => (
@@ -103,6 +104,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
                   isReadOnly={isReadOnly}
                   onBlur={() => accessKeyHelpers.setTouched(true)}
                   onChange={(value) => accessKeyHelpers.setValue(value)}
+                  width={'full'}
                 />
               </FormField.Input>
               <FormField.Error>
@@ -128,6 +130,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
                   isReadOnly={isReadOnly}
                   onBlur={() => accessSecretHelpers.setTouched(true)}
                   onChange={(value) => accessSecretHelpers.setValue(value)}
+                  width={'full'}
                 />
               </FormField.Input>
               <FormField.Error>
@@ -154,6 +157,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => queueUrlHelpers.setTouched(true)}
             onChange={(value) => queueUrlHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>
@@ -177,6 +181,7 @@ const SQSDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => regionHelpers.setTouched(true)}
             onChange={(value) => regionHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>

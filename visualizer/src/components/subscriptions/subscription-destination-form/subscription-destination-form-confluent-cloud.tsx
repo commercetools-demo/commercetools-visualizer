@@ -176,6 +176,7 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
             isReadOnly={isReadOnly}
             onBlur={() => topicHelpers.setTouched(true)}
             onChange={(value) => topicHelpers.setValue(value)}
+            width={'full'}
           />
         </FormField.Input>
         <FormField.Error>

@@ -1,6 +1,7 @@
 import { FC, JSX, ReactElement } from 'react';
 import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
 import { FormattedMessage } from 'react-intl';
+import omitEmpty from 'omit-empty-es';
 import messages from './messages';
 import SubscriptionGeneralInfoForm from '../subscription-general-info-form/subscription-general-info-form';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
@@ -40,6 +41,25 @@ export type TFormValues = {
   messages?: Array<TMessageSubscriptionInput> | null;
 };
 
+type TErrors = {
+  key: { missing?: boolean; invalidInput?: boolean };
+};
+
+const validate = (formikValues: TFormValues): TErrors => {
+  const errors: TErrors = { key: {} };
+
+  if (formikValues.key && formikValues.key.length > 0) {
+    const keyValue = formikValues.key.trim();
+    const keyLength = keyValue.length;
+    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
+      errors.key.invalidInput = true;
+  } else {
+    errors.key.missing = true;
+  }
+
+  return omitEmpty<TErrors>(errors);
+};
+
 type FormProps = {
   formElements: ReactElement;
   values: Formik['values'];
@@ -69,6 +89,7 @@ const SubscriptionDetailsForm: FC<Props> = ({
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
+    validate: validate,
     enableReinitialize: true,
   });
   const formElements = (

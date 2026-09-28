@@ -4,19 +4,6 @@ import { FC, ReactNode } from 'react';
 import { FormField, TextInput } from '@commercetools/nimbus';
 import messages from './messages';
 
-export const validateKeyInput = (key: string) => {
-  const hasKeyValue = Boolean(key);
-  if (hasKeyValue) {
-    const keyValue = key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      return JSON.stringify({ invalidInput: true });
-  } else {
-    return JSON.stringify({ missing: true });
-  }
-  return undefined;
-};
-
 const renderKeyInputError = (key?: string): ReactNode => {
   switch (key) {
     case 'invalidInput':
@@ -33,18 +20,16 @@ const renderKeyInputError = (key?: string): ReactNode => {
 type Props = { isReadOnly?: boolean };
 
 const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
-  const [keyField, keyMeta, keyHelpers] = useField<string>({
-    name: 'key',
-    validate: (key: string) => validateKeyInput(key),
-  });
-  let parsedErrorKey: string | undefined;
-  if (keyMeta.error) {
-    const parsedError =
-      typeof keyMeta.error === 'string'
-        ? JSON.parse(keyMeta.error)
-        : keyMeta.error;
-    parsedErrorKey = Object.keys(parsedError)[0];
-  }
+  const [keyField, keyMeta, keyHelpers] = useField<string>('key');
+  // The key validation lives in subscription-details-form.tsx's top-level
+  // useFormik `validate`, which sets errors as plain objects (e.g.
+  // `{ invalidInput: true }`) rather than the string Formik's `FieldMetaProps`
+  // type expects — same shape graphQLErrorHandler's `setErrors` uses for the
+  // server-side `duplicate` error.
+  const keyError = keyMeta.error as unknown as
+    | Record<string, boolean>
+    | undefined;
+  const parsedErrorKey = keyError ? Object.keys(keyError)[0] : undefined;
   return (
     <FormField.Root
       isRequired

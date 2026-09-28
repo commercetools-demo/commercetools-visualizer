@@ -2,7 +2,7 @@ import dagre from 'dagre';
 
 import { NO_VALUE_FALLBACK } from '@commercetools-frontend/constants';
 
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useLayoutEffect, useRef, useState } from 'react';
 import {
   ReactFlow,
   useNodesState,
@@ -66,11 +66,38 @@ interface Props {
   onNodeClick?: (id: string) => void;
 }
 
+// The Merchant Center app shell lets the whole page scroll rather than
+// pinning content to a fixed-height viewport, so there is no reliable CSS
+// percentage/flex chain to size the flow diagram against. Instead measure
+// the space available below the container down to the bottom of the
+// viewport at render time, and keep it in sync on resize.
+const DEFAULT_HEIGHT = 400;
+
+const useAvailableHeight = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState<number>(DEFAULT_HEIGHT);
+
+  useLayoutEffect(() => {
+    const updateHeight = () => {
+      if (containerRef.current) {
+        const { top } = containerRef.current.getBoundingClientRect();
+        setHeight(Math.max(window.innerHeight - top, 200));
+      }
+    };
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
+  return { containerRef, height };
+};
+
 const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
   }));
+  const { containerRef, height } = useAvailableHeight();
   const initialNodes: Array<Node> = items.map((item) => {
     let type = '';
     if (item.initial) {
@@ -130,7 +157,7 @@ const StateFlow: FC<Props> = ({ items, onNodeClick }) => {
   );
 
   return (
-    <div style={{ height: '400px', width: '100%' }}>
+    <div ref={containerRef} style={{ height, width: '100%' }}>
       <ReactFlow
         nodes={nodes}
         edges={edges}

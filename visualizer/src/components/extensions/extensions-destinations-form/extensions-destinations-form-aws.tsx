@@ -1,4 +1,4 @@
-import { useFormik } from 'formik';
+import { useFormikContext } from 'formik';
 import { useIntl } from 'react-intl';
 import { FormField, Stack, TextInput } from '@commercetools/nimbus';
 import { TFormValues } from '../extensions-form/extensions-form';
@@ -6,12 +6,12 @@ import { FC } from 'react';
 import messages from './messages';
 
 type Props = {
-  formik: ReturnType<typeof useFormik<TFormValues>>;
   isReadOnly?: boolean;
 };
 
-const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
+const ExtensionsDestinationsFormAws: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
+  const formik = useFormikContext<TFormValues>();
   return (
     <Stack direction="column" gap="400">
       <FormField.Root isRequired isReadOnly={isReadOnly}>

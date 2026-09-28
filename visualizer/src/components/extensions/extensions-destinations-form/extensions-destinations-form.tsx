@@ -3,16 +3,16 @@ import { useIntl } from 'react-intl';
 import { Text } from '@commercetools/nimbus';
 import { TFormValues } from '../extensions-form/extensions-form';
 import ExtensionsDestinationsFormHttp from './extensions-destinations-form-http';
-import { useFormik } from 'formik';
+import { useFormikContext } from 'formik';
 import ExtensionsDestinationsFormAws from './extensions-destinations-form-aws';
 import messages from './messages';
 
 type Props = {
-  formik: ReturnType<typeof useFormik<TFormValues>>;
   isReadOnly?: boolean;
 };
-const ExtensionsDestinationsForm: FC<Props> = ({ formik, isReadOnly }) => {
+const ExtensionsDestinationsForm: FC<Props> = ({ isReadOnly }) => {
   const intl = useIntl();
+  const formik = useFormikContext<TFormValues>();
   let toRender = (
     <Text color="neutral.11">
       {intl.formatMessage(messages.noMappingDefined, {
@@ -22,20 +22,10 @@ const ExtensionsDestinationsForm: FC<Props> = ({ formik, isReadOnly }) => {
   );
   switch (formik.values.destinationName) {
     case 'HTTP':
-      toRender = (
-        <ExtensionsDestinationsFormHttp
-          formik={formik}
-          isReadOnly={isReadOnly}
-        />
-      );
+      toRender = <ExtensionsDestinationsFormHttp isReadOnly={isReadOnly} />;
       break;
     case 'AWSLambda':
-      toRender = (
-        <ExtensionsDestinationsFormAws
-          formik={formik}
-          isReadOnly={isReadOnly}
-        />
-      );
+      toRender = <ExtensionsDestinationsFormAws isReadOnly={isReadOnly} />;
       break;
   }
   return <>{toRender}</>;

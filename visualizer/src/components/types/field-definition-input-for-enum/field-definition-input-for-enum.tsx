@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useIntl } from 'react-intl';
-import { useFormik } from 'formik';
+import { useFormikContext } from 'formik';
 import {
   Box,
   Button,
@@ -15,8 +15,6 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import messages from './messages';
 import { Item, LocalizedString } from './constants';
 import { TFormValues } from '../field-definition-input/helpers';
-
-type Formik = ReturnType<typeof useFormik>;
 
 const getLocalizedEnumLabel = (
   docLabel: LocalizedString,
@@ -88,25 +86,16 @@ type Props = {
     nextValue: string;
     absoluteIndex: number;
   }) => void;
-  formik: {
-    errors: Formik['errors'];
-    touched: Formik['touched'];
-    setFieldValue: Formik['setFieldValue'];
-    setFieldTouched: Formik['setFieldTouched'];
-    setTouched: Formik['setTouched'];
-    values: TFormValues;
-    handleChange: Formik['handleChange'];
-  };
   isDisabled?: boolean;
 };
 
 const FieldDefinitionInputForEnum: FC<Props> = ({
-  formik,
   onAddEnumValue,
   onRemoveEnumValue,
   onChangeEnumValue,
   isDisabled,
 }) => {
+  const formik = useFormikContext<TFormValues>();
   const intl = useIntl();
   const { projectLanguages } = useApplicationContext((context) => ({
     projectLanguages: context.project?.languages ?? [],

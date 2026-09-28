@@ -7,7 +7,14 @@ import {
 import { FC, ReactElement } from 'react';
 import { type FormikHelpers, FormikProvider, useFormik } from 'formik';
 import { ApolloQueryResult } from '@apollo/client';
-import { Accordion, FormField, Select, TextInput } from '@commercetools/nimbus';
+import {
+  Accordion,
+  Flex,
+  FormField,
+  PageContent,
+  Select,
+  TextInput,
+} from '@commercetools/nimbus';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
@@ -17,6 +24,7 @@ import ExtensionsDestinationsForm from '../extensions-destinations-form/extensio
 import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
+import keyInputMessages from '../../shared/key-input-error/messages';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -120,108 +128,109 @@ const ExtensionsForm: FC<Props> = ({
 
   const formElements = (
     <FormikProvider value={formik}>
-      <Accordion.Root
-        allowsMultipleExpanded
-        defaultExpandedKeys={
-          createNewMode ? ['general', 'destination', 'triggers'] : ['general']
-        }
-      >
-        <Accordion.Item value="general">
-          <Accordion.Header>
-            <FormattedMessage {...messages.generalInformationTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <FormField.Root
-              isRequired
-              isReadOnly={isImmutableFieldReadOnly}
-              isInvalid={Boolean(formik.touched.key && errors.key)}
-            >
-              <FormField.Label>
-                {intl.formatMessage(messages.keyTitle)}
-              </FormField.Label>
-              <FormField.Input>
-                <TextInput
-                  aria-label={intl.formatMessage(messages.keyTitle)}
-                  value={formik.values.key || ''}
+      <PageContent.Root variant={'wide'}>
+        <Flex direction="column" gap="400">
+          <FormField.Root
+            isRequired
+            isReadOnly={isImmutableFieldReadOnly}
+            isInvalid={Boolean(formik.touched.key && errors.key)}
+          >
+            <FormField.Label>
+              {intl.formatMessage(messages.keyTitle)}
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
+                name="key"
+                aria-label={intl.formatMessage(messages.keyTitle)}
+                value={formik.values.key || ''}
+                isReadOnly={isImmutableFieldReadOnly}
+                onChange={(value) => formik.setFieldValue('key', value)}
+                onBlur={() => formik.setFieldTouched('key', true)}
+                width={'full'}
+              />
+            </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(keyInputMessages.keyHint)}
+            </FormField.Description>
+            <FormField.Error>
+              <KeyInputError error={errors.key} resourceLabel="extension" />
+            </FormField.Error>
+          </FormField.Root>
+          <Accordion.Root
+            allowsMultipleExpanded
+            defaultExpandedKeys={
+              createNewMode ? ['destination', 'triggers'] : []
+            }
+          >
+            <Accordion.Item value="destination">
+              <Accordion.Header>
+                <FormattedMessage {...messages.destinationTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <FormField.Root
+                  isRequired
                   isReadOnly={isImmutableFieldReadOnly}
-                  onChange={(value) => formik.setFieldValue('key', value)}
-                  onBlur={() => formik.setFieldTouched('key', true)}
-                />
-              </FormField.Input>
-              <FormField.Description>
-                {intl.formatMessage(messages.keyHint)}
-              </FormField.Description>
-              <FormField.Error>
-                <KeyInputError error={errors.key} resourceLabel="extension" />
-              </FormField.Error>
-            </FormField.Root>
-          </Accordion.Content>
-        </Accordion.Item>
-
-        <Accordion.Item value="destination">
-          <Accordion.Header>
-            <FormattedMessage {...messages.destinationTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <FormField.Root
-              isRequired
-              isReadOnly={isImmutableFieldReadOnly}
-              isInvalid={Boolean(
-                formik.touched.destinationName && errors.destinationName
-              )}
-            >
-              <FormField.Label>
-                {intl.formatMessage(messages.destinationLabel)}
-              </FormField.Label>
-              <FormField.Input>
-                <Select.Root
-                  aria-label={intl.formatMessage(messages.destinationLabel)}
-                  isDisabled={isImmutableFieldReadOnly}
-                  value={formik.values.destinationName || ''}
-                  onChange={(value) =>
-                    formik.setFieldValue(
-                      'destinationName',
-                      value as DestinationName
-                    )
-                  }
-                  onBlur={() => formik.setFieldTouched('destinationName', true)}
+                  isInvalid={Boolean(
+                    formik.touched.destinationName && errors.destinationName
+                  )}
                 >
-                  <Select.Options>
-                    <Select.Option id="HTTP">
-                      {intl.formatMessage(messages.destinationHTTP)}
-                    </Select.Option>
-                    <Select.Option id="AWSLambda">
-                      {intl.formatMessage(messages.destinationAWSLambda)}
-                    </Select.Option>
-                  </Select.Options>
-                </Select.Root>
-              </FormField.Input>
-              <FormField.Description>
-                {intl.formatMessage(messages.destinationDescription)}
-              </FormField.Description>
-              <FormField.Error>
-                {formik.touched.destinationName &&
-                errors.destinationName?.missing
-                  ? intl.formatMessage(messages.requiredFieldError)
-                  : null}
-              </FormField.Error>
-            </FormField.Root>
-            <ExtensionsDestinationsForm
-              formik={formik}
-              isReadOnly={!canManage}
-            />
-          </Accordion.Content>
-        </Accordion.Item>
+                  <FormField.Label>
+                    {intl.formatMessage(messages.destinationLabel)}
+                  </FormField.Label>
+                  <FormField.Input>
+                    <Select.Root
+                      aria-label={intl.formatMessage(messages.destinationLabel)}
+                      isDisabled={isImmutableFieldReadOnly}
+                      value={formik.values.destinationName || ''}
+                      onChange={(value) =>
+                        formik.setFieldValue(
+                          'destinationName',
+                          value as DestinationName
+                        )
+                      }
+                      onBlur={() =>
+                        formik.setFieldTouched('destinationName', true)
+                      }
+                      width={'full'}
+                    >
+                      <Select.Options>
+                        <Select.Option id="HTTP">
+                          {intl.formatMessage(messages.destinationHTTP)}
+                        </Select.Option>
+                        <Select.Option id="AWSLambda">
+                          {intl.formatMessage(messages.destinationAWSLambda)}
+                        </Select.Option>
+                      </Select.Options>
+                    </Select.Root>
+                  </FormField.Input>
+                  <FormField.Description>
+                    {intl.formatMessage(messages.destinationDescription)}
+                  </FormField.Description>
+                  <FormField.Error>
+                    {formik.touched.destinationName &&
+                    errors.destinationName?.missing
+                      ? intl.formatMessage(messages.requiredFieldError)
+                      : null}
+                  </FormField.Error>
+                </FormField.Root>
+                <ExtensionsDestinationsForm
+                  formik={formik}
+                  isReadOnly={!canManage}
+                />
+              </Accordion.Content>
+            </Accordion.Item>
 
-        <Accordion.Item value="triggers">
-          <Accordion.Header>
-            <FormattedMessage {...messages.triggersTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <ExtensionsTriggersForm isReadOnly={!canManage} />
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
+            <Accordion.Item value="triggers">
+              <Accordion.Header>
+                <FormattedMessage {...messages.triggersTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <ExtensionsTriggersForm isReadOnly={!canManage} />
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion.Root>
+        </Flex>
+      </PageContent.Root>
     </FormikProvider>
   );
 

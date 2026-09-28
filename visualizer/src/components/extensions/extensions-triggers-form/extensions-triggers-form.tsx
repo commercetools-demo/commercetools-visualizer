@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import { useField } from 'formik';
-import { Card, Checkbox, Heading, Stack, Table } from '@commercetools/nimbus';
+import { Checkbox, Heading, Stack, Table } from '@commercetools/nimbus';
 import { IntlShape, useIntl } from 'react-intl';
 import { TActionType, TTriggerInput } from '../../../types/generated/ctp';
 import messages from './messages';
@@ -66,64 +66,60 @@ const ExtensionsTriggersForm: FC<Props> = ({ isReadOnly }) => {
   const [field, , helpers] = useField<Array<TTriggerInput>>('triggers');
 
   return (
-    <Card.Root variant="outlined" size="sm">
-      <Card.Body>
-        <Stack direction="column" gap="400">
-          <Heading as="h2" size="md">
-            {intl.formatMessage(messages.messagesLabel)}
-          </Heading>
-          <Table.Root variant="outline">
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeader>
-                  {intl.formatMessage(messages.columnResourceType)}
-                </Table.ColumnHeader>
-                {ACTIONS.map((action) => (
-                  <Table.ColumnHeader key={action} textAlign="center">
-                    {actionLabel(intl, action)}
-                  </Table.ColumnHeader>
-                ))}
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {RESOURCE_TYPE_IDS.map((resourceTypeId) => (
-                <Table.Row key={resourceTypeId}>
-                  <Table.Cell>
-                    {intl.formatMessage(messages[resourceTypeId])}
-                  </Table.Cell>
-                  {ACTIONS.map((action) => (
-                    <Table.Cell key={action} textAlign="center">
-                      <Checkbox
-                        aria-label={`${resourceTypeId} ${actionLabel(
-                          intl,
-                          action
-                        )}`}
-                        isReadOnly={isReadOnly}
-                        isSelected={isActionEnabled(
+    <Stack direction="column" gap="400">
+      <Heading as="h2" size="md">
+        {intl.formatMessage(messages.messagesLabel)}
+      </Heading>
+      <Table.Root variant="outline">
+        <Table.Header>
+          <Table.Row>
+            <Table.ColumnHeader>
+              {intl.formatMessage(messages.columnResourceType)}
+            </Table.ColumnHeader>
+            {ACTIONS.map((action) => (
+              <Table.ColumnHeader key={action} textAlign="center">
+                {actionLabel(intl, action)}
+              </Table.ColumnHeader>
+            ))}
+          </Table.Row>
+        </Table.Header>
+        <Table.Body>
+          {RESOURCE_TYPE_IDS.map((resourceTypeId) => (
+            <Table.Row key={resourceTypeId}>
+              <Table.Cell>
+                {intl.formatMessage(messages[resourceTypeId])}
+              </Table.Cell>
+              {ACTIONS.map((action) => (
+                <Table.Cell key={action} textAlign="center">
+                  <Checkbox
+                    aria-label={`${resourceTypeId} ${actionLabel(
+                      intl,
+                      action
+                    )}`}
+                    isReadOnly={isReadOnly}
+                    isSelected={isActionEnabled(
+                      field.value,
+                      resourceTypeId,
+                      action
+                    )}
+                    onChange={(isSelected) =>
+                      helpers.setValue(
+                        toggleAction(
                           field.value,
                           resourceTypeId,
-                          action
-                        )}
-                        onChange={(isSelected) =>
-                          helpers.setValue(
-                            toggleAction(
-                              field.value,
-                              resourceTypeId,
-                              action,
-                              isSelected
-                            )
-                          )
-                        }
-                      />
-                    </Table.Cell>
-                  ))}
-                </Table.Row>
+                          action,
+                          isSelected
+                        )
+                      )
+                    }
+                  />
+                </Table.Cell>
               ))}
-            </Table.Body>
-          </Table.Root>
-        </Stack>
-      </Card.Body>
-    </Card.Root>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Root>
+    </Stack>
   );
 };
 export default ExtensionsTriggersForm;

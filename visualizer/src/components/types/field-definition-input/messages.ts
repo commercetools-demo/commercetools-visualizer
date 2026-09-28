@@ -31,12 +31,6 @@ export default defineMessages({
     description: 'Title for fieldDefinitions name field',
     defaultMessage: 'Field Name',
   },
-  nameHint: {
-    id: 'FieldForm.name.hint',
-    description: 'Hint for fieldDefinitions name field',
-    defaultMessage:
-      'The field name is a unique term used to identify this field.  Min 2, Max 36 alphanumeric characters (a-z, 0-9), hyphens (-) and underscores (_) allowed, no spaces possible.',
-  },
   labelTitle: {
     id: 'FieldForm.label.title',
     description: 'Title for fieldDefinitions label field',

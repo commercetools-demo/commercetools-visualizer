@@ -21,12 +21,6 @@ export default defineMessages({
     description: 'Title for key field',
     defaultMessage: 'Key',
   },
-  keyHint: {
-    id: 'State.form.key.hint',
-    description: 'Hint for key field',
-    defaultMessage:
-      'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
-  },
   stateTypeTitle: {
     id: 'State.form.stateType.title',
     description: 'Title for State Type ID field',

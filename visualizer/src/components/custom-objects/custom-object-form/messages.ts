@@ -11,12 +11,6 @@ export default defineMessages({
     description: 'Title for key field',
     defaultMessage: 'Key',
   },
-  keyHint: {
-    id: 'Type.form.key.hint',
-    description: 'Hint for key field',
-    defaultMessage:
-      'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
-  },
   containerTitle: {
     id: 'CustomObject.form.container.title',
     description: 'Title for container field',

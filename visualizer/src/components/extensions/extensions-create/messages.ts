@@ -16,4 +16,9 @@ export default defineMessages({
     description: 'Success message for create type',
     defaultMessage: 'Your API Extension has been created.',
   },
+  formActionsLabel: {
+    id: 'CreateAPIExtension.formActionsLabel',
+    description: 'Accessible label for the form action buttons',
+    defaultMessage: 'Extension form actions',
+  },
 });

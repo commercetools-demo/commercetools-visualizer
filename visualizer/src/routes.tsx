@@ -7,6 +7,8 @@ import SubscriptionDetailsPage from './components/subscriptions/subscription-det
 import SubscriptionCreate from './components/subscriptions/subscription-create/subscription-create';
 import TypesList from './components/types/types-list/types-list';
 import ExtensionsList from './components/extensions/extensions-list/extensions-list';
+import ExtensionsCreate from './components/extensions/extensions-create/extensions-create';
+import ExtensionsEdit from './components/extensions/extensions-edit/extensions-edit';
 import CustomObjectsList from './components/custom-objects/custom-objects-list';
 
 type ApplicationRoutesProps = {
@@ -40,8 +42,14 @@ const ApplicationRoutes = (_props: ApplicationRoutesProps) => {
       <Route path={`${match.path}/subscriptions`}>
         <SubscriptionList linkToHome={match.url} />
       </Route>
+      <Route path={`${match.path}/extensions/new`}>
+        <ExtensionsCreate linkToWelcome={match.url} />
+      </Route>
+      <Route path={`${match.path}/extensions/:id`}>
+        <ExtensionsEdit linkToWelcome={match.url} />
+      </Route>
       <Route path={`${match.path}/extensions`}>
-        <ExtensionsList />
+        <ExtensionsList linkToHome={match.url} />
       </Route>
       <Route path={`${match.path}/types`}>
         <TypesList />

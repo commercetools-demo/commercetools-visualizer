@@ -27,6 +27,7 @@ const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
               formik.setFieldValue('destinationAwsArn', value)
             }
             onBlur={() => formik.setFieldTouched('destinationAwsArn', true)}
+            width={'full'}
           />
         </FormField.Input>
       </FormField.Root>
@@ -45,6 +46,7 @@ const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
             onBlur={() =>
               formik.setFieldTouched('destinationAwsAccessKey', true)
             }
+            width={'full'}
           />
         </FormField.Input>
       </FormField.Root>
@@ -63,6 +65,7 @@ const ExtensionsDestinationsFormAws: FC<Props> = ({ formik, isReadOnly }) => {
             onBlur={() =>
               formik.setFieldTouched('destinationAwsAccessSecret', true)
             }
+            width={'full'}
           />
         </FormField.Input>
       </FormField.Root>

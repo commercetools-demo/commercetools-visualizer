@@ -20,6 +20,7 @@ import ValueEditor from './value-editor';
 import messages from './messages';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
+import keyInputMessages from '../../shared/key-input-error/messages';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -116,7 +117,7 @@ const CustomObjectForm: FC<Props> = ({
             />
           </FormField.Input>
           <FormField.Description>
-            {intl.formatMessage(messages.keyHint)}
+            {intl.formatMessage(keyInputMessages.keyHint)}
           </FormField.Description>
           <FormField.Error>
             {formik.touched.key && (

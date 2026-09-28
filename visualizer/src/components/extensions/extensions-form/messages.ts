@@ -9,13 +9,7 @@ export default defineMessages({
   keyTitle: {
     id: 'Type.form.key.title',
     description: 'Title for key field',
-    defaultMessage: 'Key',
-  },
-  keyHint: {
-    id: 'Type.form.key.hint',
-    description: 'Hint for key field',
-    defaultMessage:
-      'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
+    defaultMessage: 'Extension Key',
   },
   destinationLabel: {
     id: 'Subscription.Destination.destinationLabel',
@@ -45,7 +39,7 @@ export default defineMessages({
   destinationTitle: {
     id: 'Extension.form.panel.destination.title',
     description: 'Title for destination panel',
-    defaultMessage: 'Destination',
+    defaultMessage: 'Extension Destination',
   },
   triggersTitle: {
     id: 'Extension.form.panel.triggers.title',

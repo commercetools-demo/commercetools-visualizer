@@ -16,12 +16,6 @@ export default defineMessages({
     description: 'Title for key field',
     defaultMessage: 'Key',
   },
-  keyHint: {
-    id: 'Type.form.key.hint',
-    description: 'Hint for key field',
-    defaultMessage:
-      'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
-  },
   resourceTypeIdsTitle: {
     id: 'Type.form.resourceTypeIds.title',
     description: 'Title for Resource Type IDs field',

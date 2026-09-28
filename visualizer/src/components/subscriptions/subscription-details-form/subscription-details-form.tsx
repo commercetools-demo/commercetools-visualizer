@@ -1,6 +1,6 @@
 import { FC, JSX, ReactElement } from 'react';
 import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
 import messages from './messages';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
@@ -25,6 +25,7 @@ import { validateKey } from '../../../utils/validate-key';
 import KeyInputError, {
   TKeyInputError,
 } from '../../shared/key-input-error/key-input-error';
+import keyInputMessages from '../../shared/key-input-error/messages';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -87,6 +88,7 @@ const SubscriptionDetailsForm: FC<Props> = ({
   onSubmit,
   isReadOnly,
 }) => {
+  const intl = useIntl();
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
@@ -115,6 +117,9 @@ const SubscriptionDetailsForm: FC<Props> = ({
                 width={'full'}
               />
             </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(keyInputMessages.keyHint)}
+            </FormField.Description>
             <FormField.Error>
               <KeyInputError
                 error={formik.errors.key as TKeyInputError}

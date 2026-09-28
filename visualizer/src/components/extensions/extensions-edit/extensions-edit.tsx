@@ -1,5 +1,5 @@
 import { FC, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { useIntl } from 'react-intl';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { PageNotFound } from '@commercetools-frontend/application-components';
@@ -8,9 +8,10 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import {
   Alert,
   Button,
+  DefaultPage,
   Flex,
+  Group,
   LoadingSpinner,
-  ModalPage,
 } from '@commercetools/nimbus';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
@@ -34,11 +35,12 @@ import {
 import { FormikHelpers } from 'formik';
 
 type Props = {
-  onClose: () => void;
+  linkToWelcome: string;
 };
 
-const ExtensionsEdit: FC<Props> = ({ onClose }) => {
+const ExtensionsEdit: FC<Props> = ({ linkToWelcome }) => {
   const intl = useIntl();
+  const history = useHistory();
   const { dataLocale } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
   }));
@@ -96,7 +98,10 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.updateSuccess),
           });
-          onClose();
+          history.replace({
+            pathname: linkToWelcome + '/extensions',
+            state: { refetch: true },
+          });
         })
         .catch(graphQLErrorHandler(showNotification));
     }
@@ -130,48 +135,55 @@ const ExtensionsEdit: FC<Props> = ({ onClose }) => {
       refetch={refetch}
     >
       {(formProps) => (
-        <ModalPage.Root isOpen onClose={onClose}>
-          <ModalPage.TopBar
-            previousPathLabel={intl.formatMessage(messages.backButton)}
-            currentPathLabel={intl.formatMessage(messages.title)}
-          />
-          <ModalPage.Header>
-            <ModalPage.Title>
-              {intl.formatMessage(messages.title)}
-            </ModalPage.Title>
-          </ModalPage.Header>
-          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
-          <ModalPage.Footer>
-            <Button slot="close" variant="outline" onPress={onClose}>
-              {intl.formatMessage(formMessages.cancelButton)}
-            </Button>
-            <Button
-              variant="outline"
-              isDisabled={!formProps.isDirty}
-              onPress={formProps.handleReset}
+        <DefaultPage.Root>
+          <DefaultPage.Header>
+            <DefaultPage.BackLink
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                history.push(linkToWelcome + '/extensions');
+              }}
             >
-              {intl.formatMessage(formMessages.revertButton)}
-            </Button>
-            <Button
-              colorPalette="primary"
-              variant="solid"
-              isDisabled={
-                formProps.isSubmitting || !formProps.isDirty || !canManage
-              }
-              onPress={() => formProps.submitForm()}
+              {intl.formatMessage(messages.backButton)}
+            </DefaultPage.BackLink>
+            <DefaultPage.Title>
+              {formProps.values?.key || intl.formatMessage(messages.title)}
+            </DefaultPage.Title>
+          </DefaultPage.Header>
+          <DefaultPage.Content>{formProps.formElements}</DefaultPage.Content>
+          <DefaultPage.Footer>
+            <Group
+              aria-label={intl.formatMessage(messages.formActionsLabel)}
+              gap="300"
             >
-              {intl.formatMessage(formMessages.submitButton)}
-            </Button>
-            <Button
-              colorPalette="critical"
-              variant="outline"
-              isDisabled={!canManage}
-              onPress={() => handleDelete()}
-            >
-              {intl.formatMessage(formMessages.deleteButton)}
-            </Button>
-          </ModalPage.Footer>
-        </ModalPage.Root>
+              <Button
+                variant="solid"
+                colorPalette="critical"
+                isDisabled={!canManage}
+                onPress={() => handleDelete()}
+              >
+                {intl.formatMessage(formMessages.deleteButton)}
+              </Button>
+              <Button
+                variant="outline"
+                isDisabled={!formProps.isDirty}
+                onPress={formProps.handleReset}
+              >
+                {intl.formatMessage(formMessages.revertButton)}
+              </Button>
+              <Button
+                variant="solid"
+                colorPalette="primary"
+                isDisabled={
+                  formProps.isSubmitting || !formProps.isDirty || !canManage
+                }
+                onPress={() => formProps.submitForm()}
+              >
+                {intl.formatMessage(formMessages.submitButton)}
+              </Button>
+            </Group>
+          </DefaultPage.Footer>
+        </DefaultPage.Root>
       )}
     </ExtensionsForm>
   );

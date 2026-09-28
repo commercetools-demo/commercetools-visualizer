@@ -27,6 +27,7 @@ import FieldDefinitionsList from '../field-definitions-list/field-definitions-li
 import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
+import keyInputMessages from '../../shared/key-input-error/messages';
 
 const resourceTypeItems = RESOURCE_TYPES.map((t) => ({ id: t, name: t }));
 type Formik = ReturnType<typeof useFormik>;
@@ -166,7 +167,7 @@ const TypesForm: FC<Props> = ({
               />
             </FormField.Input>
             <FormField.Description>
-              {intl.formatMessage(messages.keyHint)}
+              {intl.formatMessage(keyInputMessages.keyHint)}
             </FormField.Description>
             <FormField.Error>
               <KeyInputError error={errors.key} resourceLabel="type" />

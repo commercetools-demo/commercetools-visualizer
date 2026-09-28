@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import {
   Alert,
   Button,
@@ -14,14 +14,11 @@ import {
 } from '@commercetools/nimbus';
 import { Add } from '@commercetools/nimbus-icons';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
-import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { getErrorMessage, useExtensionsFetcher } from '../../../hooks';
 import { TExtension } from '../../../types/generated/ctp';
 import { PERMISSIONS } from '../../../constants';
 import messages from './messages';
 import createColumnDefinitions from './column-definitions';
-import ExtensionsCreate from '../extensions-create/extensions-create';
-import ExtensionsEdit from '../extensions-edit/extensions-edit';
 
 const DEFAULT_PER_PAGE = 20;
 
@@ -30,10 +27,17 @@ const toSortString = (sortDescriptor: SortDescriptor): string =>
     sortDescriptor.direction === 'descending' ? 'desc' : 'asc'
   }`;
 
-const ExtensionsList = () => {
+type Props = {
+  linkToHome: string;
+};
+
+interface LocationState {
+  refetch?: boolean;
+}
+
+const ExtensionsList = ({ linkToHome }: Props) => {
   const intl = useIntl();
   const { push } = useHistory();
-  const match = useRouteMatch();
 
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(DEFAULT_PER_PAGE);
@@ -52,6 +56,14 @@ const ExtensionsList = () => {
     sort: [toSortString(sortDescriptor)],
   });
 
+  const location = useLocation<LocationState>();
+
+  useEffect(() => {
+    if (location.state?.refetch) {
+      refetch();
+    }
+  }, [location]);
+
   const total = extensions?.total ?? 0;
   const results = (extensions?.results ?? []) as Array<TExtension>;
 
@@ -66,7 +78,7 @@ const ExtensionsList = () => {
             variant="outline"
             colorPalette="primary"
             isDisabled={!canManage}
-            onPress={() => push(`${match.url}/new`)}
+            onPress={() => push(`${linkToHome}/extensions/new`)}
           >
             <Add />
             {intl.formatMessage(messages.addType)}
@@ -98,7 +110,7 @@ const ExtensionsList = () => {
                 setSortDescriptor(descriptor);
                 setPage(1);
               }}
-              onRowClick={(row) => push(`${match.url}/${row.id}`)}
+              onRowClick={(row) => push(`${linkToHome}/extensions/${row.id}`)}
             />
             <Pagination
               totalItems={total}
@@ -113,29 +125,6 @@ const ExtensionsList = () => {
             />
           </Flex>
         )}
-
-        <Switch>
-          <SuspendedRoute path={`${match.path}/new`}>
-            <ExtensionsCreate
-              onSuccess={async (id: string) => {
-                await refetch();
-                push(`${match.url}/${id}`);
-              }}
-              onClose={async () => {
-                await refetch();
-                push(`${match.url}`);
-              }}
-            />
-          </SuspendedRoute>
-          <SuspendedRoute path={`${match.path}/:id`}>
-            <ExtensionsEdit
-              onClose={async () => {
-                await refetch();
-                push(`${match.url}`);
-              }}
-            />
-          </SuspendedRoute>
-        </Switch>
       </DefaultPage.Content>
     </DefaultPage.Root>
   );

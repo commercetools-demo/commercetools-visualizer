@@ -17,4 +17,10 @@ export default defineMessages({
     description: 'The message shown when a key already exists',
     defaultMessage: 'A {resource} with this key already exists.',
   },
+  keyHint: {
+    id: 'Shared.KeyInputError.keyHint',
+    description: 'Hint describing the allowed key format',
+    defaultMessage:
+      'May only contain between 2 and 256 alphanumeric characters, underscores, or hyphens (no spaces or special characters like ñ, ü, #, %).',
+  },
 });

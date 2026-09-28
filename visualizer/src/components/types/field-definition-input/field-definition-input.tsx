@@ -23,6 +23,7 @@ import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
+import keyInputMessages from '../../shared/key-input-error/messages';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -168,7 +169,7 @@ const FieldDefinitionInput: FC<Props> = ({
               />
             </FormField.Input>
             <FormField.Description>
-              {intl.formatMessage(messages.nameHint)}
+              {intl.formatMessage(keyInputMessages.keyHint)}
             </FormField.Description>
             <FormField.Error>
               <KeyInputError error={errors.name} resourceLabel="field" />

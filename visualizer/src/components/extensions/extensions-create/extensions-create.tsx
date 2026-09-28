@@ -1,9 +1,10 @@
 import { FC, useCallback } from 'react';
 import { useIntl } from 'react-intl';
+import { useHistory } from 'react-router-dom';
 import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { Button, ModalPage } from '@commercetools/nimbus';
+import { Button, DefaultPage, Group } from '@commercetools/nimbus';
 import { DOMAINS } from '@commercetools-frontend/constants';
 import { PERMISSIONS } from '../../../constants';
 import ExtensionsForm, {
@@ -19,12 +20,12 @@ import { graphQLErrorHandler, useExtensionCreator } from '../../../hooks';
 import { FormikHelpers } from 'formik';
 
 type Props = {
-  onSuccess: (id: string) => Promise<void>;
-  onClose: () => void;
+  linkToWelcome: string;
 };
 
-const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
+const ExtensionsCreate: FC<Props> = ({ linkToWelcome }) => {
   const intl = useIntl();
+  const history = useHistory();
   const { dataLocale } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
   }));
@@ -44,17 +45,20 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
         .execute({
           draft: draft,
         })
-        .then(({ createExtension }) => {
+        .then(() => {
           showNotification({
             kind: 'success',
             domain: DOMAINS.SIDE,
             text: intl.formatMessage(messages.createSuccess),
           });
-          return onSuccess(createExtension?.id || '');
+          history.push({
+            pathname: linkToWelcome + '/extensions',
+            state: { refetch: true },
+          });
         })
         .catch(graphQLErrorHandler(showNotification, formikHelpers));
     },
-    [extensionCreator, intl, onSuccess, showNotification]
+    [extensionCreator, intl, showNotification]
   );
 
   return (
@@ -66,33 +70,46 @@ const ExtensionsCreate: FC<Props> = ({ onClose, onSuccess }) => {
       createNewMode={true}
     >
       {(formProps) => (
-        <ModalPage.Root isOpen onClose={onClose}>
-          <ModalPage.TopBar
-            previousPathLabel={intl.formatMessage(messages.backButton)}
-            currentPathLabel={intl.formatMessage(messages.title)}
-          />
-          <ModalPage.Header>
-            <ModalPage.Title>
-              {intl.formatMessage(messages.title)}
-            </ModalPage.Title>
-          </ModalPage.Header>
-          <ModalPage.Content>{formProps.formElements}</ModalPage.Content>
-          <ModalPage.Footer>
-            <Button slot="close" variant="outline" onPress={onClose}>
-              {intl.formatMessage(formMessages.cancelButton)}
-            </Button>
-            <Button
-              colorPalette="primary"
-              variant="solid"
-              isDisabled={
-                formProps.isSubmitting || !formProps.isDirty || !canManage
-              }
-              onPress={() => formProps.submitForm()}
+        <DefaultPage.Root>
+          <DefaultPage.Header>
+            <DefaultPage.BackLink
+              href="#"
+              onClick={(event) => {
+                event.preventDefault();
+                history.push(linkToWelcome + '/extensions');
+              }}
             >
-              {intl.formatMessage(formMessages.submitButton)}
-            </Button>
-          </ModalPage.Footer>
-        </ModalPage.Root>
+              {intl.formatMessage(messages.backButton)}
+            </DefaultPage.BackLink>
+            <DefaultPage.Title>
+              {intl.formatMessage(messages.title)}
+            </DefaultPage.Title>
+          </DefaultPage.Header>
+          <DefaultPage.Content>{formProps.formElements}</DefaultPage.Content>
+          <DefaultPage.Footer>
+            <Group
+              aria-label={intl.formatMessage(messages.formActionsLabel)}
+              gap="300"
+            >
+              <Button
+                variant="outline"
+                onPress={() => history.push(linkToWelcome + '/extensions')}
+              >
+                {intl.formatMessage(formMessages.cancelButton)}
+              </Button>
+              <Button
+                colorPalette="primary"
+                variant="solid"
+                isDisabled={
+                  formProps.isSubmitting || !formProps.isDirty || !canManage
+                }
+                onPress={() => formProps.submitForm()}
+              >
+                {intl.formatMessage(formMessages.submitButton)}
+              </Button>
+            </Group>
+          </DefaultPage.Footer>
+        </DefaultPage.Root>
       )}
     </ExtensionsForm>
   );

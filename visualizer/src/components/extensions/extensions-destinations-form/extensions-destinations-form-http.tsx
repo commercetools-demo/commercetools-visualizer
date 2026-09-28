@@ -30,6 +30,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
               formik.setFieldValue('destinationHttpUrl', value)
             }
             onBlur={() => formik.setFieldTouched('destinationHttpUrl', true)}
+            width={'full'}
           />
         </FormField.Input>
       </FormField.Root>
@@ -54,6 +55,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
             onBlur={() =>
               formik.setFieldTouched('destinationHttpAuthenticationName', true)
             }
+            width={'full'}
           >
             <Select.Options>
               <Select.Option id="AzureFunctions">
@@ -100,6 +102,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
                   true
                 )
               }
+              width={'full'}
             />
           </FormField.Input>
         </FormField.Root>
@@ -133,6 +136,7 @@ const ExtensionsDestinationsFormHttp: FC<Props> = ({ formik, isReadOnly }) => {
                   true
                 )
               }
+              width={'full'}
             />
           </FormField.Input>
         </FormField.Root>

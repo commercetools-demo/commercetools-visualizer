@@ -27,4 +27,9 @@ export default defineMessages({
     description: 'Success message for update type',
     defaultMessage: 'Your Extension has been updated.',
   },
+  formActionsLabel: {
+    id: 'EditExtensions.formActionsLabel',
+    description: 'Accessible label for the form action buttons',
+    defaultMessage: 'Extension form actions',
+  },
 });

@@ -8,3 +8,4 @@ export {
   calculateTypeDefinitionUpdateActions,
   calculateFieldDefinitionUpdateActions,
 } from './types-connector';
+export type { PickedFieldDefinition } from './conversion';

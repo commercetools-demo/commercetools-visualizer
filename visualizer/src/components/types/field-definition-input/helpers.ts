@@ -3,7 +3,10 @@ import {
   TEnumValueInput,
   TFieldDefinition,
   TFieldDefinitionInput,
+  TFieldType,
+  TFieldTypeEnumTypeDraft,
   TFieldTypeInput,
+  TFieldTypeLocalizedEnumTypeDraft,
   TLocalizedEnumType,
   TLocalizedEnumValueInput,
   TLocalizedStringItemInputType,
@@ -11,6 +14,7 @@ import {
   TSetType,
   TTextInputHint,
 } from '../../../types/generated/ctp';
+import { PickedFieldDefinition } from '../../../hooks';
 import {
   LocalizedField,
   type LocalizedString as TLocalizedString,
@@ -136,6 +140,41 @@ export const fromFormValuesToTFieldDefinitionInput = (
     ),
   };
   return actionDraft;
+};
+
+// `calculateFieldDefinitionUpdateActions` diffs against the fetched
+// `TFieldDefinition` (output shape, `type: TFieldType` with a `name`
+// discriminator), so the edited value must be adapted from the mutation-input
+// shape (`TFieldDefinitionInput`, `type: TFieldTypeInput` — a one-of object
+// keyed by type name) into that same output-equivalent shape. Only
+// Enum/LocalizedEnum values are read by the diff (field type itself is
+// immutable after create), so other type names don't need their
+// type-specific fields reconstructed.
+export const toPickedFieldDefinition = (
+  input: TFieldDefinitionInput
+): PickedFieldDefinition => {
+  const [typeName] = Object.keys(input.type) as Array<keyof TFieldTypeInput>;
+  let type: TFieldType = { name: typeName };
+  if (typeName === 'Enum') {
+    const { values } = input.type.Enum as TFieldTypeEnumTypeDraft;
+    type = { name: 'Enum', values } as TEnumType;
+  } else if (typeName === 'LocalizedEnum') {
+    const { values } = input.type
+      .LocalizedEnum as TFieldTypeLocalizedEnumTypeDraft;
+    type = {
+      name: 'LocalizedEnum',
+      values: values.map((value) => ({
+        key: value.key,
+        labelAllLocales: value.label,
+      })),
+    } as TLocalizedEnumType;
+  }
+
+  return {
+    name: input.name,
+    labelAllLocales: input.label,
+    type,
+  };
 };
 
 export const initialValuesFromFieldDefinition = (

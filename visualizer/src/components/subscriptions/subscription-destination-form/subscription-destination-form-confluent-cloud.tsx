@@ -140,7 +140,9 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
           <Select.Root
             name={acksField.name}
             value={acksMeta.value || ''}
-            onChange={(value) => acksHelpers.setValue(value || '')}
+            onChange={(value) =>
+              acksHelpers.setValue(value != null ? String(value) : '')
+            }
             onBlur={() => acksHelpers.setTouched(true)}
             width={'full'}
           >

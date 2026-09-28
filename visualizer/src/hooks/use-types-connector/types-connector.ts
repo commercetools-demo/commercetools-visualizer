@@ -4,7 +4,7 @@ import {
   useMcQuery,
 } from '@commercetools-frontend/application-shell-connectors';
 import { createSyncTypes, DeepPartial } from '@commercetools/sync-actions';
-import { Type } from '@commercetools/platform-sdk';
+import { Type, TypeUpdateAction } from '@commercetools/platform-sdk';
 import {
   TMutation,
   TMutation_CreateTypeDefinitionArgs,
@@ -188,7 +188,15 @@ export const calculateTypeDefinitionUpdateActions = (
 ) => {
   const originalConverted = convertToActionData(originalDraft, true);
   const nextConverted = convertToActionData(nextDraft, true);
-  const actions = syncTypes.buildActions(nextConverted, originalConverted);
+  // `@commercetools/sync-actions` depends on a newer `@commercetools/platform-sdk`
+  // than this app does, so its inferred `TypeUpdateAction` return type includes
+  // action variants (e.g. `TypeRemoveEnumValuesAction`) our own version's type
+  // doesn't know about, which TS then can't match against `createGraphQlUpdateActions`'s
+  // parameter — reassert our own version's type.
+  const actions = syncTypes.buildActions(
+    nextConverted,
+    originalConverted
+  ) as Array<TypeUpdateAction>;
   return createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>;
 };
 
@@ -212,6 +220,6 @@ export const calculateFieldDefinitionUpdateActions = (
   const actions = syncTypes.buildActions(
     wrappedNextDraft,
     wrappedOriginalDraft
-  );
+  ) as Array<TypeUpdateAction>;
   return createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>;
 };

@@ -19,6 +19,7 @@ import FieldDefinitionInput from '../field-definition-input/field-definition-inp
 import {
   fromFormValuesToTFieldDefinitionInput,
   initialValuesFromFieldDefinition,
+  toPickedFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
 import {
@@ -69,7 +70,7 @@ const FieldDefinitionEdit: FC<Props> = ({ onClose }) => {
       if (fieldDefinitions) {
         const actions = calculateFieldDefinitionUpdateActions(
           fieldDefinitions[0],
-          fieldDefinitionInput
+          toPickedFieldDefinition(fieldDefinitionInput)
         );
         if (actions.length > 0) {
           await typeDefinitionUpdater

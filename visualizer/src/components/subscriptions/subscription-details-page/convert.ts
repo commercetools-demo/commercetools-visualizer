@@ -1,6 +1,15 @@
 import { TFormValues } from '../subscription-details-form/subscription-details-form';
 import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 
+type TKnownDestinationType = keyof NonNullable<TFormValues['destination']>;
+
+const isKnownDestinationType = (
+  destinationType: TFormValues['destinationType']
+): destinationType is TKnownDestinationType =>
+  destinationType === 'GoogleCloudPubSub' ||
+  destinationType === 'SQS' ||
+  destinationType === 'ConfluentCloud';
+
 export const convertFormValuesToSubscription = (
   formValues: TFormValues
 ): Pick<
@@ -10,7 +19,9 @@ export const convertFormValuesToSubscription = (
   return {
     key: formValues.key,
     destination: {
-      ...formValues.destination?.[formValues.destinationType],
+      ...(isKnownDestinationType(formValues.destinationType)
+        ? formValues.destination?.[formValues.destinationType]
+        : undefined),
       type: formValues.destinationType,
     },
     changes: formValues.changes || [],

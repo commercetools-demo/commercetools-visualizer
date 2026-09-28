@@ -9,6 +9,7 @@ import {
   AzureFunctionsAuthentication,
   Extension,
   ExtensionDestination,
+  ExtensionUpdateAction,
 } from '@commercetools/platform-sdk';
 import {
   TActionType,
@@ -274,9 +275,14 @@ export const calculateExtensionsUpdateActions = (
   originalDraft: TExtension,
   nextDraft: TExtensionDraft
 ) => {
+  // `@commercetools/sync-actions` depends on a newer `@commercetools/platform-sdk`
+  // than this app does, so its inferred `ExtensionUpdateAction` return type
+  // includes action variants (e.g. `ExtensionSetAdditionalContextAction`) our
+  // own version's type doesn't know about, which TS then can't match against
+  // `createGraphQlUpdateActions`'s parameter — reassert our own version's type.
   const httpActions = syncApiExtensions.buildActions(
     convertTExtensionDraft(nextDraft),
     convertTExtension(originalDraft)
-  );
+  ) as Array<ExtensionUpdateAction>;
   return createGraphQlUpdateActions(httpActions) as TExtensionUpdateAction[];
 };

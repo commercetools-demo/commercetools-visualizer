@@ -3,7 +3,6 @@ import { useFormik, type FormikHelpers, FormikProvider } from 'formik';
 import { FormattedMessage } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
 import messages from './messages';
-import SubscriptionGeneralInfoForm from '../subscription-general-info-form/subscription-general-info-form';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
 import {
   TChangeSubscriptionInput,
@@ -15,7 +14,17 @@ import {
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
 import SubscriptionMessagesForm from '../subscription-messages-form/subscription-messages-form';
-import { Accordion } from '@commercetools/nimbus';
+import {
+  Accordion,
+  Flex,
+  FormField,
+  PageContent,
+  TextInput,
+} from '@commercetools/nimbus';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError, {
+  TKeyInputError,
+} from '../../shared/key-input-error/key-input-error';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -42,22 +51,14 @@ export type TFormValues = {
 };
 
 type TErrors = {
-  key: { missing?: boolean; invalidInput?: boolean };
+  // `duplicate` isn't set by client-side validation — it comes from
+  // subscription-details-page.tsx's DuplicateField errorCodeMapping via
+  // graphQLErrorHandler's setErrors.
+  key: { missing?: boolean; invalidInput?: boolean; duplicate?: boolean };
 };
 
 const validate = (formikValues: TFormValues): TErrors => {
-  const errors: TErrors = { key: {} };
-
-  if (formikValues.key && formikValues.key.length > 0) {
-    const keyValue = formikValues.key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.key.invalidInput = true;
-  } else {
-    errors.key.missing = true;
-  }
-
-  return omitEmpty<TErrors>(errors);
+  return omitEmpty<TErrors>({ key: validateKey(formikValues.key) });
 };
 
 type FormProps = {
@@ -94,47 +95,68 @@ const SubscriptionDetailsForm: FC<Props> = ({
   });
   const formElements = (
     <FormikProvider value={formik}>
-      <Accordion.Root
-        allowsMultipleExpanded
-        defaultExpandedKeys={['key', 'destination']}
-      >
-        <Accordion.Item value="key">
-          <Accordion.Header>
-            <FormattedMessage {...messages.keySectionTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <SubscriptionGeneralInfoForm isReadOnly={isReadOnly} />
-          </Accordion.Content>
-        </Accordion.Item>
-        <Accordion.Item value="destination">
-          <Accordion.Header>
-            <FormattedMessage {...messages.destinationSectionTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
-            <SubscriptionDestinationForm
-              destinationType={formik.values.destinationType}
-              isReadOnly={isReadOnly}
-            />
-          </Accordion.Content>
-        </Accordion.Item>
-        <Accordion.Item value="changes">
-          <Accordion.Header>
-            <FormattedMessage {...messages.changesSectionTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <SubscriptionChangesForm isReadOnly={isReadOnly} />
-          </Accordion.Content>
-        </Accordion.Item>
-        <Accordion.Item value="messages">
-          <Accordion.Header>
-            <FormattedMessage {...messages.messagesSectionTitle} />
-          </Accordion.Header>
-          <Accordion.Content>
-            <SubscriptionMessagesForm isReadOnly={isReadOnly} />
-          </Accordion.Content>
-        </Accordion.Item>
-      </Accordion.Root>
+      <PageContent.Root variant={'wide'}>
+        <Flex direction="column" gap="400">
+          <FormField.Root
+            isRequired
+            isReadOnly={isReadOnly}
+            isInvalid={Boolean(formik.touched.key && formik.errors.key)}
+          >
+            <FormField.Label>
+              <FormattedMessage {...messages.subscriptionKeyLabel} />
+            </FormField.Label>
+            <FormField.Input>
+              <TextInput
+                name="key"
+                value={formik.values.key || ''}
+                isReadOnly={isReadOnly}
+                onChange={(value) => formik.setFieldValue('key', value)}
+                onBlur={() => formik.setFieldTouched('key', true)}
+                width={'full'}
+              />
+            </FormField.Input>
+            <FormField.Error>
+              <KeyInputError
+                error={formik.errors.key as TKeyInputError}
+                resourceLabel="subscription"
+              />
+            </FormField.Error>
+          </FormField.Root>
+          <Accordion.Root
+            allowsMultipleExpanded
+            defaultExpandedKeys={['destination']}
+          >
+            <Accordion.Item value="destination">
+              <Accordion.Header>
+                <FormattedMessage {...messages.destinationSectionTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <SubscriptionDestinationTypeForm isReadOnly={isReadOnly} />
+                <SubscriptionDestinationForm
+                  destinationType={formik.values.destinationType}
+                  isReadOnly={isReadOnly}
+                />
+              </Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="changes">
+              <Accordion.Header>
+                <FormattedMessage {...messages.changesSectionTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <SubscriptionChangesForm isReadOnly={isReadOnly} />
+              </Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="messages">
+              <Accordion.Header>
+                <FormattedMessage {...messages.messagesSectionTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <SubscriptionMessagesForm isReadOnly={isReadOnly} />
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion.Root>
+        </Flex>
+      </PageContent.Root>
     </FormikProvider>
   );
 

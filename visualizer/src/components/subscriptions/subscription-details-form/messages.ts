@@ -6,6 +6,11 @@ export default defineMessages({
     description: 'Accordion header for the key section',
     defaultMessage: 'Key',
   },
+  subscriptionKeyLabel: {
+    id: 'SubscriptionDetailsForm.keyFieldLabel',
+    description: 'The label for the subscription key field',
+    defaultMessage: 'Subscription key',
+  },
   destinationSectionTitle: {
     id: 'SubscriptionDetailsForm.destinationSectionTitle',
     description: 'Accordion header for the destination section',

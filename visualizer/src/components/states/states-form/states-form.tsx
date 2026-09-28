@@ -187,6 +187,7 @@ const StatesForm: FC<Props> = ({
                 isReadOnly={!createNewMode || !canManage}
                 onChange={(value) => formik.setFieldValue('key', value)}
                 onBlur={() => formik.setFieldTouched('key', true)}
+                width={'full'}
               />
             </FormField.Input>
             <FormField.Description>
@@ -209,6 +210,7 @@ const StatesForm: FC<Props> = ({
               )
             }
             onBlur={() => formik.setFieldTouched('name', true)}
+            width={'full'}
           />
           <FormField.Root isReadOnly={!canManage}>
             <FormField.Input>
@@ -218,6 +220,7 @@ const StatesForm: FC<Props> = ({
                 onChange={(isSelected) =>
                   formik.setFieldValue('initial', isSelected)
                 }
+                width={'full'}
               >
                 <FormattedMessage {...messages.initialTitle} />
               </Checkbox>
@@ -239,6 +242,7 @@ const StatesForm: FC<Props> = ({
                 onChange={(value) =>
                   formik.setFieldValue('stateType', value as TStateType)
                 }
+                width={'full'}
               >
                 <Select.Options items={resourceTypes}>
                   {(item) => (
@@ -262,6 +266,7 @@ const StatesForm: FC<Props> = ({
                 event.target.value
               )
             }
+            width={'full'}
             onBlur={() => formik.setFieldTouched('description', true)}
           />
           <FormField.Root isReadOnly={!canManage}>
@@ -278,6 +283,7 @@ const StatesForm: FC<Props> = ({
                 onSelectionChange={(keys) =>
                   formik.setFieldValue('transitions', keys as string[])
                 }
+                width={'full'}
                 onBlur={() => formik.setFieldTouched('transitions', true)}
               >
                 <ComboBox.Trigger />

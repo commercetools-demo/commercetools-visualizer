@@ -1,4 +1,4 @@
-import { JSX, FC, ReactElement, ReactNode } from 'react';
+import { JSX, FC, ReactElement } from 'react';
 import { useFormik, type FormikHelpers } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
@@ -25,12 +25,14 @@ import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
 import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';
 import { PERMISSIONS } from '../../../constants';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError from '../../shared/key-input-error/key-input-error';
 
 const resourceTypeItems = RESOURCE_TYPES.map((t) => ({ id: t, name: t }));
 type Formik = ReturnType<typeof useFormik>;
 
 type TErrors = {
-  key: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
+  key: { missing?: boolean; invalidInput?: boolean };
   name: { missing?: boolean };
   description: { missing?: boolean };
   resourceTypeIds: { missing?: boolean };
@@ -38,20 +40,11 @@ type TErrors = {
 
 const validate = (formikValues: TFormValues) => {
   const errors: TErrors = {
-    key: {},
+    key: validateKey(formikValues.key),
     name: {},
     description: {},
     resourceTypeIds: {},
   };
-
-  if (formikValues.key && formikValues.key.length > 0) {
-    const keyValue = formikValues.key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.key.invalidInput = true;
-  } else {
-    errors.key.missing = true;
-  }
 
   if (LocalizedField.isEmpty(formikValues.name)) {
     errors.name.missing = true;
@@ -60,13 +53,6 @@ const validate = (formikValues: TFormValues) => {
     errors.resourceTypeIds.missing = true;
   }
   return omitEmpty<TErrors>(errors);
-};
-
-const renderKeyInputError = (key?: TErrors['key']): ReactNode => {
-  if (!key) return null;
-  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
-  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
-  return null;
 };
 
 export type TFormValues = {
@@ -182,7 +168,9 @@ const TypesForm: FC<Props> = ({
             <FormField.Description>
               {intl.formatMessage(messages.keyHint)}
             </FormField.Description>
-            <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
+            <FormField.Error>
+              <KeyInputError error={errors.key} resourceLabel="type" />
+            </FormField.Error>
           </FormField.Root>
         </PageContent.Column>
         <PageContent.Column>

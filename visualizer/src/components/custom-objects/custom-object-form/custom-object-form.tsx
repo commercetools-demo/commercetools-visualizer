@@ -18,6 +18,8 @@ import {
 } from '../../../types/generated/ctp';
 import ValueEditor from './value-editor';
 import messages from './messages';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError from '../../shared/key-input-error/key-input-error';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -43,18 +45,9 @@ type TErrors = {
 
 const validate = (formikValues: TFormValues) => {
   const errors: TErrors = {
-    key: {},
+    key: validateKey(formikValues.key),
     container: {},
   };
-
-  if (formikValues.key && formikValues.key.length > 0) {
-    const keyValue = formikValues.key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.key.invalidInput = true;
-  } else {
-    errors.key.missing = true;
-  }
 
   if (!formikValues.container || formikValues.container.length === 0) {
     errors.container.missing = true;
@@ -126,9 +119,9 @@ const CustomObjectForm: FC<Props> = ({
             {intl.formatMessage(messages.keyHint)}
           </FormField.Description>
           <FormField.Error>
-            {formik.touched.key && errors.key?.missing
-              ? intl.formatMessage(messages.requiredFieldError)
-              : null}
+            {formik.touched.key && (
+              <KeyInputError error={errors.key} resourceLabel="custom object" />
+            )}
           </FormField.Error>
         </FormField.Root>
         <FormField.Root

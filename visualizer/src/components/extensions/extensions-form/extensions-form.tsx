@@ -15,6 +15,8 @@ import messages from './messages';
 import ExtensionsTriggersForm from '../extensions-triggers-form/extensions-triggers-form';
 import ExtensionsDestinationsForm from '../extensions-destinations-form/extensions-destinations-form';
 import { PERMISSIONS } from '../../../constants';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError from '../../shared/key-input-error/key-input-error';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -48,26 +50,17 @@ type FormProps = {
 };
 
 type TErrors = {
-  key: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
+  key: { missing?: boolean; invalidInput?: boolean };
   destinationName: { missing?: boolean };
   destinationHttpUrl: { missing?: boolean };
 };
 
 const validate = (formikValues: TFormValues) => {
   const errors: TErrors = {
-    key: {},
+    key: validateKey(formikValues.key),
     destinationName: {},
     destinationHttpUrl: {},
   };
-
-  if (formikValues.key && formikValues.key.length > 0) {
-    const keyValue = formikValues.key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.key.invalidInput = true;
-  } else {
-    errors.key.missing = true;
-  }
 
   if (
     !formikValues.destinationName ||
@@ -86,13 +79,6 @@ const validate = (formikValues: TFormValues) => {
   }
 
   return omitEmpty<TErrors>(errors);
-};
-
-const renderKeyInputError = (key?: TErrors['key']): ReactElement | null => {
-  if (!key) return null;
-  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
-  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
-  return null;
 };
 
 type Props = {
@@ -166,7 +152,7 @@ const ExtensionsForm: FC<Props> = ({
                 {intl.formatMessage(messages.keyHint)}
               </FormField.Description>
               <FormField.Error>
-                {renderKeyInputError(errors.key)}
+                <KeyInputError error={errors.key} resourceLabel="extension" />
               </FormField.Error>
             </FormField.Root>
           </Accordion.Content>

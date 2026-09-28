@@ -1,5 +1,5 @@
-import { FC, ReactElement, ReactNode, JSX } from 'react';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { FC, ReactElement, JSX } from 'react';
+import { useIntl } from 'react-intl';
 import { FormikErrors, type FormikHelpers, useFormik } from 'formik';
 import omitEmpty from 'omit-empty-es';
 import {
@@ -21,6 +21,8 @@ import FieldDefinitionInputForEnum from '../field-definition-input-for-enum/fiel
 import { Item } from '../field-definition-input-for-enum/constants';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError from '../../shared/key-input-error/key-input-error';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -38,7 +40,7 @@ const fieldTypeOptions: Array<{
 ];
 
 type TErrors = {
-  name: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
+  name: { missing?: boolean; invalidInput?: boolean };
   label: { missing?: boolean };
   typeName: { missing?: boolean };
   referenceTypeId: { missing?: boolean };
@@ -66,20 +68,11 @@ type Props = {
 
 const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
   const errors: TErrors = {
-    name: {},
+    name: validateKey(formikValues.name),
     label: {},
     typeName: {},
     referenceTypeId: {},
   };
-
-  if (formikValues.name && formikValues.name.length > 0) {
-    const keyValue = formikValues.name.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.name.invalidInput = true;
-  } else {
-    errors.name.missing = true;
-  }
 
   if (LocalizedField.isEmpty(formikValues.label)) {
     errors.label.missing = true;
@@ -91,13 +84,6 @@ const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
     errors.referenceTypeId.missing = true;
   }
   return omitEmpty(errors);
-};
-
-const renderNameInputError = (name?: TErrors['name']): ReactNode => {
-  if (!name) return null;
-  if (name.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
-  if (name.missing) return <FormattedMessage {...messages.requiredKey} />;
-  return null;
 };
 
 const FieldDefinitionInput: FC<Props> = ({
@@ -185,7 +171,7 @@ const FieldDefinitionInput: FC<Props> = ({
               {intl.formatMessage(messages.nameHint)}
             </FormField.Description>
             <FormField.Error>
-              {renderNameInputError(errors.name)}
+              <KeyInputError error={errors.name} resourceLabel="field" />
             </FormField.Error>
           </FormField.Root>
 

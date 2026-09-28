@@ -1,4 +1,4 @@
-import { FC, JSX, ReactElement, ReactNode } from 'react';
+import { FC, JSX, ReactElement } from 'react';
 import { FormikHelpers, useFormik } from 'formik';
 import {
   Maybe,
@@ -28,6 +28,8 @@ import { useApplicationContext } from '@commercetools-frontend/application-shell
 import { getErrorMessage, useStatesFetcher } from '../../../hooks';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import { validateKey } from '../../../utils/validate-key';
+import KeyInputError from '../../shared/key-input-error/key-input-error';
 
 type Formik = ReturnType<typeof useFormik>;
 
@@ -62,31 +64,15 @@ export type TFormValues = {
 };
 
 type TErrors = {
-  key: { missing?: boolean; invalidInput?: boolean; keyHint?: boolean };
+  key: { missing?: boolean; invalidInput?: boolean };
 };
 
 const validate = (formikValues: TFormValues) => {
   const errors: TErrors = {
-    key: {},
+    key: validateKey(formikValues.key),
   };
 
-  if (formikValues.key && formikValues.key.length > 0) {
-    const keyValue = formikValues.key.trim();
-    const keyLength = keyValue.length;
-    if (keyLength < 2 || keyLength > 256 || !/^[a-zA-Z0-9-_]+$/.test(keyValue))
-      errors.key.invalidInput = true;
-  } else {
-    errors.key.missing = true;
-  }
-
   return omitEmpty<TErrors>(errors);
-};
-
-const renderKeyInputError = (key?: TErrors['key']): ReactNode => {
-  if (!key) return null;
-  if (key.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
-  if (key.missing) return <FormattedMessage {...messages.requiredKey} />;
-  return null;
 };
 
 type Props = {
@@ -193,7 +179,9 @@ const StatesForm: FC<Props> = ({
             <FormField.Description>
               {intl.formatMessage(messages.keyHint)}
             </FormField.Description>
-            <FormField.Error>{renderKeyInputError(errors.key)}</FormField.Error>
+            <FormField.Error>
+              <KeyInputError error={errors.key} resourceLabel="state" />
+            </FormField.Error>
           </FormField.Root>
           <LocalizedField
             id="states-edit-name"

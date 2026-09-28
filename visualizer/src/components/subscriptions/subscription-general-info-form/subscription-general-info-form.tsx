@@ -1,21 +1,11 @@
 import { useField } from 'formik';
 import { FormattedMessage } from 'react-intl';
-import { FC, ReactNode } from 'react';
+import { FC } from 'react';
 import { FormField, TextInput } from '@commercetools/nimbus';
 import messages from './messages';
-
-const renderKeyInputError = (key?: string): ReactNode => {
-  switch (key) {
-    case 'invalidInput':
-      return <FormattedMessage {...messages.invalidKey} />;
-    case 'duplicate':
-      return <FormattedMessage {...messages.duplicateKey} />;
-    case 'missing':
-      return <FormattedMessage {...messages.requiredKey} />;
-    default:
-      return null;
-  }
-};
+import KeyInputError, {
+  type TKeyInputError,
+} from '../../shared/key-input-error/key-input-error';
 
 type Props = { isReadOnly?: boolean };
 
@@ -26,15 +16,12 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
   // `{ invalidInput: true }`) rather than the string Formik's `FieldMetaProps`
   // type expects — same shape graphQLErrorHandler's `setErrors` uses for the
   // server-side `duplicate` error.
-  const keyError = keyMeta.error as unknown as
-    | Record<string, boolean>
-    | undefined;
-  const parsedErrorKey = keyError ? Object.keys(keyError)[0] : undefined;
+  const keyError = keyMeta.error as unknown as TKeyInputError | undefined;
   return (
     <FormField.Root
       isRequired
       isReadOnly={isReadOnly}
-      isInvalid={Boolean(keyMeta.touched && parsedErrorKey)}
+      isInvalid={Boolean(keyMeta.touched && keyError)}
     >
       <FormField.Label>
         <FormattedMessage {...messages.subscriptionKeyLabel} />
@@ -49,7 +36,9 @@ const SubscriptionGeneralInfoForm: FC<Props> = ({ isReadOnly }) => {
           width={'full'}
         />
       </FormField.Input>
-      <FormField.Error>{renderKeyInputError(parsedErrorKey)}</FormField.Error>
+      <FormField.Error>
+        <KeyInputError error={keyError} resourceLabel="subscription" />
+      </FormField.Error>
     </FormField.Root>
   );
 };

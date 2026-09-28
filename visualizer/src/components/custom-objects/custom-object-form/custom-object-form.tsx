@@ -3,12 +3,10 @@ import { type FormikHelpers, useFormik } from 'formik';
 import { FormattedMessage, useIntl } from 'react-intl';
 import omitEmpty from 'omit-empty-es';
 import {
-  Box,
   FormField,
-  Grid,
   Heading,
+  PageContent,
   Stack,
-  Text,
   TextInput,
 } from '@commercetools/nimbus';
 import { ApolloQueryResult } from '@apollo/client';
@@ -100,83 +98,81 @@ const CustomObjectForm: FC<Props> = ({
 
   const formElements = (
     <Stack direction="column" gap="800">
-      <Stack direction="column" gap="400">
+      <PageContent.Root variant={'wide'} columns={'1/1'}>
         <Heading as="h2" size="md">
           <FormattedMessage {...messages.generalInformationTitle} />
         </Heading>
-        <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap="400">
-          <FormField.Root
-            isRequired
-            isReadOnly={!createNewMode || !canManage}
-            isInvalid={Boolean(formik.touched.key && errors.key)}
-          >
-            <FormField.Label>
-              {intl.formatMessage(messages.keyTitle)}
-            </FormField.Label>
-            <FormField.Input>
-              <TextInput
-                name="key"
-                value={formik.values.key}
-                isReadOnly={!createNewMode || !canManage}
-                onChange={(value) => formik.setFieldValue('key', value)}
-                onBlur={() => formik.setFieldTouched('key', true)}
-              />
-            </FormField.Input>
-            <FormField.Description>
-              {intl.formatMessage(messages.keyHint)}
-            </FormField.Description>
-            <FormField.Error>
-              {formik.touched.key && errors.key?.missing
-                ? intl.formatMessage(messages.requiredFieldError)
-                : null}
-            </FormField.Error>
-          </FormField.Root>
-          <FormField.Root
-            isRequired
-            isReadOnly={!createNewMode || !canManage}
-            isInvalid={Boolean(formik.touched.container && errors.container)}
-          >
-            <FormField.Label>
-              {intl.formatMessage(messages.containerTitle)}
-            </FormField.Label>
-            <FormField.Input>
-              <TextInput
-                name="container"
-                value={formik.values.container}
-                isReadOnly={!createNewMode || !canManage}
-                onChange={(value) => formik.setFieldValue('container', value)}
-                onBlur={() => formik.setFieldTouched('container', true)}
-              />
-            </FormField.Input>
-            <FormField.Error>
-              {formik.touched.container && errors.container?.missing
-                ? intl.formatMessage(messages.requiredFieldError)
-                : null}
-            </FormField.Error>
-          </FormField.Root>
-        </Grid>
-      </Stack>
+      </PageContent.Root>
+      <PageContent.Root variant={'wide'} columns={'1/1'}>
+        <FormField.Root
+          isRequired
+          isReadOnly={!createNewMode || !canManage}
+          isInvalid={Boolean(formik.touched.key && errors.key)}
+        >
+          <FormField.Label>
+            {intl.formatMessage(messages.keyTitle)}
+          </FormField.Label>
+          <FormField.Input>
+            <TextInput
+              name="key"
+              value={formik.values.key}
+              isReadOnly={!createNewMode || !canManage}
+              onChange={(value) => formik.setFieldValue('key', value)}
+              onBlur={() => formik.setFieldTouched('key', true)}
+              width={'full'}
+            />
+          </FormField.Input>
+          <FormField.Description>
+            {intl.formatMessage(messages.keyHint)}
+          </FormField.Description>
+          <FormField.Error>
+            {formik.touched.key && errors.key?.missing
+              ? intl.formatMessage(messages.requiredFieldError)
+              : null}
+          </FormField.Error>
+        </FormField.Root>
+        <FormField.Root
+          isRequired
+          isReadOnly={!createNewMode || !canManage}
+          isInvalid={Boolean(formik.touched.container && errors.container)}
+          alignContent={'start'}
+        >
+          <FormField.Label>
+            {intl.formatMessage(messages.containerTitle)}
+          </FormField.Label>
+          <FormField.Input>
+            <TextInput
+              name="container"
+              value={formik.values.container}
+              isReadOnly={!createNewMode || !canManage}
+              onChange={(value) => formik.setFieldValue('container', value)}
+              onBlur={() => formik.setFieldTouched('container', true)}
+              width={'full'}
+            />
+          </FormField.Input>
+          <FormField.Error>
+            {formik.touched.container && errors.container?.missing
+              ? intl.formatMessage(messages.requiredFieldError)
+              : null}
+          </FormField.Error>
+        </FormField.Root>
+      </PageContent.Root>
 
-      <Stack direction="column" gap="400">
-        <Text fontWeight="500">
-          {intl.formatMessage(messages.containerValue)}
-        </Text>
-        <Box>
-          <ValueEditor
-            content={{
-              text: formik.values.value,
-            }}
-            readOnly={!canManage}
-            onChange={(content) => {
-              if ('json' in content) {
-                formik.setFieldValue('value', JSON.stringify(content.json));
-              } else {
-                formik.setFieldValue('value', content.text);
-              }
-            }}
-          />
-        </Box>
-      </Stack>
+      <PageContent.Root variant={'full'}>
+        <ValueEditor
+          content={{
+            text: formik.values.value,
+          }}
+          readOnly={!canManage}
+          onChange={(content) => {
+            if ('json' in content) {
+              formik.setFieldValue('value', JSON.stringify(content.json));
+            } else {
+              formik.setFieldValue('value', content.text);
+            }
+          }}
+        />
+      </PageContent.Root>
     </Stack>
   );
 

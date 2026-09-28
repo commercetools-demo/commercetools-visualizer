@@ -77,10 +77,10 @@ export const formValuesToStatePartial = (
     type: formValues.stateType as TStateType,
     key: formValues.key || undefined,
     nameAllLocales: transformLocalizedStringToLocalizedField(
-      LocalizedTextInput.omitEmptyTranslations(formValues.name)
+      omitEmptyTranslations(formValues.name)
     ),
     descriptionAllLocales: transformLocalizedStringToLocalizedField(
-      LocalizedTextInput.omitEmptyTranslations(formValues.description)
+      omitEmptyTranslations(formValues.description)
     ),
     transitions: formValues.transitions.map(
       (transition) => ({ id: transition } as TState)

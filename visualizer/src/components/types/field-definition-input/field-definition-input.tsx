@@ -192,7 +192,7 @@ const FieldDefinitionInput: FC<Props> = ({
                 {intl.formatMessage(keyInputMessages.keyHint)}
               </FormField.Description>
               <FormField.Error>
-                <KeyInputError error={errors.name} resourceLabel="field" />
+                <KeyInputError error={errors.name} resourceType="field" />
               </FormField.Error>
             </FormField.Root>
 

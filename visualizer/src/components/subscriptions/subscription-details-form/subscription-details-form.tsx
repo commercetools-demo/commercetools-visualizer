@@ -123,7 +123,7 @@ const SubscriptionDetailsForm: FC<Props> = ({
             <FormField.Error>
               <KeyInputError
                 error={formik.errors.key as TKeyInputError}
-                resourceLabel="subscription"
+                resourceType="subscription"
               />
             </FormField.Error>
           </FormField.Root>

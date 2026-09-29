@@ -153,7 +153,7 @@ const ExtensionsForm: FC<Props> = ({
               {intl.formatMessage(keyInputMessages.keyHint)}
             </FormField.Description>
             <FormField.Error>
-              <KeyInputError error={errors.key} resourceLabel="extension" />
+              <KeyInputError error={errors.key} resourceType="extension" />
             </FormField.Error>
           </FormField.Root>
           <Accordion.Root

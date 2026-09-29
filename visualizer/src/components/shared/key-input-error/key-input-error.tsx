@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { FormattedMessage, MessageDescriptor, useIntl } from 'react-intl';
 import { TKeyValidationError } from '../../../utils/validate-key';
 import messages from './messages';
 
@@ -7,21 +7,39 @@ export type TKeyInputError = TKeyValidationError & {
   duplicate?: boolean;
 };
 
-type Props = {
-  error?: TKeyInputError;
-  // The English noun to slot into "A {resource} with this key already
-  // exists." — e.g. "type", "state", "subscription".
-  resourceLabel: string;
+export type TKeyInputResourceType =
+  | 'type'
+  | 'state'
+  | 'extension'
+  | 'subscription'
+  | 'customObject'
+  | 'field';
+
+const resourceMessages: Record<TKeyInputResourceType, MessageDescriptor> = {
+  type: messages.resourceType,
+  state: messages.resourceState,
+  extension: messages.resourceExtension,
+  subscription: messages.resourceSubscription,
+  customObject: messages.resourceCustomObject,
+  field: messages.resourceField,
 };
 
-const KeyInputError = ({ error, resourceLabel }: Props): ReactNode => {
+type Props = {
+  error?: TKeyInputError;
+  resourceType: TKeyInputResourceType;
+};
+
+const KeyInputError = ({ error, resourceType }: Props): ReactNode => {
+  const intl = useIntl();
   if (!error) return null;
   if (error.invalidInput) return <FormattedMessage {...messages.invalidKey} />;
   if (error.duplicate) {
     return (
       <FormattedMessage
         {...messages.duplicateKey}
-        values={{ resource: resourceLabel }}
+        values={{
+          resource: intl.formatMessage(resourceMessages[resourceType]),
+        }}
       />
     );
   }

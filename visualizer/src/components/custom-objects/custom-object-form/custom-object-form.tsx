@@ -121,7 +121,7 @@ const CustomObjectForm: FC<Props> = ({
           </FormField.Description>
           <FormField.Error>
             {formik.touched.key && (
-              <KeyInputError error={errors.key} resourceLabel="custom object" />
+              <KeyInputError error={errors.key} resourceType="customObject" />
             )}
           </FormField.Error>
         </FormField.Root>

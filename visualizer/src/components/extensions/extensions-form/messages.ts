@@ -2,22 +2,22 @@ import { defineMessages } from 'react-intl';
 
 export default defineMessages({
   generalInformationTitle: {
-    id: 'Type.form.panel.general.title',
+    id: 'Extension.form.panel.general.title',
     description: 'Title for general information panel',
     defaultMessage: 'General Information',
   },
   keyTitle: {
-    id: 'Type.form.key.title',
+    id: 'Extension.form.key.title',
     description: 'Title for key field',
     defaultMessage: 'Extension Key',
   },
   destinationLabel: {
-    id: 'Subscription.Destination.destinationLabel',
+    id: 'Extension.Destination.destinationLabel',
     description: 'destinationLabel',
     defaultMessage: 'Destination',
   },
   destinationDescription: {
-    id: 'Subscription.Destination.destinationDescription',
+    id: 'Extension.Destination.destinationDescription',
     description: 'destinationDescription',
     defaultMessage: 'Messaging service to which the messages are sent.',
   },

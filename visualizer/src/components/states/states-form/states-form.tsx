@@ -181,7 +181,7 @@ const StatesForm: FC<Props> = ({
               {intl.formatMessage(keyInputMessages.keyHint)}
             </FormField.Description>
             <FormField.Error>
-              <KeyInputError error={errors.key} resourceLabel="state" />
+              <KeyInputError error={errors.key} resourceType="state" />
             </FormField.Error>
           </FormField.Root>
           <LocalizedField

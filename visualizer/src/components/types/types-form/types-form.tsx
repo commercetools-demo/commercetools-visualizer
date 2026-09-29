@@ -177,7 +177,7 @@ const TypesForm: FC<Props> = ({
               {intl.formatMessage(keyInputMessages.keyHint)}
             </FormField.Description>
             <FormField.Error>
-              <KeyInputError error={errors.key} resourceLabel="type" />
+              <KeyInputError error={errors.key} resourceType="type" />
             </FormField.Error>
           </FormField.Root>
         </PageContent.Column>

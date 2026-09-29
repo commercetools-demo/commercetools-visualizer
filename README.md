@@ -86,4 +86,3 @@ The code has been built successfully using
    - AWS EventBridge, SNS, Azure are currently not supported
  - On Types
    - Deleting enum and localized enum values is not supported
-   - Change order of enum and localized enum values is not supported

@@ -1,4 +1,4 @@
-import { FC, ReactElement, JSX } from 'react';
+import { FC, ReactElement, JSX, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 import {
   FormikErrors,
@@ -126,6 +126,20 @@ const FieldDefinitionInput: FC<Props> = ({
       formik.setFieldValue('enumValues', newArray, false);
     }
   };
+
+  // Must stay referentially stable: DraggableList.Root has an internal
+  // effect that re-fires whenever the `onUpdateItems`-equivalent prop
+  // (`onReorderEnumValues`, threaded through FieldDefinitionInputForEnum's
+  // own onUpdateItems) changes identity — not just when the list itself
+  // changes. An unmemoized handler here refires that effect on every
+  // render, which calls setFieldValue every time, which re-renders this
+  // component and recreates the handler again: an infinite loop.
+  const handleReorderEnumValues = useCallback(
+    (updatedItems: Array<Item>) => {
+      formik.setFieldValue('enumValues', updatedItems, false);
+    },
+    [formik.setFieldValue]
+  );
 
   const handleChangeEnumValue = ({
     field,
@@ -354,6 +368,7 @@ const FieldDefinitionInput: FC<Props> = ({
                 onAddEnumValue={handleAddEnumValue}
                 onChangeEnumValue={handleChangeEnumValue}
                 onRemoveEnumValue={handleRemoveEnumValue}
+                onReorderEnumValues={handleReorderEnumValues}
               />
             </Box>
           )}

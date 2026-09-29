@@ -1,16 +1,18 @@
-import { FC } from 'react';
+import { FC, useCallback, useMemo, useRef } from 'react';
 import { useIntl } from 'react-intl';
 import { useFormikContext } from 'formik';
 import {
   Box,
   Button,
+  DraggableList,
+  Flex,
   Grid,
   IconButton,
   Stack,
   Text,
   TextInput,
 } from '@commercetools/nimbus';
-import { Add, Delete } from '@commercetools/nimbus-icons';
+import { Add, Delete, DragIndicator } from '@commercetools/nimbus-icons';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
 import messages from './messages';
 import { Item, LocalizedString } from './constants';
@@ -58,6 +60,7 @@ const getEnumLanguages = (
 };
 
 const createEmptyLocalizedEnum = (enumLanguages: Array<string>): Item => ({
+  _uid: crypto.randomUUID(),
   key: '',
   label: enumLanguages.reduce<Record<string, string>>(
     (acc, lang) => ({ ...acc, [lang]: '' }),
@@ -66,6 +69,7 @@ const createEmptyLocalizedEnum = (enumLanguages: Array<string>): Item => ({
 });
 
 const createEmptyPlainEnum = (): Item => ({
+  _uid: crypto.randomUUID(),
   key: '',
   label: '',
 });
@@ -86,6 +90,7 @@ type Props = {
     nextValue: string;
     absoluteIndex: number;
   }) => void;
+  onReorderEnumValues: (items: Array<Item>) => void;
   isDisabled?: boolean;
 };
 
@@ -93,6 +98,7 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
   onAddEnumValue,
   onRemoveEnumValue,
   onChangeEnumValue,
+  onReorderEnumValues,
   isDisabled,
 }) => {
   const formik = useFormikContext<TFormValues>();
@@ -111,18 +117,46 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
     onAddEnumValue(createEmptyEnumValue(isLocalized, enumLanguages));
   };
 
-  const items =
-    !formik.values.enumValues || formik.values.enumValues.length === 0
-      ? [createEmptyEnumValue(isLocalized, projectLanguages)]
-      : formik.values.enumValues;
+  // Before the user has added a real value, `items` falls back to a single
+  // placeholder row not yet stored in Formik state. That placeholder must
+  // keep the same `_uid` across renders — regenerating it (or the `items`/
+  // `draggableItems` arrays below) on every render would make DraggableList
+  // think the whole collection changed identity every render, which its
+  // internal sync effect turns into an infinite update loop.
+  const emptyItemRef = useRef<Item | undefined>(undefined);
+  if (!emptyItemRef.current) {
+    emptyItemRef.current = createEmptyEnumValue(isLocalized, projectLanguages);
+  }
+
+  const items = useMemo(
+    () =>
+      !formik.values.enumValues || formik.values.enumValues.length === 0
+        ? [emptyItemRef.current as Item]
+        : formik.values.enumValues,
+    [formik.values.enumValues]
+  );
+
+  // DraggableList requires its item type to satisfy DraggableListItemData
+  // (`label?: ReactNode`), but a LocalizedEnum's `Item.label` is a
+  // `{ [locale]: string }` record, not a ReactNode — so items are wrapped
+  // rather than fed to DraggableList directly. Memoized on `items` (not
+  // recomputed on every render) for the same reason as `emptyItemRef` above.
+  const draggableItems = useMemo(
+    () => items.map((item) => ({ _uid: item._uid, item })),
+    [items]
+  );
 
   // Column keys: key, then one label column per language (localized) or a
   // single "label" column (plain), then a delete column.
   const labelColumnKeys = isLocalized
     ? enumLanguages.map((lang) => `label_${lang}`)
     : ['label'];
-  const templateColumns = `1fr ${labelColumnKeys
-    .map(() => '1fr')
+  // `minmax(0, 1fr)`, not plain `1fr` (which is `minmax(auto, 1fr)`) — a
+  // bare `1fr` track won't shrink below its content's min-content width
+  // (each TextInput's natural minimum), so with many language columns the
+  // row overflows past the header's width instead of matching it.
+  const templateColumns = `minmax(0, 1fr) ${labelColumnKeys
+    .map(() => 'minmax(0, 1fr)')
     .join(' ')} max-content`;
 
   const cellValue = (item: Item, columnKey: string): string => {
@@ -135,63 +169,122 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
     return (item.key as string) || '';
   };
 
+  const getItemKey = useCallback(
+    (wrapper: { _uid: string }) => wrapper._uid,
+    []
+  );
+
+  const handleUpdateItems = useCallback(
+    (updatedWrappers: Array<{ _uid: string; item: Item }>) => {
+      // DraggableList has no simple "disable the whole list" prop, so guard
+      // here instead — mirrors the isDisabled gating already applied to
+      // each row's TextInput/delete button.
+      if (!isDisabled) {
+        onReorderEnumValues(updatedWrappers.map((wrapper) => wrapper.item));
+      }
+    },
+    [isDisabled, onReorderEnumValues]
+  );
+
   return (
     <Stack direction="column" gap="300">
-      <Grid templateColumns={templateColumns} gap="300" alignItems="center">
-        <Text fontWeight="500">
-          {intl.formatMessage(messages.tableHeaderLabelKey)}
-        </Text>
-        {isLocalized ? (
-          enumLanguages.map((lang) => (
-            <Text key={lang} fontWeight="500">
-              {intl.formatMessage(messages.tableHeaderLocalizedLabelLabel, {
-                language: lang.toUpperCase(),
-              })}
-            </Text>
-          ))
-        ) : (
+      <Flex alignItems="center" gap="200" paddingX="200">
+        {/* DraggableList.Root insets its rows with its own padding="200",
+            and each row's real drag-handle icon button sits to the left of
+            its content — neither of which the header (rendered outside the
+            list) gets by default, so both are mirrored here to keep the
+            header's columns lined up with each row's. */}
+        <IconButton
+          aria-hidden
+          isDisabled
+          visibility="hidden"
+          size="2xs"
+          variant="ghost"
+          colorPalette="neutral"
+        >
+          <DragIndicator />
+        </IconButton>
+        <Grid
+          flex="1"
+          minWidth={0}
+          templateColumns={templateColumns}
+          gap="300"
+          alignItems="center"
+        >
           <Text fontWeight="500">
-            {intl.formatMessage(messages.tableHeaderLabelLabel)}
+            {intl.formatMessage(messages.tableHeaderLabelKey)}
           </Text>
-        )}
-        <Box />
-
-        {items.map((item, index) => {
-          const columnKeys = ['key', ...labelColumnKeys];
-          return columnKeys
-            .map((columnKey) => (
-              <TextInput
-                key={`${index}-${columnKey}`}
-                aria-label={`${columnKey}-${index}`}
-                value={cellValue(item, columnKey)}
-                isDisabled={isDisabled}
-                onChange={(nextValue) =>
-                  onChangeEnumValue({
-                    absoluteIndex: index,
-                    field:
-                      columnKey === 'key'
-                        ? 'key'
-                        : formToDocLocalizedEnumLabel(columnKey),
-                    nextValue,
-                  })
-                }
-                width={'full'}
-              />
+          {isLocalized ? (
+            enumLanguages.map((lang) => (
+              <Text key={lang} fontWeight="500">
+                {intl.formatMessage(messages.tableHeaderLocalizedLabelLabel, {
+                  language: lang.toUpperCase(),
+                })}
+              </Text>
             ))
-            .concat(
-              <IconButton
-                key={`${index}-delete`}
-                aria-label={intl.formatMessage(messages.addEnumButtonLabel)}
-                size="xs"
-                variant="ghost"
-                isDisabled={isDisabled || items.length === 1}
-                onPress={() => onRemoveEnumValue(index)}
+          ) : (
+            <Text fontWeight="500">
+              {intl.formatMessage(messages.tableHeaderLabelLabel)}
+            </Text>
+          )}
+          <Box />
+        </Grid>
+      </Flex>
+      <DraggableList.Root<{ _uid: string; item: Item }>
+        items={draggableItems}
+        getKey={getItemKey}
+        onUpdateItems={handleUpdateItems}
+        aria-label={intl.formatMessage(messages.tableHeaderLabelKey)}
+        width="full"
+      >
+        {(wrapper) => {
+          const item = wrapper.item;
+          const absoluteIndex = items.findIndex(
+            (candidate) => candidate._uid === item._uid
+          );
+          const columnKeys = ['key', ...labelColumnKeys];
+          return (
+            <DraggableList.Item id={wrapper._uid}>
+              <Grid
+                templateColumns={templateColumns}
+                gap="300"
+                alignItems="center"
+                width="full"
+                minWidth={0}
               >
-                <Delete />
-              </IconButton>
-            );
-        })}
-      </Grid>
+                {columnKeys.map((columnKey) => (
+                  <TextInput
+                    key={columnKey}
+                    aria-label={`${columnKey}-${absoluteIndex}`}
+                    value={cellValue(item, columnKey)}
+                    isDisabled={isDisabled}
+                    onChange={(nextValue) =>
+                      onChangeEnumValue({
+                        absoluteIndex,
+                        field:
+                          columnKey === 'key'
+                            ? 'key'
+                            : formToDocLocalizedEnumLabel(columnKey),
+                        nextValue,
+                      })
+                    }
+                    width={'full'}
+                  />
+                ))}
+                <IconButton
+                  aria-label={intl.formatMessage(messages.addEnumButtonLabel)}
+                  size="xs"
+                  variant="ghost"
+                  isDisabled={isDisabled || items.length === 1}
+                  onPress={() => onRemoveEnumValue(absoluteIndex)}
+                >
+                  <Delete />
+                </IconButton>
+              </Grid>
+            </DraggableList.Item>
+          );
+        }}
+      </DraggableList.Root>
       <Box>
         <Button
           variant="outline"

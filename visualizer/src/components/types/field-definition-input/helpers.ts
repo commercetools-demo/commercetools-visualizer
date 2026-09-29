@@ -212,6 +212,14 @@ export const initialValuesFromFieldDefinition = (
       let type = actualType as TLocalizedEnumType;
       enumValues = type.values.map(
         (value): Item => ({
+          // A persisted value's key is already unique/non-empty (enforced
+          // server-side), so it's a stable, deterministic `_uid` here —
+          // unlike crypto.randomUUID(), which would make this function
+          // return a value that's never `isEqual` to its own prior result
+          // even when the underlying data hasn't changed, defeating
+          // Formik's `enableReinitialize` deep-equality check and
+          // resetting the form on unrelated re-renders.
+          _uid: value.key,
           key: value.key,
           label: value.labelAllLocales.reduce(
             (a, v) => ({ ...a, [v.locale]: v.value }),
@@ -222,7 +230,11 @@ export const initialValuesFromFieldDefinition = (
     } else if (typeName === 'Enum') {
       let type = actualType as TEnumType;
       enumValues = type.values.map(
-        (value): Item => ({ key: value.key, label: value.label })
+        (value): Item => ({
+          _uid: value.key,
+          key: value.key,
+          label: value.label,
+        })
       );
     } else if (typeName === 'LocalizedString') {
       isLocalized = true;

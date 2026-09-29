@@ -46,7 +46,7 @@
     "@commercetools/nimbus-icons": "^3.5.1",
     "@commercetools/nimbus-tokens": "^3.5.1",
     "@commercetools/platform-sdk": "8.24.0",
-    "@commercetools/sync-actions": "^8.1.0",
+    "@commercetools/sync-actions": "^8.4.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@formatjs/cli": "6.16.32",

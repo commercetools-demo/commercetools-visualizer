@@ -20,10 +20,12 @@ From `spec.md` §4, mount under the app root:
 | View | Route | Presentation |
 |------|-------|--------------|
 | List | `/extensions` | full page, data table |
-| Create | `/extensions/new` | modal form over the list |
-| Edit | `/extensions/:id` | modal form (Revert, Save, Delete) over the list |
+| Create | `/extensions/new` | full page with collapsible sections |
+| Edit | `/extensions/:id` | full page with collapsible sections (Revert, Save, Delete) |
 
-Create and edit are modal routes layered on the list, so the list stays mounted behind them.
+Create and edit are their own top-level routes (registered before `/extensions` so they
+match first), not modals nested inside the list — the list is a separate component that
+isn't mounted while create/edit are active.
 
 ## 2. Data layer
 
@@ -83,8 +85,8 @@ on **edit** only General Information is expanded.
 4. **Timeout** (`timeoutInMs`, optional integer). No client validation — server-enforced.
 
 **Save** is disabled while submitting, when pristine, or without Manage. On create: build the
-`ExtensionDraft`, call `CreateExtension`, show a created notification, navigate to the new
-`/extensions/:id`. On edit save: send computed actions + current version via
+`ExtensionDraft`, call `CreateExtension`, show a created notification, navigate back to
+`/extensions` (refetched). On edit save: send computed actions + current version via
 `UpdateExtension`, show an updated notification, refetch. **Revert** resets the form to
 loaded values. **Delete** calls `DeleteExtension` (no confirmation) and returns to the list.
 

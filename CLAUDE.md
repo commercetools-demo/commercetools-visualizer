@@ -122,6 +122,17 @@ REST payload becomes the GraphQL `TChangeSubscriptionDestination` union). If you
 new update action that carries a payload shape sync-actions and the GraphQL schema
 disagree on, it needs a case in `convertAction`.
 
+`@commercetools/sync-actions` doesn't always *detect* a diff at all, though, regardless
+of shape — e.g. its Type enum-value diffing (`actionsMapEnums`) only wires up add/change
+handlers, never a remove one, so a deleted enum value is silently dropped rather than
+producing `removeEnumValues`/`removeLocalizedEnumValues`. `calculateFieldDefinitionUpdateActions`
+(`use-types-connector/types-connector.ts`) works around this with its own
+`calculateEnumValueRemovals`, diffing by key and prepending the result before the
+sync-actions-produced actions (removal must apply before any `changeEnumValueOrder`,
+since that action's `keys` must match the *current* value set). Before assuming a
+change will be picked up automatically, check the installed `sync-actions` version's
+source for the relevant `actionsMap*` function rather than just the target schema.
+
 Error handling: mutations are wrapped with `graphQLErrorHandler(showNotification,
 formikHelpers, errorCodeMapping?)` (`src/hooks/shared/error-handling.ts`). Pass an
 `ErrorCodeMapping` (`{ errorCode, errorObject }[]`) when a specific GraphQL error code

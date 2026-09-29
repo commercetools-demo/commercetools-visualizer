@@ -127,8 +127,9 @@ shows the add control.
   send one `addFieldDefinition` action. Notify; refetch.
 
 **Edit sub-form** — **Name** and **Type** are **immutable** (read-only). Editable:
-Label, `Set` (display only — immutable, see below), input hint, enum values (add
-only), reference type (display only — immutable). Submit → diffed actions.
+Label, `Set` (display only — immutable, see below), input hint, enum values (add,
+edit, remove, and reorder), reference type (display only — immutable). Submit →
+diffed actions.
 
 **Field-type variants** (FR-010–FR-015), driven by `typeName` + toggles, mapping to
 `FieldTypeInput` (data-model.md union):
@@ -150,16 +151,17 @@ only), reference type (display only — immutable). Submit → diffed actions.
 **Immutability:** Name, Type, Reference type, and Set/element type are read-only in
 edit (spec.md §6).
 
-**Enum value editor** (FR-013) — inline rows of **Key** + **Label** (one Label per
-project language for LocalizedEnum). Add a row via an add control; remove a row
-(disabled when only one row remains). Empty-key rows are filtered out on persist. An
-enum field with no values shows one empty row. For LocalizedEnum, show project
-languages first, then any extra languages already present in existing values.
+**Enum value editor** (FR-013) — inline, drag-and-drop-reorderable rows of **Key** +
+**Label** (one Label per project language for LocalizedEnum). Add a row via an add
+control; remove a row (disabled when only one row remains) — this works for
+persisted values too. Empty-key rows are filtered out on persist. An enum field with
+no values shows one empty row. For LocalizedEnum, show project languages first, then
+any extra languages already present in existing values.
 
-> **Documented limitations (spec.md §6):** you **cannot delete a persisted enum
-> value** (no remove action) — only unsaved rows can be removed in the UI. You
-> **cannot reorder** enum values (no reorder action used). Persist therefore only
-> emits `add*EnumValue` (new keys) and `change*EnumValueLabel` (edited labels).
+> **Removal and reordering (spec.md §6):** persist emits `add*EnumValue` (new keys),
+> `change*EnumValueLabel` (edited labels), `remove*EnumValues` (removed keys —
+> diffed client-side, since `@commercetools/sync-actions` doesn't emit this on its
+> own), and `change*EnumValueOrder` (drag-and-drop reordering).
 
 ## 6. Cross-cutting
 
@@ -183,14 +185,15 @@ All per [../README.md](../README.md):
 - [ ] Edit: Key and Resource type IDs read-only; only changed name/description
       persisted (no actions ⇒ no call).
 - [ ] Delete removes the Type, notifies, returns to the list.
-- [ ] Field definitions: add/edit/delete work; Name and Type read-only in edit;
-      add = single `addFieldDefinition`, remove = single `removeFieldDefinition`.
+- [ ] Field definitions: add persists immediately (single `addFieldDefinition`);
+      remove is staged behind the Type-level Save/Revert (single
+      `removeFieldDefinition` on submit); Name and Type read-only in edit.
 - [ ] All field-type variants build correctly (String ±localized ±multiline;
       Number/Boolean/Money; Date/Time/DateTime; Enum/LocalizedEnum; Reference with
       required referenceTypeId; Set wrapping any element type).
 - [ ] Required and Set are mutually exclusive (with tooltip).
-- [ ] Enum editor: add/edit values, empty-key rows dropped, one-row floor; cannot
-      delete or reorder persisted values.
+- [ ] Enum editor: add/edit/remove values and drag-and-drop reorder, including
+      persisted values; empty-key rows dropped; one-row floor.
 - [ ] Without Manage everything is read-only/disabled, not hidden.
 - [ ] Localized inputs per language; empty translations omitted; version conflicts
       surface an error and prompt reload.

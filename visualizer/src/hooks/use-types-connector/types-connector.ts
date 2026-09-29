@@ -7,6 +7,7 @@ import { createSyncTypes, DeepPartial } from '@commercetools/sync-actions';
 import { Type, TypeUpdateAction } from '@commercetools/platform-sdk';
 import {
   TEnumType,
+  TFieldDefinition,
   TLocalizedEnumType,
   TMutation,
   TMutation_CreateTypeDefinitionArgs,
@@ -200,6 +201,22 @@ export const calculateTypeDefinitionUpdateActions = (
     originalConverted
   ) as Array<TypeUpdateAction>;
   return createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>;
+};
+
+// `convertToActionData(draft, true)` deliberately ignores fieldDefinitions
+// (see calculateTypeDefinitionUpdateActions above) — adding/editing a field
+// definition is handled by its own dedicated create/edit flow, which
+// persists immediately. Removing one, though, is staged in the type form's
+// own Formik state (so it goes through the same Save/Revert as
+// key/name/description), so it needs its own diff here, by field name.
+export const calculateFieldDefinitionRemovals = (
+  originalFieldDefinitions: Array<TFieldDefinition>,
+  nextFieldDefinitions: Array<TFieldDefinition>
+): Array<TTypeUpdateAction> => {
+  const nextNames = new Set(nextFieldDefinitions.map((field) => field.name));
+  return originalFieldDefinitions
+    .filter((field) => !nextNames.has(field.name))
+    .map((field) => ({ removeFieldDefinition: { fieldName: field.name } }));
 };
 
 // `@commercetools/sync-actions`'s enum diffing (`actionsMapEnums` in its

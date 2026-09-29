@@ -117,7 +117,6 @@ which action buttons are shown.
 - Changing destination type in the detail view should re-initialize the destination config;
   ensure the change is captured as an update action.
 - No bulk operations, no cloning, no search/virtualization in the (large) message-type list.
-- Some legacy key-validation copy references "business unit" and should be corrected.
 
 ## 7. Out of scope / non-goals
 

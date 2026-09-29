@@ -11,8 +11,8 @@
 API Extensions let merchants run custom logic during commercetools API requests. An
 extension points at a **destination** (an HTTP endpoint, optionally authenticated, or an AWS
 Lambda) and declares **triggers** — combinations of resource type and action (Create /
-Update) that invoke it, with an optional condition. The feature provides CRUD with create
-and edit in modals over a paginated list.
+Update) that invoke it, with an optional condition. The feature provides CRUD: create and
+edit are their own full pages with collapsible sections, alongside a paginated list.
 
 ## 2. User scenarios
 
@@ -53,8 +53,8 @@ and edit in modals over a paginated list.
   per-trigger `condition` (JMESPath) is stored and round-tripped but **not editable in the UI**.
 - **FR-008 — Timeout** (`timeoutInMs`, optional integer; server enforces limits).
 - **FR-009** On create, build an `ExtensionDraft` (rebuilding the nested destination from the
-  flat form fields), call create, show a created notification, and navigate to the new
-  extension's edit view.
+  flat form fields), call create, show a created notification, and navigate back to the list
+  (refetched).
 - **FR-010** On edit save, compute update actions (setKey, changeDestination, changeTriggers,
   setTimeoutInMs) and update with the current version; on success show an updated
   notification and refetch. Revert resets to loaded values. Delete removes the extension (no
@@ -65,8 +65,8 @@ and edit in modals over a paginated list.
 | View | Route | Presentation |
 |------|-------|--------------|
 | List | `/extensions` | full page, data table |
-| Create | `/extensions/new` | modal form |
-| Edit | `/extensions/:id` | modal form (Revert, Save, Delete) |
+| Create | `/extensions/new` | full page with collapsible sections |
+| Edit | `/extensions/:id` | full page with collapsible sections (Revert, Save, Delete) |
 
 ## 5. Validation rules
 

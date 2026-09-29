@@ -115,9 +115,10 @@ Via `commercetools-demo-shared-data-fetching-hooks` (`useTypeDefinitionUpdater`,
 | Field input hint | `changeInputHint { fieldName, inputHint }` |
 | Add enum value | `addEnumValue { fieldName, value }` (enum) / `addLocalizedEnumValue` (localized) |
 | Change enum label | `changeEnumValueLabel` (enum) / `changeLocalizedEnumValueLabel` (localized) |
+| Remove enum value | `removeEnumValues { fieldName, keys }` (enum) / `removeLocalizedEnumValues` (localized) — diffed client-side, since `@commercetools/sync-actions` never emits this action on its own |
+| Reorder enum values | `changeEnumValueOrder { fieldName, keys }` (enum) / `changeLocalizedEnumValueOrder` (localized) — driven by drag-and-drop in the enum value editor |
 
 > Action names verified against the commercetools schema (see `contracts/types.graphql`).
 >
 > **No action exists to change a field definition's `required` flag** after creation — it is
-> set only at creation via `FieldDefinitionInput.required`. Enum value **removal** and
-> **reordering** actions likewise do not exist / are not used (see spec §6).
+> set only at creation via `FieldDefinitionInput.required` (see spec §6).

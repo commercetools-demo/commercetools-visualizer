@@ -3,8 +3,6 @@ import { useIntl, type IntlShape } from 'react-intl';
 import { Switch, useHistory, useRouteMatch } from 'react-router-dom';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { useApplicationContext } from '@commercetools-frontend/application-shell-connectors';
-import { DOMAINS } from '@commercetools-frontend/constants';
-import { useShowNotification } from '@commercetools-frontend/actions-global';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { ApolloQueryResult } from '@apollo/client';
 import {
@@ -22,10 +20,8 @@ import {
   TFieldDefinition,
   TQuery,
   TQuery_TypeDefinitionArgs,
-  TTypeUpdateAction,
 } from '../../../types/generated/ctp';
 import messages from './messages';
-import { useTypeDefinitionUpdater } from '../../../hooks';
 import { renderAttributeTypeName } from './render-attribute-type-name';
 import { PERMISSIONS } from '../../../constants';
 import { formatLocalizedString } from '../../../utils/format-localized-string';
@@ -42,6 +38,7 @@ type Props = {
   version: number;
   value: Array<TFieldDefinition>;
   linkToHome: string;
+  onRemoveFieldDefinition: (name: string) => void;
   refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
@@ -66,12 +63,11 @@ const FieldDefinitionsList: FC<Props> = ({
   refetch,
   linkToHome,
   version,
+  onRemoveFieldDefinition,
 }) => {
   const intl = useIntl();
   const match = useRouteMatch();
   const { push } = useHistory();
-  const typeDefinitionUpdater = useTypeDefinitionUpdater();
-  const showNotification = useShowNotification();
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
@@ -85,23 +81,6 @@ const FieldDefinitionsList: FC<Props> = ({
     ...item,
     id: index + '',
   }));
-
-  const deleteItem = async (name: string) => {
-    const deleteAction: TTypeUpdateAction = {
-      removeFieldDefinition: { fieldName: name },
-    };
-    await typeDefinitionUpdater.execute({
-      actions: [deleteAction],
-      id: id,
-      version: version,
-    });
-    showNotification({
-      kind: 'success',
-      domain: DOMAINS.SIDE,
-      text: intl.formatMessage(messages.removeFieldDefinitionButtonSuccess),
-    });
-    refetch && (await refetch());
-  };
 
   const columns: Array<DataTableColumnItem<TFieldDefinitionWithId>> = [
     {
@@ -149,7 +128,7 @@ const FieldDefinitionsList: FC<Props> = ({
           size="xs"
           variant="ghost"
           isDisabled={!canManage}
-          onPress={() => deleteItem(row.name)}
+          onPress={() => onRemoveFieldDefinition(row.name)}
         >
           <Delete />
         </IconButton>

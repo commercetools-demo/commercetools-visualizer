@@ -22,6 +22,7 @@ import formMessages from '../types-form/messages';
 
 import messages from './messages';
 import {
+  calculateFieldDefinitionRemovals,
   calculateTypeDefinitionUpdateActions,
   getErrorMessage,
   graphQLErrorHandler,
@@ -60,10 +61,13 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
     ) => {
       const data = formValuesToDoc(formikValues);
       if (typeDefinition) {
-        const updateActions = calculateTypeDefinitionUpdateActions(
-          typeDefinition,
-          data
-        );
+        const updateActions = [
+          ...calculateFieldDefinitionRemovals(
+            typeDefinition.fieldDefinitions,
+            formikValues.fieldDefinitions
+          ),
+          ...calculateTypeDefinitionUpdateActions(typeDefinition, data),
+        ];
         if (updateActions.length > 0) {
           await typeDefinitionUpdater
             .execute({

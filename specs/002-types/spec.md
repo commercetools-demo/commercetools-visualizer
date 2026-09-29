@@ -64,10 +64,12 @@ types, date/time variants, enums (plain and localized), references, and `Set` co
   the Type); **Label** (localized, required); **Type** (required). On success the field is
   added to the Type (single update action) and a success notification is shown.
 - **FR-008** Edit a field definition: **Name** and **Type** are immutable (read-only). Label,
-  input hint, and enum values (add only) are editable and persist via field-specific update
-  actions. **Required** is shown but **cannot be persisted on an existing field** — see §6.
-  `Set` and reference type are fixed once the field exists.
-- **FR-009** Delete a field definition removes it from the Type; refetch the Type afterward.
+  input hint, and enum values (add, edit, remove, and reorder) are editable and persist via
+  field-specific update actions. **Required** is shown but **cannot be persisted on an
+  existing field** — see §6. `Set` and reference type are fixed once the field exists.
+- **FR-009** Delete a field definition: removal is staged in the Type form like any other
+  edit (Name, Description, etc.) — it only takes effect when the Type-level Save is pressed,
+  and can be undone with Revert until then.
 
 ### Field types and their configuration
 
@@ -77,11 +79,12 @@ types, date/time variants, enums (plain and localized), references, and `Set` co
 - **FR-011** **Number**, **Boolean**, **Money** — no additional configuration.
 - **FR-012** **Date** type selector offers a format choice: **Date**, **Time**, or
   **DateTime** (maps to the three commercetools field types).
-- **FR-013** **Enum** / **LocalizedEnum** — managed via an inline value editor: rows of
-  **Key** + **Label** (one label per project language for LocalizedEnum). Add a row via an
-  add control; remove a row (disabled when only one row remains). Empty-key rows are filtered
-  out on persist. For LocalizedEnum, languages shown = project languages first, then any
-  additional languages already present in existing values.
+- **FR-013** **Enum** / **LocalizedEnum** — managed via an inline, drag-and-drop-reorderable
+  value editor: rows of **Key** + **Label** (one label per project language for
+  LocalizedEnum). Add a row via an add control; remove a row (disabled when only one row
+  remains) — this applies to persisted values too, not just unsaved rows. Empty-key rows are
+  filtered out on persist. For LocalizedEnum, languages shown = project languages first, then
+  any additional languages already present in existing values.
 - **FR-014** **Reference** — requires a **Reference type ID** chosen from a predefined list;
   immutable after creation.
 - **FR-015** **Set** — a checkbox that wraps the selected element type in a `Set`. Immutable
@@ -112,9 +115,10 @@ The field-definition list and enum value editor render inline within the Type ed
 
 ## 6. Edge cases & known limitations
 
-- **Deleting an enum value from an already-persisted enum is not supported** — only unsaved
-  (not-yet-persisted) enum rows can be removed. (Documented limitation.)
-- **Reordering enum values is not supported** — no reorder action exists. (Documented limitation.)
+- Deleting and reordering persisted enum values are both supported: removal is diffed
+  client-side (`@commercetools/sync-actions` doesn't emit a remove action for enum values on
+  its own) into `removeEnumValues`/`removeLocalizedEnumValues`, and drag-and-drop reordering
+  into `changeEnumValueOrder`/`changeLocalizedEnumValueOrder` — see data-model.md.
 - **A field definition's `required` flag cannot be changed after creation** — the commercetools
   API exposes no such update action (confirmed against the schema). It is only settable at field
   creation via `FieldDefinitionInput.required`. The edit form may surface the toggle, but a

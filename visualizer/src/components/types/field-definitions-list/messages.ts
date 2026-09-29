@@ -41,11 +41,6 @@ export default defineMessages({
     description: 'Label for remove field definition action',
     defaultMessage: 'Remove Field Definition',
   },
-  removeFieldDefinitionButtonSuccess: {
-    id: 'Type.form.button.removeFieldDefinitionSuccess',
-    description: 'Label for remove field button success',
-    defaultMessage: 'Successfully remove FieldDefinition',
-  },
   localizedLabel: {
     id: 'ProjectSettings.ProductTypes.Details.localizedLabel',
     description: 'Text of label to indicate localized fields',

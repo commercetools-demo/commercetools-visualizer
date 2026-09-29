@@ -113,6 +113,13 @@ const TypesForm: FC<Props> = ({
     demandedPermissions: [PERMISSIONS.Manage],
   });
 
+  const handleRemoveFieldDefinition = (name: string) => {
+    formik.setFieldValue(
+      'fieldDefinitions',
+      formik.values.fieldDefinitions.filter((field) => field.name !== name)
+    );
+  };
+
   const errors = formik.errors as Partial<TErrors>;
 
   const formElements = (
@@ -248,6 +255,7 @@ const TypesForm: FC<Props> = ({
             value={formik.values.fieldDefinitions}
             linkToHome={linkToHome}
             refetch={refetch}
+            onRemoveFieldDefinition={handleRemoveFieldDefinition}
           />
         )}
       </PageContent.Root>

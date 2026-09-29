@@ -7,5 +7,6 @@ export {
   useTypeWithDefinitionByNameFetcher,
   calculateTypeDefinitionUpdateActions,
   calculateFieldDefinitionUpdateActions,
+  calculateFieldDefinitionRemovals,
 } from './types-connector';
 export type { PickedFieldDefinition } from './conversion';

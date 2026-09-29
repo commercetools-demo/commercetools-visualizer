@@ -152,7 +152,6 @@ All per ../README.md — do not reinvent:
 - **`status`** is read but **not surfaced** in list or detail.
 - **No draft persistence on create** — navigating away or refreshing loses progress.
 - No bulk operations, cloning, or search/virtualization in the (large) message-type list.
-- Fix legacy key-validation copy that references "business unit".
 
 ## Verification checklist
 

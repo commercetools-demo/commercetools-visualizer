@@ -1,5 +1,6 @@
 query FetchTypeWithDefinitionByName($id: String, $includeNames: [String!]) {
   typeDefinition(id: $id) {
+    id
     fieldDefinitions(includeNames: $includeNames) {
       name
       required

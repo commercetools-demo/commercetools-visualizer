@@ -23,10 +23,10 @@
 #   selecting it under the same `destination` field forces the alias
 #   `eventGridAccessKey` to avoid a field-type conflict.
 #
-# UI scope: only GoogleCloudPubSub, SQS and ConfluentCloud are configurable in
-# this app. SNS, EventBridge, AzureServiceBus and EventGrid (Azure Event Grid)
-# are valid destinations in the schema and are read back here, but the app
-# exposes no configuration form for them (see spec §6).
+# UI scope: all 7 destination types (GoogleCloudPubSub, SQS, ConfluentCloud, SNS,
+# EventBridge, AzureServiceBus, EventGrid) are configurable in this app. The
+# picker's option `id` for each type must match its discriminator string here
+# exactly (e.g. `EventGrid`, not `AzureEventGrid`).
 #
 # ---------------------------------------------------------------------------
 # Update actions (input: SubscriptionUpdateAction) used by this app

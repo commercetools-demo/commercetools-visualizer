@@ -89,4 +89,69 @@ export default defineMessages({
     description: 'Heading for the Confluent Cloud destination config form',
     defaultMessage: 'Configure Confluent Cloud Destination',
   },
+  configureSNSHeading: {
+    id: 'Subscription.Destination.configureSNSHeading',
+    description: 'Heading for the AWS SNS destination config form',
+    defaultMessage: 'Configure AWS SNS Destination',
+  },
+  destinationSNSTopicArn: {
+    id: 'Subscription.Destination.destinationSNSTopicArn',
+    description: 'destinationSNSTopicArn',
+    defaultMessage: 'ARN of the Amazon SNS topic.',
+  },
+  destinationSNSAuthenticationMode: {
+    id: 'Subscription.Destination.destinationSNSAuthenticationMode',
+    description: 'destinationSNSAuthenticationMode',
+    defaultMessage: 'Defines the method of authentication for the SNS topic.',
+  },
+  destinationSNSAccessKey: {
+    id: 'Subscription.Destination.destinationSNSAccessKey',
+    description: 'destinationSNSAccessKey',
+    defaultMessage: 'Destination SNS Access Key',
+  },
+  destinationSNSAccessSecret: {
+    id: 'Subscription.Destination.destinationSNSAccessSecret',
+    description: 'destinationSNSAccessSecret',
+    defaultMessage: 'Destination SNS Secret',
+  },
+  configureEventBridgeHeading: {
+    id: 'Subscription.Destination.configureEventBridgeHeading',
+    description: 'Heading for the AWS EventBridge destination config form',
+    defaultMessage: 'Configure AWS EventBridge Destination',
+  },
+  destinationEventBridgeAccountId: {
+    id: 'Subscription.Destination.destinationEventBridgeAccountId',
+    description: 'destinationEventBridgeAccountId',
+    defaultMessage: 'ID of the AWS account to which events are sent.',
+  },
+  destinationEventBridgeRegion: {
+    id: 'Subscription.Destination.destinationEventBridgeRegion',
+    description: 'destinationEventBridgeRegion',
+    defaultMessage: 'AWS Region of the event bus.',
+  },
+  configureAzureServiceBusHeading: {
+    id: 'Subscription.Destination.configureAzureServiceBusHeading',
+    description: 'Heading for the Azure Service Bus destination config form',
+    defaultMessage: 'Configure Azure Service Bus Destination',
+  },
+  destinationAzureServiceBusConnectionString: {
+    id: 'Subscription.Destination.destinationAzureServiceBusConnectionString',
+    description: 'destinationAzureServiceBusConnectionString',
+    defaultMessage: 'Connection string of the Azure Service Bus queue/topic.',
+  },
+  configureAzureEventGridHeading: {
+    id: 'Subscription.Destination.configureAzureEventGridHeading',
+    description: 'Heading for the Azure Event Grid destination config form',
+    defaultMessage: 'Configure Azure Event Grid Destination',
+  },
+  destinationAzureEventGridUri: {
+    id: 'Subscription.Destination.destinationAzureEventGridUri',
+    description: 'destinationAzureEventGridUri',
+    defaultMessage: 'URI of the Azure Event Grid topic.',
+  },
+  destinationAzureEventGridAccessKey: {
+    id: 'Subscription.Destination.destinationAzureEventGridAccessKey',
+    description: 'destinationAzureEventGridAccessKey',
+    defaultMessage: 'Access key of the Azure Event Grid topic.',
+  },
 });

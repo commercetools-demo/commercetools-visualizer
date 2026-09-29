@@ -340,5 +340,94 @@ describe('createGraphQlUpdateActions', () => {
         },
       });
     });
+
+    it('converts an SNS destination, mapping the authenticationMode to the GraphQL enum', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'SNS',
+            accessKey: 'accessKey',
+            accessSecret: 'accessSecret',
+            authenticationMode: 'IAM',
+            topicArn: 'arn:aws:sns:eu-west-1:123456789012:my-topic',
+          },
+        },
+      ]);
+      expect(action).toEqual({
+        changeDestination: {
+          destination: {
+            SNS: {
+              accessKey: 'accessKey',
+              accessSecret: 'accessSecret',
+              authenticationMode: TAwsAuthenticationMode.Iam,
+              topicArn: 'arn:aws:sns:eu-west-1:123456789012:my-topic',
+            },
+          },
+        },
+      });
+    });
+
+    it('converts an EventBridge destination', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'EventBridge',
+            accountId: '123456789012',
+            region: 'eu-west-1',
+          },
+        },
+      ]);
+      expect(action).toEqual({
+        changeDestination: {
+          destination: {
+            EventBridge: { accountId: '123456789012', region: 'eu-west-1' },
+          },
+        },
+      });
+    });
+
+    it('converts an AzureServiceBus destination', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'AzureServiceBus',
+            connectionString: 'Endpoint=sb://example',
+          },
+        },
+      ]);
+      expect(action).toEqual({
+        changeDestination: {
+          destination: {
+            AzureServiceBus: { connectionString: 'Endpoint=sb://example' },
+          },
+        },
+      });
+    });
+
+    it('converts an EventGrid (Azure Event Grid) destination', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'EventGrid',
+            uri: 'https://example.eventgrid.azure.net/api/events',
+            accessKey: 'accessKey',
+          },
+        },
+      ]);
+      expect(action).toEqual({
+        changeDestination: {
+          destination: {
+            EventGrid: {
+              uri: 'https://example.eventgrid.azure.net/api/events',
+              accessKey: 'accessKey',
+            },
+          },
+        },
+      });
+    });
   });
 });

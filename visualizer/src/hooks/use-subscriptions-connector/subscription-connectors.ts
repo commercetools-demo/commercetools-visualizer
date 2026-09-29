@@ -53,13 +53,34 @@ const convertTSubscription = (subscription: InputType): PickedReturnType => {
   switch (subscription.destination.type) {
     case 'GoogleCloudPubSub':
     case 'SQS':
-    case 'ConfluentCloud': {
+    case 'ConfluentCloud':
+    case 'SNS':
+    case 'EventBridge':
+    case 'AzureServiceBus': {
       const adaptedDestination = {
         ...subscription.destination,
         type: subscription.destination.type,
       } as TGoogleCloudPubSubDestination;
       const { __typename, ...rest } = adaptedDestination;
       destination = rest as Destination;
+      break;
+    }
+    case 'EventGrid': {
+      // The fetched field is aliased `eventGridAccessKey` (see
+      // SubscriptionFragment) to avoid a field-type conflict with SNS/SQS's
+      // `accessKey` under the same `destination` selection — rename it back
+      // to `accessKey` to match AzureEventGridDestination's REST shape.
+      const adaptedDestination = subscription.destination as {
+        __typename?: string;
+        type: string;
+        uri: string;
+        eventGridAccessKey?: string;
+      };
+      destination = {
+        type: 'EventGrid',
+        uri: adaptedDestination.uri,
+        accessKey: adaptedDestination.eventGridAccessKey,
+      } as Destination;
       break;
     }
   }

@@ -26,10 +26,14 @@ const SubscriptionDestinationTypeForm: FC<Props> = ({ isReadOnly }) => {
       id: 'EventBridge',
       label: intl.formatMessage(messages.destinationAWSEventBridge),
     },
-    { id: 'sns', label: intl.formatMessage(messages.destinationSNS) },
+    { id: 'SNS', label: intl.formatMessage(messages.destinationSNS) },
     { id: 'SQS', label: intl.formatMessage(messages.destinationSQS) },
     {
-      id: 'AzureEventGrid',
+      // The commercetools API's discriminator for Azure Event Grid is
+      // "EventGrid" (see `AzureEventGridDestination.type` in
+      // @commercetools/platform-sdk) — must match exactly so a fetched
+      // subscription's destination.type lines up with this option's id.
+      id: 'EventGrid',
       label: intl.formatMessage(messages.destinationAzureEventGrid),
     },
     {

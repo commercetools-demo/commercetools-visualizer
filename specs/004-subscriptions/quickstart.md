@@ -96,18 +96,22 @@ component — no stepper, no per-step routes. All sections are visible and edita
 
 1. **Key** (expanded) — field **Key**, required, shared key rule (../README.md §6).
 2. **Destination** (expanded) — **Destination type**: required, clearable, searchable select
-   over the 7 types. Changing it re-initializes the type-specific config below. The
-   **3 implemented configs** and their **required fields**:
+   over the 7 types (option `id`s are the API's own discriminator strings — e.g.
+   `EventGrid`, not `AzureEventGrid`). Changing it re-initializes the type-specific config
+   below. The **7 implemented configs** and their **required fields**:
    - **Google Cloud Pub/Sub** — `topic` (required), `projectId` (required).
    - **AWS SQS** — `authenticationMode` (`IAM` | `Credentials`, required); `accessKey` &
      `accessSecret` (required **only** when mode = `Credentials`); `queueUrl` (required);
      `region` (required).
    - **Confluent Cloud** — `bootstrapServer`, `apiKey`, `apiSecret`, `acks` (`0`|`1`|`all`),
      `topic` — all required.
-   - **SNS / EventBridge / Azure Service Bus / Azure Event Grid** — no form; show
-     "No mapping defined so far for {type}". On create this blocks Save; on edit, existing
-     subscriptions of these types can't have their destination edited (key/changes/messages
-     remain editable).
+   - **AWS SNS** — `authenticationMode` (`IAM` | `Credentials`, required); `accessKey` &
+     `accessSecret` (required **only** when mode = `Credentials`); `topicArn` (required).
+   - **AWS EventBridge** — `accountId` (required), `region` (required).
+   - **Azure Service Bus** — `connectionString` (required).
+   - **Azure Event Grid** — `uri` (required), `accessKey` (required). Read back aliased as
+     `eventGridAccessKey` (field-type conflict with SNS/SQS's `accessKey`); renamed back to
+     `accessKey` before diffing (see `convertTSubscription`).
 3. **Changes** (collapsed) — optional multi-select over the 40 resource types; each
    selection adds `{ resourceTypeId }`. Zero allowed.
 4. **Messages** (collapsed) — optional, **grouped by resource type**; each group is labelled

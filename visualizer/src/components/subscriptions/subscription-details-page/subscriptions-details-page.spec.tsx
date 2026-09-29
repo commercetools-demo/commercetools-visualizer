@@ -300,6 +300,20 @@ describe('notifications', () => {
       expect((destinations as HTMLInputElement).value).toBe('AWS SNS');
     });
 
+    // SNS's own required fields (authentication mode + topic ARN) — IAM mode
+    // doesn't need access key/secret, mirroring SQS's conditional fields.
+    const authenticationModeTrigger = await screen.findByRole('button', {
+      name: /authentication/i,
+    });
+    fireEvent.click(authenticationModeTrigger);
+    const iamOption = await screen.findByRole('option', { name: 'IAM' });
+    fireEvent.click(iamOption);
+
+    const topicArnInput = await screen.findByLabelText(/arn of the amazon/i);
+    fireEvent.change(topicArnInput, {
+      target: { value: 'arn:aws:sns:eu-west-1:123456789012:my-topic' },
+    });
+
     // updating subscription details
     const saveButton = screen.getByRole('button', { name: /save/i });
     fireEvent.click(saveButton);

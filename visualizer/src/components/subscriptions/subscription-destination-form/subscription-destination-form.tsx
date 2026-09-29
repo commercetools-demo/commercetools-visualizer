@@ -4,6 +4,10 @@ import { Stack } from '@commercetools/nimbus';
 import GoogleCloudPubSubDestination from './subscription-destination-form-gcp';
 import SQSDestination from './subscription-destination-form-sqs';
 import ConfluentCloudDestination from './subscription-destination-form-confluent-cloud';
+import SNSDestination from './subscription-destination-form-sns';
+import EventBridgeDestination from './subscription-destination-form-event-bridge';
+import AzureServiceBusDestination from './subscription-destination-form-azure-service-bus';
+import AzureEventGridDestination from './subscription-destination-form-event-grid';
 import messages from './messages';
 
 type Props = {
@@ -30,6 +34,18 @@ const SubscriptionDestinationForm: FC<Props> = ({
       break;
     case 'ConfluentCloud':
       toRender = <ConfluentCloudDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'SNS':
+      toRender = <SNSDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'EventBridge':
+      toRender = <EventBridgeDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'AzureServiceBus':
+      toRender = <AzureServiceBusDestination isReadOnly={isReadOnly} />;
+      break;
+    case 'EventGrid':
+      toRender = <AzureEventGridDestination isReadOnly={isReadOnly} />;
       break;
   }
 

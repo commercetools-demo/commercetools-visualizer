@@ -31,17 +31,26 @@ TSubscriptionDraft {
 
 ## Destination variants
 
+All 7 are configurable in the UI. The API's own discriminator string is used as each
+type's `id`/`type` value throughout the app (form, diffing, GraphQL mutation input) —
+note `EventGrid`, not `AzureEventGrid`, for Azure Event Grid.
+
 ```
 GoogleCloudPubSub { type:'GoogleCloudPubSub', topic, projectId }
 SQS              { type:'SQS', authenticationMode:'IAM'|'Credentials',
                    accessKey?, accessSecret?, queueUrl, region }
 ConfluentCloud   { type:'ConfluentCloud', bootstrapServer, apiKey, apiSecret,
                    acks:'0'|'1'|'all', topic }
--- declared but NOT configurable in UI --
+SNS              { type:'SNS', authenticationMode?:'IAM'|'Credentials',
+                   accessKey?, accessSecret?, topicArn }
+EventBridge      { type:'EventBridge', accountId, region }
+                 // `source` is read-only (server-assigned); not part of the input.
 AzureServiceBus  { type:'AzureServiceBus', connectionString }
-AzureEventGrid   { type:'AzureEventGrid', uri, accessKey }
-EventBridge      { type:'EventBridge', accountId, region, source? }
-SNS              { type:'SNS', … }
+EventGrid        { type:'EventGrid', uri, accessKey }
+                 // Read back aliased as `eventGridAccessKey` (see SubscriptionFragment
+                 // in contracts/subscriptions.graphql) to avoid a field-type conflict
+                 // with SNS/SQS's `accessKey` under the same `destination` selection;
+                 // convertTSubscription renames it back to `accessKey` before diffing.
 ```
 
 ## Form / draft models
@@ -56,7 +65,10 @@ subscription).
 TFormValues {
   id, key,
   destinationType,                          // one of the 7 types
-  destination?: { GoogleCloudPubSub?, SQS?, ConfluentCloud? },
+  destination?: {
+    GoogleCloudPubSub?, SQS?, ConfluentCloud?, SNS?, EventBridge?,
+    AzureServiceBus?, EventGrid?,
+  },
   changes?: { resourceTypeId }[],
   messages?: { resourceTypeId, types: string[] }[],
 }
@@ -64,9 +76,10 @@ TFormValues {
 
 ## Enumerations
 
-- **Destination types (7)** — `GoogleCloudPubSub`, `SQS`, `ConfluentCloud`, `SNS`,
-  `EventBridge`, `AzureServiceBus`, `AzureEventGrid`. Fully configurable: first three only.
-- **SQS auth mode** — `IAM` | `Credentials`.
+- **Destination types (7, all configurable)** — `GoogleCloudPubSub`, `SQS`,
+  `ConfluentCloud`, `SNS`, `EventBridge`, `AzureServiceBus`, `EventGrid` (these are the
+  API's own discriminator strings, used verbatim as each picker option's `id`).
+- **SQS / SNS auth mode** — `IAM` | `Credentials`.
 - **Confluent acks** — `0` | `1` | `all`.
 - **Change resource types (40)** — approval-flow, approval-rule, associate-role,
   attribute-group, business-unit, cart, cart-discount, category, channel, customer,

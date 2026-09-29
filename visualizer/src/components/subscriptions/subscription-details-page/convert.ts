@@ -8,7 +8,11 @@ const isKnownDestinationType = (
 ): destinationType is TKnownDestinationType =>
   destinationType === 'GoogleCloudPubSub' ||
   destinationType === 'SQS' ||
-  destinationType === 'ConfluentCloud';
+  destinationType === 'ConfluentCloud' ||
+  destinationType === 'SNS' ||
+  destinationType === 'EventBridge' ||
+  destinationType === 'AzureServiceBus' ||
+  destinationType === 'EventGrid';
 
 export const convertFormValuesToSubscription = (
   formValues: TFormValues

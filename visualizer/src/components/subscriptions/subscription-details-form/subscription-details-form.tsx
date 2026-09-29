@@ -5,9 +5,13 @@ import omitEmpty from 'omit-empty-es';
 import messages from './messages';
 import SubscriptionDestinationTypeForm from '../subscription-destination-type-form/subscription-destination-type-form';
 import {
+  TAzureServiceBusDestination,
   TChangeSubscriptionInput,
+  TEventBridgeDestination,
+  TEventGridDestination,
   TGoogleCloudPubSubDestination,
   TMessageSubscriptionInput,
+  TSnsDestination,
   TSqsDestination,
   TConfluentCloudDestination,
 } from '../../../types/generated/ctp';
@@ -32,12 +36,13 @@ type Formik = ReturnType<typeof useFormik>;
 export type TFormValues = {
   id: string;
   key: string;
-  destinationType: // | 'AzureServiceBus'
-  | 'ConfluentCloud'
-    // | 'EventBridge'
-    // | 'EventGrid'
+  destinationType:
+    | 'AzureServiceBus'
+    | 'ConfluentCloud'
+    | 'EventBridge'
+    | 'EventGrid'
     | 'GoogleCloudPubSub'
-    // | 'SNS'
+    | 'SNS'
     | 'SQS'
     | string;
   destination:
@@ -45,6 +50,10 @@ export type TFormValues = {
         GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
         SQS?: TSqsDestination;
         ConfluentCloud?: TConfluentCloudDestination;
+        SNS?: TSnsDestination;
+        EventBridge?: TEventBridgeDestination;
+        AzureServiceBus?: TAzureServiceBusDestination;
+        EventGrid?: TEventGridDestination;
       }
     | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;

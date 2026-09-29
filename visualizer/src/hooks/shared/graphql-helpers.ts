@@ -184,6 +184,54 @@ const getDestinationFromPayload = (
       };
       break;
     }
+    case 'SNS': {
+      result = {
+        destination: {
+          SNS: {
+            accessKey: payload.destination.accessKey,
+            accessSecret: payload.destination.accessSecret,
+            authenticationMode:
+              payload.destination.authenticationMode === 'IAM'
+                ? TAwsAuthenticationMode.Iam
+                : TAwsAuthenticationMode.Credentials,
+            topicArn: payload.destination.topicArn,
+          },
+        },
+      };
+      break;
+    }
+    case 'EventBridge': {
+      result = {
+        destination: {
+          EventBridge: {
+            accountId: payload.destination.accountId,
+            region: payload.destination.region,
+          },
+        },
+      };
+      break;
+    }
+    case 'AzureServiceBus': {
+      result = {
+        destination: {
+          AzureServiceBus: {
+            connectionString: payload.destination.connectionString,
+          },
+        },
+      };
+      break;
+    }
+    case 'EventGrid': {
+      result = {
+        destination: {
+          EventGrid: {
+            uri: payload.destination.uri,
+            accessKey: payload.destination.accessKey,
+          },
+        },
+      };
+      break;
+    }
   }
   return result;
 };

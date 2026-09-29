@@ -6,6 +6,8 @@ import {
 import { createSyncTypes, DeepPartial } from '@commercetools/sync-actions';
 import { Type, TypeUpdateAction } from '@commercetools/platform-sdk';
 import {
+  TEnumType,
+  TLocalizedEnumType,
   TMutation,
   TMutation_CreateTypeDefinitionArgs,
   TMutation_DeleteTypeDefinitionArgs,
@@ -200,6 +202,60 @@ export const calculateTypeDefinitionUpdateActions = (
   return createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>;
 };
 
+// `@commercetools/sync-actions`'s enum diffing (`actionsMapEnums` in its
+// source) only wires up ADD_ACTIONS/CHANGE_ACTIONS for a field's enum
+// `values` — no REMOVE_ACTIONS — so a removed enum value is silently
+// dropped from the diff; no removeEnumValues/removeLocalizedEnumValues
+// action is ever generated. Detect removals ourselves instead. Must run
+// (and be applied) before any changeEnumValueOrder action, since that
+// action's `keys` must match the field's *current* value set at the time
+// it's applied — which only holds once the removal has already happened.
+const calculateEnumValueRemovals = (
+  originalDraft: PickedFieldDefinition,
+  nextDraft: PickedFieldDefinition
+): Array<TTypeUpdateAction> => {
+  const typeName = originalDraft.type.name;
+  if (
+    !originalDraft.name ||
+    (typeName !== 'Enum' && typeName !== 'LocalizedEnum')
+  ) {
+    return [];
+  }
+
+  const originalValues = (originalDraft.type as TEnumType | TLocalizedEnumType)
+    .values;
+  const nextValues =
+    nextDraft.type.name === typeName
+      ? (nextDraft.type as TEnumType | TLocalizedEnumType).values
+      : [];
+  const nextKeys = new Set(nextValues.map((value) => value.key));
+  const removedKeys = originalValues
+    .map((value) => value.key)
+    .filter((key) => !nextKeys.has(key));
+
+  if (removedKeys.length === 0) {
+    return [];
+  }
+
+  return typeName === 'Enum'
+    ? [
+        {
+          removeEnumValues: {
+            fieldName: originalDraft.name,
+            keys: removedKeys,
+          },
+        },
+      ]
+    : [
+        {
+          removeLocalizedEnumValues: {
+            fieldName: originalDraft.name,
+            keys: removedKeys,
+          },
+        },
+      ];
+};
+
 export const calculateFieldDefinitionUpdateActions = (
   originalDraft: PickedFieldDefinition,
   nextDraft: PickedFieldDefinition
@@ -221,5 +277,8 @@ export const calculateFieldDefinitionUpdateActions = (
     wrappedNextDraft,
     wrappedOriginalDraft
   ) as Array<TypeUpdateAction>;
-  return createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>;
+  return [
+    ...calculateEnumValueRemovals(originalDraft, nextDraft),
+    ...(createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>),
+  ];
 };

@@ -84,5 +84,3 @@ The code has been built successfully using
 ## Known issues
  - On Subscriptions:
    - AWS EventBridge, SNS, Azure are currently not supported
- - On Types
-   - Deleting enum and localized enum values is not supported

@@ -174,6 +174,19 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
     []
   );
 
+  // GridListItem (which DraggableList.Item renders under the hood) requires
+  // a non-empty `textValue` for type-to-select accessibility whenever its
+  // children aren't plain text — true here since each row renders a Grid of
+  // TextInputs. The enum key is the row's primary identifier, so it's the
+  // most useful thing to type-to-select against; fall back to a static
+  // string for a still-blank new row rather than passing an empty string,
+  // which react-aria treats the same as a missing textValue.
+  const getItemTextValue = useCallback(
+    (item: Item) =>
+      item.key?.trim() || intl.formatMessage(messages.newEnumValueTextValue),
+    [intl]
+  );
+
   const handleUpdateItems = useCallback(
     (updatedWrappers: Array<{ _uid: string; item: Item }>) => {
       // DraggableList has no simple "disable the whole list" prop, so guard
@@ -244,7 +257,10 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
           );
           const columnKeys = ['key', ...labelColumnKeys];
           return (
-            <DraggableList.Item id={wrapper._uid}>
+            <DraggableList.Item
+              id={wrapper._uid}
+              textValue={getItemTextValue(item)}
+            >
               <Grid
                 templateColumns={templateColumns}
                 gap="300"

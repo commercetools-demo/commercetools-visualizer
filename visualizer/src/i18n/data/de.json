@@ -108,6 +108,7 @@
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.key": "Enum-Schlüssel",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label": "Bezeichnung des Listenelements",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label.localized": "Bezeichnung des Listenelements ({language})",
+  "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.newItem.textValue": "Neues Listenelement",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDate": "Datum",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDateTime": "Datum und Uhrzeit",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionTime": "Uhrzeit",

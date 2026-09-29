@@ -25,4 +25,10 @@ export default defineMessages({
       'The column title of the enumeration label for plain enums in the table displaying enums on the attributed-detail page in product-types administration',
     defaultMessage: 'List Item Label',
   },
+  newEnumValueTextValue: {
+    id: 'ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.newItem.textValue',
+    description:
+      'Fallback type-to-select text value (accessibility) for an enum-table row whose key is still blank',
+    defaultMessage: 'New list item',
+  },
 });

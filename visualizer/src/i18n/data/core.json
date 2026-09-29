@@ -106,6 +106,7 @@
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.key": "Enumeration Key",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label": "List Item Label",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label.localized": "List Item Label ({language})",
+  "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.newItem.textValue": "New list item",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDate": "Date",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionDateTime": "Date and Time",
   "ProjectSettings.ProductTypes.Details.AttributeDefinition.Details.optionTime": "Time",

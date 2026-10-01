@@ -2,6 +2,7 @@ import { TFormValues } from '../subscription-details-form/subscription-details-f
 import {
   TCommercetoolsSubscription,
   TConfluentCloudDestination,
+  TSubscriptionFormatInput,
 } from '../../../types/generated/ctp';
 
 type TKnownDestinationType = keyof NonNullable<TFormValues['destination']>;
@@ -56,11 +57,39 @@ const omitEmptyOptionalFields = <T extends object | undefined>(
   return config;
 };
 
+// Maps the fetched delivery format into the form's shape. Unknown formats are treated as
+// the default (Platform).
+export const convertSubscriptionFormatToFormValue = (
+  format: TCommercetoolsSubscription['format'] | undefined | null
+): TFormValues['format'] => {
+  if (format?.type === 'CloudEvents') {
+    return {
+      type: 'CloudEvents',
+      cloudEventsVersion: (format as { cloudEventsVersion?: string })
+        .cloudEventsVersion,
+    };
+  }
+  return { type: 'Platform' };
+};
+
+// The `format` of a SubscriptionDraft: Platform is the API default, so only CloudEvents is
+// sent explicitly.
+export const convertFormValuesToDraftFormat = (
+  format: TFormValues['format']
+): TSubscriptionFormatInput | undefined =>
+  format?.type === 'CloudEvents'
+    ? {
+        CloudEvents: {
+          cloudEventsVersion: format.cloudEventsVersion?.trim() || '',
+        },
+      }
+    : undefined;
+
 export const convertFormValuesToSubscription = (
   formValues: TFormValues
 ): Pick<
   TCommercetoolsSubscription,
-  'key' | 'destination' | 'changes' | 'messages'
+  'key' | 'destination' | 'changes' | 'messages' | 'events'
 > => {
   return {
     key: formValues.key,
@@ -78,6 +107,11 @@ export const convertFormValuesToSubscription = (
       formValues.messages?.map((message) => ({
         resourceTypeId: message.resourceTypeId,
         types: message.types || [],
+      })) || [],
+    events:
+      formValues.events?.map((event) => ({
+        resourceTypeId: event.resourceTypeId,
+        types: event.types || [],
       })) || [],
   };
 };

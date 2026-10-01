@@ -21,6 +21,10 @@ import {
 } from '../../../test-utils/models/subscriptions';
 import { cleanup } from '@testing-library/react';
 
+// Each test renders the whole subscription form (hundreds of message/event checkboxes), which
+// can take several seconds when the suite runs in parallel — the 5s default is too tight.
+jest.setTimeout(20000);
+
 const mockServer = setupServer();
 afterEach(async () => {
   mockServer.resetHandlers();
@@ -527,7 +531,7 @@ describe('destination configuration of an existing subscription', () => {
 
       await changeKeyAndSave();
 
-      await waitFor(() => expect(calls).toHaveLength(1));
+      await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
       expect(calls[0].actions).toEqual([
         { setKey: { key: TEST_SUBSCRIPTION_NEW_KEY } },
       ]);
@@ -556,7 +560,7 @@ describe('destination configuration of an existing subscription', () => {
     fireEvent.change(keyInput, { target: { value: 'my-record-key' } });
     fireEvent.click(screen.getByRole('button', { name: /save/i }));
 
-    await waitFor(() => expect(calls).toHaveLength(1));
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
     expect(calls[0].actions).toEqual([
       {
         changeDestination: {
@@ -567,4 +571,185 @@ describe('destination configuration of an existing subscription', () => {
       },
     ]);
   }, 15000);
+});
+
+describe('events and delivery format of an existing subscription', () => {
+  const fetchWith = (overrides: Record<string, unknown>) =>
+    graphql.query('FetchSubscription', (_req, res, ctx) =>
+      res(
+        ctx.data({
+          subscription: {
+            ...random().key(TEST_SUBSCRIPTION_KEY).buildGraphql(),
+            events: [],
+            format: { __typename: 'PlatformFormat', type: 'Platform' },
+            ...overrides,
+          },
+        })
+      )
+    );
+
+  const captureUpdate = () => {
+    const calls: Array<{ actions: Array<Record<string, unknown>> }> = [];
+    const handler = graphql.mutation('UpdateSubscription', (req, res, ctx) => {
+      calls.push(req.variables as (typeof calls)[number]);
+      return res(
+        ctx.data({
+          updateSubscription: random()
+            .key(TEST_SUBSCRIPTION_NEW_KEY)
+            .buildGraphql(),
+        })
+      );
+    });
+    return { calls, handler };
+  };
+
+  const expandEvents = async () =>
+    fireEvent.click(await screen.findByRole('button', { name: 'Events' }));
+
+  it('shows the delivery format right below the key, read-only for an existing subscription', async () => {
+    useMockServerHandlers([
+      fetchWith({
+        format: {
+          __typename: 'CloudEventsSubscriptionsFormat',
+          type: 'CloudEvents',
+          cloudEventsVersion: '1.0',
+        },
+      }),
+    ]);
+    renderApp();
+
+    const version = (await screen.findByLabelText(
+      /cloudevents specification version/i
+    )) as HTMLInputElement;
+    expect(version.value).toBe('1.0');
+    expect(version).toHaveAttribute('readonly');
+    expect(screen.getByLabelText('Delivery format')).toBeDisabled();
+  }, 15000);
+
+  it('does not block saving when the fetched CloudEvents format has no version', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([
+      fetchWith({
+        format: {
+          __typename: 'CloudEventsSubscriptionsFormat',
+          type: 'CloudEvents',
+          cloudEventsVersion: '',
+        },
+      }),
+      handler,
+    ]);
+    renderApp();
+
+    fireEvent.change(await screen.findByLabelText(/subscription key/i), {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
+    expect(calls[0].actions).toEqual([
+      { setKey: { key: TEST_SUBSCRIPTION_NEW_KEY } },
+    ]);
+  }, 20000);
+
+  it('shows a resource subscribed with no types as "all events", with its types disabled', async () => {
+    useMockServerHandlers([
+      fetchWith({ events: [{ resourceTypeId: 'checkout', types: [] }] }),
+    ]);
+    renderApp();
+    await expandEvents();
+
+    expect(
+      await screen.findByRole('checkbox', {
+        name: 'Receive all events of Checkout',
+      })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Payment Charged' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('checkbox', { name: 'Receive all events of Import API' })
+    ).not.toBeChecked();
+  }, 15000);
+
+  it('shows the fetched event types as selected', async () => {
+    useMockServerHandlers([
+      fetchWith({
+        events: [{ resourceTypeId: 'import-api', types: ['ImportUnresolved'] }],
+      }),
+    ]);
+    renderApp();
+    await expandEvents();
+
+    expect(
+      await screen.findByRole('checkbox', { name: 'Unresolved' })
+    ).toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Validation Failed' })
+    ).not.toBeChecked();
+  }, 15000);
+
+  it('saving only a new key does not send setEvents', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([
+      fetchWith({
+        events: [
+          { resourceTypeId: 'checkout', types: ['CheckoutPaymentCharged'] },
+        ],
+      }),
+      handler,
+    ]);
+    renderApp();
+
+    fireEvent.change(await screen.findByLabelText(/subscription key/i), {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
+    expect(calls[0].actions).toEqual([
+      { setKey: { key: TEST_SUBSCRIPTION_NEW_KEY } },
+    ]);
+  }, 20000);
+
+  it('sends setEvents when an event type is added', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([fetchWith({ events: [] }), handler]);
+    renderApp();
+    await expandEvents();
+
+    fireEvent.click(
+      await screen.findByRole('checkbox', { name: 'Payment Refunded' })
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
+    expect(calls[0].actions).toEqual([
+      {
+        setEvents: {
+          events: [
+            { resourceTypeId: 'checkout', types: ['CheckoutPaymentRefunded'] },
+          ],
+        },
+      },
+    ]);
+  }, 20000);
+
+  it('sends setEvents with a resource and no types when "all events" is chosen', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([fetchWith({ events: [] }), handler]);
+    renderApp();
+    await expandEvents();
+
+    fireEvent.click(
+      await screen.findByRole('checkbox', {
+        name: 'Receive all events of Import API',
+      })
+    );
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
+    expect(calls[0].actions).toEqual([
+      { setEvents: { events: [{ resourceTypeId: 'import-api', types: [] }] } },
+    ]);
+  }, 20000);
 });

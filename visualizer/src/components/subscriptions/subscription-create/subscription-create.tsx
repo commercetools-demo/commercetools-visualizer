@@ -15,6 +15,7 @@ import {
 import { useSubscriptionCreator, graphQLErrorHandler } from '../../../hooks';
 import { Button, DefaultPage, Group } from '@commercetools/nimbus';
 import { PERMISSIONS } from '../../../constants';
+import { convertFormValuesToDraftFormat } from '../subscription-details-page/convert';
 import SubscriptionDetailsForm, {
   TFormValues,
 } from '../subscription-details-form/subscription-details-form';
@@ -48,6 +49,11 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
           formikValues.messages && formikValues.messages.length > 0
             ? formikValues.messages
             : undefined,
+        events:
+          formikValues.events && formikValues.events.length > 0
+            ? formikValues.events
+            : undefined,
+        format: convertFormValuesToDraftFormat(formikValues.format),
       };
       await subscriptionCreator
         .execute({
@@ -80,6 +86,8 @@ const SubscriptionCreate: FC<Props> = ({ linkToWelcome }) => {
         destination: undefined,
         changes: [],
         messages: [],
+        events: [],
+        format: { type: 'Platform' },
       }}
       onSubmit={handleSubmit}
       dataLocale=""

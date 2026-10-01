@@ -45,7 +45,7 @@ type PickedReturnType = Partial<
 
 export type InputType = Pick<
   TCommercetoolsSubscription,
-  'key' | 'destination' | 'changes' | 'messages'
+  'key' | 'destination' | 'changes' | 'messages' | 'events'
 >;
 
 const convertTSubscription = (subscription: InputType): PickedReturnType => {
@@ -221,6 +221,38 @@ export const useSubscriptionDeleter = () => {
   return { loading, execute };
 };
 
+type EventsList = InputType['events'];
+
+// Order-insensitive, null-tolerant representation for comparing event subscriptions.
+const normalizeEvents = (events: EventsList) =>
+  JSON.stringify(
+    (events ?? [])
+      .map((event) => ({
+        resourceTypeId: event.resourceTypeId,
+        types: [...(event.types ?? [])].sort(),
+      }))
+      .sort((a, b) => a.resourceTypeId.localeCompare(b.resourceTypeId))
+  );
+
+// `@commercetools/sync-actions`' subscription sync (`baseActionsList` in its source) only
+// knows setKey/setMessages/setChanges/changeDestination — it never emits `setEvents`, so a
+// changed event subscription is silently dropped. Detect it ourselves.
+const calculateEventsActions = (
+  originalDraft: InputType,
+  nextDraft: InputType
+) =>
+  normalizeEvents(originalDraft.events) === normalizeEvents(nextDraft.events)
+    ? []
+    : [
+        {
+          action: 'setEvents',
+          events: (nextDraft.events ?? []).map((event) => ({
+            resourceTypeId: event.resourceTypeId,
+            types: event.types ?? [],
+          })),
+        },
+      ];
+
 export const calculateSubscriptionUpdateActions = (
   originalDraft: InputType,
   nextDraft: InputType
@@ -229,7 +261,12 @@ export const calculateSubscriptionUpdateActions = (
     convertTSubscription(nextDraft),
     convertTSubscription(originalDraft)
   );
-  return createGraphQlUpdateActions(
-    updateActions
-  ) as TSubscriptionUpdateAction[];
+  return createGraphQlUpdateActions([
+    ...updateActions,
+    // The platform SDK version we depend on has no SubscriptionSetEventsAction type.
+    ...(calculateEventsActions(
+      originalDraft,
+      nextDraft
+    ) as unknown as typeof updateActions),
+  ]) as TSubscriptionUpdateAction[];
 };

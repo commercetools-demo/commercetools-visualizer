@@ -21,6 +21,11 @@ export default defineMessages({
     description: 'Accordion header for the changes section',
     defaultMessage: 'Changes',
   },
+  eventsSectionTitle: {
+    id: 'SubscriptionDetailsForm.eventsSectionTitle',
+    description: 'Accordion header for the events section',
+    defaultMessage: 'Events',
+  },
   messagesSectionTitle: {
     id: 'SubscriptionDetailsForm.messagesSectionTitle',
     description: 'Accordion header for the messages section',

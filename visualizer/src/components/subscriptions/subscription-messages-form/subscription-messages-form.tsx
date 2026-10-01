@@ -62,6 +62,23 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
       )
     );
 
+  // An entry with no `types` subscribes to *all* messages of the resource.
+  const isAllSelected = (resourceTypeId: string) => {
+    const entry = field.value?.find(
+      (item) => item.resourceTypeId === resourceTypeId
+    );
+    return Boolean(entry) && (entry?.types?.length ?? 0) === 0;
+  };
+
+  const toggleAll = (resourceTypeId: string, isSelected: boolean) => {
+    const others = (field.value ?? []).filter(
+      (item) => item.resourceTypeId !== resourceTypeId
+    );
+    helpers.setValue(
+      isSelected ? [...others, { resourceTypeId, types: [] }] : others
+    );
+  };
+
   const toggle = (
     resourceTypeId: string,
     name: string,
@@ -102,6 +119,17 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
               })}
             </Accordion.Header>
             <Accordion.Content>
+              <Checkbox
+                isSelected={isAllSelected(item.resourceTypeId)}
+                isReadOnly={isReadOnly}
+                onChange={(isSelected) =>
+                  toggleAll(item.resourceTypeId, isSelected)
+                }
+              >
+                {intl.formatMessage(messages.allTypesLabel, {
+                  label: item.resourceTypeName,
+                })}
+              </Checkbox>
               <Grid
                 templateColumns={{ base: '1fr', md: 'repeat(3, 1fr)' }}
                 gap="200"
@@ -111,6 +139,7 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
                     key={entry.key}
                     isSelected={isChecked(item.resourceTypeId, entry.key)}
                     isReadOnly={isReadOnly}
+                    isDisabled={isAllSelected(item.resourceTypeId)}
                     onChange={(isSelected) =>
                       toggle(item.resourceTypeId, entry.key, isSelected)
                     }

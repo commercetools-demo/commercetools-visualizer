@@ -15,6 +15,10 @@ import { cleanup } from '@testing-library/react';
 import SubscriptionCreate from './subscription-create';
 import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 
+// Each test renders the whole create form (hundreds of message/event checkboxes), which can
+// take several seconds when the suite runs in parallel — the 5s default is too tight.
+jest.setTimeout(20000);
+
 const mockServer = setupServer();
 afterEach(async () => {
   mockServer.resetHandlers();
@@ -271,4 +275,163 @@ describe('creating a subscription', () => {
       expect(confluent).not.toMatch(/"key":null/);
     }, 20000);
   });
+});
+
+describe('events and delivery format', () => {
+  type CreateCall = { draft: Record<string, unknown> };
+
+  // Fills the minimum (key + GCP destination), lets the test adjust other sections, then
+  // submits and returns the draft that was sent.
+  const createWith = async (
+    prepare: () => Promise<void> = async () => {}
+  ): Promise<CreateCall> => {
+    const calls: Array<CreateCall> = [];
+    mockServer.use(
+      graphql.mutation('CreateSubscription', (req, res, ctx) => {
+        calls.push(req.variables as CreateCall);
+        return res(
+          ctx.data({ createSubscription: { id: 'newly-created-id' } })
+        );
+      })
+    );
+    renderApp();
+
+    fireEvent.change(await screen.findByLabelText(/subscription key/i), {
+      target: { value: TEST_SUBSCRIPTION_KEY },
+    });
+    fireEvent.change(screen.getByRole('combobox', { name: 'Destination' }), {
+      target: { value: 'Google Cloud Pub/Sub' },
+    });
+    fireEvent.click(
+      await screen.findByRole('option', { name: 'Google Cloud Pub/Sub' })
+    );
+    fireEvent.change(await screen.findByLabelText(/name of the topic/i), {
+      target: { value: 'my-topic' },
+    });
+    fireEvent.change(await screen.findByLabelText(/google cloud project/i), {
+      target: { value: 'my-project' },
+    });
+
+    await prepare();
+
+    fireEvent.click(screen.getByRole('button', { name: /create/i }));
+    await waitFor(() => expect(calls).toHaveLength(1), { timeout: 8000 });
+    return calls[0];
+  };
+
+  const expandEvents = () =>
+    fireEvent.click(screen.getByRole('button', { name: 'Events' }));
+
+  it('offers the Checkout and Import API event groups', async () => {
+    renderApp();
+    await screen.findByLabelText(/subscription key/i);
+    expandEvents();
+
+    expect(
+      await screen.findByText('Events related to Checkout (9).')
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Events related to Import API (6).')
+    ).toBeInTheDocument();
+  });
+
+  it('sends no events when none are selected', async () => {
+    const call = await createWith();
+    expect(call.draft).not.toHaveProperty('events');
+  }, 20000);
+
+  it('subscribes to all events of a resource by sending only its resourceTypeId', async () => {
+    const call = await createWith(async () => {
+      expandEvents();
+      fireEvent.click(
+        await screen.findByRole('checkbox', {
+          name: 'Receive all events of Checkout',
+        })
+      );
+    });
+    expect(call.draft.events).toEqual([
+      { resourceTypeId: 'checkout', types: [] },
+    ]);
+  }, 20000);
+
+  it('disables the individual event types while "all" is selected', async () => {
+    renderApp();
+    await screen.findByLabelText(/subscription key/i);
+    expandEvents();
+
+    fireEvent.click(
+      await screen.findByRole('checkbox', {
+        name: 'Receive all events of Checkout',
+      })
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole('checkbox', { name: 'Order Creation Failed' })
+      ).toBeDisabled()
+    );
+    expect(
+      screen.getByRole('checkbox', { name: 'Container Created' })
+    ).toBeEnabled();
+  }, 10000);
+
+  it('sends the specific event types that were selected', async () => {
+    const call = await createWith(async () => {
+      expandEvents();
+      fireEvent.click(
+        await screen.findByRole('checkbox', { name: 'Payment Charged' })
+      );
+      fireEvent.click(
+        screen.getByRole('checkbox', { name: 'Container Created' })
+      );
+    });
+    expect(call.draft.events).toEqual(
+      expect.arrayContaining([
+        { resourceTypeId: 'checkout', types: ['CheckoutPaymentCharged'] },
+        { resourceTypeId: 'import-api', types: ['ImportContainerCreated'] },
+      ])
+    );
+    expect(call.draft.events).toHaveLength(2);
+  }, 20000);
+
+  it('defaults the delivery format to Platform and sends no format', async () => {
+    const call = await createWith();
+    expect(call.draft).not.toHaveProperty('format');
+  }, 20000);
+
+  it('sends CloudEvents with the default specification version when chosen', async () => {
+    const call = await createWith(async () => {
+      fireEvent.click(await screen.findByLabelText('Delivery format'));
+      fireEvent.click(
+        await screen.findByRole('option', { name: 'CloudEvents' })
+      );
+      expect(
+        (
+          (await screen.findByLabelText(
+            /cloudevents specification version/i
+          )) as HTMLInputElement
+        ).value
+      ).toBe('1.0');
+    });
+    expect(call.draft.format).toEqual({
+      CloudEvents: { cloudEventsVersion: '1.0' },
+    });
+  }, 20000);
+
+  it('does not submit CloudEvents without a specification version', async () => {
+    mockServer.use(createSubscriptionHandler);
+    renderApp();
+    await screen.findByLabelText(/subscription key/i);
+    fireEvent.click(await screen.findByLabelText('Delivery format'));
+    fireEvent.click(await screen.findByRole('option', { name: 'CloudEvents' }));
+    const version = await screen.findByLabelText(
+      /cloudevents specification version/i
+    );
+    fireEvent.change(version, { target: { value: '' } });
+    fireEvent.blur(version);
+
+    expect(
+      await screen.findByText(/this field is required/i)
+    ).toBeInTheDocument();
+  }, 20000);
 });

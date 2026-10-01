@@ -32,6 +32,7 @@ import { FormikHelpers } from 'formik';
 import {
   convertFormValuesToSubscription,
   convertSubscriptionDestinationToFormValue,
+  convertSubscriptionFormatToFormValue,
 } from './convert';
 
 const errorCodeMapping: ErrorCodeMapping = [
@@ -150,6 +151,8 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
         ),
         changes: subscription.changes,
         messages: subscription.messages,
+        events: subscription.events ?? [],
+        format: convertSubscriptionFormatToFormValue(subscription.format),
       }}
       onSubmit={handleSubmit}
       isReadOnly={!canManage}

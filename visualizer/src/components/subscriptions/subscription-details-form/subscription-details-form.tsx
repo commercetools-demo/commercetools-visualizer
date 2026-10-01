@@ -10,6 +10,7 @@ import {
   TEventBridgeDestination,
   TEventGridDestination,
   TGoogleCloudPubSubDestination,
+  TEventSubscriptionInput,
   TMessageSubscriptionInput,
   TSnsDestination,
   TSqsDestination,
@@ -18,6 +19,8 @@ import {
 import SubscriptionDestinationForm from '../subscription-destination-form/subscription-destination-form';
 import SubscriptionChangesForm from '../subscription-changes-form/subscription-changes-form';
 import SubscriptionMessagesForm from '../subscription-messages-form/subscription-messages-form';
+import SubscriptionEventsForm from '../subscription-events-form/subscription-events-form';
+import SubscriptionFormatForm from '../subscription-format-form/subscription-format-form';
 import {
   Accordion,
   Flex,
@@ -58,6 +61,12 @@ export type TFormValues = {
     | undefined;
   changes?: Array<TChangeSubscriptionInput> | null;
   messages?: Array<TMessageSubscriptionInput> | null;
+  events?: Array<TEventSubscriptionInput> | null;
+  // Delivery format; immutable once the subscription exists (no update action).
+  format?: {
+    type: 'Platform' | 'CloudEvents' | string;
+    cloudEventsVersion?: string;
+  };
 };
 
 type TErrors = {
@@ -65,10 +74,22 @@ type TErrors = {
   // subscription-details-page.tsx's DuplicateField errorCodeMapping via
   // graphQLErrorHandler's setErrors.
   key: { missing?: boolean; invalidInput?: boolean; duplicate?: boolean };
+  format?: { cloudEventsVersion: { missing: boolean } };
 };
 
 const validate = (formikValues: TFormValues): TErrors => {
-  return omitEmpty<TErrors>({ key: validateKey(formikValues.key) });
+  // The delivery format can only be chosen on create; for an existing subscription it is
+  // read-only, so there is nothing the user could fix.
+  const formatErrors =
+    !formikValues.id &&
+    formikValues.format?.type === 'CloudEvents' &&
+    !formikValues.format.cloudEventsVersion?.trim()
+      ? { cloudEventsVersion: { missing: true } }
+      : undefined;
+  return omitEmpty<TErrors>({
+    key: validateKey(formikValues.key),
+    format: formatErrors,
+  });
 };
 
 type FormProps = {
@@ -136,6 +157,9 @@ const SubscriptionDetailsForm: FC<Props> = ({
               />
             </FormField.Error>
           </FormField.Root>
+          <SubscriptionFormatForm
+            isReadOnly={isReadOnly || Boolean(formik.values.id)}
+          />
           <Accordion.Root
             allowsMultipleExpanded
             defaultExpandedKeys={['destination']}
@@ -166,6 +190,14 @@ const SubscriptionDetailsForm: FC<Props> = ({
               </Accordion.Header>
               <Accordion.Content>
                 <SubscriptionMessagesForm isReadOnly={isReadOnly} />
+              </Accordion.Content>
+            </Accordion.Item>
+            <Accordion.Item value="events">
+              <Accordion.Header>
+                <FormattedMessage {...messages.eventsSectionTitle} />
+              </Accordion.Header>
+              <Accordion.Content>
+                <SubscriptionEventsForm isReadOnly={isReadOnly} />
               </Accordion.Content>
             </Accordion.Item>
           </Accordion.Root>

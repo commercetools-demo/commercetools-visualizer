@@ -112,12 +112,17 @@ component — no stepper, no per-step routes. All sections are visible and edita
    - **Azure Event Grid** — `uri` (required), `accessKey` (required). Read back aliased as
      `eventGridAccessKey` (field-type conflict with SNS/SQS's `accessKey`); renamed back to
      `accessKey` before diffing (see `convertTSubscription`).
+   **Delivery format** (right below the key, no accordion): Platform | CloudEvents (+ required
+   version, default `1.0`); create only — read-only on edit.
 3. **Changes** (collapsed) — optional multi-select over the 42 change resource types; each
    selection adds `{ resourceTypeId }`. Zero allowed.
 4. **Messages** (collapsed) — optional, **grouped by resource type**; each group is labelled
    with its message-type count and lists message-type checkboxes. Checking adds the type to
    that resource's `types[]`; unchecking removes it, and **removes the resource entry when
-   its `types[]` becomes empty**.
+   its `types[]` becomes empty**. A "Receive all messages of …" checkbox per group sends the
+   resource with empty `types` (= all of its messages).
+5. **Events** (collapsed) — same as Messages for the `checkout` (9) and `import-api` (6)
+   event types.
 
 **Changes vs messages semantics:** *changes* = whole-resource change notifications
 (`{ resourceTypeId }` only); *messages* = specific message types per resource
@@ -125,8 +130,8 @@ component — no stepper, no per-step routes. All sections are visible and edita
 
 **Building the `SubscriptionDraft` on create Save** (FR-008): assemble `key`; `destination`
 from the chosen type's config mapped to the `DestinationInput` key; include `changes` only
-if non-empty; include `messages` only if non-empty; set `format` to Platform
-(`{ Platform: {} }`). On success: created notification, return to `/subscriptions` with
+if non-empty; include `messages` and `events` only if non-empty; send `format` only for
+CloudEvents (`{ CloudEvents: { cloudEventsVersion } }`) — Platform is the API default. On success: created notification, return to `/subscriptions` with
 `refetch`. Formik still blocks an invalid submit and surfaces field errors, but the Save
 button itself is only disabled while submitting or without Manage — not on invalidity or
 read-only state (see the gating note above).
@@ -149,8 +154,9 @@ All per ../README.md — do not reinvent:
 
 ## Known gaps to carry over (spec §6)
 
-- **All 7 destination types are configurable and editable**; `IronMQ`, CloudEvents `format`
-  and `events` subscriptions are not exposed.
+- **All 7 documented destination types are configurable and editable.** `IronMQ` is not
+  offered (undocumented, not in the GraphQL schema). The delivery `format` cannot be changed
+  after creation (no update action).
 - **`format`** (Platform vs CloudEvents) is **not surfaced**; always defaults to Platform.
 - **`status`** is read but **not surfaced** in list or detail.
 - **No draft persistence on create** — navigating away or refreshing loses progress.

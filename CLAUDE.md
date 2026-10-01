@@ -133,7 +133,9 @@ sync-actions-produced actions (removal must apply before any `changeEnumValueOrd
 since that action's `keys` must match the *current* value set). The remaining actions are
 then diffed against the field *with those removed values already filtered out*
 (`withoutRemovedEnumValues`), because sync-actions pairs enum values by position and would
-otherwise report every value after a removed one as a bogus `addEnumValue`. Before assuming a
+otherwise report every value after a removed one as a bogus `addEnumValue`. `calculateSubscriptionUpdateActions` has the
+same gap: sync-actions' subscription sync only knows setKey/setMessages/setChanges/
+changeDestination, so `setEvents` is diffed in `subscription-connectors.ts`. Before assuming a
 change will be picked up automatically, check the installed `sync-actions` version's
 source for the relevant `actionsMap*` function rather than just the target schema.
 
@@ -188,6 +190,9 @@ before assuming a cross-cutting behavior is a one-off.
   `CustomerGroupAssignmentAdded` to `customer-group`).
 - Pure logic (conversions, `calculate*UpdateActions`, column definitions via
   `createIntl`, `graphQLErrorHandler`) has plain unit specs next to the source file.
+- Nimbus `Select` has no `isReadOnly`, and an `isDisabled` set on `Select.Root` inside a
+  `FormField` is overridden by the field's own state — put `isDisabled` on `FormField.Root`
+  (the trigger then gets `disabled`; assert it, the default render silently stays enabled).
 - Nimbus injects a theme-bootstrapping `<script>` into the render container, so assert on
   text via `screen`, not `container.textContent`.
 

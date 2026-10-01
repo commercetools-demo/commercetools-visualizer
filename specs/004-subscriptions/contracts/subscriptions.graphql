@@ -109,6 +109,7 @@ query SubscriptionById($id: String!) {
     }
     messages { resourceTypeId types }
     changes { resourceTypeId }
+    events { resourceTypeId types }
     format {
       type
       ... on CloudEventsSubscriptionsFormat { cloudEventsVersion }

@@ -217,4 +217,108 @@ describe('calculateSubscriptionUpdateActions', () => {
       });
     });
   });
+
+  describe('events (not detected by sync-actions, so diffed here)', () => {
+    const withEvents = (events: InputType['events']): InputType => ({
+      ...baseSubscription,
+      events,
+    });
+    const checkout = (types: Array<string>) => ({
+      resourceTypeId: 'checkout',
+      types,
+    });
+
+    it.each([
+      ['both missing', undefined, undefined],
+      ['null vs empty', null, []],
+      [
+        'identical',
+        [checkout(['CheckoutPaymentCharged'])],
+        [checkout(['CheckoutPaymentCharged'])],
+      ],
+      [
+        'same events in a different order',
+        [
+          checkout(['CheckoutPaymentCharged', 'CheckoutPaymentRefunded']),
+          { resourceTypeId: 'import-api', types: ['ImportUnresolved'] },
+        ],
+        [
+          { resourceTypeId: 'import-api', types: ['ImportUnresolved'] },
+          checkout(['CheckoutPaymentRefunded', 'CheckoutPaymentCharged']),
+        ],
+      ],
+    ])('produces no action when events are unchanged (%s)', (_name, a, b) => {
+      expect(
+        calculateSubscriptionUpdateActions(withEvents(a), withEvents(b))
+      ).toEqual([]);
+    });
+
+    it('produces setEvents when events are added', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          withEvents([]),
+          withEvents([checkout(['CheckoutPaymentCharged'])])
+        )
+      ).toEqual([
+        {
+          setEvents: {
+            events: [
+              { resourceTypeId: 'checkout', types: ['CheckoutPaymentCharged'] },
+            ],
+          },
+        },
+      ]);
+    });
+
+    it('produces setEvents when an event type is added to a resource', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          withEvents([checkout(['CheckoutPaymentCharged'])]),
+          withEvents([
+            checkout(['CheckoutPaymentCharged', 'CheckoutPaymentRefunded']),
+          ])
+        )
+      ).toContainEqual({
+        setEvents: {
+          events: [
+            {
+              resourceTypeId: 'checkout',
+              types: ['CheckoutPaymentCharged', 'CheckoutPaymentRefunded'],
+            },
+          ],
+        },
+      });
+    });
+
+    it('treats "all events of a resource" (empty types) as different from specific types', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          withEvents([checkout(['CheckoutPaymentCharged'])]),
+          withEvents([checkout([])])
+        )
+      ).toEqual([
+        { setEvents: { events: [{ resourceTypeId: 'checkout', types: [] }] } },
+      ]);
+    });
+
+    it('produces setEvents with an empty list when all events are removed', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          withEvents([checkout(['CheckoutPaymentCharged'])]),
+          withEvents([])
+        )
+      ).toEqual([{ setEvents: { events: [] } }]);
+    });
+
+    it('combines setEvents with the other actions', () => {
+      const actions = calculateSubscriptionUpdateActions(
+        { ...baseSubscription, key: 'old', events: [] },
+        { ...baseSubscription, key: 'new', events: [checkout([])] }
+      );
+      expect(actions.map((a) => Object.keys(a)[0]).sort()).toEqual([
+        'setEvents',
+        'setKey',
+      ]);
+    });
+  });
 });

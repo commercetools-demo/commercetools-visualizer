@@ -100,7 +100,15 @@ TFormValues {
   sizes are pinned by `subscription-message-types.spec.ts`. Messages of resources without a
   message-subscription resource type (Cart, Recurring Order, Payment Method, Cart Discount,
   Discount Code, Discount Group) are intentionally not listed.
-- **Format** — `Platform` | `CloudEvents`.
+- **Event resource types (2)** — `checkout`, `import-api` (`EventSubscriptionResourceTypeId`).
+- **Event types (15)** — grouped under those 2 resources in `subscriptionEventTypesByResource`
+  (Checkout: 9 `Checkout*`; Import API: 6 `Import*`), pinned by
+  `subscription-event-types.spec.ts`.
+- **MessageSubscription / EventSubscription `types`** — optional; an entry with no `types`
+  subscribes to *all* messages/events of that resource (the UI's "Receive all …" checkbox).
+- **Format** — `Platform` | `CloudEvents` (`cloudEventsVersion`, e.g. `1.0`). Immutable after
+  creation: the update actions are only `setKey`, `setMessages`, `setChanges`, `setEvents`,
+  `changeDestination`.
 - **Status** — `Healthy`, `ConfigurationError`, `TemporaryError`, `ManuallySuspended`,
   `ConfigurationErrorDeliveryStopped`.
 
@@ -122,5 +130,6 @@ TFormValues {
 | Destination | `changeDestination { destination }` |
 | Messages | `setMessages { messages }` |
 | Changes | `setChanges { changes }` |
+| Events | `setEvents { events }` — diffed by the app (order-insensitive, null = []), because `@commercetools/sync-actions` 8.4 only knows setKey/setMessages/setChanges/changeDestination |
 
 Only changed fields produce actions; if none, no update call is made.

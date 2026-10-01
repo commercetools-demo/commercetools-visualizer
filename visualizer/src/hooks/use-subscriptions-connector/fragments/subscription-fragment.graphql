@@ -22,4 +22,14 @@ fragment SubscriptionFragment on CommercetoolsSubscription {
     resourceTypeId
     types
   }
+  events {
+    resourceTypeId
+    types
+  }
+  format {
+    type
+    ... on CloudEventsSubscriptionsFormat {
+      cloudEventsVersion
+    }
+  }
 }

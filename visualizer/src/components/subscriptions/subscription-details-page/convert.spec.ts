@@ -1,7 +1,9 @@
 import type { TFormValues } from '../subscription-details-form/subscription-details-form';
 import {
+  convertFormValuesToDraftFormat,
   convertFormValuesToSubscription,
   convertSubscriptionDestinationToFormValue,
+  convertSubscriptionFormatToFormValue,
 } from './convert';
 
 const base: TFormValues = {
@@ -280,5 +282,72 @@ describe('convertSubscriptionDestinationToFormValue', () => {
       topicArn: 'arn:aws:sns:eu-west-1:1:t',
       authenticationMode: 'IAM',
     });
+  });
+});
+
+describe('convertFormValuesToSubscription — events', () => {
+  it('defaults missing and null events to an empty array', () => {
+    expect(convertFormValuesToSubscription(base).events).toEqual([]);
+    expect(
+      convertFormValuesToSubscription({ ...base, events: null }).events
+    ).toEqual([]);
+  });
+
+  it('maps events, defaulting missing types to [] ("all events of the resource") and dropping extra fields', () => {
+    const result = convertFormValuesToSubscription({
+      ...base,
+      events: [
+        {
+          resourceTypeId: 'checkout',
+          types: ['CheckoutPaymentCharged'],
+          __typename: 'EventSubscription',
+        },
+        { resourceTypeId: 'import-api' },
+      ] as unknown as TFormValues['events'],
+    });
+
+    expect(result.events).toEqual([
+      { resourceTypeId: 'checkout', types: ['CheckoutPaymentCharged'] },
+      { resourceTypeId: 'import-api', types: [] },
+    ]);
+  });
+});
+
+describe('delivery format conversion', () => {
+  it('maps a fetched CloudEvents format, keeping its version', () => {
+    expect(
+      convertSubscriptionFormatToFormValue({
+        __typename: 'CloudEventsSubscriptionsFormat',
+        type: 'CloudEvents',
+        cloudEventsVersion: '1.0',
+      } as never)
+    ).toEqual({ type: 'CloudEvents', cloudEventsVersion: '1.0' });
+  });
+
+  it.each([
+    ['Platform', { type: 'Platform' }],
+    ['a missing format', undefined],
+    ['null', null],
+    ['an unknown format', { type: 'Something' }],
+  ])('maps %s to Platform', (_name, format) => {
+    expect(convertSubscriptionFormatToFormValue(format as never)).toEqual({
+      type: 'Platform',
+    });
+  });
+
+  it('sends nothing for Platform, since it is the API default', () => {
+    expect(
+      convertFormValuesToDraftFormat({ type: 'Platform' })
+    ).toBeUndefined();
+    expect(convertFormValuesToDraftFormat(undefined)).toBeUndefined();
+  });
+
+  it('sends a trimmed CloudEvents version', () => {
+    expect(
+      convertFormValuesToDraftFormat({
+        type: 'CloudEvents',
+        cloudEventsVersion: ' 1.0 ',
+      })
+    ).toEqual({ CloudEvents: { cloudEventsVersion: '1.0' } });
   });
 });

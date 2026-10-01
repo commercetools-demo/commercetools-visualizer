@@ -48,3 +48,8 @@ MC_PROJECT_KEY=other-project MC_PORT=3002 CUSTOM_OBJECTS_CONTAINER=other-contain
   CSS transition time to finish before screenshotting or you'll capture it mid-animation.
 - The States list renders as a react-flow diagram, not a table — click a
   `.react-flow__node`, not a table row, to reach its detail view.
+- `capture.mjs` launches Chromium with `--disable-features=ViewTransition,ViewTransitionOnNavigation`.
+  Without it, the app's startup View Transition gets skipped (`Transition was skipped`
+  page error) and the page stops producing frames, so `page.screenshot()` times out on
+  the very first shot (even without `fullPage`, even headed). If screenshots hang again,
+  probe with `requestAnimationFrame` — if it never fires, rendering is stalled, not the script.

@@ -20,7 +20,13 @@ const AUTH_STATE_PATH = path.join(__dirname, 'auth-state.json');
 const OUTPUT_DIR = path.join(__dirname, '..', '..', 'docs');
 const CUSTOM_OBJECTS_CONTAINER = process.env.CUSTOM_OBJECTS_CONTAINER || 'page-editor';
 
-const browser = await chromium.launch({ headless: true });
+// The MC shell/Nimbus start a View Transition on startup; in Chromium 149 the skipped
+// transition leaves the page without any further frames (requestAnimationFrame stops
+// firing), so every page.screenshot() times out. Disabling the feature avoids that.
+const browser = await chromium.launch({
+  headless: true,
+  args: ['--disable-features=ViewTransition,ViewTransitionOnNavigation'],
+});
 const context = await browser.newContext({
   storageState: AUTH_STATE_PATH,
   viewport: { width: 1440, height: 900 },

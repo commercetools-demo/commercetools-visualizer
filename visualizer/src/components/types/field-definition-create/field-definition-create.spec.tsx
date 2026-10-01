@@ -95,7 +95,7 @@ type UpdateCall = {
 const captureUpdate = () => {
   const calls: Array<UpdateCall> = [];
   const handler = graphql.mutation('UpdateTypeDefinition', (req, res, ctx) => {
-    calls.push(req.variables);
+    calls.push(req.variables as UpdateCall);
     return res(
       ctx.data({
         updateTypeDefinition: buildTypeDefinition({

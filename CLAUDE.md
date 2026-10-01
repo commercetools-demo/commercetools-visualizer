@@ -29,11 +29,12 @@ npm run typecheck             # tsc --noEmit
 CI (`.github/workflows/ci.yml`) only runs `npm run build` and `npm run test` on PRs into
 `main` — it does **not** run `lint` or `typecheck`.
 
-`npm run typecheck` currently fails immediately with
-`Cannot find type definition file for 'graphql-ctp'` / `'json-stable-stringify'`. This
-is a pre-existing environment issue in the base `tsconfig-mc-app.json` `types` list, not
-something introduced by your change — it aborts before checking any project file, so it
-gives no signal either way about your edits.
+`npm run typecheck` passes cleanly (`skipLibCheck` is on in `tsconfig.json` because
+third-party `.d.ts` files in chakra/react-use/apollo ship their own errors). tsconfig's
+`typeRoots` includes `@types-extensions`, and TypeScript loads *every* folder under a type
+root as an implicit type library — so a stray empty directory there (e.g. a leftover
+`@types-extensions/graphql-ctp/`) aborts `tsc` with `Cannot find type definition file`
+before any project file is checked. Delete such empty folders if you see that error.
 
 ### Regenerating GraphQL types (`generate-types:ctp`)
 

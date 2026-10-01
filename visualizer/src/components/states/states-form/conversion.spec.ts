@@ -1,4 +1,4 @@
-import type { TState } from '../../../types/generated/ctp';
+import { TState, TStateType } from '../../../types/generated/ctp';
 import {
   formValuesToState,
   formValuesToStatePartial,
@@ -11,7 +11,7 @@ const languages = ['en', 'de'];
 const formValues = (overrides: Partial<TFormValues> = {}): TFormValues => ({
   id: 'state-1',
   initial: true,
-  stateType: 'LineItemState',
+  stateType: TStateType.LineItemState,
   key: 'my-state',
   name: { en: 'Name', de: '' },
   description: { en: '', de: '' },
@@ -131,7 +131,7 @@ describe('formValuesToStatePartial', () => {
 
   it('carries type and initial through', () => {
     const partial = formValuesToStatePartial(
-      formValues({ stateType: 'ReviewState', initial: false })
+      formValues({ stateType: TStateType.ReviewState, initial: false })
     );
     expect(partial.type).toBe('ReviewState');
     expect(partial.initial).toBe(false);

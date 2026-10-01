@@ -1,14 +1,15 @@
+import { TState, TStateType } from '../../types/generated/ctp';
 import { convertTStateToState, PickedState } from './conversion';
 
 describe('convertTStateToState', () => {
   it('converts localized name/description and transitions to the REST shape', () => {
     const draft: PickedState = {
       key: 'my-state',
-      type: 'LineItemState',
+      type: TStateType.LineItemState,
       nameAllLocales: [{ locale: 'en', value: 'My state' }],
       descriptionAllLocales: [{ locale: 'en', value: 'Description' }],
       initial: true,
-      transitions: [{ id: 'other-state-id' }],
+      transitions: [{ id: 'other-state-id' } as TState],
     };
 
     expect(convertTStateToState(draft)).toEqual({

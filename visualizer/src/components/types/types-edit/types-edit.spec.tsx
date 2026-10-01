@@ -231,7 +231,13 @@ const captureUpdate = () => {
     actions: Array<Record<string, unknown>>;
   }> = [];
   const handler = graphql.mutation('UpdateTypeDefinition', (req, res, ctx) => {
-    calls.push(req.variables);
+    calls.push(
+      req.variables as {
+        id: string;
+        version: number;
+        actions: Array<Record<string, unknown>>;
+      }
+    );
     return res(
       ctx.data({
         updateTypeDefinition: {
@@ -346,7 +352,13 @@ describe('deleting', () => {
     useMockServerHandlers([
       typeHandler(),
       graphql.mutation('DeleteTypeDefintion', (req, res, ctx) => {
-        calls.push(req.variables);
+        calls.push(
+          req.variables as {
+            id: string;
+            version: number;
+            actions: Array<Record<string, unknown>>;
+          }
+        );
         return res(ctx.data({ deleteTypeDefinition: { id: TEST_TYPE_ID } }));
       }),
     ]);

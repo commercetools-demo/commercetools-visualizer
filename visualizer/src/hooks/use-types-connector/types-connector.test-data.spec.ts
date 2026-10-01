@@ -148,7 +148,7 @@ describe('calculateTypeDefinitionUpdateActions (test-data types)', () => {
 
   it('produces setDescription when the description changes', () => {
     const next = clone(original);
-    next.descriptionAllLocales.find((l) => l.locale === 'en')!.value = 'New';
+    next.descriptionAllLocales!.find((l) => l.locale === 'en')!.value = 'New';
     const actions = calculateTypeDefinitionUpdateActions(original, next);
     expect(actions).toHaveLength(1);
     expect(actions[0]).toHaveProperty('setDescription');
@@ -157,7 +157,7 @@ describe('calculateTypeDefinitionUpdateActions (test-data types)', () => {
   it('produces both actions when name and description change', () => {
     const next = clone(original);
     next.nameAllLocales.find((l) => l.locale === 'en')!.value = 'Renamed';
-    next.descriptionAllLocales.find((l) => l.locale === 'en')!.value = 'New';
+    next.descriptionAllLocales!.find((l) => l.locale === 'en')!.value = 'New';
     const kinds = calculateTypeDefinitionUpdateActions(original, next).map(
       (a) => Object.keys(a)[0]
     );

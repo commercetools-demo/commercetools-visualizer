@@ -301,8 +301,8 @@ const withoutRemovedEnumValues = (
     type: {
       ...type,
       values: type.values.filter((value) => nextKeys.has(value.key)),
-    },
-  } as PickedFieldDefinition;
+    } as TEnumType | TLocalizedEnumType,
+  };
 };
 
 export const calculateFieldDefinitionUpdateActions = (

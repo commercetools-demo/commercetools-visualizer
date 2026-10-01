@@ -1,4 +1,8 @@
-import type { TExtension } from '../../../types/generated/ctp';
+import {
+  TActionType,
+  type TExtension,
+  type TTriggerInput,
+} from '../../../types/generated/ctp';
 import { tExtensionToFormValues, formValuesToTExtension } from './conversion';
 import type { TFormValues } from './extensions-form';
 
@@ -154,7 +158,9 @@ describe('tExtensionToFormValues', () => {
 });
 
 describe('formValuesToTExtension', () => {
-  const triggers = [{ resourceTypeId: 'cart', actions: ['Create'] }];
+  const triggers: Array<TTriggerInput> = [
+    { resourceTypeId: 'cart', actions: [TActionType.Create] },
+  ];
 
   it('builds an HTTP destination without authentication', () => {
     const values: TFormValues = {

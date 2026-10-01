@@ -374,6 +374,7 @@ describe('createGraphQlUpdateActions', () => {
           action: 'changeDestination',
           destination: {
             type: 'EventBridge',
+            source: 'aws.partner/commercetools',
             accountId: '123456789012',
             region: 'eu-west-1',
           },

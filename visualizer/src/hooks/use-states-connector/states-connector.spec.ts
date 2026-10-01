@@ -1,9 +1,10 @@
+import { TStateType } from '../../types/generated/ctp';
 import { calculateStateUpdateActions } from './states-connector';
 import { PickedState } from './conversion';
 
 const baseState: PickedState = {
   key: 'my-state',
-  type: 'LineItemState',
+  type: TStateType.LineItemState,
   nameAllLocales: [{ locale: 'en', value: 'My state' }],
   descriptionAllLocales: [{ locale: 'en', value: 'Description' }],
   initial: false,

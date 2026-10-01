@@ -3,7 +3,9 @@
   "compilerOptions": {
     "typeRoots": ["@types", "@types-extensions", "node_modules/@types"],
     // Allow tsc to resolve dependencies of `@types` packages in the way pnpm sets up the `node_modules`.
-    "preserveSymlinks": false
+    "preserveSymlinks": false,
+    // Third-party .d.ts files (chakra, react-use, apollo) ship their own type errors.
+    "skipLibCheck": true
   },
   "include": ["src"]
 }

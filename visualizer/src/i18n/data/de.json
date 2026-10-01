@@ -105,6 +105,7 @@
   "FieldForm.type.title": "Typ",
   "FieldForm.updated.title": "Feld-Definition aktualisiert",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.addEnumButton.label": "Neues Listenelement hinzufügen",
+  "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.removeEnumButton.label": "Listenelement entfernen",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.key": "Enum-Schlüssel",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label": "Bezeichnung des Listenelements",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label.localized": "Bezeichnung des Listenelements ({language})",

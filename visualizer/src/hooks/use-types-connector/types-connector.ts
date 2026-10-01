@@ -273,13 +273,45 @@ const calculateEnumValueRemovals = (
       ];
 };
 
+// The removal actions run first (see calculateEnumValueRemovals), so every
+// other action must be diffed against the field *as it is after the removal*.
+// Diffing against the full original instead makes sync-actions pair the
+// remaining values by position: removing a non-last value shifts the ones
+// after it, and each shifted value is then reported as a brand-new one
+// (an addEnumValue/addLocalizedEnumValue for a key that already exists).
+const withoutRemovedEnumValues = (
+  originalDraft: PickedFieldDefinition,
+  nextDraft: PickedFieldDefinition
+): PickedFieldDefinition => {
+  const typeName = originalDraft.type.name;
+  if (
+    (typeName !== 'Enum' && typeName !== 'LocalizedEnum') ||
+    nextDraft.type.name !== typeName
+  ) {
+    return originalDraft;
+  }
+  const nextKeys = new Set(
+    (nextDraft.type as TEnumType | TLocalizedEnumType).values.map(
+      (value) => value.key
+    )
+  );
+  const type = originalDraft.type as TEnumType | TLocalizedEnumType;
+  return {
+    ...originalDraft,
+    type: {
+      ...type,
+      values: type.values.filter((value) => nextKeys.has(value.key)),
+    },
+  } as PickedFieldDefinition;
+};
+
 export const calculateFieldDefinitionUpdateActions = (
   originalDraft: PickedFieldDefinition,
   nextDraft: PickedFieldDefinition
 ) => {
   const wrappedOriginalDraft = convertToActionData(
     {
-      fieldDefinitions: [originalDraft],
+      fieldDefinitions: [withoutRemovedEnumValues(originalDraft, nextDraft)],
     },
     false
   );

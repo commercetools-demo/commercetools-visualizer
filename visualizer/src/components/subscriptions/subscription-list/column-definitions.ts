@@ -4,6 +4,14 @@ import { TCommercetoolsSubscription } from '../../../types/generated/ctp';
 import destinationMessages from '../subscription-destination-type-form/messages';
 import messages from './messages';
 
+// API destination type -> message key, for the types whose message key doesn't
+// follow the plain `destination<Type>` pattern.
+const destinationMessageKeys: Record<string, keyof typeof destinationMessages> =
+  {
+    EventBridge: 'destinationAWSEventBridge',
+    EventGrid: 'destinationAzureEventGrid',
+  };
+
 type TCreateColumnDefinitions = {
   intl: IntlShape;
 };
@@ -38,8 +46,9 @@ const createColumnDefinitions = ({
       try {
         return intl.formatMessage(
           destinationMessages[
-            ('destination' +
-              row.destination.type) as keyof typeof destinationMessages
+            destinationMessageKeys[row.destination.type] ??
+              (('destination' +
+                row.destination.type) as keyof typeof destinationMessages)
           ]
         );
       } catch {

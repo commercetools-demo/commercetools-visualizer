@@ -105,6 +105,7 @@
   "FieldForm.type.title": "Type",
   "FieldForm.updated.title": "Field Definition updated",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.addEnumButton.label": "Add New List Item",
+  "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.removeEnumButton.label": "Remove List Item",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.key": "Enumeration Key",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label": "List Item Label",
   "ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.label.localized": "List Item Label ({language})",

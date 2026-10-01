@@ -250,6 +250,7 @@ export const initialValuesFromFieldDefinition = (
       ) ?? {}
     ),
     name: fieldDefinition?.name || '',
+    required: fieldDefinition?.required ?? false,
     isMultiLine: (fieldDefinition?.inputHint || 'SingleLine') === 'MultiLine',
     format: format,
     isLocalized: isLocalized,

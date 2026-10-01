@@ -209,6 +209,7 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
             header's columns lined up with each row's. */}
         <IconButton
           aria-hidden
+          aria-label={intl.formatMessage(messages.tableHeaderLabelKey)}
           isDisabled
           visibility="hidden"
           size="2xs"
@@ -248,6 +249,11 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
         getKey={getItemKey}
         onUpdateItems={handleUpdateItems}
         aria-label={intl.formatMessage(messages.tableHeaderLabelKey)}
+        // Every row is full of text inputs. With type-ahead on, each typed
+        // character is matched against the rows' textValue (their key) and
+        // moves focus to the matching row, dropping the rest of the user's
+        // typing.
+        disallowTypeAhead
         width="full"
       >
         {(wrapper) => {
@@ -288,7 +294,9 @@ const FieldDefinitionInputForEnum: FC<Props> = ({
                   />
                 ))}
                 <IconButton
-                  aria-label={intl.formatMessage(messages.addEnumButtonLabel)}
+                  aria-label={intl.formatMessage(
+                    messages.removeEnumButtonLabel
+                  )}
                   size="xs"
                   variant="ghost"
                   isDisabled={isDisabled || items.length === 1}

@@ -7,6 +7,12 @@ export default defineMessages({
       'The label of the button adding a new enum-value in the footer of the enum-table',
     defaultMessage: 'Add New List Item',
   },
+  removeEnumButtonLabel: {
+    id: 'ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.removeEnumButton.label',
+    description:
+      'The accessible label of the button removing an enum-value row from the enum-table',
+    defaultMessage: 'Remove List Item',
+  },
   tableHeaderLabelKey: {
     id: 'ProjectSettings.ProductType.AttributeDefinitions.Details.EnumTable.headers.key',
     description:

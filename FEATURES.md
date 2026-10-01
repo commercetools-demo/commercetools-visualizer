@@ -74,10 +74,12 @@ project). Data access goes through per-feature connector hooks
   relabelling, removing, and reordering persisted values are all supported; removals are
   diffed client-side because `@commercetools/sync-actions` never emits them
   (`use-types-connector/types-connector.ts`).
-- Reference field type supports 15 target resource types (approval-flow,
-  associate-role, business-unit, cart, category, channel, customer,
-  key-value-document, order, product, product-type, review, state, shipping-method,
-  zone) (`field-definition-input/constants.ts`).
+- Types can attach to all 38 `ResourceTypeId`s (`types-form/constants.ts`), and Reference
+  fields can target all 19 `CustomFieldReferenceValue`s (approval-flow, approval-rule,
+  associate-role, business-unit, cart, cart-discount, category, channel, customer,
+  customer-group, key-value-document, order, product, product-type, review, state,
+  shipping-method, variant, zone) (`field-definition-input/constants.ts`). Both lists are
+  pinned by specs.
 - Field definitions table per type, with add, edit, and delete of individual field
   definitions (`field-definitions-list/field-definitions-list.tsx`). Deleting a field is
   staged in the type form and only applied on Save (Revert undoes it).

@@ -1,7 +1,10 @@
+// Allowed `resourceTypeIds` for a Type — keep in sync with `ResourceTypeId`:
+// https://docs.commercetools.com/api/projects/types#resourcetypeid
 export const RESOURCE_TYPES = [
   'address',
   'asset',
   'approval-flow',
+  'approval-rule',
   'associate-role',
   'business-unit',
   'cart-discount',
@@ -20,9 +23,15 @@ export const RESOURCE_TYPES = [
   'order-return-item',
   'payment',
   'payment-interface-interaction',
+  'payment-method',
+  'payment-method-info',
   'product-price',
   'product-selection',
+  'product-tailoring',
   'quote',
+  'reservation',
+  'review',
+  'recurring-order',
   'shipping',
   'shipping-method',
   'shopping-list',

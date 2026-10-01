@@ -77,16 +77,23 @@ TFieldDefinitionFormValues {
 
 ## Enumerations
 
-- **Resource type IDs** (Type applicability) — predefined list including: address, asset,
-  approval-flow, associate-role, business-unit, cart-discount, category, channel, customer,
-  customer-group, custom-line-item, discount-code, inventory-entry, line-item, order,
-  order-edit, order-delivery, order-parcel, order-return-item, payment,
-  payment-interface-interaction, product-price, product-selection, quote, shipping,
-  shipping-method, shopping-list, shopping-list-text-line-item, standalone-price, store,
-  transaction.
-- **Reference type IDs** (Reference fields) — predefined list including: approval-flow,
-  associate-role, business-unit, cart, category, channel, customer, key-value-document,
-  order, product, product-type, review, state, shipping-method, zone.
+- **Resource type IDs** (Type applicability) — the full `ResourceTypeId` enum (38 values):
+  address, asset, approval-flow, approval-rule, associate-role, business-unit,
+  cart-discount, category, channel, customer, customer-group, custom-line-item,
+  discount-code, inventory-entry, line-item, order, order-edit, order-delivery,
+  order-parcel, order-return-item, payment, payment-interface-interaction, payment-method,
+  payment-method-info, product-price, product-selection, product-tailoring, quote,
+  reservation, review, recurring-order, shipping, shipping-method, shopping-list,
+  shopping-list-text-line-item, standalone-price, store, transaction. Some only apply to
+  B2B-enabled projects (approval-flow, approval-rule, associate-role, business-unit); all
+  are offered unconditionally.
+- **Reference type IDs** (Reference fields) — the full `CustomFieldReferenceValue` enum
+  (19 values): approval-flow, approval-rule, associate-role, business-unit, cart,
+  cart-discount, category, channel, customer, customer-group, key-value-document, order,
+  product, product-type, review, state, shipping-method, variant, zone. `variant` only
+  applies to projects with the Modular product catalog model.
+- Both lists are pinned to the official values by `types-form/constants.spec.ts` and
+  `field-definition-input/constants.spec.ts`.
 - **Input hint** — `SingleLine` | `MultiLine`.
 - **Date format** — Date | Time | DateTime.
 

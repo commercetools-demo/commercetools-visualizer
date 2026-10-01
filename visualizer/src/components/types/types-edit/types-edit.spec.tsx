@@ -5,6 +5,7 @@ import {
   fireEvent,
   screen,
   waitFor,
+  within,
   mapResourceAccessToAppliedPermissions,
   renderAppWithRedux,
   type TRenderAppWithReduxOptions,
@@ -15,6 +16,11 @@ import { cleanup } from '@testing-library/react';
 import { Type } from '@commercetools-test-data/type';
 import { TTypeGraphql } from '@commercetools-test-data/type/dist/declarations/src/type/types';
 import { LocalizedString } from '@commercetools-test-data/commons';
+import {
+  buildFieldDefinition,
+  buildTypeDefinition,
+  simpleFieldType,
+} from '../../../test-utils/models/types';
 import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 import TypesEdit from './types-edit';
 
@@ -51,7 +57,8 @@ const type = Type.random()
 // once by `EntryPoint`, which isn't rendered here, so it's added explicitly.
 const renderApp = (
   options: Partial<TRenderAppWithReduxOptions> = {},
-  includeManagePermissions = true
+  includeManagePermissions = true,
+  onClose: () => void = jest.fn()
 ) => {
   const route =
     options.route || `/my-project/${entryPointUriPath}/types/${TEST_TYPE_ID}`;
@@ -60,7 +67,7 @@ const renderApp = (
       <NimbusProvider locale="en" loadFonts={false}>
         <TypesEdit
           linkToHome={`/my-project/${entryPointUriPath}/types`}
-          onClose={jest.fn()}
+          onClose={onClose}
         />
       </NimbusProvider>
     </Route>,
@@ -186,5 +193,305 @@ describe('rendering', () => {
     await screen.findByRole('heading', {
       name: /we could not find what you are looking for/i,
     });
+  });
+});
+
+// --- Saving, deleting and staged field removal -----------------------------
+
+const TYPE_VERSION = 4;
+const buildEditableType = () =>
+  buildTypeDefinition({
+    id: TEST_TYPE_ID,
+    key: TEST_TYPE_KEY,
+    name: TEST_TYPE_NAME,
+    description: 'test-description',
+    version: TYPE_VERSION,
+    resourceTypeIds: ['customer'],
+    fieldDefinitions: [
+      buildFieldDefinition('first-field', simpleFieldType('String'), {
+        label: 'First label',
+      }),
+      buildFieldDefinition('second-field', simpleFieldType('Number'), {
+        label: 'Second label',
+      }),
+    ],
+  });
+
+const typeHandler = (typeDefinition: unknown = buildEditableType()) =>
+  graphql.query('FetchType', (_req, res, ctx) =>
+    res(ctx.data({ typeDefinition }))
+  );
+
+// Captures the variables of the `UpdateTypeDefinition` mutation and answers
+// with the type at the next version, as the real API would.
+const captureUpdate = () => {
+  const calls: Array<{
+    id: string;
+    version: number;
+    actions: Array<Record<string, unknown>>;
+  }> = [];
+  const handler = graphql.mutation('UpdateTypeDefinition', (req, res, ctx) => {
+    calls.push(req.variables);
+    return res(
+      ctx.data({
+        updateTypeDefinition: {
+          ...buildEditableType(),
+          version: TYPE_VERSION + 1,
+        },
+      })
+    );
+  });
+  return { calls, handler };
+};
+
+const fieldRow = async (name: string) =>
+  // eslint-disable-next-line testing-library/no-node-access
+  (await screen.findByText(name)).closest('[role="row"]') as HTMLElement;
+
+const typeName = async () =>
+  (await screen.findByDisplayValue(TEST_TYPE_NAME)) as HTMLInputElement;
+
+describe('saving', () => {
+  it('sends a changeName action with the current version and shows a success notification', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    fireEvent.change(await typeName(), {
+      target: { value: TEST_TYPE_NEW_NAME },
+    });
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].id).toBe(TEST_TYPE_ID);
+    expect(calls[0].version).toBe(TYPE_VERSION);
+    expect(calls[0].actions).toHaveLength(1);
+    expect(calls[0].actions[0]).toHaveProperty('changeName');
+    expect(JSON.stringify(calls[0].actions[0])).toContain(TEST_TYPE_NEW_NAME);
+    await screen.findByText('Your Type has been updated.');
+  });
+
+  it('sends a setDescription action when only the description changed', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    const description = await screen.findByDisplayValue('test-description');
+    fireEvent.change(description, { target: { value: 'new description' } });
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toHaveLength(1);
+    expect(calls[0].actions[0]).toHaveProperty('setDescription');
+    expect(JSON.stringify(calls[0].actions[0])).toContain('new description');
+  });
+
+  it('keeps Save disabled while nothing changed, so no mutation is sent', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    await typeName();
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    expect(saveButton).toBeDisabled();
+    fireEvent.click(saveButton);
+    expect(calls).toHaveLength(0);
+  });
+
+  it('sends no mutation when a change is reverted to the original value', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    const name = await typeName();
+    fireEvent.change(name, { target: { value: TEST_TYPE_NEW_NAME } });
+    fireEvent.change(name, { target: { value: TEST_TYPE_NAME } });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /save/i })).toBeDisabled()
+    );
+    expect(calls).toHaveLength(0);
+  });
+
+  it('shows an error notification and no success when the update fails', async () => {
+    useMockServerHandlers([
+      typeHandler(),
+      graphql.mutation('UpdateTypeDefinition', (_req, res, ctx) =>
+        res(ctx.errors([{ message: 'Concurrent modification boom' }]))
+      ),
+    ]);
+    renderApp();
+
+    fireEvent.change(await typeName(), {
+      target: { value: TEST_TYPE_NEW_NAME },
+    });
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+
+    await screen.findByText(/Concurrent modification boom/);
+    expect(
+      screen.queryByText('Your Type has been updated.')
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe('deleting', () => {
+  it('sends the delete mutation with id and version, then closes', async () => {
+    const calls: Array<{ id: string; version: number }> = [];
+    const onClose = jest.fn();
+    useMockServerHandlers([
+      typeHandler(),
+      graphql.mutation('DeleteTypeDefintion', (req, res, ctx) => {
+        calls.push(req.variables);
+        return res(ctx.data({ deleteTypeDefinition: { id: TEST_TYPE_ID } }));
+      }),
+    ]);
+    renderApp({}, true, onClose);
+
+    fireEvent.click(await screen.findByRole('button', { name: /delete/i }));
+
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
+    expect(calls).toEqual([{ id: TEST_TYPE_ID, version: TYPE_VERSION }]);
+  });
+
+  it('shows an error and does not close when the delete fails', async () => {
+    const onClose = jest.fn();
+    useMockServerHandlers([
+      typeHandler(),
+      graphql.mutation('DeleteTypeDefintion', (_req, res, ctx) =>
+        res(ctx.errors([{ message: 'Type is still in use' }]))
+      ),
+    ]);
+    renderApp({}, true, onClose);
+
+    fireEvent.click(await screen.findByRole('button', { name: /delete/i }));
+
+    await screen.findByText(/Type is still in use/);
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('disables the delete button without the manage permission', async () => {
+    useMockServerHandlers([typeHandler()]);
+    renderApp({}, false);
+
+    expect(
+      await screen.findByRole('button', { name: /delete/i })
+    ).toBeDisabled();
+  });
+});
+
+describe('fetch errors', () => {
+  it('renders an alert with the GraphQL error message', async () => {
+    useMockServerHandlers([
+      graphql.query('FetchType', (_req, res, ctx) =>
+        res(ctx.errors([{ message: 'Type fetch exploded' }]))
+      ),
+    ]);
+    renderApp();
+
+    expect(await screen.findByText(/Type fetch exploded/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /save/i })
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe('field definitions', () => {
+  it('lists the fields of the type', async () => {
+    useMockServerHandlers([typeHandler()]);
+    renderApp();
+    expect(await fieldRow('first-field')).toBeInTheDocument();
+    expect(await fieldRow('second-field')).toBeInTheDocument();
+  });
+
+  it('stages a field removal until Save, then sends removeFieldDefinition', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    const row = await fieldRow('first-field');
+    fireEvent.click(
+      within(row).getByRole('button', { name: 'Remove Field Definition' })
+    );
+
+    // Staged: gone from the table, but nothing was sent yet.
+    await waitFor(() =>
+      expect(screen.queryByText('first-field')).not.toBeInTheDocument()
+    );
+    expect(screen.getByText('second-field')).toBeInTheDocument();
+    expect(calls).toHaveLength(0);
+
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].version).toBe(TYPE_VERSION);
+    expect(calls[0].actions).toEqual([
+      { removeFieldDefinition: { fieldName: 'first-field' } },
+    ]);
+  });
+
+  it('combines a staged removal with a name change in one update', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    fireEvent.change(await typeName(), {
+      target: { value: TEST_TYPE_NEW_NAME },
+    });
+    const row = await fieldRow('second-field');
+    fireEvent.click(
+      within(row).getByRole('button', { name: 'Remove Field Definition' })
+    );
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    const names = calls[0].actions.map((a) => Object.keys(a)[0]);
+    expect(names).toEqual(['removeFieldDefinition', 'changeName']);
+    expect(calls[0].actions[0]).toEqual({
+      removeFieldDefinition: { fieldName: 'second-field' },
+    });
+  });
+
+  it('Revert restores a staged removal without sending anything', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([typeHandler(), handler]);
+    renderApp();
+
+    const row = await fieldRow('first-field');
+    fireEvent.click(
+      within(row).getByRole('button', { name: 'Remove Field Definition' })
+    );
+    await waitFor(() =>
+      expect(screen.queryByText('first-field')).not.toBeInTheDocument()
+    );
+
+    const revert = screen.getByRole('button', { name: /revert/i });
+    await waitFor(() => expect(revert).toBeEnabled());
+    fireEvent.click(revert);
+
+    expect(await fieldRow('first-field')).toBeInTheDocument();
+    await waitFor(() => expect(revert).toBeDisabled());
+    expect(calls).toHaveLength(0);
+  });
+
+  it('disables field removal and adding without the manage permission', async () => {
+    useMockServerHandlers([typeHandler()]);
+    renderApp({}, false);
+
+    await fieldRow('first-field');
+    screen
+      .getAllByRole('button', { name: 'Remove Field Definition' })
+      .forEach((button) => expect(button).toBeDisabled());
+    expect(
+      screen.getByRole('button', { name: /add field definition/i })
+    ).toBeDisabled();
   });
 });

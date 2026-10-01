@@ -50,11 +50,12 @@ Implement against the validated documents in
   delete; surface a version-mismatch error as a notification and prompt reload.
 - **Update actions = diff** of the loaded `State` vs the form draft
   (`calculateStateUpdateActions`); map per [data-model.md](./data-model.md):
-  `changeInitial`, `setName`, `setDescription`, `setTransitions`. Only changed
+  `changeInitial`, `setName`, `setDescription`, `setTransitions`, `addRoles`/`removeRoles`. Only changed
   fields produce actions, and **if no actions result, do not call `UpdateState`**.
 - **Draft assembly** for create: `type`, trimmed `key`, localized `name`/
   `description` with empty translations omitted, `transitions` as references
-  `{ typeId: "state", id }`, `initial`. `roles` is not set by the form (FR-005).
+  `{ typeId: "state", id }` (only when transitions are restricted), `roles` (when any),
+  `initial` (FR-005).
 
 ## 3. States list
 
@@ -85,23 +86,27 @@ Fields & validation (spec.md §4–5):
 
 - **Key** — required; shared key rule (README §6: 2–256, `^[a-zA-Z0-9-_]+$`,
   trimmed). **Read-only in edit** (immutable after create).
-- **State type** — required. **Read-only in edit** (immutable after create).
-- **Initial** — boolean; defaults to `true` on create. Editable.
-- **Transitions** — multi-select of **same-type** states. In edit, the option
-  list excludes the current state. Editable.
+- **State type** — required, the 9 `StateTypeEnum` values. Read-only in edit **only for
+  built-in states** (put `isDisabled` on `FormField.Root`, not on `Select.Root`).
+- **Initial** — boolean; defaults to `false` on create. Editable.
+- **Transitions** — a checkbox "Only allow transitions to the selected states" (off by
+  default; **unset ≠ empty**, see spec FR-004a) plus a multi-select of **same-type** states,
+  enabled only when it is on. In edit, the option list excludes the current state.
+- **Roles** — only the roles that apply to the type (`Return` for LineItemState,
+  `ReviewIncludedInStatistics` for ReviewState); dropped when the type changes.
 - **Name / Description** — optional localized strings, one input per project
   language; **omit empty translations** on save (README §4).
 
 Behavior:
 
 - **Create:** defaults are `initial = true`, empty key, empty name/description,
-  no transitions, `stateType` = active tab. On success: created notification,
+  transitions not restricted, `stateType` = active tab. On success: created notification,
   navigate to the new state's edit view (FR-004/005).
 - **Edit:** Save computes update actions and calls `UpdateState` only when ≥1
   action results; on success: updated notification + refetch (FR-006).
 - **Revert** resets the form to loaded values; disabled when pristine (FR-007).
 - **Delete** removes the state with no confirmation dialog, returns to the list,
-  and shows a deleted notification (FR-008).
+  and shows a deleted notification (FR-008). Disabled for built-in states.
 - **No Manage permission:** all fields render **read-only** and Save / Delete are
   **disabled, never hidden** (README §3). Built-in (`builtIn`) states further
   constrain editability.
@@ -124,9 +129,9 @@ All per [../README.md](../README.md):
       counts.
 - [ ] Transition graph renders nodes (entry/terminal styling), animated edges,
       and node-click → edit view (layout is fixed top-to-bottom).
-- [ ] Create defaults: `initial = true`, type = active tab, empty fields.
+- [ ] Create defaults: `initial = false`, type = active tab, empty fields, transitions unrestricted.
 - [ ] Key validation (2–256, pattern, trimmed) and required State type enforced.
-- [ ] Edit: Key and State type read-only; transitions exclude the current state.
+- [ ] Edit: Key and State type read-only only for built-in states; transitions exclude the current state; unset transitions stay unset when something else is saved.
 - [ ] Save issues only the changed update actions; no call when nothing changed.
 - [ ] Empty localized translations are omitted on create and update.
 - [ ] Version-mismatch on update/delete surfaces an error and prompts reload.

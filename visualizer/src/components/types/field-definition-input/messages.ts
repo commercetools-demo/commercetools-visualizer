@@ -26,6 +26,12 @@ export default defineMessages({
     description: 'The error message for required fields',
     defaultMessage: 'This field is required. Provide a value.',
   },
+  nameTypeConflict: {
+    id: 'FieldDefinition.form.nameTypeConflict',
+    description: 'Error when a field of this name exists with another type',
+    defaultMessage:
+      'A field named "{name}" already exists on the type "{typeKey}", which applies to the same resource type, with the type {existingType}. Fields with the same name must have the same type.',
+  },
   nameTitle: {
     id: 'FieldForm.name.title',
     description: 'Title for fieldDefinitions name field',

@@ -2,7 +2,10 @@
 
 **Status:** Extracted from existing implementation
 **Domain:** commercetools `Type` (custom field definitions)
-**Spec version:** 1.0 (2026-06-25)
+**Spec version:** 1.1 (2026-10-01) — field definitions can be **reordered** (staged until Save),
+the **input hint** really is editable on an existing field (the checkbox was disabled), and
+adding a field is checked against **same-name fields of other Types**. 1.0 (2026-06-25): initial
+extraction.
 
 > Shared conventions (permissions, localization, optimistic concurrency, key validation,
 > notifications, list conventions) are defined in [../README.md](../README.md) and are not
@@ -63,10 +66,23 @@ types, date/time variants, enums (plain and localized), references, and `Set` co
 - **FR-007** Add a field definition with: **Name** (required, shared key rule, unique within
   the Type); **Label** (localized, required); **Type** (required). On success the field is
   added to the Type (single update action) and a success notification is shown.
+  **Same-name rule (API):** a field with the same name on *another* Type that applies to the
+  same resource type must have the same type. The form checks this once name and type are set
+  (all Types are loaded for it) and shows which Type already has the field and with which type
+  (`String`, `Set<String>`, `Reference(product)`, `LocalizedEnum`, …). Types are compared by
+  name, a Set by its element type, a Reference by its target; enum *values* are not compared (the
+  API's rule for them isn't documented — a mismatch is left to the API). If the Types can't be
+  loaded the check is skipped and the API decides.
 - **FR-008** Edit a field definition: **Name** and **Type** are immutable (read-only). Label,
   input hint, and enum values (add, edit, remove, and reorder) are editable and persist via
   field-specific update actions. **Required** is shown with the field's stored value but
   **cannot be persisted on an existing field** — see §6. `Set` and reference type are fixed once the field exists.
+- **FR-008a** Reorder field definitions: each row of the field table has **Move up** / **Move
+  down** buttons (the first row can't go up, the last can't go down; disabled without Manage).
+  Like a removal, a move is staged in the Type form and only takes effect on the Type-level
+  Save (Revert undoes it). Save sends `changeFieldDefinitionOrder { fieldNames }` with the names
+  of the *remaining* fields in the new order, after any `removeFieldDefinition` — and nothing
+  if the remaining fields are in their original order.
 - **FR-009** Delete a field definition: removal is staged in the Type form like any other
   edit (Name, Description, etc.) — it only takes effect when the Type-level Save is pressed,
   and can be undone with Revert until then.

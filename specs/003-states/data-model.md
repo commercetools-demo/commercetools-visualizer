@@ -8,13 +8,13 @@
 |-------|------|-------|
 | `id` | string (UUID) | |
 | `key` | string | shared key rule; immutable after create |
-| `type` | StateType | immutable after create |
+| `type` | StateType | editable unless `builtIn` (`changeType`) |
 | `name` / `nameAllLocales` | LocalizedString? | optional |
 | `description` / `descriptionAllLocales` | LocalizedString? | optional |
 | `initial` | boolean | first step of a workflow |
-| `transitions` | State[] (refs) | targets of the same type |
-| `roles` | StateRole[] | not editable in UI |
-| `builtIn` | boolean | system state; read-only |
+| `transitions` | State[]? (refs) | targets of the same type; **unset = any, `[]` = final** |
+| `roles` | StateRole[] | `Return` for LineItemState, `ReviewIncludedInStatistics` for ReviewState |
+| `builtIn` | boolean | system state; can't be deleted, key/type read-only |
 | `version` | number | optimistic concurrency |
 | `createdAt` / `lastModifiedAt` | DateTime | |
 
@@ -27,8 +27,8 @@ TStateDraft {
   name?: LocalizedStringItemInput[]     // empty omitted
   description?: LocalizedStringItemInput[]
   initial?: boolean                     // default true
-  transitions?: ReferenceInput[]        // { typeId: type, id }
-  roles?: StateRole[]                   // not set by form
+  transitions?: ReferenceInput[]        // { typeId: type, id }; omitted unless restricted
+  roles?: StateRole[]                   // omitted when none
 }
 ```
 
@@ -42,15 +42,19 @@ TFormValues {
   name: Record<locale, string>
   description: Record<locale, string>
   initial: boolean
-  transitions: string[]                 // target state IDs
+  restrictTransitions: boolean          // false = leave transitions unset (any allowed)
+  transitions: string[]                 // target state IDs (used when restricted)
+  roles: StateRole[]
 }
 ```
 
 ## Enumerations
 
-- **StateType** — `LineItemState`, `OrderState`, `PaymentState`, `ProductState`,
-  `QuoteRequestState`, `QuoteState`, `ReviewState`, `StagedQuoteState`.
-- **StateRole** — `Return`, `ReviewIncludedInStatistics` (not editable in UI).
+- **StateType (9)** — `LineItemState`, `OrderState`, `PaymentState`, `ProductState`,
+  `QuoteRequestState`, `QuoteState`, `RecurringOrderState`, `ReviewState`,
+  `StagedQuoteState`. Single source: `state-types.ts`, pinned by `state-types.spec.ts`.
+- **StateRole (2)** — `Return` (LineItemState only), `ReviewIncludedInStatistics` (ReviewState
+  only).
 
 ## API operations (commercetools GraphQL — `ctp` target)
 
@@ -74,9 +78,9 @@ transitions { id }, builtIn, roles, version, createdAt, lastModifiedAt.
 | Initial flag | `changeInitial { initial }` |
 | Name | `setName { name }` |
 | Description | `setDescription { description }` |
-| Transitions | `setTransitions { transitions }` |
-| Key (not exposed) | `changeKey { key }` |
-| Type (not exposed) | `changeType { type }` |
-| Roles (not exposed) | `setRoles` / `addRoles` / `removeRoles` |
+| Transitions | `setTransitions { transitions }` — `transitions` omitted to remove the restriction (unset), `[]` for a final state |
+| Key | `changeKey { key }` (not for built-in states) |
+| Type | `changeType { type }` (not for built-in states) |
+| Roles | `addRoles` / `removeRoles` (sync-actions diffs the sorted arrays) |
 
 Only changed fields produce actions; if none, no update call is made.

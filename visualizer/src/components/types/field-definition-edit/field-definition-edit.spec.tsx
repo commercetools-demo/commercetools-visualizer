@@ -226,8 +226,8 @@ describe('rendering an existing field definition', () => {
       name: /input hint|multi/i,
     });
     expect(multiLine).toBeChecked();
-    // The input hint is immutable after create, so it can't be edited here.
-    expect(multiLine).toBeDisabled();
+    // The input hint can be changed after creation (changeInputHint).
+    expect(multiLine).toBeEnabled();
   });
 
   it('lists the values of an Enum field', async () => {
@@ -546,5 +546,113 @@ describe('without the Manage permission', () => {
     screen
       .getAllByRole('button', { name: 'Remove List Item' })
       .forEach((button) => expect(button).toBeDisabled());
+  });
+});
+
+describe('changing the input hint', () => {
+  const inputHintCheckbox = () =>
+    screen.findByRole('checkbox', { name: /input hint|multi/i });
+
+  it('sends changeInputHint when a Text field is switched to multi-line', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(
+      fetchHandler(buildFieldDefinition('notes', simpleFieldType('String'))),
+      handler
+    );
+    renderEdit({ fieldName: 'notes' });
+
+    await userEvent.click(await inputHintCheckbox());
+    await saveChanges();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      { changeInputHint: { fieldName: 'notes', inputHint: 'MultiLine' } },
+    ]);
+  });
+
+  it('sends changeInputHint when a multi-line field is switched back to a single line', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(
+      fetchHandler(
+        buildFieldDefinition('notes', simpleFieldType('String'), {
+          inputHint: 'MultiLine',
+        })
+      ),
+      handler
+    );
+    renderEdit({ fieldName: 'notes' });
+
+    await userEvent.click(await inputHintCheckbox());
+    await saveChanges();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      { changeInputHint: { fieldName: 'notes', inputHint: 'SingleLine' } },
+    ]);
+  });
+
+  it('works for a localized text field too', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(
+      fetchHandler(
+        buildFieldDefinition('title', simpleFieldType('LocalizedString'))
+      ),
+      handler
+    );
+    renderEdit({ fieldName: 'title' });
+
+    await userEvent.click(await inputHintCheckbox());
+    await saveChanges();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      { changeInputHint: { fieldName: 'title', inputHint: 'MultiLine' } },
+    ]);
+  });
+
+  it('sends no action when only the label changes', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(
+      fetchHandler(
+        buildFieldDefinition('notes', simpleFieldType('String'), {
+          inputHint: 'MultiLine',
+        })
+      ),
+      handler
+    );
+    renderEdit({ fieldName: 'notes' });
+
+    const label = await labelInput();
+    await userEvent.clear(label);
+    await userEvent.type(label, 'Another label');
+    await saveChanges();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions.map((action) => Object.keys(action)[0])).toEqual([
+      'changeLabel',
+    ]);
+  });
+
+  it('is not offered for field types it does not apply to', async () => {
+    mockServer.use(
+      fetchHandler(buildFieldDefinition('amount', simpleFieldType('Number')))
+    );
+    renderEdit({ fieldName: 'amount' });
+
+    await screen.findByLabelText(/field name/i);
+    expect(
+      screen.queryByRole('checkbox', { name: /input hint|multi/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it('is read-only without the Manage permission', async () => {
+    mockServer.use(
+      fetchHandler(buildFieldDefinition('notes', simpleFieldType('String')))
+    );
+    renderEdit({ fieldName: 'notes', canManage: false });
+
+    const checkbox = await inputHintCheckbox();
+    await userEvent.click(checkbox);
+    expect(checkbox).not.toBeChecked();
   });
 });

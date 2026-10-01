@@ -20,6 +20,7 @@ import {
   PageContent,
   Select,
   Stack,
+  Text,
   TextInput,
 } from '@commercetools/nimbus';
 import { transformLocalizedFieldToLocalizedString } from '@commercetools-frontend/l10n';
@@ -31,19 +32,14 @@ import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
 import keyInputMessages from '../../shared/key-input-error/messages';
+import { STATE_TYPES, STATE_TYPE_LABELS, allowedRoles } from '../state-types';
 
 type Formik = ReturnType<typeof useFormik>;
 
-export const resourceTypes = [
-  { value: 'OrderState', label: 'Order State' },
-  { value: 'LineItemState', label: 'Line Item State' },
-  { value: 'ProductState', label: 'Product State' },
-  { value: 'ReviewState', label: 'Review State' },
-  { value: 'PaymentState', label: 'Payment State' },
-  { value: 'QuoteRequestState', label: 'Quote Request State' },
-  { value: 'StagedQuoteState', label: 'Staged Quote State' },
-  { value: 'QuoteState', label: 'Quote State' },
-];
+export const resourceTypes = STATE_TYPES.map((value) => ({
+  value,
+  label: STATE_TYPE_LABELS[value],
+}));
 
 type FormProps = {
   formElements: ReactElement;
@@ -60,17 +56,28 @@ export type TFormValues = {
   name: LocalizedString;
   description: LocalizedString;
   stateType: TStateType;
+  // Whether transitions are validated at all: unset lets the state move to any state of the
+  // same type, while a (possibly empty) list allows only those — empty = a final state.
+  restrictTransitions: boolean;
   transitions: Array<string>;
+  roles: Array<string>;
   initial: boolean;
 };
 
 type TErrors = {
   key: { missing?: boolean; invalidInput?: boolean };
+  roles: { notAllowed?: boolean };
 };
 
 const validate = (formikValues: TFormValues) => {
   const errors: TErrors = {
     key: validateKey(formikValues.key),
+    // A role only applies to one state type.
+    roles: formikValues.roles.some(
+      (role) => !allowedRoles(formikValues.stateType).includes(role)
+    )
+      ? { notAllowed: true }
+      : {},
   };
 
   return omitEmpty<TErrors>(errors);
@@ -87,6 +94,8 @@ type Props = {
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
   createNewMode?: boolean;
+  // Built-in states can't be deleted and their key can't be changed.
+  isBuiltIn?: boolean;
 };
 
 const StatesForm: FC<Props> = ({
@@ -94,6 +103,7 @@ const StatesForm: FC<Props> = ({
   onSubmit,
   children,
   createNewMode = false,
+  isBuiltIn = false,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
@@ -214,12 +224,24 @@ const StatesForm: FC<Props> = ({
                 <FormattedMessage {...messages.initialTitle} />
               </Checkbox>
             </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.initialHint)}
+            </FormField.Description>
           </FormField.Root>
+          {isBuiltIn && (
+            <Text color="neutral.11">
+              {intl.formatMessage(messages.builtInNote)}
+            </Text>
+          )}
         </Stack>
       </PageContent.Column>
       <PageContent.Column sticky>
         <Stack direction="column" gap="400">
-          <FormField.Root isRequired isReadOnly={!createNewMode || !canManage}>
+          <FormField.Root
+            isRequired
+            isReadOnly={!createNewMode || !canManage}
+            isDisabled={!createNewMode || !canManage}
+          >
             <FormField.Label>
               {intl.formatMessage(messages.stateTypeTitle)}
             </FormField.Label>
@@ -227,10 +249,16 @@ const StatesForm: FC<Props> = ({
               <Select.Root
                 aria-label={intl.formatMessage(messages.stateTypeTitle)}
                 value={formik.values.stateType}
-                isDisabled={!createNewMode || !canManage}
-                onChange={(value) =>
-                  formik.setFieldValue('stateType', value as TStateType)
-                }
+                onChange={(value) => {
+                  formik.setFieldValue('stateType', value as TStateType);
+                  // roles only exist for some types: drop the ones that no longer apply
+                  formik.setFieldValue(
+                    'roles',
+                    formik.values.roles.filter((role) =>
+                      allowedRoles(value as string).includes(role)
+                    )
+                  );
+                }}
                 width={'full'}
               >
                 <Select.Options items={resourceTypes}>
@@ -258,7 +286,19 @@ const StatesForm: FC<Props> = ({
             width={'full'}
             onBlur={() => formik.setFieldTouched('description', true)}
           />
-          <FormField.Root isReadOnly={!canManage}>
+          <Checkbox
+            isSelected={formik.values.restrictTransitions}
+            isReadOnly={!canManage}
+            onChange={(isSelected) =>
+              formik.setFieldValue('restrictTransitions', isSelected)
+            }
+          >
+            {intl.formatMessage(messages.restrictTransitions)}
+          </Checkbox>
+          <FormField.Root
+            isReadOnly={!canManage}
+            isDisabled={!formik.values.restrictTransitions}
+          >
             <FormField.Label>
               {intl.formatMessage(messages.transitionsTitle)}
             </FormField.Label>
@@ -287,7 +327,48 @@ const StatesForm: FC<Props> = ({
                 </ComboBox.Popover>
               </ComboBox.Root>
             </FormField.Input>
+            <FormField.Description>
+              {intl.formatMessage(messages.transitionsHint)}
+            </FormField.Description>
           </FormField.Root>
+          {allowedRoles(formik.values.stateType).length > 0 && (
+            <FormField.Root
+              isReadOnly={!canManage}
+              isInvalid={Boolean(errors.roles?.notAllowed)}
+            >
+              <FormField.Label>
+                {intl.formatMessage(messages.rolesTitle)}
+              </FormField.Label>
+              <FormField.Input>
+                <Stack direction="column" gap="200">
+                  {allowedRoles(formik.values.stateType).map((role) => (
+                    <Checkbox
+                      key={role}
+                      isSelected={formik.values.roles.includes(role)}
+                      isReadOnly={!canManage}
+                      onChange={(isSelected) =>
+                        formik.setFieldValue(
+                          'roles',
+                          isSelected
+                            ? [...formik.values.roles, role]
+                            : formik.values.roles.filter(
+                                (existing) => existing !== role
+                              )
+                        )
+                      }
+                    >
+                      {intl.formatMessage(
+                        messages[`role${role}` as 'roleReturn']
+                      )}
+                    </Checkbox>
+                  ))}
+                </Stack>
+              </FormField.Input>
+              <FormField.Description>
+                {intl.formatMessage(messages.rolesHint)}
+              </FormField.Description>
+            </FormField.Root>
+          )}
         </Stack>
       </PageContent.Column>
     </PageContent.Root>

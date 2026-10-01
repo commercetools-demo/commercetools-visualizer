@@ -118,8 +118,9 @@ Via `commercetools-demo-shared-data-fetching-hooks` (`useTypeDefinitionUpdater`,
 | Description | `changeDescription { description }` (a.k.a. setDescription) |
 | Add field | `addFieldDefinition { fieldDefinition }` |
 | Remove field | `removeFieldDefinition { fieldName }` |
+| Reorder fields | `changeFieldDefinitionOrder { fieldNames }` — all remaining names in the new order, sent after removals; diffed by `calculateFieldDefinitionOrderActions` because the type update deliberately ignores field definitions |
 | Field label | `changeLabel { fieldName, label }` |
-| Field input hint | `changeInputHint { fieldName, inputHint }` |
+| Field input hint | `changeInputHint { fieldName, inputHint }` — String/LocalizedString fields; `inputHint` is part of the diffed field shape |
 | Add enum value | `addEnumValue { fieldName, value }` (enum) / `addLocalizedEnumValue` (localized) |
 | Change enum label | `changeEnumValueLabel` (enum) / `changeLocalizedEnumValueLabel` (localized) |
 | Remove enum value | `removeEnumValues { fieldName, keys }` (enum) / `removeLocalizedEnumValues` (localized) — diffed client-side, since `@commercetools/sync-actions` never emits this action on its own. The remaining update actions are then diffed against the field *after* that removal, otherwise sync-actions pairs values by position and reports every value after the removed one as a new `addEnumValue`/`addLocalizedEnumValue` for a key that already exists |

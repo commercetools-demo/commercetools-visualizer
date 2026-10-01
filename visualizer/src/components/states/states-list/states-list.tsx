@@ -26,6 +26,7 @@ import { getErrorMessage, useStatesFetcher } from '../../../hooks';
 import { SuspendedRoute } from '@commercetools-frontend/application-shell';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
+import { STATE_TYPES } from '../state-types';
 
 const StateCreate = lazy(() => import('../states-create/states-create'));
 
@@ -41,16 +42,7 @@ export interface TabProp {
   content: ReactNode;
 }
 
-const availableStates = [
-  'LineItemState',
-  'OrderState',
-  'PaymentState',
-  'ProductState',
-  'QuoteRequestState',
-  'QuoteState',
-  'ReviewState',
-  'StagedQuoteState',
-];
+const availableStates = STATE_TYPES;
 
 const StatesList = (props: Props) => {
   const intl = useIntl();

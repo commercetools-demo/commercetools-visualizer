@@ -1,0 +1,29 @@
+# Every Type with the (simplified) type of each of its field definitions. Used to check, before
+# adding a field, that a field with the same name on another Type for the same resource type
+# has the same type — the API requires that.
+query FetchTypeFieldTypes {
+  typeDefinitions(limit: 500, offset: 0) {
+    results {
+      id
+      key
+      resourceTypeIds
+      fieldDefinitions {
+        name
+        type {
+          name
+          ... on ReferenceType {
+            referenceTypeId
+          }
+          ... on SetType {
+            elementType {
+              name
+              ... on ReferenceType {
+                referenceTypeId
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

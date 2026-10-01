@@ -382,9 +382,12 @@ export const calculateExtensionsUpdateActions = (
 
 // The other Extensions of the project, for picking dependencies (see restrictions.ts).
 export const useExtensionDependencyCandidates = () => {
+  // Only used for validation, so it stays out of the cache: its narrow selection of
+  // `triggers` (no `condition`) would otherwise overwrite what the open extension's own query
+  // cached, and make that query refetch.
   const { data, error, loading } = useMcQuery<TQuery>(
     FetchDependencyCandidatesQuery,
-    { context: mcApiContext }
+    { context: mcApiContext, fetchPolicy: 'no-cache' }
   );
   const candidates: Array<DependencyCandidate> | undefined =
     data?.extensions.results.map((extension) => ({

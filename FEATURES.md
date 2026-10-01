@@ -45,10 +45,15 @@ project). Data access goes through per-feature connector hooks
 ## States
 
 - List, create, and edit commercetools [States](https://docs.commercetools.com/api/projects/states)
-  (`src/components/states`), scoped by state type (Line Item, Order, Payment, Product,
-  Quote Request, Quote, Review, Staged Quote) with localized name/description, an
-  "initial state" flag, and a multi-select for outgoing transitions
+  (`src/components/states`), scoped by state type (all 9: Line Item, Order, Payment, Product,
+  Quote Request, Quote, Recurring Order, Review, Staged Quote — `state-types.ts`) with
+  localized name/description, an "initial state" flag, roles (`Return` for line item states,
+  `ReviewIncludedInStatistics` for review states) and outgoing transitions
   (`states-form/states-form.tsx`).
+- Transitions distinguish "unset" (any transition allowed) from "none" (a final state): a
+  checkbox chooses whether they are restricted at all, so saving an unrelated change never
+  turns an unrestricted state into a dead end.
+- Built-in states keep their key and type read-only, show a note, and can't be deleted.
 - State transition flow diagram: renders a state type's states and transitions as an
   interactive, auto-laid-out (top-to-bottom) graph (`states-list/states-flow.tsx`) using
   `@xyflow/react` + `dagre`; clicking a node opens that state's detail view.
@@ -105,9 +110,13 @@ project). Data access goes through per-feature connector hooks
   customer-group, key-value-document, order, product, product-type, review, state,
   shipping-method, variant, zone) (`field-definition-input/constants.ts`). Both lists are
   pinned by specs.
-- Field definitions table per type, with add, edit, and delete of individual field
-  definitions (`field-definitions-list/field-definitions-list.tsx`). Deleting a field is
-  staged in the type form and only applied on Save (Revert undoes it).
+- Field definitions table per type, with add, edit, delete and move up/down of individual
+  field definitions (`field-definitions-list/field-definitions-list.tsx`). Deleting or moving a
+  field is staged in the type form and only applied on Save (Revert undoes it); the order is
+  saved with `changeFieldDefinitionOrder`. The input hint of a text field can be changed on an
+  existing field.
+- Adding a field is checked against the API rule that a field name used on another Type for
+  the same resource type needs the same type (`field-definition-input/name-conflicts.ts`).
 
 ## Custom Objects
 

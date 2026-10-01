@@ -4,6 +4,7 @@ fragment StateFragment on State {
   type
   initial
   builtIn
+  roles
   transitions {
     id
   }

@@ -224,7 +224,7 @@ const typeHandler = (typeDefinition: unknown = buildEditableType()) =>
 
 // Captures the variables of the `UpdateTypeDefinition` mutation and answers
 // with the type at the next version, as the real API would.
-const captureUpdate = () => {
+const captureUpdate = (respondWith: () => unknown = buildEditableType) => {
   const calls: Array<{
     id: string;
     version: number;
@@ -241,7 +241,7 @@ const captureUpdate = () => {
     return res(
       ctx.data({
         updateTypeDefinition: {
-          ...buildEditableType(),
+          ...(respondWith() as object),
           version: TYPE_VERSION + 1,
         },
       })
@@ -505,5 +505,202 @@ describe('field definitions', () => {
     expect(
       screen.getByRole('button', { name: /add field definition/i })
     ).toBeDisabled();
+  });
+});
+
+describe('reordering field definitions', () => {
+  // three fields, so that moving one has a visible effect on both neighbours
+  const threeFields = () =>
+    buildTypeDefinition({
+      id: TEST_TYPE_ID,
+      key: TEST_TYPE_KEY,
+      name: TEST_TYPE_NAME,
+      description: 'test-description',
+      version: TYPE_VERSION,
+      resourceTypeIds: ['customer'],
+      fieldDefinitions: ['alpha', 'beta', 'gamma'].map((name) =>
+        buildFieldDefinition(name, simpleFieldType('String'), {
+          label: `${name} label`,
+        })
+      ),
+    });
+
+  // the field names in table order (header rows have no row header cell)
+  const fieldOrder = () =>
+    screen
+      .getAllByRole('row')
+      .filter((row) => within(row).queryAllByRole('rowheader').length > 0)
+      .map((row) => within(row).getAllByRole('rowheader')[0].textContent);
+  const moveUp = async (name: string) =>
+    fireEvent.click(
+      within(await fieldRow(name)).getByRole('button', {
+        name: `Move field ${name} up`,
+      })
+    );
+  const moveDown = async (name: string) =>
+    fireEvent.click(
+      within(await fieldRow(name)).getByRole('button', {
+        name: `Move field ${name} down`,
+      })
+    );
+  const save = async () => {
+    const saveButton = screen.getByRole('button', { name: /save/i });
+    await waitFor(() => expect(saveButton).toBeEnabled());
+    fireEvent.click(saveButton);
+  };
+
+  it('cannot move the first field up or the last field down', async () => {
+    useMockServerHandlers([typeHandler(threeFields())]);
+    renderApp();
+
+    expect(
+      within(await fieldRow('alpha')).getByRole('button', {
+        name: 'Move field alpha up',
+      })
+    ).toBeDisabled();
+    expect(
+      within(await fieldRow('gamma')).getByRole('button', {
+        name: 'Move field gamma down',
+      })
+    ).toBeDisabled();
+    expect(
+      within(await fieldRow('beta')).getByRole('button', {
+        name: 'Move field beta up',
+      })
+    ).toBeEnabled();
+  });
+
+  it('stages a move until Save, then sends changeFieldDefinitionOrder with all names in the new order', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    await moveUp('gamma');
+
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['alpha', 'gamma', 'beta'])
+    );
+    expect(calls).toHaveLength(0);
+    await save();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].version).toBe(TYPE_VERSION);
+    expect(calls[0].actions).toEqual([
+      {
+        changeFieldDefinitionOrder: { fieldNames: ['alpha', 'gamma', 'beta'] },
+      },
+    ]);
+  });
+
+  it('moves a field down as well', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    await moveDown('alpha');
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['beta', 'alpha', 'gamma'])
+    );
+    await save();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      {
+        changeFieldDefinitionOrder: { fieldNames: ['beta', 'alpha', 'gamma'] },
+      },
+    ]);
+  });
+
+  it('sends nothing when a field is moved and moved back', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    await moveDown('alpha');
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['beta', 'alpha', 'gamma'])
+    );
+    await moveUp('alpha');
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['alpha', 'beta', 'gamma'])
+    );
+
+    // The form is pristine again, so there is nothing to save.
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /save/i })).toBeDisabled()
+    );
+    expect(calls).toHaveLength(0);
+  });
+
+  it('sends the removal first, then the order of the remaining fields', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    await moveUp('gamma'); // alpha, gamma, beta
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['alpha', 'gamma', 'beta'])
+    );
+    fireEvent.click(
+      within(await fieldRow('alpha')).getByRole('button', {
+        name: 'Remove Field Definition',
+      })
+    );
+    await waitFor(() => expect(fieldOrder()).toEqual(['gamma', 'beta']));
+    await save();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      { removeFieldDefinition: { fieldName: 'alpha' } },
+      { changeFieldDefinitionOrder: { fieldNames: ['gamma', 'beta'] } },
+    ]);
+  });
+
+  it('sends no order action when a removal leaves the remaining fields in their original order', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    fireEvent.click(
+      within(await fieldRow('beta')).getByRole('button', {
+        name: 'Remove Field Definition',
+      })
+    );
+    await waitFor(() => expect(fieldOrder()).toEqual(['alpha', 'gamma']));
+    await save();
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      { removeFieldDefinition: { fieldName: 'beta' } },
+    ]);
+  });
+
+  it('Revert restores the original order without sending anything', async () => {
+    const { calls, handler } = captureUpdate(threeFields);
+    useMockServerHandlers([typeHandler(threeFields()), handler]);
+    renderApp();
+
+    await moveUp('gamma');
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['alpha', 'gamma', 'beta'])
+    );
+    const revert = screen.getByRole('button', { name: /revert/i });
+    await waitFor(() => expect(revert).toBeEnabled());
+    fireEvent.click(revert);
+
+    await waitFor(() =>
+      expect(fieldOrder()).toEqual(['alpha', 'beta', 'gamma'])
+    );
+    expect(calls).toHaveLength(0);
+  });
+
+  it('disables the move buttons without the manage permission', async () => {
+    useMockServerHandlers([typeHandler(threeFields())]);
+    renderApp({}, false);
+
+    await fieldRow('beta');
+    screen
+      .getAllByRole('button', { name: /^Move field / })
+      .forEach((button) => expect(button).toBeDisabled());
   });
 });

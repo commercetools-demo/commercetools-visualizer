@@ -1,4 +1,5 @@
 import {
+  calculateFieldDefinitionOrderActions,
   calculateFieldDefinitionRemovals,
   calculateFieldDefinitionUpdateActions,
   calculateTypeDefinitionUpdateActions,
@@ -189,5 +190,77 @@ describe('calculateTypeDefinitionUpdateActions', () => {
     expect(calculateTypeDefinitionUpdateActions(draft, { ...draft })).toEqual(
       []
     );
+  });
+});
+
+describe('calculateFieldDefinitionOrderActions', () => {
+  const fields = (...names: string[]) => names.map((name) => ({ name }));
+
+  it('produces nothing when the order is unchanged', () => {
+    expect(
+      calculateFieldDefinitionOrderActions(
+        fields('a', 'b', 'c'),
+        fields('a', 'b', 'c')
+      )
+    ).toEqual([]);
+  });
+
+  it('produces changeFieldDefinitionOrder with all names in the new order', () => {
+    expect(
+      calculateFieldDefinitionOrderActions(
+        fields('a', 'b', 'c'),
+        fields('c', 'a', 'b')
+      )
+    ).toEqual([
+      { changeFieldDefinitionOrder: { fieldNames: ['c', 'a', 'b'] } },
+    ]);
+  });
+
+  it('only compares the fields that are still there (removals are a separate action)', () => {
+    expect(
+      calculateFieldDefinitionOrderActions(
+        fields('a', 'b', 'c'),
+        fields('a', 'c')
+      )
+    ).toEqual([]);
+    expect(
+      calculateFieldDefinitionOrderActions(
+        fields('a', 'b', 'c'),
+        fields('c', 'a')
+      )
+    ).toEqual([{ changeFieldDefinitionOrder: { fieldNames: ['c', 'a'] } }]);
+  });
+
+  it('produces nothing for no fields', () => {
+    expect(calculateFieldDefinitionOrderActions([], [])).toEqual([]);
+  });
+});
+
+describe('calculateFieldDefinitionUpdateActions — input hint', () => {
+  const stringField = (inputHint: string): PickedFieldDefinition =>
+    ({
+      name: 'notes',
+      inputHint,
+      type: { name: 'String' },
+    } as unknown as PickedFieldDefinition);
+
+  it('produces changeInputHint when the hint changes', () => {
+    expect(
+      calculateFieldDefinitionUpdateActions(
+        stringField('SingleLine'),
+        stringField('MultiLine')
+      )
+    ).toEqual([
+      { changeInputHint: { fieldName: 'notes', inputHint: 'MultiLine' } },
+    ]);
+  });
+
+  it('produces nothing when the hint is unchanged', () => {
+    expect(
+      calculateFieldDefinitionUpdateActions(
+        stringField('MultiLine'),
+        stringField('MultiLine')
+      )
+    ).toEqual([]);
   });
 });

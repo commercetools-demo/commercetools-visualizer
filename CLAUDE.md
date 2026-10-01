@@ -188,6 +188,14 @@ before assuming a cross-cutting behavior is a one-off.
   `type`, `channel`, `core` and `commons` test-data packages are installed; other features
   use hand-written fixtures (subscriptions have their own builders in
   `src/test-utils/models/subscriptions/`).
+- A field the API treats as *unset* differently from *empty* needs an explicit tri-state in the
+  form, not `[]` as the "nothing" value: a state's `transitions` (unset = any transition allowed,
+  `[]` = a final state) is `restrictTransitions` + a list, and an unset one is left out of the
+  diffed shape so sync-actions can't turn it into `[]`.
+- Lookup queries that only feed validation (`FetchTypeFieldTypes`,
+  `FetchExtensionDependencyCandidates`) use `fetchPolicy: 'no-cache'`: their narrow selection of
+  un-normalized arrays (`fieldDefinitions`, `triggers`) would otherwise overwrite what the open
+  page's own query cached.
 - Lists that mirror an API enum (Type `resourceTypeIds`, Reference targets, Subscription
   change/message resource types, message types per resource) are pinned by specs next to the
   constants, each holding its own copy of the official values with the docs URL. When a spec

@@ -18,12 +18,17 @@ import {
   TQuery_TypeDefinitionsArgs,
   TTypeUpdateAction,
 } from '../../types/generated/ctp';
+import type {
+  FieldTypeShape,
+  TypeWithFieldTypes,
+} from '../../components/types/field-definition-input/name-conflicts';
 import { mcApiContext } from '../shared/mc-api-context';
 import {
   createGraphQlUpdateActions,
   extractErrorFromGraphQlResponse,
 } from '../shared/graphql-helpers';
 import FetchAllQuery from './fetch-all.graphql';
+import FetchFieldTypesQuery from './fetch-field-types.graphql';
 import FetchQuery from './fetch.graphql';
 import CreateMutation from './create.graphql';
 import UpdateMutation from './update.graphql';
@@ -209,6 +214,27 @@ export const calculateTypeDefinitionUpdateActions = (
 // persists immediately. Removing one, though, is staged in the type form's
 // own Formik state (so it goes through the same Save/Revert as
 // key/name/description), so it needs its own diff here, by field name.
+// Moving a field is staged in the type form (like removing one) and sent on Save. The API
+// wants all remaining field names in the new order, so this is computed after the removals:
+// only the fields that are still there are compared. (`createSyncTypes` can emit
+// `changeFieldDefinitionOrder` too, but the type update deliberately ignores field
+// definitions — see `calculateTypeDefinitionUpdateActions`.)
+export const calculateFieldDefinitionOrderActions = (
+  originalFieldDefinitions: Array<{ name: string }>,
+  nextFieldDefinitions: Array<{ name: string }>
+): Array<TTypeUpdateAction> => {
+  const nextNames = nextFieldDefinitions.map((field) => field.name);
+  const remainingOriginalNames = originalFieldDefinitions
+    .map((field) => field.name)
+    .filter((name) => nextNames.includes(name));
+  const isSameOrder =
+    remainingOriginalNames.length === nextNames.length &&
+    remainingOriginalNames.every((name, index) => name === nextNames[index]);
+  return isSameOrder
+    ? []
+    : [{ changeFieldDefinitionOrder: { fieldNames: nextNames } }];
+};
+
 export const calculateFieldDefinitionRemovals = (
   originalFieldDefinitions: Array<TFieldDefinition>,
   nextFieldDefinitions: Array<TFieldDefinition>
@@ -330,4 +356,26 @@ export const calculateFieldDefinitionUpdateActions = (
     ...calculateEnumValueRemovals(originalDraft, nextDraft),
     ...(createGraphQlUpdateActions(actions) as Array<TTypeUpdateAction>),
   ];
+};
+
+// Every Type with the types of its fields, to catch "same field name, different type" on
+// another Type for the same resource type before the API does.
+export const useTypeFieldTypes = () => {
+  // Only used for validation, so it stays out of the cache: its narrow selection of
+  // `fieldDefinitions` would otherwise overwrite what the open Type's own query cached.
+  const { data, error, loading } = useMcQuery<TQuery>(FetchFieldTypesQuery, {
+    context: mcApiContext,
+    fetchPolicy: 'no-cache',
+  });
+  const types: Array<TypeWithFieldTypes> | undefined =
+    data?.typeDefinitions.results.map((type) => ({
+      id: type.id,
+      key: type.key,
+      resourceTypeIds: type.resourceTypeIds,
+      fieldDefinitions: type.fieldDefinitions.map((field) => ({
+        name: field.name,
+        type: field.type as unknown as FieldTypeShape,
+      })),
+    }));
+  return { types, error, loading };
 };

@@ -36,6 +36,16 @@ export default defineMessages({
     description: 'Text for add field definition button',
     defaultMessage: 'Add Field Definition',
   },
+  moveFieldUp: {
+    id: 'FieldDefinitionsList.moveFieldUp',
+    description: 'Button moving a field definition one position up',
+    defaultMessage: 'Move field {name} up',
+  },
+  moveFieldDown: {
+    id: 'FieldDefinitionsList.moveFieldDown',
+    description: 'Button moving a field definition one position down',
+    defaultMessage: 'Move field {name} down',
+  },
   removeFieldDefinitionButton: {
     id: 'Type.form.button.removeFieldDefinition',
     description: 'Label for remove field definition action',

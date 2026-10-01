@@ -18,6 +18,10 @@ export default defineMessages<string>({
     id: 'States.LineItemState',
     defaultMessage: 'Line Item State ({amount})',
   },
+  RecurringOrderState: {
+    id: 'States.RecurringOrderState',
+    defaultMessage: 'Recurring Order State ({amount})',
+  },
   OrderState: {
     id: 'States.OrderState',
     defaultMessage: 'Order State list ({amount})',

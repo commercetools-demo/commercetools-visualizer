@@ -1,4 +1,9 @@
-import { TState, TStateDraft, TStateType } from '../../../types/generated/ctp';
+import {
+  TState,
+  TStateDraft,
+  TStateRole,
+  TStateType,
+} from '../../../types/generated/ctp';
 import { TFormValues } from './states-form';
 import { LocalizedField, type LocalizedString } from '@commercetools/nimbus';
 import {
@@ -40,10 +45,15 @@ export const stateToFormValues = (
         state?.descriptionAllLocales ?? []
       ) ?? {}
     ),
+    // `transitions` unset means "any transition is allowed" (validation off), an empty list
+    // means "no transition is allowed" (a final state) — they are different, so remember
+    // which one the state has.
+    restrictTransitions: state?.transitions != null,
     transitions:
       state?.transitions?.map((value) => {
         return value.id;
       }) || [],
+    roles: state?.roles ?? [],
   };
 };
 // Shape sent to the `createState` mutation (StateDraft: name/description).
@@ -57,10 +67,17 @@ export const formValuesToState = (formValues: TFormValues): TStateDraft => {
     description: transformLocalizedStringToLocalizedField(
       omitEmptyTranslations(formValues.description)
     ),
-    transitions: formValues.transitions.map((transition) => ({
-      typeId: formValues.stateType,
-      id: transition,
-    })),
+    // Left out when not restricted: the API then does not validate transitions.
+    transitions: formValues.restrictTransitions
+      ? formValues.transitions.map((transition) => ({
+          typeId: formValues.stateType,
+          id: transition,
+        }))
+      : undefined,
+    roles:
+      formValues.roles.length > 0
+        ? (formValues.roles as TStateRole[])
+        : undefined,
     initial: formValues.initial,
   };
 };
@@ -82,9 +99,12 @@ export const formValuesToStatePartial = (
     descriptionAllLocales: transformLocalizedStringToLocalizedField(
       omitEmptyTranslations(formValues.description)
     ),
-    transitions: formValues.transitions.map(
-      (transition) => ({ id: transition } as TState)
-    ),
+    transitions: formValues.restrictTransitions
+      ? formValues.transitions.map(
+          (transition) => ({ id: transition } as TState)
+        )
+      : undefined,
+    roles: formValues.roles as TStateRole[],
     initial: formValues.initial,
   };
 };

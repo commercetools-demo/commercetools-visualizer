@@ -112,6 +112,76 @@ const captureUpdate = () => {
   return { calls, handler };
 };
 
+// --- the other Types of the project (for the same-name/same-type check) ---
+
+type Shape = { name: string; referenceTypeId?: string; elementType?: Shape };
+const TYPENAMES: Record<string, string> = {
+  Boolean: 'BooleanType',
+  Date: 'DateType',
+  DateTime: 'DateTimeType',
+  Time: 'TimeType',
+  Money: 'MoneyType',
+  Number: 'NumberType',
+  String: 'StringType',
+  LocalizedString: 'LocalizedStringType',
+  Enum: 'EnumType',
+  LocalizedEnum: 'LocalizedEnumType',
+  Reference: 'ReferenceType',
+  Set: 'SetType',
+};
+const gqlType = (shape: Shape): object => ({
+  __typename: TYPENAMES[shape.name],
+  name: shape.name,
+  ...(shape.referenceTypeId ? { referenceTypeId: shape.referenceTypeId } : {}),
+  ...(shape.elementType ? { elementType: gqlType(shape.elementType) } : {}),
+});
+const typeWithFields = (
+  id: string,
+  key: string,
+  resourceTypeIds: string[],
+  fields: Record<string, Shape> = {}
+) => ({
+  __typename: 'TypeDefinition',
+  id,
+  key,
+  resourceTypeIds,
+  fieldDefinitions: Object.entries(fields).map(([name, type]) => ({
+    __typename: 'FieldDefinition',
+    name,
+    type: gqlType(type),
+  })),
+});
+
+const PROJECT_TYPES = [
+  // the type the field is added to: applies to customers
+  typeWithFields(TEST_TYPE_ID, 'current-type', ['customer']),
+  typeWithFields('type-2', 'other-customer-type', ['customer', 'order'], {
+    color: { name: 'String' },
+    tags: { name: 'Set', elementType: { name: 'String' } },
+    owner: { name: 'Reference', referenceTypeId: 'customer' },
+  }),
+  // applies to orders only, so it is irrelevant for a customer type
+  typeWithFields('type-3', 'order-only-type', ['order'], {
+    weight: { name: 'Number' },
+  }),
+];
+
+const mockProjectTypes = (types: unknown[] = PROJECT_TYPES) =>
+  mockServer.use(
+    graphql.query('FetchTypeFieldTypes', (_req, res, ctx) =>
+      res(
+        ctx.data({
+          typeDefinitions: {
+            __typename: 'TypeDefinitionQueryResult',
+            results: types,
+          },
+        })
+      )
+    )
+  );
+
+beforeEach(() => mockProjectTypes());
+
 const chooseOption = async (triggerName: RegExp, optionName: string) => {
   const trigger = await screen.findByRole('button', { name: triggerName });
   act(() => trigger.focus());
@@ -570,5 +640,124 @@ describe('without the Manage permission', () => {
     expect(
       screen.getByRole('button', { name: /create field definition/i })
     ).toBeDisabled();
+  });
+});
+
+describe('a field name that other Types already use', () => {
+  const conflictText = (typeKey: string, existing: string) =>
+    new RegExp(
+      `already exists on the type "${typeKey}".*with the type ${existing.replace(
+        /[()<>]/g,
+        '\\$&'
+      )}`,
+      'i'
+    );
+
+  it('is rejected when another Type for the same resource type has it with a different type', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(handler);
+    renderApp();
+
+    await fillBasics('color');
+    await chooseType('Number');
+
+    expect(
+      await screen.findByText(conflictText('other-customer-type', 'String'))
+    ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: /create field definition/i })
+    );
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(calls).toHaveLength(0);
+  });
+
+  it('is accepted with the same type', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(handler);
+    renderApp();
+
+    await fillBasics('color');
+    await chooseType('Text');
+    await submit();
+
+    expect((await sentField(calls)).name).toBe('color');
+    expect(
+      screen.queryByText(/already exists on the type/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it('is accepted when only a Type for another resource type has it', async () => {
+    const { calls, handler } = captureUpdate();
+    mockServer.use(handler);
+    renderApp();
+
+    await fillBasics('weight');
+    await chooseType('Text'); // order-only-type has it as a Number, but for orders
+    await submit();
+
+    expect((await sentField(calls)).name).toBe('weight');
+  });
+
+  it('compares a Set by its element type', async () => {
+    renderApp();
+
+    await fillBasics('tags');
+    await chooseType('Text'); // not a Set
+    expect(
+      await screen.findByText(
+        conflictText('other-customer-type', 'Set<String>')
+      )
+    ).toBeInTheDocument();
+
+    await userEvent.click(checkbox(/set/i));
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/already exists on the type/i)
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it('tells a localized text field from a plain one', async () => {
+    renderApp();
+
+    await fillBasics('color');
+    await chooseType('Text');
+    await userEvent.click(checkbox(/localized/i));
+
+    expect(
+      await screen.findByText(conflictText('other-customer-type', 'String'))
+    ).toBeInTheDocument();
+  });
+
+  it('is not flagged before a type has been chosen', async () => {
+    renderApp();
+
+    await fillBasics('color');
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 300));
+    });
+    expect(
+      screen.queryByText(/already exists on the type/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not block creating a field when the other Types could not be loaded (the API still checks)', async () => {
+    mockServer.use(
+      graphql.query('FetchTypeFieldTypes', (_req, res, ctx) =>
+        res(ctx.errors([{ message: 'boom' }]))
+      )
+    );
+    const { calls, handler } = captureUpdate();
+    mockServer.use(handler);
+    renderApp();
+
+    await fillBasics('color');
+    await chooseType('Number');
+    await submit();
+
+    expect((await sentField(calls)).name).toBe('color');
   });
 });

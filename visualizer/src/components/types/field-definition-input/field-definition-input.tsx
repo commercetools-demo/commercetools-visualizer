@@ -27,6 +27,12 @@ import { Item } from '../field-definition-input-for-enum/constants';
 import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
+import {
+  FieldNameConflict,
+  TypeWithFieldTypes,
+  findFieldNameConflict,
+  signatureFromFormValues,
+} from './name-conflicts';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
 import keyInputMessages from '../../shared/key-input-error/messages';
 
@@ -46,7 +52,12 @@ const fieldTypeOptions: Array<{
 ];
 
 type TErrors = {
-  name: { missing?: boolean; invalidInput?: boolean };
+  name: {
+    missing?: boolean;
+    invalidInput?: boolean;
+    // another Type for the same resource type has a field of this name with another type
+    typeConflict?: FieldNameConflict;
+  };
   label: { missing?: boolean };
   typeName: { missing?: boolean };
   referenceTypeId: { missing?: boolean };
@@ -69,16 +80,35 @@ type Props = {
   initialValues: TFormValues;
   dataLocale: string;
   createNewMode?: boolean;
+  // When adding a field: the Type it is added to and all Types, to check that a field of the
+  // same name on another Type for the same resource type has the same type.
+  nameConflictContext?: {
+    typeId: string;
+    types: ReadonlyArray<TypeWithFieldTypes>;
+  };
   children: (formProps: FormProps) => JSX.Element;
 };
 
-const validate = (formikValues: TFormValues): FormikErrors<TFormValues> => {
+const validate = (
+  formikValues: TFormValues,
+  nameConflictContext: Props['nameConflictContext']
+): FormikErrors<TFormValues> => {
   const errors: TErrors = {
     name: validateKey(formikValues.name),
     label: {},
     typeName: {},
     referenceTypeId: {},
   };
+
+  if (nameConflictContext && Object.keys(errors.name).length === 0) {
+    const conflict = findFieldNameConflict({
+      typeId: nameConflictContext.typeId,
+      fieldName: formikValues.name.trim(),
+      signature: signatureFromFormValues(formikValues),
+      types: nameConflictContext.types,
+    });
+    if (conflict) errors.name.typeConflict = conflict;
+  }
 
   if (LocalizedField.isEmpty(formikValues.label)) {
     errors.label.missing = true;
@@ -98,11 +128,12 @@ const FieldDefinitionInput: FC<Props> = ({
   onSubmit,
   dataLocale,
   createNewMode = false,
+  nameConflictContext,
 }) => {
   const formik = useFormik<TFormValues>({
     initialValues: initialValues,
     onSubmit: onSubmit,
-    validate,
+    validate: (values) => validate(values, nameConflictContext),
     enableReinitialize: true,
   });
   const intl = useIntl();
@@ -193,6 +224,15 @@ const FieldDefinitionInput: FC<Props> = ({
               </FormField.Description>
               <FormField.Error>
                 <KeyInputError error={errors.name} resourceType="field" />
+                {errors.name?.typeConflict && (
+                  <Text color="critical.11">
+                    {intl.formatMessage(messages.nameTypeConflict, {
+                      name: formik.values.name.trim(),
+                      typeKey: errors.name.typeConflict.typeKey,
+                      existingType: errors.name.typeConflict.existingType,
+                    })}
+                  </Text>
+                )}
               </FormField.Error>
             </FormField.Root>
 
@@ -335,7 +375,7 @@ const FieldDefinitionInput: FC<Props> = ({
             {formik.values.typeName === 'String' && (
               <Checkbox
                 isSelected={formik.values.isMultiLine}
-                isDisabled={isImmutable}
+                isReadOnly={!canManage}
                 onChange={(value) => formik.setFieldValue('isMultiLine', value)}
                 width={'full'}
               >

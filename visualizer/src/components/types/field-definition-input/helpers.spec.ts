@@ -152,6 +152,7 @@ describe('toPickedFieldDefinition', () => {
     expect(toPickedFieldDefinition(input)).toEqual({
       name: 'myField',
       labelAllLocales: [{ locale: 'en', value: 'My field' }],
+      inputHint: 'SingleLine',
       type: { name: 'Enum', values: [{ key: 'a', label: 'A' }] },
     });
   });

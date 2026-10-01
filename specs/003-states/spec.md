@@ -2,7 +2,10 @@
 
 **Status:** Extracted from existing implementation
 **Domain:** commercetools `State` (finite state machines)
-**Spec version:** 1.0 (2026-06-25)
+**Spec version:** 1.1 (2026-10-01) — fixes how transitions are sent (unset ≠ empty), adds
+`RecurringOrderState` (9 state types), the roles field, and the built-in state restrictions; the
+spec now matches the code for the create default and for which fields are editable. 1.0
+(2026-06-25): initial extraction.
 
 > Shared conventions are in [../README.md](../README.md).
 
@@ -43,24 +46,41 @@ feature provides CRUD plus an interactive transition graph for each state type.
 
 ### Create
 
-- **FR-004** Create a state with defaults: `initial = true`, empty key, empty localized
-  name/description, no transitions, and `stateType` = the active type. Fields: **Key**
-  (required, shared key rule); **State type** (required); **Initial** (boolean); **Transitions**
-  (multi-select of same-type states); **Name** and **Description** (localized, optional).
+- **FR-004** Create a state with defaults: `initial = false`, empty key, empty localized
+  name/description, transitions **not restricted** (see FR-004a), no roles, and `stateType` =
+  the active type. Fields: **Key** (required, shared key rule); **State type** (required, one
+  of the 9 `StateTypeEnum` values); **Initial** (boolean); **Transitions** (FR-004a);
+  **Roles** (FR-004b); **Name** and **Description** (localized, optional).
+- **FR-004a — Transitions have three states.** The API distinguishes *unset* (validation off:
+  the state may move to any state of its type), an *empty list* (a final state: no transition
+  allowed) and a *list*. A checkbox **"Only allow transitions to the selected states"** (off by
+  default) chooses between "unset" and "list"; the multi-select of same-type states is enabled
+  only when it is on, and with it on and nothing selected the state is final. Turning it off on
+  a state that had transitions sends `setTransitions` without `transitions`. A state whose
+  transitions are unset must **never** be sent `transitions: []` just because something else
+  changed (that used to make it a dead end).
+- **FR-004b — Roles.** A state can have roles: `Return` (only `LineItemState`, used by orders'
+  line-item transitions) and `ReviewIncludedInStatistics` (only `ReviewState`). The form lists
+  only the roles that apply to the selected type, and drops a role when the type is changed to
+  one it doesn't apply to. Saved with `addRoles` / `removeRoles` (create sends `roles`).
 - **FR-005** On save, build a State draft (type, trimmed key, localized name/description with
-  empty translations omitted, transitions as references `{ typeId: stateType, id }`, initial).
-  `roles` is not editable via the form. On success show a created notification and navigate
+  empty translations omitted, transitions as references `{ typeId: stateType, id }` only when
+  restricted, roles when any, initial). On success show a created notification and navigate
   to the new state's edit view.
 
 ### Edit & delete
 
-- **FR-006** In edit, Key and State type are read-only; Initial, Transitions, Name, and
-  Description are editable. The transitions multi-select lists other states of the same type
+- **FR-006** In edit, a state that is **not built in** can change everything: Key and State type
+  (saved with `changeKey` / `changeType`), Initial, Transitions, Roles, Name and Description.
+  A **built-in** state (`builtIn`, e.g. the Line Item states every project has) has a read-only
+  Key and State type — the select is really disabled — and shows a note saying it can't be
+  deleted. The transitions multi-select lists other states of the same type
   (excludes the current state). Save computes update actions and calls update only if at
   least one action results; on success show an updated notification and refetch.
 - **FR-007** Revert resets the form to loaded values (disabled when pristine).
 - **FR-008** Delete removes the state (no confirmation dialog) and returns to the list; show
-  a deleted notification.
+  a deleted notification. The button is **disabled for built-in states**, which the API does not
+  allow to be deleted.
 
 ## 4. Views & navigation
 
@@ -84,20 +104,23 @@ and full-width Name and Description.
 
 - **No transition-graph validation** — self-transitions, multiple initial states, cycles,
   unreachable states, and deadlocks are not prevented by the UI (the API may reject some).
-- Key and State type are immutable after creation (fields disabled in edit).
-- `roles` (Return, ReviewIncludedInStatistics) exist on the entity but are **not editable** in the UI.
-- Built-in (system) states are visible; form editability is constrained by the `builtIn` flag.
+- Key and State type are editable for states that are not built in (the API has `changeKey` and
+  `changeType`); built-in states keep them read-only.
+- Whether the API returns `null` or `[]` for unset transitions is assumed to be `null`; if it
+  returned `[]` such a state would show as "restricted to none" (but a save would still not
+  change it).
+- Built-in (system) states are visible; they can't be deleted and keep key and type.
 - No pagination (capped at 100 per type), no search; filtering is only by the type tabs.
 - The transition graph has a fixed height; very large state machines are hard to read.
 
 ## 7. Out of scope / non-goals
 
-- Editing key/type after creation; editing roles; bulk operations.
+- Bulk operations.
 
 ## Review checklist
 
-- [ ] All 8 state types covered (see data-model)
+- [ ] All 9 state types covered (see data-model)
 - [ ] Initial flag and transitions semantics captured
 - [ ] Graph interaction (node click; fixed top-to-bottom layout) captured
-- [ ] Immutability (key, type) and non-editable roles stated
+- [ ] Built-in restrictions (key, type, delete) and role rules per type stated
 - [ ] Update-action mapping present in `data-model.md`

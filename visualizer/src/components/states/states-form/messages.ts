@@ -30,7 +30,40 @@ export default defineMessages({
     id: 'State.form.transitions.hint',
     description: 'Hint for the transitions field',
     defaultMessage:
-      'The states this state is allowed to move to. Leave empty to make this a final state (no further transitions). This is one-directional — add this state to the other state as well if you need a two-way transition.',
+      'The states of the same type this state is allowed to move to. With none selected it is a final state (no further transitions). This is one-directional — add this state to the other state as well if you need a two-way transition.',
+  },
+  restrictTransitions: {
+    id: 'State.form.transitions.restrict',
+    description: 'Checkbox restricting the transitions to the selected states',
+    defaultMessage:
+      'Only allow transitions to the selected states (when off, any state of the same type is allowed)',
+  },
+  rolesTitle: {
+    id: 'State.form.roles.title',
+    description: 'Title for the roles field',
+    defaultMessage: 'Roles',
+  },
+  rolesHint: {
+    id: 'State.form.roles.hint',
+    description: 'Explains the roles of a state',
+    defaultMessage:
+      'Roles the state can fulfil. Which roles are available depends on the state type.',
+  },
+  roleReturn: {
+    id: 'State.form.roles.Return',
+    description: 'The Return role of a line item state',
+    defaultMessage: 'Return (used by orders when transitioning line items)',
+  },
+  roleReviewIncludedInStatistics: {
+    id: 'State.form.roles.ReviewIncludedInStatistics',
+    description: 'The ReviewIncludedInStatistics role of a review state',
+    defaultMessage: "Review's rating counts towards the rating statistics",
+  },
+  builtInNote: {
+    id: 'State.form.builtIn.note',
+    description: 'Shown for built-in states',
+    defaultMessage:
+      "This is a built-in state: its key can't be changed and it can't be deleted.",
   },
   initialTitle: {
     id: 'State.form.initial.title',

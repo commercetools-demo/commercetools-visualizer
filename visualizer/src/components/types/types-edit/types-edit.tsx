@@ -22,6 +22,7 @@ import formMessages from '../types-form/messages';
 
 import messages from './messages';
 import {
+  calculateFieldDefinitionOrderActions,
   calculateFieldDefinitionRemovals,
   calculateTypeDefinitionUpdateActions,
   getErrorMessage,
@@ -63,6 +64,10 @@ const TypesEdit: FC<Props> = ({ linkToHome, onClose }) => {
       if (typeDefinition) {
         const updateActions = [
           ...calculateFieldDefinitionRemovals(
+            typeDefinition.fieldDefinitions,
+            formikValues.fieldDefinitions
+          ),
+          ...calculateFieldDefinitionOrderActions(
             typeDefinition.fieldDefinitions,
             formikValues.fieldDefinitions
           ),

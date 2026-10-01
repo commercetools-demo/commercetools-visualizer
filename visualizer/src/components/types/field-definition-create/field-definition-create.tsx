@@ -14,7 +14,11 @@ import {
   initialValuesFromFieldDefinition,
   TFormValues,
 } from '../field-definition-input/helpers';
-import { graphQLErrorHandler, useTypeDefinitionUpdater } from '../../../hooks';
+import {
+  graphQLErrorHandler,
+  useTypeDefinitionUpdater,
+  useTypeFieldTypes,
+} from '../../../hooks';
 import { FormikHelpers } from 'formik';
 
 type Props = {
@@ -33,6 +37,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
 
   const showNotification = useShowNotification();
   const typeDefinitionUpdater = useTypeDefinitionUpdater();
+  const { types } = useTypeFieldTypes();
   const { dataLocale, projectLanguages } = useApplicationContext((context) => ({
     dataLocale: context.dataLocale ?? '',
     projectLanguages: context.project?.languages ?? [],
@@ -73,6 +78,7 @@ const FieldDefinitionCreate: FC<Props> = ({ onClose }) => {
       onSubmit={handleSubmit}
       createNewMode={true}
       dataLocale={dataLocale}
+      nameConflictContext={types ? { typeId: id, types } : undefined}
     >
       {(formProps) => (
         <ModalPage.Root isOpen onClose={onClose}>

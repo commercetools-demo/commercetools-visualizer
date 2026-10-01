@@ -15,7 +15,9 @@ const formValues = (overrides: Partial<TFormValues> = {}): TFormValues => ({
   key: 'my-state',
   name: { en: 'Name', de: '' },
   description: { en: '', de: '' },
+  restrictTransitions: true,
   transitions: ['t1', 't2'],
+  roles: [],
   ...overrides,
 });
 
@@ -30,7 +32,9 @@ describe('stateToFormValues', () => {
       key: '',
       name: { en: '', de: '' },
       description: { en: '', de: '' },
+      restrictTransitions: false,
       transitions: [],
+      roles: [],
     });
   });
 
@@ -56,7 +60,9 @@ describe('stateToFormValues', () => {
       key: 'k1',
       name: { en: 'Hello', de: '' },
       description: { en: '', de: 'Beschreibung' },
+      restrictTransitions: true,
       transitions: ['x', 'y'],
+      roles: [],
     });
   });
 
@@ -135,5 +141,95 @@ describe('formValuesToStatePartial', () => {
     );
     expect(partial.type).toBe('ReviewState');
     expect(partial.initial).toBe(false);
+  });
+});
+
+describe('transitions: unset (any) vs empty (final) vs listed', () => {
+  const stateWith = (transitions: unknown): Partial<TState> =>
+    ({
+      id: 's1',
+      key: 'k',
+      type: 'OrderState',
+      transitions,
+    } as Partial<TState>);
+
+  it.each([
+    ['unset (null)', null, false],
+    ['unset (undefined)', undefined, false],
+    ['empty list = a final state', [], true],
+    ['a list', [{ id: 'x' }], true],
+  ])('shows %s as restrictTransitions=%p', (_name, transitions, restricted) => {
+    expect(
+      stateToFormValues(languages, stateWith(transitions)).restrictTransitions
+    ).toBe(restricted);
+  });
+
+  it('a new state does not restrict transitions by default', () => {
+    expect(stateToFormValues(languages).restrictTransitions).toBe(false);
+  });
+
+  describe('when not restricted', () => {
+    const unrestricted = formValues({
+      restrictTransitions: false,
+      transitions: ['stale'],
+    });
+
+    it('leaves transitions out of the create draft, ignoring a stale selection', () => {
+      expect(formValuesToState(unrestricted).transitions).toBeUndefined();
+    });
+
+    it('leaves transitions out of the diffed shape', () => {
+      expect(
+        formValuesToStatePartial(unrestricted).transitions
+      ).toBeUndefined();
+    });
+  });
+
+  describe('when restricted', () => {
+    it('sends an empty list for none selected (a final state)', () => {
+      const restricted = formValues({
+        restrictTransitions: true,
+        transitions: [],
+      });
+      expect(formValuesToState(restricted).transitions).toEqual([]);
+      expect(formValuesToStatePartial(restricted).transitions).toEqual([]);
+    });
+
+    it('sends the selected ones', () => {
+      const restricted = formValues({
+        restrictTransitions: true,
+        transitions: ['t1'],
+      });
+      expect(formValuesToState(restricted).transitions).toEqual([
+        { typeId: 'LineItemState', id: 't1' },
+      ]);
+      expect(formValuesToStatePartial(restricted).transitions).toEqual([
+        { id: 't1' },
+      ]);
+    });
+  });
+});
+
+describe('roles', () => {
+  it('maps the fetched roles into the form, defaulting to none', () => {
+    expect(
+      stateToFormValues(languages, {
+        roles: ['Return'],
+      } as unknown as Partial<TState>).roles
+    ).toEqual(['Return']);
+    expect(stateToFormValues(languages, {}).roles).toEqual([]);
+  });
+
+  it('sends the roles in the create draft, and none when there are none', () => {
+    expect(formValuesToState(formValues({ roles: ['Return'] })).roles).toEqual([
+      'Return',
+    ]);
+    expect(formValuesToState(formValues({ roles: [] })).roles).toBeUndefined();
+  });
+
+  it('carries the roles into the diffed shape', () => {
+    expect(
+      formValuesToStatePartial(formValues({ roles: ['Return'] })).roles
+    ).toEqual(['Return']);
   });
 });

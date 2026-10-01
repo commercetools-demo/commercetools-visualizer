@@ -173,6 +173,7 @@ export const toPickedFieldDefinition = (
   return {
     name: input.name,
     labelAllLocales: input.label,
+    inputHint: input.inputHint ?? undefined,
     type,
   };
 };

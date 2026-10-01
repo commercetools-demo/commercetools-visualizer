@@ -121,6 +121,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
       initialValues={stateToFormValues(projectLanguages, state)}
       onSubmit={handleSubmit}
       createNewMode={!(state?.builtIn && state?.builtIn === true)}
+      isBuiltIn={Boolean(state?.builtIn)}
     >
       {(formProps) => (
         <ModalPage.Root isOpen onClose={onClose}>
@@ -158,7 +159,7 @@ const StatesEdit: FC<Props> = ({ onClose }) => {
             <Button
               colorPalette="critical"
               variant="outline"
-              isDisabled={!canManage}
+              isDisabled={!canManage || Boolean(state?.builtIn)}
               onPress={() => handleDelete()}
             >
               {intl.formatMessage(formMessages.deleteButton)}

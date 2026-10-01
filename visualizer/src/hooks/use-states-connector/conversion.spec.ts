@@ -19,6 +19,7 @@ describe('convertTStateToState', () => {
       description: { en: 'Description' },
       initial: true,
       transitions: [{ typeId: 'state', id: 'other-state-id' }],
+      roles: [],
     });
   });
 

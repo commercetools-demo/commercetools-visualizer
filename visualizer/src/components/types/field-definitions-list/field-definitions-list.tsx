@@ -15,7 +15,14 @@ import {
   Text,
   type DataTableColumnItem,
 } from '@commercetools/nimbus';
-import { Add, Check, Close, Delete } from '@commercetools/nimbus-icons';
+import {
+  Add,
+  ArrowDownward,
+  ArrowUpward,
+  Check,
+  Close,
+  Delete,
+} from '@commercetools/nimbus-icons';
 import {
   TFieldDefinition,
   TQuery,
@@ -39,6 +46,8 @@ type Props = {
   value: Array<TFieldDefinition>;
   linkToHome: string;
   onRemoveFieldDefinition: (name: string) => void;
+  // Moves a field one position; the new order is staged in the type form until Save.
+  onMoveFieldDefinition?: (name: string, direction: 'up' | 'down') => void;
   refetch?: (
     variables?: Partial<TQuery_TypeDefinitionArgs> | undefined
   ) => Promise<ApolloQueryResult<TQuery>>;
@@ -64,6 +73,7 @@ const FieldDefinitionsList: FC<Props> = ({
   linkToHome,
   version,
   onRemoveFieldDefinition,
+  onMoveFieldDefinition,
 }) => {
   const intl = useIntl();
   const match = useRouteMatch();
@@ -118,6 +128,44 @@ const FieldDefinitionsList: FC<Props> = ({
         <BooleanCell value={row.type?.name === 'Set'} intl={intl} />
       ),
     },
+    ...(onMoveFieldDefinition
+      ? [
+          {
+            id: 'move',
+            header: '',
+            isSortable: false,
+            accessor: (row: TFieldDefinitionWithId) => {
+              const index = Number(row.id);
+              return (
+                <Flex gap="100">
+                  <IconButton
+                    aria-label={intl.formatMessage(messages.moveFieldUp, {
+                      name: row.name,
+                    })}
+                    size="xs"
+                    variant="ghost"
+                    isDisabled={!canManage || index === 0}
+                    onPress={() => onMoveFieldDefinition(row.name, 'up')}
+                  >
+                    <ArrowUpward />
+                  </IconButton>
+                  <IconButton
+                    aria-label={intl.formatMessage(messages.moveFieldDown, {
+                      name: row.name,
+                    })}
+                    size="xs"
+                    variant="ghost"
+                    isDisabled={!canManage || index === fields.length - 1}
+                    onPress={() => onMoveFieldDefinition(row.name, 'down')}
+                  >
+                    <ArrowDownward />
+                  </IconButton>
+                </Flex>
+              );
+            },
+          },
+        ]
+      : []),
     {
       id: 'delete',
       header: '',

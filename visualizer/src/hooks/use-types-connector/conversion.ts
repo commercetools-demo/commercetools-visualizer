@@ -10,7 +10,7 @@ import { transformLocalizedFieldToLocalizedString } from '../shared/graphql-help
 
 type PickedFieldType = TFieldType;
 export type PickedFieldDefinition = Partial<
-  Pick<TFieldDefinition, 'labelAllLocales' | 'name'>
+  Pick<TFieldDefinition, 'labelAllLocales' | 'name' | 'inputHint'>
 > & {
   type: PickedFieldType;
 };
@@ -37,6 +37,8 @@ const mapFieldType = (
   const base = {
     name: item.name,
     label: transformLocalizedFieldToLocalizedString(item.labelAllLocales),
+    // The text input hint (`SingleLine` | `MultiLine`) can be changed after creation.
+    inputHint: item.inputHint as FieldDefinition['inputHint'],
   };
   if (item.type.name === 'LocalizedEnum') {
     const type = item.type as TLocalizedEnumType;

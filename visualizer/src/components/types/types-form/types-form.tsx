@@ -24,6 +24,7 @@ import { useIsAuthorized } from '@commercetools-frontend/permissions';
 import messages from './messages';
 import { RESOURCE_TYPES } from './constants';
 import FieldDefinitionsList from '../field-definitions-list/field-definitions-list';
+import { Direction, moveFieldDefinition } from './field-definition-order';
 import { PERMISSIONS } from '../../../constants';
 import { validateKey } from '../../../utils/validate-key';
 import KeyInputError from '../../shared/key-input-error/key-input-error';
@@ -112,6 +113,13 @@ const TypesForm: FC<Props> = ({
   const canManage = useIsAuthorized({
     demandedPermissions: [PERMISSIONS.Manage],
   });
+
+  const handleMoveFieldDefinition = (name: string, direction: Direction) => {
+    formik.setFieldValue(
+      'fieldDefinitions',
+      moveFieldDefinition(formik.values.fieldDefinitions, name, direction)
+    );
+  };
 
   const handleRemoveFieldDefinition = (name: string) => {
     formik.setFieldValue(
@@ -256,6 +264,7 @@ const TypesForm: FC<Props> = ({
             linkToHome={linkToHome}
             refetch={refetch}
             onRemoveFieldDefinition={handleRemoveFieldDefinition}
+            onMoveFieldDefinition={handleMoveFieldDefinition}
           />
         )}
       </PageContent.Root>

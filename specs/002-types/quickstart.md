@@ -61,6 +61,7 @@ the call. Map (see the contract header for exact payloads):
 - Description changed → `setDescription` (omit/empty array clears it)
 - Field-definition **label** changed → `changeLabel { fieldName, label }`
 - Field-definition **inputHint** changed → `changeInputHint { fieldName, inputHint }`
+- Field definitions **moved** → `changeFieldDefinitionOrder { fieldNames }` (remaining names, after removals)
 - Enum value added → `addEnumValue` / `addLocalizedEnumValue`
 - Enum value label changed → `changeEnumValueLabel` / `changeLocalizedEnumValueLabel`
 

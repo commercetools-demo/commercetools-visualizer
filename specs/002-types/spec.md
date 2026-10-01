@@ -65,8 +65,8 @@ types, date/time variants, enums (plain and localized), references, and `Set` co
   added to the Type (single update action) and a success notification is shown.
 - **FR-008** Edit a field definition: **Name** and **Type** are immutable (read-only). Label,
   input hint, and enum values (add, edit, remove, and reorder) are editable and persist via
-  field-specific update actions. **Required** is shown but **cannot be persisted on an
-  existing field** — see §6. `Set` and reference type are fixed once the field exists.
+  field-specific update actions. **Required** is shown with the field's stored value but
+  **cannot be persisted on an existing field** — see §6. `Set` and reference type are fixed once the field exists.
 - **FR-009** Delete a field definition: removal is staged in the Type form like any other
   edit (Name, Description, etc.) — it only takes effect when the Type-level Save is pressed,
   and can be undone with Revert until then.
@@ -84,7 +84,9 @@ types, date/time variants, enums (plain and localized), references, and `Set` co
   LocalizedEnum). Add a row via an add control; remove a row (disabled when only one row
   remains) — this applies to persisted values too, not just unsaved rows. Empty-key rows are
   filtered out on persist. For LocalizedEnum, languages shown = project languages first, then
-  any additional languages already present in existing values.
+  any additional languages already present in existing values. Each row's remove control is
+  labelled "Remove List Item". Typing in a Key/Label input never moves focus to another row
+  (the list's type-ahead is disabled).
 - **FR-014** **Reference** — requires a **Reference type ID** chosen from a predefined list;
   immutable after creation.
 - **FR-015** **Set** — a checkbox that wraps the selected element type in a `Set`. Immutable
@@ -121,8 +123,9 @@ The field-definition list and enum value editor render inline within the Type ed
   into `changeEnumValueOrder`/`changeLocalizedEnumValueOrder` — see data-model.md.
 - **A field definition's `required` flag cannot be changed after creation** — the commercetools
   API exposes no such update action (confirmed against the schema). It is only settable at field
-  creation via `FieldDefinitionInput.required`. The edit form may surface the toggle, but a
-  change to it will not persist; treat `required` as immutable post-creation.
+  creation via `FieldDefinitionInput.required`. The edit form loads the stored value into the
+  toggle (so a required field shows as checked), but a change to it will not persist; treat
+  `required` as immutable post-creation.
 - Key, Type (of a field), Reference type, and Set/element type are immutable after creation.
 - Empty localized translations are omitted on persist.
 - Localized display falls back from `dataLocale` to other project languages, then to key/id.

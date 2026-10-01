@@ -1,5 +1,5 @@
 # commercetools Visualizer
-The commercetools Visualizer is a [custom application](https://docs.commercetools.com/merchant-center-customizations/custom-applications) related to non-standard types within the commercetools Merchant Center. It supports rendering various elements like Subscriptions, API Extensions, Types, States, Shopping Lists and Carts.
+The commercetools Visualizer is a [custom application](https://docs.commercetools.com/merchant-center-customizations/custom-applications) related to non-standard types within the commercetools Merchant Center. It supports rendering and editing Subscriptions, API Extensions, Types, States and Custom Objects.
 
 ## Introduction
 
@@ -22,27 +22,27 @@ The commercetools Visualizer is pre-packaged to run as a connect application. Fo
 ### API Extensions
 
 List View
-![Types-List.jpg](./visualizer/docs/Extensions-List.jpg)
+![Extensions-List.jpg](./visualizer/docs/Extensions-List.jpg)
 New View
-![Types-New.jpg](./visualizer/docs/Extensions-New.jpg)
+![Extensions-New.jpg](./visualizer/docs/Extensions-New.jpg)
 
 ### States
 
 List View
-![Types-List.jpg](./visualizer/docs/States-List.jpg)
+![States-List.jpg](./visualizer/docs/States-List.jpg)
 Detail View
-![Types-Details.jpg](./visualizer/docs/States-Details.jpg)
+![States-Details.jpg](./visualizer/docs/States-Details.jpg)
 New View
-![Types-New.jpg](./visualizer/docs/States-New.jpg)
+![States-New.jpg](./visualizer/docs/States-New.jpg)
 
 ### Subscriptions
 
 List View
-![Types-List.jpg](./visualizer/docs/Subscriptions-List.jpg)
+![Subscriptions-List.jpg](./visualizer/docs/Subscriptions-List.jpg)
 Detail View
-![Types-Details.jpg](./visualizer/docs/Subscriptions-Details.jpg)
+![Subscriptions-Details.jpg](./visualizer/docs/Subscriptions-Details.jpg)
 New View
-![Types-New.jpg](./visualizer/docs/Subscriptions-New.jpg)
+![Subscriptions-New.jpg](./visualizer/docs/Subscriptions-New.jpg)
 
 ### Types
 
@@ -82,5 +82,16 @@ The code has been built successfully using
 * npm 10.9.2
 
 ## Known issues
- - On Subscriptions:
-   - AWS EventBridge, SNS, Azure are currently not supported
+ - On Types: a field definition's `required` flag can only be set when the field is created; the commercetools API has no update action for it, so changing it on an existing field has no effect.
+ - On Subscriptions: the subscription `format` (Platform / CloudEvents) and `status` are not exposed.
+
+## Development
+
+```shell
+cd ./visualizer
+npm test            # jest
+npm run typecheck   # tsc --noEmit
+npm run lint
+```
+
+The docs screenshots can be regenerated with the Playwright scripts in [visualizer/scripts/screenshots](./visualizer/scripts/screenshots).

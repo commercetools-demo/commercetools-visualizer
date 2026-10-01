@@ -111,7 +111,12 @@ which action buttons are shown.
   for each type must match the commercetools API's own discriminator string exactly (e.g.
   Azure Event Grid's is `EventGrid`, not `AzureEventGrid`) — a mismatch there silently
   falls through to the "No mapping defined" placeholder for that type, even though its
-  label displays correctly.
+  label displays correctly. The list's Destination Type column resolves its label by message
+  key, which for `EventBridge` (`destinationAWSEventBridge`) and `EventGrid`
+  (`destinationAzureEventGrid`) differs from the plain `destination<Type>` pattern, so those
+  two are mapped explicitly; an unknown type falls back to the raw API string.
+- With no destination type selected, the destination section shows a "No mapping defined so
+  far for" placeholder with an empty type name (known cosmetic gap).
 - **Subscription `format`** (Platform vs CloudEvents) is not exposed; defaults to Platform.
 - **Subscription `status`** (Healthy / ConfigurationError / TemporaryError / ManuallySuspended
   / ConfigurationErrorDeliveryStopped) is on the entity but not surfaced in list or detail.

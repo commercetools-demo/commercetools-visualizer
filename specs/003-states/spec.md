@@ -17,7 +17,7 @@ feature provides CRUD plus an interactive transition graph for each state type.
 
 - As a merchant, I can view all states grouped by resource type via tabs, with a count per type.
 - As a merchant, I can see the transitions of a state type as an interactive directed graph
-  and toggle the graph between vertical and horizontal layouts.
+  (laid out top-to-bottom).
 - As a merchant, I can click a state node in the graph to open that state's detail view.
 - As a merchant, I can create a state by choosing a state type, entering a unique key, and
   optionally setting a localized name and description.
@@ -36,8 +36,8 @@ feature provides CRUD plus an interactive transition graph for each state type.
 - **FR-002** For the active type, render an interactive transition graph: one node per state
   labelled by localized name (fallback chain → key); states with `initial=true` styled as
   entry nodes; states with no outgoing transitions styled as terminal nodes; animated
-  directed edges to each transition target. A control toggles layout direction
-  (vertical ⇄ horizontal). Clicking a node navigates to that state's detail view.
+  directed edges to each transition target. The layout is fixed top-to-bottom (there is no
+  layout-direction toggle). Clicking a node navigates to that state's detail view.
 - **FR-003** "Add New State" in the header is disabled without Manage; it opens the create
   view with the state type pre-selected from the active tab.
 
@@ -98,6 +98,6 @@ and full-width Name and Description.
 
 - [ ] All 8 state types covered (see data-model)
 - [ ] Initial flag and transitions semantics captured
-- [ ] Graph interaction (layout toggle, node click) captured
+- [ ] Graph interaction (node click; fixed top-to-bottom layout) captured
 - [ ] Immutability (key, type) and non-editable roles stated
 - [ ] Update-action mapping present in `data-model.md`

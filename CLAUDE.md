@@ -130,7 +130,10 @@ producing `removeEnumValues`/`removeLocalizedEnumValues`. `calculateFieldDefinit
 (`use-types-connector/types-connector.ts`) works around this with its own
 `calculateEnumValueRemovals`, diffing by key and prepending the result before the
 sync-actions-produced actions (removal must apply before any `changeEnumValueOrder`,
-since that action's `keys` must match the *current* value set). Before assuming a
+since that action's `keys` must match the *current* value set). The remaining actions are
+then diffed against the field *with those removed values already filtered out*
+(`withoutRemovedEnumValues`), because sync-actions pairs enum values by position and would
+otherwise report every value after a removed one as a bogus `addEnumValue`. Before assuming a
 change will be picked up automatically, check the installed `sync-actions` version's
 source for the relevant `actionsMap*` function rather than just the target schema.
 
@@ -163,4 +166,30 @@ before assuming a cross-cutting behavior is a one-off.
   `graphql.mutation`) rather than mocking the connector hooks — see any
   `*.spec.tsx` next to a `*-page.tsx`/`*-edit.tsx` for the pattern
   (`renderAppWithRedux` + `NimbusProvider` wrapper, `onUnhandledRequest: 'error'` to
-  catch un-mocked queries).
+  catch un-mocked queries). Capture mutation variables inside the handler (cast
+  `req.variables` to the expected shape) and assert on the update actions sent.
+- Mock Types data with `@commercetools-test-data/type` through the wrappers in
+  `src/test-utils/models/types/` (`buildTypeDefinition`, `buildFieldDefinition`,
+  `simpleFieldType`/`enumFieldType`/`localizedEnumFieldType`/`referenceFieldType`/
+  `setFieldType`). Nested fields must be passed to the builders as **builders**, not as
+  built objects (`buildGraphql` on a built value throws "Builder … does not exist on field"),
+  and `random()` adds extra random locales — to test a diff, `JSON.parse(JSON.stringify())`
+  a built value and mutate the clone instead of building two independent ones. Only the
+  `type`, `channel`, `core` and `commons` test-data packages are installed; other features
+  use hand-written fixtures (subscriptions have their own builders in
+  `src/test-utils/models/subscriptions/`).
+- Pure logic (conversions, `calculate*UpdateActions`, column definitions via
+  `createIntl`, `graphQLErrorHandler`) has plain unit specs next to the source file.
+- Nimbus injects a theme-bootstrapping `<script>` into the render container, so assert on
+  text via `screen`, not `container.textContent`.
+
+### Docs screenshots
+
+`visualizer/scripts/screenshots/` (its own npm project, Playwright) regenerates
+`visualizer/docs/*` used by the README. `npm run login` (headed, manual MC login) saves a
+gitignored `auth-state.json`; `npm run capture` then needs the dev server on port 3001 and
+real data in the target project. `capture.mjs` launches Chromium with
+`--disable-features=ViewTransition,ViewTransitionOnNavigation` — without it the app's
+startup View Transition stalls frame production and every `page.screenshot()` times out.
+`~/.commercetools/mc-credentials.json` (an API token used for codegen) is unrelated to
+`auth-state.json` (a browser session) and cannot replace it.

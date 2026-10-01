@@ -72,7 +72,6 @@ Full-page view for the active type:
     outgoing transitions styled as **terminal** nodes.
   - **Animated directed edges** from each state to each of its transition
     targets.
-  - A **layout-direction toggle** (vertical ⇄ horizontal).
   - **Clicking a node** navigates to that state's edit view (`/states/:id`).
 - Show a loading indicator while fetching and an error notification on failure
   (README §7).
@@ -124,7 +123,7 @@ All per [../README.md](../README.md):
 - [ ] `/states` redirects to the first type with states; tabs show per-type
       counts.
 - [ ] Transition graph renders nodes (entry/terminal styling), animated edges,
-      a vertical⇄horizontal toggle, and node-click → edit view.
+      and node-click → edit view (layout is fixed top-to-bottom).
 - [ ] Create defaults: `initial = true`, type = active tab, empty fields.
 - [ ] Key validation (2–256, pattern, trimmed) and required State type enforced.
 - [ ] Edit: Key and State type read-only; transitions exclude the current state.

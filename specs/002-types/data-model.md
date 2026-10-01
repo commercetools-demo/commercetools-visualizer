@@ -115,7 +115,7 @@ Via `commercetools-demo-shared-data-fetching-hooks` (`useTypeDefinitionUpdater`,
 | Field input hint | `changeInputHint { fieldName, inputHint }` |
 | Add enum value | `addEnumValue { fieldName, value }` (enum) / `addLocalizedEnumValue` (localized) |
 | Change enum label | `changeEnumValueLabel` (enum) / `changeLocalizedEnumValueLabel` (localized) |
-| Remove enum value | `removeEnumValues { fieldName, keys }` (enum) / `removeLocalizedEnumValues` (localized) — diffed client-side, since `@commercetools/sync-actions` never emits this action on its own |
+| Remove enum value | `removeEnumValues { fieldName, keys }` (enum) / `removeLocalizedEnumValues` (localized) — diffed client-side, since `@commercetools/sync-actions` never emits this action on its own. The remaining update actions are then diffed against the field *after* that removal, otherwise sync-actions pairs values by position and reports every value after the removed one as a new `addEnumValue`/`addLocalizedEnumValue` for a key that already exists |
 | Reorder enum values | `changeEnumValueOrder { fieldName, keys }` (enum) / `changeLocalizedEnumValueOrder` (localized) — driven by drag-and-drop in the enum value editor |
 
 > Action names verified against the commercetools schema (see `contracts/types.graphql`).

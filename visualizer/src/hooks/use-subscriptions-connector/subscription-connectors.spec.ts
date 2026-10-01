@@ -155,4 +155,66 @@ describe('calculateSubscriptionUpdateActions', () => {
       },
     });
   });
+
+  it('sees no change for an EventGrid draft built from the form (accessKey) vs the fetched one (eventGridAccessKey)', () => {
+    const fetched: InputType = {
+      ...baseSubscription,
+      destination: {
+        __typename: 'EventGridDestination',
+        type: 'EventGrid',
+        uri: 'https://example.eventgrid.azure.net/api/events',
+        eventGridAccessKey: 'my-key',
+      } as unknown as InputType['destination'],
+    };
+    const fromForm: InputType = {
+      ...baseSubscription,
+      destination: {
+        type: 'EventGrid',
+        uri: 'https://example.eventgrid.azure.net/api/events',
+        accessKey: 'my-key',
+      } as unknown as InputType['destination'],
+    };
+
+    expect(calculateSubscriptionUpdateActions(fetched, fromForm)).toEqual([]);
+  });
+
+  describe('Confluent Cloud record key', () => {
+    const confluent = (extra: object): InputType => ({
+      ...baseSubscription,
+      destination: {
+        __typename: 'ConfluentCloudDestination',
+        type: 'ConfluentCloud',
+        acks: '1',
+        apiKey: 'apiKey',
+        apiSecret: 'apiSecret',
+        bootstrapServer: 'broker:9092',
+        topic: 'my-topic',
+        ...extra,
+      } as unknown as InputType['destination'],
+    });
+
+    it('treats a fetched null key and a form draft without a key as unchanged', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          confluent({ key: null }),
+          confluent({})
+        )
+      ).toEqual([]);
+    });
+
+    it('produces changeDestination, including the key, when a key is added', () => {
+      expect(
+        calculateSubscriptionUpdateActions(
+          confluent({ key: null }),
+          confluent({ key: 'my-record-key' })
+        )
+      ).toContainEqual({
+        changeDestination: {
+          destination: {
+            ConfluentCloud: expect.objectContaining({ key: 'my-record-key' }),
+          },
+        },
+      });
+    });
+  });
 });

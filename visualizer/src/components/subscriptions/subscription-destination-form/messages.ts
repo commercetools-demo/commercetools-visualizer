@@ -69,6 +69,11 @@ export default defineMessages({
     description: 'destinationSQSAuthenticationMode',
     defaultMessage: 'The name of the topic.',
   },
+  destinationConfluentCloudKey: {
+    id: 'Subscription.Destination.destinationConfluentCloudKey',
+    description: 'destinationConfluentCloudKey',
+    defaultMessage: 'The Kafka record key (optional).',
+  },
   noMappingDefined: {
     id: 'Subscription.Destination.noMappingDefined',
     description: 'Shown for destination types with no configuration UI',

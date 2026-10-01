@@ -75,7 +75,7 @@ query SubscriptionsList($limit: Int, $offset: Int, $sort: [String!]) {
         type
         ... on GoogleCloudPubSubDestination { topic projectId }
         ... on SQSDestination { queueUrl region authenticationMode }
-        ... on ConfluentCloudDestination { bootstrapServer acks topic }
+        ... on ConfluentCloudDestination { bootstrapServer acks topic key }
         ... on SNSDestination { topicArn authenticationMode }
         ... on EventBridgeDestination { region accountId }
         ... on AzureServiceBusDestination { connectionString }
@@ -101,7 +101,7 @@ query SubscriptionById($id: String!) {
       type
       ... on GoogleCloudPubSubDestination { topic projectId }
       ... on SQSDestination { queueUrl region authenticationMode accessKey }
-      ... on ConfluentCloudDestination { bootstrapServer acks topic apiKey }
+      ... on ConfluentCloudDestination { bootstrapServer acks topic apiKey key }
       ... on SNSDestination { topicArn authenticationMode accessKey }
       ... on EventBridgeDestination { region accountId }
       ... on AzureServiceBusDestination { connectionString }

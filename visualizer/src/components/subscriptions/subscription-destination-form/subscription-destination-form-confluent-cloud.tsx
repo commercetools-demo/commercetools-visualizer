@@ -40,6 +40,10 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
     validate: validateInput,
   });
 
+  const [keyField, keyMeta, keyHelpers] = useField<string | undefined>({
+    name: 'destination.ConfluentCloud.key',
+  });
+
   return (
     <>
       <Heading as="h3" size="sm">
@@ -184,6 +188,21 @@ const ConfluentCloudDestination: FC<Props> = ({ isReadOnly }) => {
             <FormattedMessage {...messages.requiredFieldError} />
           ) : null}
         </FormField.Error>
+      </FormField.Root>
+      <FormField.Root isReadOnly={isReadOnly}>
+        <FormField.Label>
+          <FormattedMessage {...messages.destinationConfluentCloudKey} />
+        </FormField.Label>
+        <FormField.Input>
+          <TextInput
+            name={keyField.name}
+            value={keyMeta.value || ''}
+            isReadOnly={isReadOnly}
+            onBlur={() => keyHelpers.setTouched(true)}
+            onChange={(value) => keyHelpers.setValue(value)}
+            width={'full'}
+          />
+        </FormField.Input>
       </FormField.Root>
     </>
   );

@@ -1,5 +1,8 @@
 import type { TFormValues } from '../subscription-details-form/subscription-details-form';
-import { convertFormValuesToSubscription } from './convert';
+import {
+  convertFormValuesToSubscription,
+  convertSubscriptionDestinationToFormValue,
+} from './convert';
 
 const base: TFormValues = {
   id: 'sub-1',
@@ -129,5 +132,153 @@ describe('convertFormValuesToSubscription', () => {
 
   it('carries the key through', () => {
     expect(convertFormValuesToSubscription(base).key).toBe('my-subscription');
+  });
+});
+
+describe('convertFormValuesToSubscription — Confluent Cloud record key', () => {
+  const confluent = (key?: string): TFormValues => ({
+    ...base,
+    destinationType: 'ConfluentCloud',
+    destination: {
+      ConfluentCloud: {
+        acks: '1',
+        apiKey: 'k',
+        apiSecret: 's',
+        bootstrapServer: 'broker:9092',
+        topic: 't',
+        ...(key === undefined ? {} : { key }),
+      },
+    } as TFormValues['destination'],
+  });
+
+  it('keeps a record key that was entered', () => {
+    expect(
+      convertFormValuesToSubscription(confluent('my-record-key')).destination
+    ).toMatchObject({ type: 'ConfluentCloud', key: 'my-record-key' });
+  });
+
+  it.each([undefined, ''])('omits the key when it is %p', (key) => {
+    expect(
+      convertFormValuesToSubscription(confluent(key)).destination
+    ).not.toHaveProperty('key');
+  });
+});
+
+describe('convertSubscriptionDestinationToFormValue', () => {
+  const dest = (value: object) =>
+    value as Parameters<typeof convertSubscriptionDestinationToFormValue>[0];
+
+  it.each([
+    ['GoogleCloudPubSub', { projectId: 'p', topic: 't' }],
+    [
+      'SQS',
+      {
+        queueUrl: 'https://sqs/q',
+        region: 'eu-west-1',
+        authenticationMode: 'IAM',
+      },
+    ],
+    [
+      'SNS',
+      {
+        topicArn: 'arn:aws:sns:eu-west-1:1:t',
+        authenticationMode: 'Credentials',
+        accessKey: 'ak',
+        accessSecret: 'as',
+      },
+    ],
+    [
+      'EventBridge',
+      {
+        accountId: '123456789012',
+        region: 'eu-west-1',
+        source: 'aws.partner/x',
+      },
+    ],
+    ['AzureServiceBus', { connectionString: 'Endpoint=sb://x' }],
+    [
+      'ConfluentCloud',
+      {
+        acks: 'all',
+        apiKey: 'k',
+        apiSecret: 's',
+        bootstrapServer: 'b:9092',
+        topic: 't',
+        key: 'record-key',
+      },
+    ],
+  ])(
+    'nests the %s config under its type, without __typename/type',
+    (type, config) => {
+      expect(
+        convertSubscriptionDestinationToFormValue(
+          dest({ __typename: `${type}Destination`, type, ...config })
+        )
+      ).toEqual({ [type]: config });
+    }
+  );
+
+  it('renames Event Grid’s eventGridAccessKey alias back to accessKey', () => {
+    expect(
+      convertSubscriptionDestinationToFormValue(
+        dest({
+          __typename: 'EventGridDestination',
+          type: 'EventGrid',
+          uri: 'https://x.eventgrid.azure.net/api/events',
+          eventGridAccessKey: 'secret',
+        })
+      )
+    ).toEqual({
+      EventGrid: {
+        uri: 'https://x.eventgrid.azure.net/api/events',
+        accessKey: 'secret',
+      },
+    });
+  });
+
+  it('drops null fields (unset optionals such as an IAM SQS access key)', () => {
+    expect(
+      convertSubscriptionDestinationToFormValue(
+        dest({
+          type: 'SQS',
+          queueUrl: 'q',
+          region: 'r',
+          authenticationMode: 'IAM',
+          accessKey: null,
+          accessSecret: null,
+        })
+      )
+    ).toEqual({
+      SQS: { queueUrl: 'q', region: 'r', authenticationMode: 'IAM' },
+    });
+  });
+
+  it('returns undefined for a destination type the app has no form for', () => {
+    expect(
+      convertSubscriptionDestinationToFormValue(
+        dest({ type: 'IronMQ', uri: 'https://mq' })
+      )
+    ).toBeUndefined();
+  });
+
+  it('round-trips with convertFormValuesToSubscription', () => {
+    const fetched = dest({
+      __typename: 'SNSDestination',
+      type: 'SNS',
+      topicArn: 'arn:aws:sns:eu-west-1:1:t',
+      authenticationMode: 'IAM',
+      accessKey: null,
+      accessSecret: null,
+    });
+    const result = convertFormValuesToSubscription({
+      ...base,
+      destinationType: 'SNS',
+      destination: convertSubscriptionDestinationToFormValue(fetched),
+    });
+    expect(result.destination).toEqual({
+      type: 'SNS',
+      topicArn: 'arn:aws:sns:eu-west-1:1:t',
+      authenticationMode: 'IAM',
+    });
   });
 });

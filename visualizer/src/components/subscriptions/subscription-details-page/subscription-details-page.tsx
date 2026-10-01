@@ -28,13 +28,11 @@ import {
   calculateSubscriptionUpdateActions,
   type ErrorCodeMapping,
 } from '../../../hooks';
-import {
-  TConfluentCloudDestination,
-  TGoogleCloudPubSubDestination,
-  TSqsDestination,
-} from '../../../types/generated/ctp';
 import { FormikHelpers } from 'formik';
-import { convertFormValuesToSubscription } from './convert';
+import {
+  convertFormValuesToSubscription,
+  convertSubscriptionDestinationToFormValue,
+} from './convert';
 
 const errorCodeMapping: ErrorCodeMapping = [
   { errorCode: 'DuplicateField', errorObject: { duplicate: true } },
@@ -141,36 +139,15 @@ const SubscriptionDetailsPage: FC<Props> = ({ linkToWelcome }) => {
       })
       .catch(graphQLErrorHandler);
   };
-  let dest:
-    | {
-        GoogleCloudPubSub?: TGoogleCloudPubSubDestination;
-        SQS?: TSqsDestination;
-        ConfluentCloud?: TConfluentCloudDestination;
-      }
-    | undefined;
-
-  if (subscription.destination.type === 'GoogleCloudPubSub') {
-    dest = {
-      GoogleCloudPubSub:
-        subscription.destination as TGoogleCloudPubSubDestination,
-    };
-  } else if (subscription.destination.type === 'SQS') {
-    dest = {
-      SQS: subscription.destination as TSqsDestination,
-    };
-  } else if (subscription.destination.type === 'ConfluentCloud') {
-    dest = {
-      ConfluentCloud: subscription.destination as TConfluentCloudDestination,
-    };
-  }
-
   return (
     <SubscriptionDetailsForm
       initialValues={{
         id: subscription.id,
         key: subscription.key || '',
         destinationType: subscription.destination.type || '',
-        destination: dest,
+        destination: convertSubscriptionDestinationToFormValue(
+          subscription.destination
+        ),
         changes: subscription.changes,
         messages: subscription.messages,
       }}

@@ -179,6 +179,9 @@ const getDestinationFromPayload = (
             apiSecret: payload.destination.apiSecret,
             bootstrapServer: payload.destination.bootstrapServer,
             topic: payload.destination.topic,
+            ...(payload.destination.key
+              ? { key: payload.destination.key }
+              : {}),
           },
         },
       };

@@ -341,6 +341,54 @@ describe('createGraphQlUpdateActions', () => {
       });
     });
 
+    it('passes the optional ConfluentCloud record key through when set', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'ConfluentCloud',
+            acks: '1',
+            apiKey: 'apiKey',
+            apiSecret: 'apiSecret',
+            bootstrapServer: 'broker:9092',
+            topic: 'my-topic',
+            key: 'my-record-key',
+          },
+        },
+      ]);
+      expect(action).toEqual({
+        changeDestination: {
+          destination: {
+            ConfluentCloud: expect.objectContaining({ key: 'my-record-key' }),
+          },
+        },
+      });
+    });
+
+    it('omits an empty ConfluentCloud record key', () => {
+      const [action] = createGraphQlUpdateActions([
+        {
+          action: 'changeDestination',
+          destination: {
+            type: 'ConfluentCloud',
+            acks: '1',
+            apiKey: 'apiKey',
+            apiSecret: 'apiSecret',
+            bootstrapServer: 'broker:9092',
+            topic: 'my-topic',
+            key: '',
+          },
+        },
+      ]);
+      expect(
+        (
+          action as {
+            changeDestination: { destination: { ConfluentCloud: object } };
+          }
+        ).changeDestination.destination.ConfluentCloud
+      ).not.toHaveProperty('key');
+    });
+
     it('converts an SNS destination, mapping the authenticationMode to the GraphQL enum', () => {
       const [action] = createGraphQlUpdateActions([
         {

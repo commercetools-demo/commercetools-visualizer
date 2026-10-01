@@ -13,6 +13,7 @@ export const changes = [
   'customer-group',
   'customer-password-token',
   'discount-code',
+  'discount-group',
   'extension',
   'inventory-entry',
   'key-value-document',
@@ -26,6 +27,8 @@ export const changes = [
   'product-type',
   'quote',
   'quote-request',
+  'recurrence-policy',
+  'recurring-order',
   'review',
   'shipping-method',
   'shopping-list',
@@ -36,5 +39,6 @@ export const changes = [
   'subscription',
   'tax-category',
   'type',
+  'variant',
   'zone',
 ];

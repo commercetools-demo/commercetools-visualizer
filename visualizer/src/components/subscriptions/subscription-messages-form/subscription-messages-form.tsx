@@ -10,133 +10,40 @@ import { TMessageSubscriptionInput } from '../../../types/generated/ctp';
 import messages from './messages';
 import { useIntl } from 'react-intl';
 import { FC } from 'react';
-import { subscriptionMessageTypes } from './subscription-message-types';
-
-const messagesConfig = [
-  { resourceTypeId: 'approval-flow', resourceTypeName: 'ApprovalFlow' },
-  { resourceTypeId: 'approval-rule', resourceTypeName: 'ApprovalRule' },
-  { resourceTypeId: 'associate-role', resourceTypeName: 'AssociateRole' },
-  { resourceTypeId: 'business-unit', resourceTypeName: 'BusinessUnit' },
-  { resourceTypeId: 'category', resourceTypeName: 'Category' },
-  { resourceTypeId: 'cart-discount', resourceTypeName: 'CartDiscount' },
-  { resourceTypeId: 'customer', resourceTypeName: 'Customer' },
-  { resourceTypeId: 'discount-code', resourceTypeName: 'DiscountCode' },
-  {
-    resourceTypeId: 'inventory-entry',
-    resourceTypeName: 'InventoryEntry',
-  },
-  {
-    resourceTypeId: 'order',
-    resourceTypeName: [
-      'CustomLineItem',
-      'Delivery',
-      'LineItem',
-      'Order',
-      'Parcel',
-      'ReturnInfo',
-    ],
-    label: 'Order',
-  },
-  {
-    resourceTypeId: 'payment',
-    resourceTypeName: 'Payment',
-  },
-  {
-    resourceTypeId: 'product-selection',
-    resourceTypeName: 'ProductSelection',
-  },
-  {
-    resourceTypeId: 'product-tailoring',
-    resourceTypeName: ['ProductTailoring', 'ProductVariantTailoring'],
-  },
-  {
-    resourceTypeId: 'product',
-    resourceTypeName: 'Product',
-  },
-  {
-    resourceTypeId: 'quote-request',
-    resourceTypeName: 'QuoteRequest',
-  },
-  {
-    resourceTypeId: 'quote',
-    resourceTypeName: 'Quote',
-  },
-  {
-    resourceTypeId: 'review',
-    resourceTypeName: 'Review',
-  },
-  {
-    resourceTypeId: 'staged-quote',
-    resourceTypeName: 'StagedQuote',
-  },
-  {
-    resourceTypeId: 'standalone-price',
-    resourceTypeName: 'StandalonePrice',
-  },
-  {
-    resourceTypeId: 'store',
-    resourceTypeName: 'Store',
-  },
-];
+import { subscriptionMessageTypesByResource } from './subscription-message-types';
 
 const formatCamelCase = (input: string): string => {
   return input.replace(/([a-z])([A-Z])/g, '$1 $2'); // Add a space between lowercase and uppercase letters
 };
 
-const filterMessages = (
-  messages: Array<string>,
-  filter: string,
-  removePrefix = false
-) => {
-  const result: Array<string> = [];
+const toPascalCase = (resourceTypeId: string): string =>
+  resourceTypeId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('');
 
-  for (let i = messages.length - 1; i >= 0; i--) {
-    if (messages[i].startsWith(filter)) {
-      result.push(messages[i]);
-      messages.splice(i, 1);
-    }
-  }
-
-  return result.map((item) => ({
-    key: item,
-    value: formatCamelCase(removePrefix ? item.substring(filter.length) : item),
-  }));
-};
-
-const entries = () => {
-  const messageNameClone = [...subscriptionMessageTypes];
-
-  return messagesConfig
-    .map((entry) => {
-      let names = entry.resourceTypeName;
-      if (!Array.isArray(names)) {
-        names = [names];
-      }
-      const messageNames = names
-        .map((resourceTypeName) =>
-          filterMessages(
-            messageNameClone,
-            resourceTypeName,
-            !Array.isArray(entry.resourceTypeName)
-          )
-        )
-        .flat();
-
+// One accordion group per resource type a MessageSubscription can target. A message
+// name is shown without the resource's name prefix ("ApprovalFlowCreated" -> "Created")
+// unless some of the group's messages don't carry it (e.g. an Order's `LineItem*`,
+// `Delivery*` and `Parcel*` messages), in which case full names are shown.
+export const messageEntries = () =>
+  Object.entries(subscriptionMessageTypesByResource)
+    .map(([resourceTypeId, names]) => {
+      const prefix = toPascalCase(resourceTypeId);
+      const stripPrefix = names.every((name) => name.startsWith(prefix));
       return {
-        resourceTypeId: entry.resourceTypeId,
-        resourceTypeName: formatCamelCase(
-          entry.label
-            ? entry.label
-            : Array.isArray(entry.resourceTypeName)
-            ? entry.resourceTypeName[0]
-            : entry.resourceTypeName
-        ),
-        amountOfMessage: messageNames.length,
-        types: messageNames,
+        resourceTypeId,
+        resourceTypeName: formatCamelCase(prefix),
+        amountOfMessage: names.length,
+        types: names.map((name) => ({
+          key: name,
+          value: formatCamelCase(
+            stripPrefix ? name.substring(prefix.length) : name
+          ),
+        })),
       };
     })
     .sort((a, b) => a.resourceTypeId.localeCompare(b.resourceTypeId));
-};
 
 type Props = {
   isReadOnly?: boolean;
@@ -184,9 +91,9 @@ const SubscriptionMessagesForm: FC<Props> = ({ isReadOnly }) => {
       </Heading>
       <Accordion.Root
         allowsMultipleExpanded
-        expandedKeys={entries().map((item) => item.resourceTypeId)}
+        expandedKeys={messageEntries().map((item) => item.resourceTypeId)}
       >
-        {entries().map((item) => (
+        {messageEntries().map((item) => (
           <Accordion.Item key={item.resourceTypeId} value={item.resourceTypeId}>
             <Accordion.Header>
               {intl.formatMessage(messages.resourceTypeLabel, {

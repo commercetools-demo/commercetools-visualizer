@@ -182,6 +182,7 @@
   "Subscription.Destination.destinationConfluentCloudApiKey": "API Key to be used.",
   "Subscription.Destination.destinationConfluentCloudApiSecret": "API Secret to be used.",
   "Subscription.Destination.destinationConfluentCloudBootstrapServer": "URL to the bootstrap server including the port number in the format {cluster}.{region}.{provider}.confluent.cloud:9092.",
+  "Subscription.Destination.destinationConfluentCloudKey": "The Kafka record key (optional).",
   "Subscription.Destination.destinationConfluentCloudTopic": "The name of the topic.",
   "Subscription.Destination.destinationDescription": "Messaging service to which the messages are sent.",
   "Subscription.Destination.destinationEventBridge": "AWS EventBridge",

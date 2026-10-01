@@ -354,3 +354,217 @@ describe('notifications', () => {
     // within(notification).getByText(/some fake error message/i);
   }, 10000);
 });
+
+describe('destination configuration of an existing subscription', () => {
+  const fetchWithDestination = (destination: Record<string, unknown>) =>
+    graphql.query('FetchSubscription', (_req, res, ctx) =>
+      res(
+        ctx.data({
+          subscription: {
+            ...random().key(TEST_SUBSCRIPTION_KEY).buildGraphql(),
+            destination,
+          },
+        })
+      )
+    );
+
+  const captureUpdate = () => {
+    const calls: Array<{ actions: Array<Record<string, unknown>> }> = [];
+    const handler = graphql.mutation('UpdateSubscription', (req, res, ctx) => {
+      calls.push(req.variables as (typeof calls)[number]);
+      return res(
+        ctx.data({
+          updateSubscription: random()
+            .key(TEST_SUBSCRIPTION_NEW_KEY)
+            .buildGraphql(),
+        })
+      );
+    });
+    return { calls, handler };
+  };
+
+  const valueOf = async (label: RegExp) =>
+    ((await screen.findByLabelText(label)) as HTMLInputElement).value;
+
+  const changeKeyAndSave = async () => {
+    const keyInput = await screen.findByLabelText(/subscription key/i);
+    fireEvent.change(keyInput, {
+      target: { value: TEST_SUBSCRIPTION_NEW_KEY },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+  };
+
+  it('loads an SNS destination into the form', async () => {
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'SNSDestination',
+        type: 'SNS',
+        topicArn: 'arn:aws:sns:eu-west-1:123456789012:my-topic',
+        authenticationMode: 'IAM',
+        accessKey: null,
+        accessSecret: null,
+      }),
+    ]);
+    renderApp();
+
+    expect(await valueOf(/arn of the amazon sns topic/i)).toBe(
+      'arn:aws:sns:eu-west-1:123456789012:my-topic'
+    );
+    await screen.findByRole('heading', {
+      name: /configure aws sns destination/i,
+    });
+  }, 10000);
+
+  it('loads an EventBridge destination into the form', async () => {
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'EventBridgeDestination',
+        type: 'EventBridge',
+        accountId: '123456789012',
+        region: 'eu-west-1',
+        source: 'aws.partner/commercetools.com/abc',
+      }),
+    ]);
+    renderApp();
+
+    expect(await valueOf(/id of the aws account/i)).toBe('123456789012');
+    expect(await valueOf(/aws region of the event bus/i)).toBe('eu-west-1');
+  }, 10000);
+
+  it('loads an Azure Service Bus destination into the form', async () => {
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'AzureServiceBusDestination',
+        type: 'AzureServiceBus',
+        connectionString: 'Endpoint=sb://my-bus.servicebus.windows.net/',
+      }),
+    ]);
+    renderApp();
+
+    expect(await valueOf(/connection string of the azure service bus/i)).toBe(
+      'Endpoint=sb://my-bus.servicebus.windows.net/'
+    );
+  }, 10000);
+
+  it('loads an Event Grid destination into the form, including its aliased access key', async () => {
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'EventGridDestination',
+        type: 'EventGrid',
+        uri: 'https://my-topic.eventgrid.azure.net/api/events',
+        eventGridAccessKey: 'my-access-key',
+      }),
+    ]);
+    renderApp();
+
+    expect(await valueOf(/uri of the azure event grid topic/i)).toBe(
+      'https://my-topic.eventgrid.azure.net/api/events'
+    );
+    expect(await valueOf(/access key of the azure event grid topic/i)).toBe(
+      'my-access-key'
+    );
+  }, 10000);
+
+  it('loads a Confluent Cloud destination into the form, including the record key', async () => {
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'ConfluentCloudDestination',
+        type: 'ConfluentCloud',
+        acks: '1',
+        apiKey: 'my-api-key',
+        apiSecret: 'my-api-secret',
+        bootstrapServer: 'pkc-1.europe-west1.gcp.confluent.cloud:9092',
+        topic: 'my-topic',
+        key: 'my-record-key',
+      }),
+    ]);
+    renderApp();
+
+    expect(await valueOf(/the kafka record key/i)).toBe('my-record-key');
+    expect(await valueOf(/the name of the topic/i)).toBe('my-topic');
+  }, 10000);
+
+  it.each([
+    [
+      'EventGrid',
+      {
+        __typename: 'EventGridDestination',
+        type: 'EventGrid',
+        uri: 'https://my-topic.eventgrid.azure.net/api/events',
+        eventGridAccessKey: 'my-access-key',
+      },
+    ],
+    [
+      'SNS (IAM, null credentials)',
+      {
+        __typename: 'SNSDestination',
+        type: 'SNS',
+        topicArn: 'arn:aws:sns:eu-west-1:123456789012:my-topic',
+        authenticationMode: 'IAM',
+        accessKey: null,
+        accessSecret: null,
+      },
+    ],
+    [
+      'ConfluentCloud (no record key)',
+      {
+        __typename: 'ConfluentCloudDestination',
+        type: 'ConfluentCloud',
+        acks: '1',
+        apiKey: 'k',
+        apiSecret: 's',
+        bootstrapServer: 'b:9092',
+        topic: 't',
+        key: null,
+      },
+    ],
+  ])(
+    'saving only a new key does not touch the %s destination',
+    async (_name, destination) => {
+      const { calls, handler } = captureUpdate();
+      useMockServerHandlers([fetchWithDestination(destination), handler]);
+      renderApp();
+
+      await changeKeyAndSave();
+
+      await waitFor(() => expect(calls).toHaveLength(1));
+      expect(calls[0].actions).toEqual([
+        { setKey: { key: TEST_SUBSCRIPTION_NEW_KEY } },
+      ]);
+    },
+    15000
+  );
+
+  it('sends changeDestination with the record key once one is entered for Confluent Cloud', async () => {
+    const { calls, handler } = captureUpdate();
+    useMockServerHandlers([
+      fetchWithDestination({
+        __typename: 'ConfluentCloudDestination',
+        type: 'ConfluentCloud',
+        acks: '1',
+        apiKey: 'k',
+        apiSecret: 's',
+        bootstrapServer: 'b:9092',
+        topic: 't',
+        key: null,
+      }),
+      handler,
+    ]);
+    renderApp();
+
+    const keyInput = await screen.findByLabelText(/the kafka record key/i);
+    fireEvent.change(keyInput, { target: { value: 'my-record-key' } });
+    fireEvent.click(screen.getByRole('button', { name: /save/i }));
+
+    await waitFor(() => expect(calls).toHaveLength(1));
+    expect(calls[0].actions).toEqual([
+      {
+        changeDestination: {
+          destination: {
+            ConfluentCloud: expect.objectContaining({ key: 'my-record-key' }),
+          },
+        },
+      },
+    ]);
+  }, 15000);
+});

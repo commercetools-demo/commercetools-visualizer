@@ -2,9 +2,11 @@
 
 **Status:** Extracted from existing implementation
 **Domain:** commercetools `Subscription` (event messaging)
-**Spec version:** 1.2 (2026-09-29) — all 7 destination types are now configurable (GCP
-Pub/Sub, AWS SQS, Confluent Cloud, SNS, EventBridge, Azure Service Bus, Azure Event
-Grid); see this file's git history for the 1.1 "3 of 7 configurable" text.
+**Spec version:** 1.3 (2026-10-01) — change/message resource types now match the API's
+enums (4 change types and 5 message resource types added, 2 invalid message groups removed,
+the message-type list completed), Confluent Cloud gets its optional record `key`, and the
+detail page loads all 7 destination types. 1.2 (2026-09-29): all 7 destination types
+configurable; see git history for the 1.1 "3 of 7 configurable" text.
 
 > Shared conventions are in [../README.md](../README.md).
 
@@ -57,15 +59,19 @@ which action buttons are shown.
   - **AWS SQS**: Authentication mode (`IAM` | `Credentials`, required); Access key & Access
     secret (required only when mode = Credentials); Queue URL (required); Region (required).
   - **Confluent Cloud**: Bootstrap server (required), API key (required), API secret
-    (required), Acks (`0` | `1` | `all`, required), Topic (required).
+    (required), Acks (`0` | `1` | `all`, required), Topic (required), Record key (optional;
+    omitted from the draft when empty).
   - **AWS SNS**: Authentication mode (`IAM` | `Credentials`, required); Access key & Access
     secret (required only when mode = Credentials); Topic ARN (required).
   - **AWS EventBridge**: Account ID (required), Region (required).
   - **Azure Service Bus**: Connection string (required).
   - **Azure Event Grid**: URI (required), Access key (required).
-- **FR-006 — Changes section.** Optional multi-select of resource types (40 options); each
-  selection adds `{ resourceTypeId }`. Zero selections allowed.
-- **FR-007 — Messages section.** Optional, grouped by resource type; each group is labelled
+- **FR-006 — Changes section.** Optional multi-select over all 42 `ChangeSubscriptionResourceTypeId`
+  values; each selection adds `{ resourceTypeId }`. Zero selections allowed.
+- **FR-007 — Messages section.** Optional, grouped by the 23 `MessageSubscriptionResourceTypeId`
+  values (a message is listed under the resource the Messages reference files it under,
+  e.g. `CustomerGroupAssignmentAdded` under `customer-group` but `CustomerGroupSet` under
+  `customer`); each group is labelled
   with its message-type count and lists individual message-type checkboxes. Checking adds
   the type to that resource's `types[]`; unchecking removes it, and removes the resource
   entry when its `types[]` becomes empty. Zero selections allowed.
@@ -77,7 +83,10 @@ which action buttons are shown.
 ### Detail / edit
 
 - **FR-009** Fetch the subscription by id and populate the shared form (§FR-002) with its
-  current values; the Key field becomes read-only per FR-003.
+  current values; the Key field becomes read-only per FR-003. The destination config of
+  **every** destination type is loaded into its form (unset optional fields as empty;
+  Event Grid's fetched `eventGridAccessKey` alias into its `accessKey` field). Saving a
+  change that doesn't touch the destination must not produce a `changeDestination` action.
 - **FR-010** Without Manage: on both create and edit, all sections render read-only and
   Save/Delete are disabled; "Add new Subscription" on the list is disabled too.
 - **FR-011** Save converts the form to a subscription, computes update actions (changeKey,
@@ -115,6 +124,15 @@ which action buttons are shown.
   key, which for `EventBridge` (`destinationAWSEventBridge`) and `EventGrid`
   (`destinationAzureEventGrid`) differs from the plain `destination<Type>` pattern, so those
   two are mapped explicitly; an unknown type falls back to the raw API string.
+- **No message subscription for some resources.** Messages of Cart, Recurring Order,
+  Payment Method, Cart Discount, Discount Code and Discount Group exist in the Messages
+  reference, but `MessageSubscriptionResourceTypeId` has no value for them, so the form
+  cannot offer them (their *changes* — `cart`, `cart-discount`, `discount-code`,
+  `discount-group`, `recurring-order` — can be subscribed to). Offering `cart-discount` /
+  `discount-code` message groups, as earlier versions did, sends resource type IDs the API
+  rejects.
+- **Not exposed:** `events` (`checkout` / `import-api` event subscriptions, available in the
+  GraphQL schema), CloudEvents `format`, and IronMQ (neither is in the GraphQL schema).
 - With no destination type selected, the destination section shows a "No mapping defined so
   far for" placeholder with an empty type name (known cosmetic gap).
 - **Subscription `format`** (Platform vs CloudEvents) is not exposed; defaults to Platform.

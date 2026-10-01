@@ -104,7 +104,7 @@ component — no stepper, no per-step routes. All sections are visible and edita
      `accessSecret` (required **only** when mode = `Credentials`); `queueUrl` (required);
      `region` (required).
    - **Confluent Cloud** — `bootstrapServer`, `apiKey`, `apiSecret`, `acks` (`0`|`1`|`all`),
-     `topic` — all required.
+     `topic` — all required; `key` (the Kafka record key) optional, omitted when empty.
    - **AWS SNS** — `authenticationMode` (`IAM` | `Credentials`, required); `accessKey` &
      `accessSecret` (required **only** when mode = `Credentials`); `topicArn` (required).
    - **AWS EventBridge** — `accountId` (required), `region` (required).
@@ -112,7 +112,7 @@ component — no stepper, no per-step routes. All sections are visible and edita
    - **Azure Event Grid** — `uri` (required), `accessKey` (required). Read back aliased as
      `eventGridAccessKey` (field-type conflict with SNS/SQS's `accessKey`); renamed back to
      `accessKey` before diffing (see `convertTSubscription`).
-3. **Changes** (collapsed) — optional multi-select over the 40 resource types; each
+3. **Changes** (collapsed) — optional multi-select over the 42 change resource types; each
    selection adds `{ resourceTypeId }`. Zero allowed.
 4. **Messages** (collapsed) — optional, **grouped by resource type**; each group is labelled
    with its message-type count and lists message-type checkboxes. Checking adds the type to
@@ -149,9 +149,8 @@ All per ../README.md — do not reinvent:
 
 ## Known gaps to carry over (spec §6)
 
-- **Only GCP Pub/Sub, AWS SQS, and Confluent Cloud are configurable.** The other 4 types
-  appear in the destination-type picker but block Save on create and can't be edited in
-  detail.
+- **All 7 destination types are configurable and editable**; `IronMQ`, CloudEvents `format`
+  and `events` subscriptions are not exposed.
 - **`format`** (Platform vs CloudEvents) is **not surfaced**; always defaults to Platform.
 - **`status`** is read but **not surfaced** in list or detail.
 - **No draft persistence on create** — navigating away or refreshing loses progress.

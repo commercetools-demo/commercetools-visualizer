@@ -186,6 +186,7 @@
   "Subscription.Destination.destinationConfluentCloudApiSecret": "Zu verwendendes API-Secret.",
   "Subscription.Destination.destinationConfluentCloudBootstrapServer": "URL zum Bootstrap-Server einschließlich der Portnummer im Format {cluster}.{region}.{provider}.confluent.cloud:9092.",
   "Subscription.Destination.destinationConfluentCloudTopic": "Der Name des Topics.",
+  "Subscription.Destination.destinationConfluentCloudKey": "Der Kafka-Record-Key (optional).",
   "Subscription.Destination.destinationDescription": "Messaging-Dienst, an den die Nachrichten gesendet werden.",
   "Subscription.Destination.destinationEventBridge": "AWS EventBridge",
   "Subscription.Destination.destinationEventBridgeAccountId": "ID des AWS-Kontos, an das Events gesendet werden.",

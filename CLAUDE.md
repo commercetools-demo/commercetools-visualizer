@@ -178,6 +178,14 @@ before assuming a cross-cutting behavior is a one-off.
   `type`, `channel`, `core` and `commons` test-data packages are installed; other features
   use hand-written fixtures (subscriptions have their own builders in
   `src/test-utils/models/subscriptions/`).
+- Lists that mirror an API enum (Type `resourceTypeIds`, Reference targets, Subscription
+  change/message resource types, message types per resource) are pinned by specs next to the
+  constants, each holding its own copy of the official values with the docs URL. When a spec
+  fails after an API change, update the constant *and* the spec copy. Source for the values:
+  the OpenAPI enums (`commercetools-oas-schemata`) or the docs pages; message types come
+  from the Messages reference pages, where each message is listed under its owning resource
+  (don't group them by name prefix — `CustomerGroupSet` belongs to `customer`, but
+  `CustomerGroupAssignmentAdded` to `customer-group`).
 - Pure logic (conversions, `calculate*UpdateActions`, column definitions via
   `createIntl`, `graphQLErrorHandler`) has plain unit specs next to the source file.
 - Nimbus injects a theme-bootstrapping `<script>` into the render container, so assert on

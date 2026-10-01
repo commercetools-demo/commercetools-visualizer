@@ -62,7 +62,12 @@ const convertTSubscription = (subscription: InputType): PickedReturnType => {
         type: subscription.destination.type,
       } as TGoogleCloudPubSubDestination;
       const { __typename, ...rest } = adaptedDestination;
-      destination = rest as Destination;
+      // The API returns `null` for unset optional fields (e.g. a Confluent Cloud
+      // `key`, or SQS credentials under IAM); a draft built from the form leaves them
+      // out, which must not register as a change.
+      destination = Object.fromEntries(
+        Object.entries(rest).filter(([, value]) => value !== null)
+      ) as unknown as Destination;
       break;
     }
     case 'EventGrid': {
@@ -70,16 +75,19 @@ const convertTSubscription = (subscription: InputType): PickedReturnType => {
       // SubscriptionFragment) to avoid a field-type conflict with SNS/SQS's
       // `accessKey` under the same `destination` selection — rename it back
       // to `accessKey` to match AzureEventGridDestination's REST shape.
+      // A draft built from the form (rather than fetched) already carries `accessKey`.
       const adaptedDestination = subscription.destination as {
         __typename?: string;
         type: string;
         uri: string;
         eventGridAccessKey?: string;
+        accessKey?: string;
       };
       destination = {
         type: 'EventGrid',
         uri: adaptedDestination.uri,
-        accessKey: adaptedDestination.eventGridAccessKey,
+        accessKey:
+          adaptedDestination.eventGridAccessKey ?? adaptedDestination.accessKey,
       } as Destination;
       break;
     }

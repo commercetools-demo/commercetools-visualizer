@@ -55,9 +55,16 @@ project). Data access goes through per-feature connector hooks
   dispatching to `-gcp.tsx`, `-sqs.tsx`, `-sns.tsx`, `-event-bridge.tsx`,
   `-confluent-cloud.tsx`, `-azure-service-bus.tsx`, `-event-grid.tsx`). Which of them are
   exercised end-to-end against a real queue/topic is not tracked here.
-- Editors for which resource-type Messages (order, cart, customer, etc.) and which
-  Changes (resource-type + fields) a subscription fires on
-  (`subscription-messages-form`, `subscription-changes-form`).
+- Confluent Cloud destinations take an optional Kafka record key (omitted when empty).
+  Editing an existing subscription loads the config of every destination type into the
+  form (`subscription-details-page/convert.ts`).
+- Editors for which Messages and Changes a subscription fires on: all 42
+  `ChangeSubscriptionResourceTypeId`s (`subscription-changes-form`) and the 23
+  `MessageSubscriptionResourceTypeId`s with 293 message types filed under the resource
+  they belong to (`subscription-messages-form`, `subscription-message-types.ts`). Both are
+  pinned to the API's enums by specs. Messages of resources the API can't subscribe to
+  (Cart, Recurring Order, Payment Method, Cart Discount, Discount Code, Discount Group)
+  are not offered.
 
 ## Types (custom field definitions)
 
@@ -135,7 +142,8 @@ project). Data access goes through per-feature connector hooks
 - Only `required` at field creation: the commercetools API has no update action for a
   field definition's `required` flag, so it is shown on edit but cannot be changed
   (`specs/002-types/spec.md`).
-- Subscription `format` (Platform vs CloudEvents) and `status` are not exposed.
+- Subscription `format` (Platform vs CloudEvents), `status` and `events` (`checkout` /
+  `import-api`) are not exposed; IronMQ isn't supported (not in the GraphQL schema).
 - Former visualizations (`entity-diagram`, `visualize-drilldown`) and the Carts /
   Shopping Lists views were removed and are not being reimplemented
   (`specs/README.md`).

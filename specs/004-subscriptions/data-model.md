@@ -81,16 +81,25 @@ TFormValues {
   API's own discriminator strings, used verbatim as each picker option's `id`).
 - **SQS / SNS auth mode** — `IAM` | `Credentials`.
 - **Confluent acks** — `0` | `1` | `all`.
-- **Change resource types (40)** — approval-flow, approval-rule, associate-role,
-  attribute-group, business-unit, cart, cart-discount, category, channel, customer,
-  customer-email-token, customer-group, customer-password-token, discount-code, extension,
-  inventory-entry, key-value-document, order, order-edit, payment, product, product-discount,
-  product-selection, product-tailoring, product-type, quote, quote-request, review,
-  shipping-method, shopping-list, staged-quote, standalone-price, state, store, subscription,
-  tax-category, type, zone.
-- **Message types** — 245+ values grouped by ~18 resource types (e.g. ProductCreated,
-  OrderStateChanged, BusinessUnit* …). See `subscriptionMessageTypes` in the source for the
-  authoritative list.
+- **Change resource types (42)** — the full `ChangeSubscriptionResourceTypeId` enum:
+  approval-flow, approval-rule, associate-role, attribute-group, business-unit, cart,
+  cart-discount, category, channel, customer, customer-email-token, customer-group,
+  customer-password-token, discount-code, discount-group, extension, inventory-entry,
+  key-value-document, order, order-edit, payment, product, product-discount,
+  product-selection, product-tailoring, product-type, quote, quote-request,
+  recurrence-policy, recurring-order, review, shipping-method, shopping-list, staged-quote,
+  standalone-price, state, store, subscription, tax-category, type, variant, zone.
+- **Message resource types (23)** — the full `MessageSubscriptionResourceTypeId` enum:
+  approval-flow, approval-rule, associate-role, business-unit, category, customer,
+  customer-email-token, customer-group, customer-password-token, inventory-entry, order,
+  payment, product, product-selection, product-tailoring, quote, quote-request, review,
+  shopping-list, staged-quote, standalone-price, store, variant.
+- **Message types (293)** — grouped under those 23 resources in
+  `subscriptionMessageTypesByResource` (source of truth for the UI), derived from the
+  Messages reference where each message is listed under the resource it belongs to. Group
+  sizes are pinned by `subscription-message-types.spec.ts`. Messages of resources without a
+  message-subscription resource type (Cart, Recurring Order, Payment Method, Cart Discount,
+  Discount Code, Discount Group) are intentionally not listed.
 - **Format** — `Platform` | `CloudEvents`.
 - **Status** — `Healthy`, `ConfigurationError`, `TemporaryError`, `ManuallySuspended`,
   `ConfigurationErrorDeliveryStopped`.

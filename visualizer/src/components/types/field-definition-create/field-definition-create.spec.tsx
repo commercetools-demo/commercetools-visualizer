@@ -17,6 +17,10 @@ import { entryPointUriPath, PERMISSIONS } from '../../../constants';
 import { buildTypeDefinition } from '../../../test-utils/models/types';
 import FieldDefinitionCreate from './field-definition-create';
 
+// Each test renders the whole create page (Nimbus + lazy routes), which can take several
+// seconds when the whole suite runs in parallel — the 5s default is too tight.
+jest.setTimeout(20000);
+
 const mockServer = setupServer();
 afterEach(async () => {
   mockServer.resetHandlers();
@@ -447,7 +451,9 @@ describe('validation', () => {
   ])('rejects the name %p (%s)', async (value) => {
     renderApp();
     const name = await screen.findByLabelText(/field name/i);
-    await userEvent.type(name, value);
+    // paste, not type: typing 257 characters key by key alone exceeds the timeout
+    await userEvent.click(name);
+    await userEvent.paste(value);
     await userEvent.tab();
     expect(
       await screen.findByText(/^key must contain between 2 and 256/i)

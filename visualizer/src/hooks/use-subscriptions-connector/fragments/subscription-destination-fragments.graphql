@@ -36,4 +36,5 @@ fragment ConfluentCloudDestinationFragment on ConfluentCloudDestination {
   apiSecret
   bootstrapServer
   topic
+  key
 }

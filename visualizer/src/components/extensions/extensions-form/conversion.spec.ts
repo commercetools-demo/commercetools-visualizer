@@ -30,6 +30,9 @@ describe('tExtensionToFormValues', () => {
       destinationAwsAccessKey: undefined,
       destinationAwsAccessSecret: undefined,
       destinationAwsArn: undefined,
+      includeOldResource: false,
+      expansionPaths: [],
+      dependencies: [],
     });
   });
 
@@ -273,5 +276,174 @@ describe('formValuesToTExtension', () => {
       url: 'https://example.com',
       authentication: { AuthorizationHeader: { headerValue: 'Basic 1' } },
     });
+  });
+});
+
+describe('Google Cloud Function destination', () => {
+  it('maps a fetched Google Cloud Function destination to form values', () => {
+    const extension = {
+      ...baseExtension,
+      destination: {
+        type: 'GoogleCloudFunction',
+        url: 'https://europe-west1-proj.cloudfunctions.net/fn',
+      },
+    } as unknown as TExtension;
+
+    const values = tExtensionToFormValues(extension);
+
+    expect(values.destinationName).toBe('GoogleCloudFunction');
+    expect(values.destinationGcfUrl).toBe(
+      'https://europe-west1-proj.cloudfunctions.net/fn'
+    );
+    expect(values.destinationHttpUrl).toBeUndefined();
+  });
+
+  it('builds a Google Cloud Function destination and no other destination', () => {
+    const draft = formValuesToTExtension({
+      key: 'k1',
+      destinationName: 'GoogleCloudFunction',
+      destinationGcfUrl: 'https://fn.example.com',
+      triggers: [],
+    });
+    expect(draft.destination).toEqual({
+      GoogleCloudFunction: { url: 'https://fn.example.com' },
+    });
+  });
+
+  it('defaults a missing URL to an empty string', () => {
+    expect(
+      formValuesToTExtension({
+        key: 'k1',
+        destinationName: 'GoogleCloudFunction',
+        triggers: [],
+      }).destination.GoogleCloudFunction
+    ).toEqual({ url: '' });
+  });
+});
+
+describe('timeoutInMs', () => {
+  const http = {
+    ...baseExtension,
+    destination: { type: 'HTTP', url: 'https://example.com' },
+  };
+
+  it('shows a fetched timeout as text in the form', () => {
+    expect(
+      tExtensionToFormValues({
+        ...http,
+        timeoutInMs: 2500,
+      } as unknown as TExtension).timeoutInMs
+    ).toBe('2500');
+  });
+
+  it('leaves the field empty when the extension has no timeout', () => {
+    expect(
+      tExtensionToFormValues({
+        ...http,
+        timeoutInMs: null,
+      } as unknown as TExtension).timeoutInMs
+    ).toBeUndefined();
+    expect(tExtensionToFormValues().timeoutInMs).toBeUndefined();
+  });
+
+  it.each([
+    ['5000', 5000],
+    [' 750 ', 750],
+    ['', undefined],
+    ['   ', undefined],
+    [undefined, undefined],
+  ])('converts the text %p to %p on save', (text, expected) => {
+    expect(
+      formValuesToTExtension({
+        key: 'k1',
+        destinationName: 'HTTP',
+        destinationHttpUrl: 'https://example.com',
+        timeoutInMs: text,
+        triggers: [],
+      }).timeoutInMs
+    ).toBe(expected);
+  });
+});
+
+describe('expansion paths, dependencies and additional context', () => {
+  const http = {
+    ...baseExtension,
+    destination: { type: 'HTTP', url: 'https://example.com' },
+  };
+
+  it('maps the fetched values into the form', () => {
+    const values = tExtensionToFormValues({
+      ...http,
+      expansionPaths: ['lineItems[*].variant', 'customerGroup'],
+      additionalContext: { includeOldResource: true },
+      dependenciesRef: [
+        { typeId: 'extension', id: 'ext-1' },
+        { typeId: 'extension', id: 'ext-2' },
+      ],
+    } as unknown as TExtension);
+
+    expect(values.expansionPaths).toEqual([
+      'lineItems[*].variant',
+      'customerGroup',
+    ]);
+    expect(values.includeOldResource).toBe(true);
+    expect(values.dependencies).toEqual(['ext-1', 'ext-2']);
+  });
+
+  it('treats missing/null values as empty', () => {
+    const values = tExtensionToFormValues({
+      ...http,
+      expansionPaths: undefined,
+      additionalContext: null,
+      dependenciesRef: undefined,
+    } as unknown as TExtension);
+
+    expect(values.expansionPaths).toEqual([]);
+    expect(values.includeOldResource).toBe(false);
+    expect(values.dependencies).toEqual([]);
+  });
+
+  const formValues = (extra: Partial<TFormValues>): TFormValues => ({
+    key: 'k1',
+    destinationName: 'HTTP',
+    destinationHttpUrl: 'https://example.com',
+    triggers: [],
+    ...extra,
+  });
+
+  it('builds the draft fields from the form', () => {
+    const draft = formValuesToTExtension(
+      formValues({
+        expansionPaths: ['a', 'b'],
+        includeOldResource: true,
+        dependencies: ['ext-1'],
+      })
+    );
+
+    expect(draft.expansionPaths).toEqual(['a', 'b']);
+    expect(draft.additionalContext).toEqual({ includeOldResource: true });
+    expect(draft.dependencies).toEqual([{ typeId: 'extension', id: 'ext-1' }]);
+  });
+
+  it('leaves empty/false values out of the draft', () => {
+    const draft = formValuesToTExtension(
+      formValues({
+        expansionPaths: [],
+        includeOldResource: false,
+        dependencies: [],
+      })
+    );
+
+    expect(draft.expansionPaths).toBeUndefined();
+    expect(draft.additionalContext).toBeUndefined();
+    expect(draft.dependencies).toBeUndefined();
+  });
+
+  it('trims expansion paths and drops blank rows on save', () => {
+    expect(
+      formValuesToTExtension(
+        formValues({ expansionPaths: ['  lineItems[*].variant ', '', '   '] })
+      ).expansionPaths
+    ).toEqual(['lineItems[*].variant']);
   });
 });

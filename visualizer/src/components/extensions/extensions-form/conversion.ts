@@ -1,3 +1,4 @@
+import { normalizeExpansionPaths } from './restrictions';
 import {
   DestinationHttpAuthenticationName,
   DestinationName,
@@ -10,6 +11,7 @@ import {
   TExtension,
   TExtensionDestinationInput,
   TExtensionDraft,
+  TGoogleCloudFunctionDestination,
   THttpDestination,
   THttpDestinationAuthenticationInput,
   TTriggerInput,
@@ -24,6 +26,7 @@ export const tExtensionToFormValues = (extension?: TExtension): TFormValues => {
   let destinationAwsAccessKey = undefined;
   let destinationAwsAccessSecret = undefined;
   let destinationAwsArn = undefined;
+  let destinationGcfUrl = undefined;
   switch (extension?.destination.type) {
     case 'HTTP': {
       destinationName = 'HTTP';
@@ -55,6 +58,13 @@ export const tExtensionToFormValues = (extension?: TExtension): TFormValues => {
       destinationAwsArn = dest.arn;
       break;
     }
+    case 'GoogleCloudFunction': {
+      destinationName = 'GoogleCloudFunction';
+      destinationGcfUrl = (
+        extension?.destination as TGoogleCloudFunctionDestination
+      ).url;
+      break;
+    }
   }
   const triggers: Array<TTriggerInput> =
     extension?.triggers.map((value): TTriggerInput => {
@@ -77,6 +87,15 @@ export const tExtensionToFormValues = (extension?: TExtension): TFormValues => {
     destinationAwsAccessKey: destinationAwsAccessKey,
     destinationAwsAccessSecret: destinationAwsAccessSecret,
     destinationAwsArn: destinationAwsArn,
+    destinationGcfUrl: destinationGcfUrl,
+    includeOldResource:
+      extension?.additionalContext?.includeOldResource ?? false,
+    expansionPaths: extension?.expansionPaths ?? [],
+    dependencies: extension?.dependenciesRef?.map((ref) => ref.id) ?? [],
+    timeoutInMs:
+      extension?.timeoutInMs != null
+        ? String(extension.timeoutInMs)
+        : undefined,
   };
 };
 export const formValuesToTExtension = (
@@ -115,11 +134,29 @@ export const formValuesToTExtension = (
       accessSecret: formValues.destinationAwsAccessSecret || '',
       arn: formValues.destinationAwsArn || '',
     };
+  } else if (formValues.destinationName === 'GoogleCloudFunction') {
+    destination.GoogleCloudFunction = {
+      url: formValues.destinationGcfUrl || '',
+    };
   }
 
+  const timeout = formValues.timeoutInMs?.trim();
+  const expansionPaths = normalizeExpansionPaths(formValues.expansionPaths);
+  const dependencies = formValues.dependencies ?? [];
+  // Empty/false values are left out of the draft (the API defaults), and treated as "empty"
+  // by `calculateExtensionsUpdateActions`.
   return {
     key: formValues.key,
     destination: destination,
     triggers: formValues.triggers,
+    timeoutInMs: timeout ? Number(timeout) : undefined,
+    expansionPaths: expansionPaths.length > 0 ? expansionPaths : undefined,
+    dependencies:
+      dependencies.length > 0
+        ? dependencies.map((id) => ({ typeId: 'extension', id }))
+        : undefined,
+    additionalContext: formValues.includeOldResource
+      ? { includeOldResource: true }
+      : undefined,
   };
 };

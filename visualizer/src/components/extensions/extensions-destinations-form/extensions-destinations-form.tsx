@@ -5,6 +5,7 @@ import { TFormValues } from '../extensions-form/extensions-form';
 import ExtensionsDestinationsFormHttp from './extensions-destinations-form-http';
 import { useFormikContext } from 'formik';
 import ExtensionsDestinationsFormAws from './extensions-destinations-form-aws';
+import ExtensionsDestinationsFormGcf from './extensions-destinations-form-gcf';
 import messages from './messages';
 
 type Props = {
@@ -26,6 +27,9 @@ const ExtensionsDestinationsForm: FC<Props> = ({ isReadOnly }) => {
       break;
     case 'AWSLambda':
       toRender = <ExtensionsDestinationsFormAws isReadOnly={isReadOnly} />;
+      break;
+    case 'GoogleCloudFunction':
+      toRender = <ExtensionsDestinationsFormGcf isReadOnly={isReadOnly} />;
       break;
   }
   return <>{toRender}</>;

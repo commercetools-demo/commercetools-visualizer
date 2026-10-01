@@ -132,6 +132,7 @@ const ExtensionsEdit: FC<Props> = ({ linkToWelcome }) => {
       onSubmit={handleSubmit}
       dataLocale={dataLocale}
       version={extension.version}
+      extensionId={extension.id}
       refetch={refetch}
     >
       {(formProps) => (

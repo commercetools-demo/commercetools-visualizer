@@ -31,4 +31,12 @@ fragment ExtensionFragment on Extension {
     actions
     condition
   }
+  expansionPaths
+  additionalContext {
+    includeOldResource
+  }
+  dependenciesRef {
+    id
+    typeId
+  }
 }

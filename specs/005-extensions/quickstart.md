@@ -68,21 +68,34 @@ on **edit** only General Information is expanded.
 1. **General Information — Key** (required, shared key rule per ../README.md §6; immutable /
    read-only in edit).
 2. **Destination.**
-   - **Type** select: `HTTP` (default) | `AWSLambda`. **Immutable in edit** — render
-     read-only after creation. (`GoogleCloudFunction` exists in the schema but is **not**
-     offered; omit it.) Switching type in create mode need not clear the other type's fields —
+   - **Type** select: `HTTP` (default) | `AWSLambda` | `GoogleCloudFunction`. **Immutable in
+     edit** — the select is disabled (put `isDisabled` on `FormField.Root`, not on
+     `Select.Root`). Switching type in create mode need not clear the other type's fields —
      the draft conversion ignores irrelevant fields.
    - **HTTP fields:** **URL** (required). **Authentication** select: None |
      `AuthorizationHeader` (→ header value field) | `AzureFunctions` (→ key field). The
      conditional secret field is required only when its method is selected.
    - **AWS Lambda fields:** **ARN**, **Access key**, **Access secret** (all required).
+   - **Google Cloud Function field:** **URL** (required).
 3. **Triggers.** A matrix of resource type × action (`Create` / `Update`); resource types
-   per `data-model.md` (cart, order, payment, customer, quote-request, staged-quote, quote,
-   business-unit). Checking a box adds the action to that resource's `actions[]`, creating
-   the trigger entry if absent; unchecking removes the action, and removes the trigger entry
-   when its `actions[]` becomes empty. Each trigger's optional `condition` (JMESPath) is
-   round-tripped (read and written back) but has **no editor UI**.
-4. **Timeout** (`timeoutInMs`, optional integer). No client validation — server-enforced.
+   per `data-model.md` (all 12). Checking a box adds the action to that resource's
+   `actions[]`, creating the trigger entry if absent; unchecking removes the action, and
+   removes the trigger entry when its `actions[]` becomes empty. Toggling edits the trigger in
+   place, so its position and optional `condition` are kept. Each row also has an optional **Condition** (predicate syntax; enabled once an action
+   is selected). A resource type with **several** triggers is shown read-only with a note and
+   left untouched on save.
+4. **Expansion paths** (collapsed). Up to **3** free-text paths in add/remove rows (Add is
+   disabled at 3); blank rows dropped on save; duplicates rejected; saved with
+   `setExpansionPaths`.
+5. **Dependencies** (collapsed). Checkboxes for the project's other extensions (key, else id),
+   loaded with `FetchExtensionDependencyCandidates`. Disabled, with the reason shown: would
+   close a cycle, doesn't cover every trigger resource type/action, or the 5-dependency limit
+   is reached; the extension itself is never listed. A *selected* dependency that became
+   invalid is flagged and blocks saving. Saved with `setDependencies`.
+6. **Timeout** (`timeoutInMs`, optional) and **Include the previous resource state**
+   (`additionalContext.includeOldResource`) sit under the key, above the sections. Timeout:
+   text field, empty or a positive whole number, saved as a number; clearing sends
+   `setTimeoutInMs` without a value. The checkbox sends `setAdditionalContext`.
 
 **Save** is disabled while submitting, when pristine, or without Manage. On create: build the
 `ExtensionDraft`, call `CreateExtension`, show a created notification, navigate back to

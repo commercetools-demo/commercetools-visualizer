@@ -46,6 +46,11 @@ export default defineMessages({
     description: 'Label for the AWS Lambda access secret field',
     defaultMessage: 'AccessSecret',
   },
+  destinationGcfUrl: {
+    id: 'Extension.Destination.destinationGcfUrl',
+    description: 'destinationGcfUrl',
+    defaultMessage: 'URL of the Google Cloud Function',
+  },
   noMappingDefined: {
     id: 'Extension.Destination.noMappingDefined',
     description: 'Shown for destination types with no configuration UI',

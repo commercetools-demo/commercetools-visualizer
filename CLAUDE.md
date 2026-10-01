@@ -133,9 +133,17 @@ sync-actions-produced actions (removal must apply before any `changeEnumValueOrd
 since that action's `keys` must match the *current* value set). The remaining actions are
 then diffed against the field *with those removed values already filtered out*
 (`withoutRemovedEnumValues`), because sync-actions pairs enum values by position and would
-otherwise report every value after a removed one as a bogus `addEnumValue`. `calculateSubscriptionUpdateActions` has the
-same gap: sync-actions' subscription sync only knows setKey/setMessages/setChanges/
-changeDestination, so `setEvents` is diffed in `subscription-connectors.ts`. Before assuming a
+otherwise report every value after a removed one as a bogus `addEnumValue`.
+Subscriptions have the same kind of gap: sync-actions' subscription sync only knows
+setKey/setMessages/setChanges/changeDestination, so `setEvents` is diffed in
+`subscription-connectors.ts`. And `calculateExtensionsUpdateActions` only sees what its
+`convertTExtension*` helpers copy into the compared shape — a destination type or field they
+don't convert (as AWS Lambda and `timeoutInMs` once weren't) produces *no action at all*, so
+add new fields there and to the update-action spec. Extensions' dependencies, expansion paths
+and additional context are not known to sync-actions either and are diffed in
+`calculateExtraActions` (same file). Limits the API documents for such fields (max 5
+dependencies, no cycles, applicable to every trigger/action, max 3 expansion paths) live in
+`extensions-form/restrictions.ts` as pure, unit-tested functions. Before assuming a
 change will be picked up automatically, check the installed `sync-actions` version's
 source for the relevant `actionsMap*` function rather than just the target schema.
 

@@ -4,5 +4,6 @@ export {
   useExtensionDeleter,
   useExtensionUpdater,
   useExtensionCreator,
+  useExtensionDependencyCandidates,
   calculateExtensionsUpdateActions,
 } from './extensions-connectors';

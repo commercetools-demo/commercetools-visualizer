@@ -21,15 +21,26 @@ project). Data access goes through per-feature connector hooks
 - List, create, and edit commercetools [API Extensions](https://docs.commercetools.com/api/projects/api-extensions)
   (`src/components/extensions`), including key, destination and trigger configuration
   and timeout settings (`extensions-form/extensions-form.tsx`).
-- Destination editor branches on destination type: an HTTP destination (URL, with
-  Authorization-header or Azure Functions authentication) and an AWS Lambda destination
-  (ARN, access key/secret), each with its own form
-  (`extensions-destinations-form/extensions-destinations-form-http.tsx`,
-  `extensions-destinations-form-aws.tsx`).
-- Trigger builder lets you check which resource + action combinations invoke the
-  extension, across cart, order, payment, customer, quote-request, staged-quote,
-  quote, and business-unit resources, for Create and Update actions
-  (`extensions-triggers-form/extensions-triggers-form.tsx`).
+- Destination editor branches on destination type: HTTP (URL, with Authorization-header or
+  Azure Functions authentication), AWS Lambda (ARN, access key/secret) and Google Cloud
+  Function (URL), each with its own form
+  (`extensions-destinations-form/extensions-destinations-form-http.tsx`, `-aws.tsx`,
+  `-gcf.tsx`). The destination type is fixed after creation. Edits to any of the three are
+  saved as `changeDestination` (`use-extensions-connector/extensions-connectors.ts`).
+- Optional timeout (milliseconds) below the key, saved with `setTimeoutInMs`, and an
+  "include the previous resource state" option (`additionalContext.includeOldResource`).
+- Expansion paths (at most 3) and dependencies on other extensions (Extension Chaining), each
+  saved with its own update action. The documented restrictions are enforced in the UI
+  (`extensions-form/restrictions.ts`): max 5 dependencies, none circular, each triggered for
+  every resource type and action of the extension, at most 3 expansion paths.
+  `@commercetools/sync-actions` can't diff these, so the app does.
+- Trigger builder lets you check which resource + action combinations invoke the extension,
+  across all 12 `ExtensionResourceTypeId`s (cart, order, payment, payment-method, customer,
+  customer-group, quote-request, staged-quote, quote, business-unit, shopping-list, product),
+  for Create and Update actions (`extensions-triggers-form/extensions-triggers-form.tsx`);
+  the list is pinned to the API enum by a spec. Each trigger has an optional condition
+  (predicate syntax); toggling an action keeps a trigger's condition and position, and a
+  resource type with several triggers is shown read-only and left untouched.
 
 ## States
 

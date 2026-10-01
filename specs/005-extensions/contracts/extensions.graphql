@@ -7,8 +7,8 @@
 # Resource: Extension. Destination is the `ExtensionDestination` interface, implemented by
 # `HttpDestination`, `AWSLambdaDestination`, and `GoogleCloudFunctionDestination`. The HTTP
 # `authentication` field is the union `AuthorizationHeader` | `AzureFunctionsAuthentication`.
-# GoogleCloudFunctionDestination exists in the schema but is NOT offered in the UI (see spec
-# §4 / data-model "schema only"); it is intentionally omitted from the read selections below.
+# All three destination types are offered in the UI; the read selections below omit
+# GoogleCloudFunctionDestination for brevity (`... on GoogleCloudFunctionDestination { url }`).
 #
 # ---------------------------------------------------------------------------------------------
 # Update actions used by edit (see data-model "Update-action mapping"). Only changed fields
@@ -17,6 +17,11 @@
 #   changeDestination { destination }    — replace destination (ExtensionDestinationInput)
 #   changeTriggers    { triggers }       — replace the full triggers array (TriggerInput[])
 #   setTimeoutInMs    { timeoutInMs }    — set/clear timeout
+#   setAdditionalContext { additionalContext { includeOldResource } }
+#   setExpansionPaths { expansionPaths } — the full list (at most 3)
+#   setDependencies   { dependencies }   — the full list of ResourceIdentifierInput
+#                                          { typeId: "extension", id } (at most 5, acyclic)
+# The last three are not produced by @commercetools/sync-actions; the app diffs them itself.
 #
 # Example `actions:` payload (variables for UpdateExtension):
 #   "actions": [

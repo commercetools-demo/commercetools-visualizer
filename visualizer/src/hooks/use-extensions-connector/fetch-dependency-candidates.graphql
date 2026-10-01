@@ -1,0 +1,18 @@
+# Every other Extension of the project (a project has at most 25), with what is needed to
+# pick dependencies: which triggers it has (applicability) and what it depends on (cycles).
+query FetchExtensionDependencyCandidates {
+  extensions(limit: 100) {
+    results {
+      id
+      key
+      triggers {
+        resourceTypeId
+        actions
+      }
+      dependenciesRef {
+        id
+        typeId
+      }
+    }
+  }
+}

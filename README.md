@@ -17,41 +17,41 @@ The commercetools Visualizer is pre-packaged to run as a connect application. Fo
 
 ### Home Screen
 
-![Homescreen.jpg](./visualizer/docs/Homescreen.jpg)
+![Homescreen.png](./visualizer/docs/Homescreen.png)
 
 ### API Extensions
 
 List View
-![Extensions-List.jpg](./visualizer/docs/Extensions-List.jpg)
+![Extensions-List.png](./visualizer/docs/Extensions-List.png)
 New View
-![Extensions-New.jpg](./visualizer/docs/Extensions-New.jpg)
+![Extensions-New.png](./visualizer/docs/Extensions-New.png)
 
 ### States
 
 List View
-![States-List.jpg](./visualizer/docs/States-List.jpg)
+![States-List.png](./visualizer/docs/States-List.png)
 Detail View
-![States-Details.jpg](./visualizer/docs/States-Details.jpg)
+![States-Details.png](./visualizer/docs/States-Details.png)
 New View
-![States-New.jpg](./visualizer/docs/States-New.jpg)
+![States-New.png](./visualizer/docs/States-New.png)
 
 ### Subscriptions
 
 List View
-![Subscriptions-List.jpg](./visualizer/docs/Subscriptions-List.jpg)
+![Subscriptions-List.png](./visualizer/docs/Subscriptions-List.png)
 Detail View
-![Subscriptions-Details.jpg](./visualizer/docs/Subscriptions-Details.jpg)
+![Subscriptions-Details.png](./visualizer/docs/Subscriptions-Details.png)
 New View
-![Subscriptions-New.jpg](./visualizer/docs/Subscriptions-New.jpg)
+![Subscriptions-New.png](./visualizer/docs/Subscriptions-New.png)
 
 ### Types
 
 List View
-![Types-List.jpg](./visualizer/docs/Types-List.jpg)
+![Types-List.png](./visualizer/docs/Types-List.png)
 Detail View
-![Types-Details.jpg](./visualizer/docs/Types-Details.jpg)
+![Types-Details.png](./visualizer/docs/Types-Details.png)
 New View
-![Types-New.jpg](./visualizer/docs/Types-New.jpg)
+![Types-New.png](./visualizer/docs/Types-New.png)
 
 ### Custom Objects
 
@@ -94,4 +94,4 @@ npm run typecheck   # tsc --noEmit
 npm run lint
 ```
 
-The docs screenshots can be regenerated with the Playwright scripts in [visualizer/scripts/screenshots](./visualizer/scripts/screenshots).
+The docs screenshots can be regenerated with Cypress (`npm run cypress:screenshots` in `visualizer/`, with the dev server running and `CYPRESS_LOGIN_USER`/`CYPRESS_LOGIN_PASSWORD` set in `.env.local`).

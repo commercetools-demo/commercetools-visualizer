@@ -11,3 +11,8 @@ coverage
 .idea
 build/
 public/
+
+# Cypress output
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/

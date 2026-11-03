@@ -212,13 +212,25 @@ before assuming a cross-cutting behavior is a one-off.
 - Nimbus injects a theme-bootstrapping `<script>` into the render container, so assert on
   text via `screen`, not `container.textContent`.
 
-### Docs screenshots
+### Cypress (E2E + screenshots)
 
-`visualizer/scripts/screenshots/` (its own npm project, Playwright) regenerates
-`visualizer/docs/*` used by the README. `npm run login` (headed, manual MC login) saves a
-gitignored `auth-state.json`; `npm run capture` then needs the dev server on port 3001 and
-real data in the target project. `capture.mjs` launches Chromium with
-`--disable-features=ViewTransition,ViewTransitionOnNavigation` — without it the app's
-startup View Transition stalls frame production and every `page.screenshot()` times out.
-`~/.commercetools/mc-credentials.json` (an API token used for codegen) is unrelated to
-`auth-state.json` (a browser session) and cannot replace it.
+`visualizer/cypress/` + `cypress.config.ts` follow commercetools' recommended E2E setup
+(`@commercetools-frontend/cypress` `cy.loginToMerchantCenter`, `@testing-library/cypress`).
+Run from `visualizer/` with the dev server up (`npm start`, port 3001): `npm run cypress:open`,
+`npm run cypress:run`, or `npm run cypress:screenshots` (only `cypress/e2e/screenshots.cy.ts`).
+This is the **only** way the README screenshots (`visualizer/docs/*.png`) are produced: the
+`after:screenshot` hook in `cypress.config.ts` moves each PNG into `docs/` (it must `rename`
+the file itself, returning a new path alone doesn't move it). Each shot first waits for
+page-specific content (a bare "no spinner" wait captured blank pages), so the spec fails
+rather than photographing an empty page; it needs real data in each area except Extensions
+(the list screenshot is taken even when empty). Electron is sized 1440x900 so nothing is
+cropped; output is 2x retina on a Mac.
+Credentials: `CYPRESS_LOGIN_USER` and `CYPRESS_LOGIN_PASSWORD` are blank
+placeholders in the tracked `.env`; real values go in gitignored `.env.local`
+(`cypress.config.ts` loads `.env.local`, then `.env`, never overriding real env vars; the
+project key is `INITIAL_PROJECT_KEY`, there is no Cypress-specific one). Optional `CYPRESS_CUSTOM_OBJECTS_CONTAINER`
+(default `page-editor`). `cypress` is pinned to `^15`: v16 removed `Cypress.env()`, which the
+commercetools login command still calls. The config adds the
+`--disable-features=ViewTransition,ViewTransitionOnNavigation` Chromium flag: without it the
+app's startup View Transition stalls frame production and screenshots time out. Install with `--ignore-scripts`/`npx cypress install` behind
+Zscaler: set `NODE_EXTRA_CA_CERTS="$HOME/zscaler-ca.pem"`. CI does not run Cypress.
